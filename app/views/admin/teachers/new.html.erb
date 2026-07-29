@@ -1,0 +1,3 @@
+<%= render "shared/page_header", title: t("teachers.new.title"), description: t("teachers.new.description") %>
+<%= render "shared/teacher_profiles/form", profile: @profile, user: @user,
+           eligible_users: @eligible_teacher_users, admin_mode: true %>

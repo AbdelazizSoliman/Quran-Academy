@@ -1,0 +1,122 @@
+<%= render "shared/teacher_profiles/errors", profile: %>
+<% form_url = admin_mode ? (profile.persisted? ? admin_teacher_path(profile) : admin_teachers_path) : teacher_profile_path %>
+<%= form_with model: profile, url: form_url, class: "mt-5 space-y-6", data: { component: "teacher-profile-form" } do |form| %>
+  <% if admin_mode && profile.new_record? %>
+    <fieldset class="ds-card p-5">
+      <legend class="ds-section-title"><%= t("teacher_profiles.sections.account") %></legend>
+      <% if user %>
+        <%= form.hidden_field :user_id, value: user.id %>
+        <p class="mt-3 font-semibold"><%= user.full_name %> · <span dir="ltr"><%= user.email %></span></p>
+      <% else %>
+        <%= form.label :user_id, t("teacher_profiles.fields.user"), class: "ds-label mt-3" %>
+        <%= form.select :user_id, eligible_users.map { |candidate| ["#{candidate.full_name} — #{candidate.email}", candidate.id] },
+                        { include_blank: t("teacher_profiles.form.select_teacher") }, class: "ds-control mt-2" %>
+      <% end %>
+    </fieldset>
+  <% end %>
+
+  <% identity_fields = %i[display_name gender date_of_birth nationality country_of_residence city phone_number whatsapp_number] %>
+  <fieldset class="ds-card p-5">
+    <legend class="ds-section-title"><%= t("teacher_profiles.sections.identity") %></legend>
+    <div class="mt-4 grid gap-5 sm:grid-cols-2">
+      <% identity_fields.each do |field| %>
+        <div>
+          <%= form.label field, t("teacher_profiles.fields.#{field}"), class: "ds-label" %>
+          <% if field == :gender %>
+            <%= form.select field, TeacherProfile::GENDERS.map { |value| [t("teacher_profiles.catalogs.genders.#{value}"), value] }, {}, class: "ds-control mt-2" %>
+          <% else %>
+            <%= form.public_send(field == :date_of_birth ? :date_field : (field.in?(%i[phone_number whatsapp_number]) ? :telephone_field : :text_field),
+                                 field, class: "ds-control mt-2", aria: { invalid: profile.errors[field].any? }) %>
+          <% end %>
+        </div>
+      <% end %>
+      <div class="sm:col-span-2">
+        <%= form.label :bio, t("teacher_profiles.fields.bio"), class: "ds-label" %>
+        <%= form.text_area :bio, class: "ds-control mt-2", rows: 4 %>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="ds-card p-5">
+    <legend class="ds-section-title"><%= t("teacher_profiles.sections.qualifications") %></legend>
+    <div class="mt-4 grid gap-5 sm:grid-cols-2">
+      <% %i[highest_qualification tajweed_qualification].each do |field| %>
+        <div><%= form.label field, t("teacher_profiles.fields.#{field}"), class: "ds-label" %><%= form.text_field field, class: "ds-control mt-2" %></div>
+      <% end %>
+      <% %i[years_of_teaching_experience quran_teaching_experience_years].each do |field| %>
+        <div><%= form.label field, t("teacher_profiles.fields.#{field}"), class: "ds-label" %><%= form.number_field field, min: 0, max: 100, class: "ds-control mt-2" %></div>
+      <% end %>
+      <div>
+        <%= form.label :ijazah_status, t("teacher_profiles.fields.ijazah_status"), class: "ds-label" %>
+        <%= form.select :ijazah_status, TeacherProfile::IJAZAH_STATUSES.map { |value| [t("teacher_profiles.catalogs.ijazah_statuses.#{value}"), value] }, {}, class: "ds-control mt-2" %>
+      </div>
+      <% %i[qualification_details ijazah_details].each do |field| %>
+        <div class="sm:col-span-2"><%= form.label field, t("teacher_profiles.fields.#{field}"), class: "ds-label" %><%= form.text_area field, rows: 3, class: "ds-control mt-2" %></div>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <fieldset class="ds-card p-5">
+    <legend class="ds-section-title"><%= t("teacher_profiles.sections.capabilities") %></legend>
+    <% catalogs = {
+      teaching_languages: [AcademySetting.current_or_nil&.teaching_languages || [], :teaching_languages],
+      student_age_groups: [TeacherProfile::AGE_GROUPS, :age_groups],
+      teaching_specializations: [TeacherProfile::SPECIALIZATIONS, :specializations]
+    } %>
+    <div class="mt-4 grid gap-6 lg:grid-cols-3">
+      <% catalogs.each do |field, (values, scope)| %>
+        <fieldset>
+          <legend class="ds-label"><%= t("teacher_profiles.fields.#{field}") %></legend>
+          <%= hidden_field_tag "teacher_profile[#{field}][]", "" %>
+          <div class="mt-3 space-y-2">
+            <% values.each do |value| %>
+              <label class="flex min-h-11 items-center gap-3 rounded-xl border border-app-border px-3 py-2">
+                <%= check_box_tag "teacher_profile[#{field}][]", value, profile.public_send(field).include?(value), class: "size-4 rounded border-app-border text-app-primary focus:ring-app-focus" %>
+                <span class="text-sm"><%= t("teacher_profiles.catalogs.#{scope}.#{value}") %></span>
+              </label>
+            <% end %>
+          </div>
+        </fieldset>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <fieldset class="ds-card p-5">
+    <legend class="ds-section-title"><%= t("teacher_profiles.sections.emergency") %></legend>
+    <div class="mt-4 grid gap-5 sm:grid-cols-2">
+      <% %i[emergency_contact_name emergency_contact_phone].each do |field| %>
+        <div><%= form.label field, t("teacher_profiles.fields.#{field}"), class: "ds-label" %><%= form.text_field field, class: "ds-control mt-2" %></div>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <% if admin_mode %>
+    <fieldset class="ds-card p-5">
+      <legend class="ds-section-title"><%= t("teacher_profiles.sections.employment") %></legend>
+      <div class="mt-4 grid gap-5 sm:grid-cols-2">
+        <% { employment_status: TeacherProfile::EMPLOYMENT_STATUSES, engagement_type: TeacherProfile::ENGAGEMENT_TYPES }.each do |field, values| %>
+          <div><%= form.label field, t("teacher_profiles.fields.#{field}"), class: "ds-label" %><%= form.select field, values.map { |value| [t("teacher_profiles.catalogs.#{field.to_s.pluralize}.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+        <% end %>
+        <% %i[joined_on left_on].each do |field| %>
+          <div><%= form.label field, t("teacher_profiles.fields.#{field}"), class: "ds-label" %><%= form.date_field field, class: "ds-control mt-2" %></div>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <fieldset class="ds-card p-5">
+      <legend class="ds-section-title"><%= t("teacher_profiles.sections.compensation") %></legend>
+      <p class="mt-2 ds-caption"><%= t("teacher_profiles.form.compensation_hint") %></p>
+      <div class="mt-4 grid gap-5 sm:grid-cols-3">
+        <div><%= form.label :default_lesson_rate, t("teacher_profiles.fields.default_lesson_rate"), class: "ds-label" %><%= form.number_field :default_lesson_rate, min: 0, step: "0.01", class: "ds-control mt-2" %></div>
+        <div><%= form.label :compensation_currency, t("teacher_profiles.fields.compensation_currency"), class: "ds-label" %><%= form.text_field :compensation_currency, maxlength: 3, class: "ds-control mt-2", dir: "ltr" %></div>
+        <div><%= form.label :compensation_unit, t("teacher_profiles.fields.compensation_unit"), class: "ds-label" %><%= form.select :compensation_unit, TeacherProfile::COMPENSATION_UNITS.map { |value| [t("teacher_profiles.catalogs.compensation_units.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+      </div>
+      <div class="mt-5"><%= form.label :internal_notes, t("teacher_profiles.fields.internal_notes"), class: "ds-label" %><%= form.text_area :internal_notes, rows: 4, class: "ds-control mt-2" %></div>
+    </fieldset>
+  <% end %>
+
+  <div class="sticky bottom-3 flex flex-wrap justify-end gap-3 rounded-xl border border-app-border bg-app-surface/95 p-4 shadow-lg">
+    <%= render "shared/components/button", label: t("actions.cancel"), href: admin_mode ? admin_teachers_path : teacher_profile_path, variant: :secondary %>
+    <%= render "shared/components/button", label: t("actions.save"), type: "submit" %>
+  </div>
+<% end %>

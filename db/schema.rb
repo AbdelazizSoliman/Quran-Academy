@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,6 +91,73 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_220000) do
     t.check_constraint "singleton_key::text = 'current'::text", name: "academy_settings_singleton"
   end
 
+  create_table "teacher_profile_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "teacher_profile_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_teacher_profile_events_on_actor_id"
+    t.index ["event_type"], name: "index_teacher_profile_events_on_event_type"
+    t.index ["teacher_profile_id", "created_at"], name: "idx_on_teacher_profile_id_created_at_258e33ce7c"
+    t.index ["teacher_profile_id"], name: "index_teacher_profile_events_on_teacher_profile_id"
+  end
+
+  create_table "teacher_profiles", force: :cascade do |t|
+    t.text "bio"
+    t.string "city"
+    t.string "compensation_currency", default: "EGP", null: false
+    t.string "compensation_unit", default: "per_lesson", null: false
+    t.string "country_of_residence"
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.date "date_of_birth"
+    t.decimal "default_lesson_rate", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "display_name"
+    t.string "emergency_contact_name"
+    t.string "emergency_contact_phone"
+    t.string "employment_status", default: "candidate", null: false
+    t.string "engagement_type", default: "contractor", null: false
+    t.string "gender", default: "unspecified", null: false
+    t.string "highest_qualification"
+    t.text "ijazah_details"
+    t.string "ijazah_status", default: "none", null: false
+    t.text "internal_notes"
+    t.date "joined_on"
+    t.date "left_on"
+    t.string "nationality"
+    t.string "phone_number"
+    t.string "profile_status", default: "draft", null: false
+    t.string "public_id", null: false
+    t.text "qualification_details"
+    t.integer "quran_teaching_experience_years", default: 0, null: false
+    t.string "student_age_groups", default: [], null: false, array: true
+    t.string "tajweed_qualification"
+    t.string "teaching_languages", default: [], null: false, array: true
+    t.string "teaching_specializations", default: [], null: false, array: true
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.bigint "user_id", null: false
+    t.string "whatsapp_number"
+    t.integer "years_of_teaching_experience", default: 0, null: false
+    t.index ["created_by_id"], name: "index_teacher_profiles_on_created_by_id"
+    t.index ["employment_status"], name: "index_teacher_profiles_on_employment_status"
+    t.index ["engagement_type"], name: "index_teacher_profiles_on_engagement_type"
+    t.index ["joined_on"], name: "index_teacher_profiles_on_joined_on"
+    t.index ["profile_status"], name: "index_teacher_profiles_on_profile_status"
+    t.index ["public_id"], name: "index_teacher_profiles_on_public_id", unique: true
+    t.index ["student_age_groups"], name: "index_teacher_profiles_on_student_age_groups", using: :gin
+    t.index ["teaching_languages"], name: "index_teacher_profiles_on_teaching_languages", using: :gin
+    t.index ["teaching_specializations"], name: "index_teacher_profiles_on_teaching_specializations", using: :gin
+    t.index ["updated_by_id"], name: "index_teacher_profiles_on_updated_by_id"
+    t.index ["user_id"], name: "index_teacher_profiles_on_user_id", unique: true
+    t.check_constraint "default_lesson_rate >= 0::numeric", name: "teacher_profiles_rate_nonnegative"
+    t.check_constraint "left_on IS NULL OR joined_on IS NULL OR left_on >= joined_on", name: "teacher_profiles_date_order"
+    t.check_constraint "quran_teaching_experience_years >= 0", name: "teacher_profiles_quran_experience_nonnegative"
+    t.check_constraint "years_of_teaching_experience >= 0", name: "teacher_profiles_experience_nonnegative"
+  end
+
   create_table "user_account_events", force: :cascade do |t|
     t.bigint "actor_id", null: false
     t.datetime "created_at", null: false
@@ -140,6 +207,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_220000) do
   add_foreign_key "academy_setting_events", "academy_settings", on_delete: :restrict
   add_foreign_key "academy_setting_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "academy_settings", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "teacher_profile_events", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "teacher_profile_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "teacher_profiles", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "teacher_profiles", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "teacher_profiles", "users", on_delete: :restrict
   add_foreign_key "user_account_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "user_account_events", "users", column: "target_user_id", on_delete: :restrict
   add_foreign_key "users", "users", column: "approved_by_id", on_delete: :nullify

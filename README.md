@@ -126,6 +126,38 @@ containing only changed safe fields. No-op and failed updates create no event. M
 academy switching, provider secrets, and all academy business modules remain intentionally
 out of scope.
 
+## Teacher profiles
+
+Teacher-specific professional information lives in `TeacherProfile`, a one-to-one extension
+of a teacher-role `User`. Authentication identity therefore remains separate from teaching
+qualifications, capabilities, contact information, and operational defaults. Administrators
+initialize profiles explicitly; assigning the teacher role alone does not create one.
+
+Each profile receives an immutable, server-generated public identifier such as
+`TCH-7H3PK9M2QX`, protected by a unique database index. Account status, employment status (`candidate`, `active`, `on_leave`,
+`inactive`, `departed`), and profile status (`draft`, `complete`, `verified`, `archived`) are
+distinct. Archived profiles and their audit history are retained and can be restored; the UI
+provides no hard-delete action. A teacher with a profile cannot be moved to another user role
+until the profile lifecycle is deliberately resolved.
+
+Teaching languages use stable codes constrained by the academy configuration. Student age
+groups and teaching specializations use controlled, extensible catalogs. Compensation rate,
+currency, and unit are future defaults only—no payroll calculation, payment, invoice, or
+financial transaction is implemented. New profiles copy the current academy defaults;
+existing stored profile values do not change when academy defaults later change.
+
+Active administrators manage profiles, lifecycle actions, compensation, internal notes, and
+audit history under `/admin/teachers`. Active teachers can view their own profile and edit a
+restricted set of personal and professional fields under `/teacher/profile`. Compensation,
+internal notes, employment, verification, ownership, and public IDs are excluded from that
+self-service boundary. Teachers without a profile receive a safe onboarding state.
+
+`TeacherProfileEvent` records transactional creation, meaningful updates, self-service
+changes, verification, archival, and restoration with recursively validated safe
+before/after metadata. Schedules, recurring availability, lessons, attendance, student
+assignments, payroll entries, payments, public directories, uploads, and performance reports
+remain out of scope.
+
 ## Technology stack
 
 - Ruby 3.4.6

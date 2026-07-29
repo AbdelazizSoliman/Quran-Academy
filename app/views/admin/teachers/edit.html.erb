@@ -1,0 +1,5 @@
+<%= render "shared/page_header", title: t("teachers.edit.title"),
+           description: @profile.public_id,
+           secondary_action: render("shared/components/button", label: t("actions.view"), href: admin_teacher_path(@profile), variant: :secondary) %>
+<%= render "shared/teacher_profiles/form", profile: @profile, user: @profile.user,
+           eligible_users: [], admin_mode: true %>

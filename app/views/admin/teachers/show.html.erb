@@ -1,0 +1,81 @@
+<% edit_action = render("shared/components/button", label: t("actions.edit"), href: edit_admin_teacher_path(@profile), icon: :settings) %>
+<%= render "shared/page_header",
+           title: @profile.display_name.presence || @profile.user.full_name,
+           description: @profile.public_id,
+           badge: teacher_profile_status_badge(@profile),
+           secondary_action: render("shared/components/button", label: t("teachers.actions.back"), href: admin_teachers_path, variant: :ghost),
+           primary_action: edit_action %>
+<%= render "shared/teacher_profiles/errors", profile: @profile %>
+
+<div class="mb-6 grid gap-4 sm:grid-cols-3">
+  <% { completion: "#{@profile.completion_percentage}%", employment_status: teacher_employment_badge(@profile), user_status: user_status_badge(@profile.user) }.each do |field, value| %>
+    <div class="ds-card p-5"><p class="ds-caption"><%= t("teacher_profiles.fields.#{field}") %></p><div class="mt-2 text-lg font-bold"><%= value %></div></div>
+  <% end %>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-2">
+  <% account = capture do %><dl class="grid gap-4 sm:grid-cols-2">
+    <div><dt class="ds-caption"><%= t("teacher_profiles.fields.user") %></dt><dd class="mt-1 font-semibold"><%= link_to @profile.user.full_name, admin_user_path(@profile.user), class: "text-app-primary hover:underline" %></dd></div>
+    <div><dt class="ds-caption"><%= t("admin.users.fields.email") %></dt><dd class="mt-1" dir="ltr"><%= @profile.user.email %></dd></div>
+    <div><dt class="ds-caption"><%= t("teacher_profiles.fields.engagement_type") %></dt><dd class="mt-1"><%= teacher_catalog_badge(:engagement_types, @profile.engagement_type) %></dd></div>
+    <div><dt class="ds-caption"><%= t("teacher_profiles.fields.joined_on") %></dt><dd class="mt-1"><%= teacher_value(@profile.joined_on) %></dd></div>
+  </dl><% end %>
+  <%= render "shared/components/card", title: t("teacher_profiles.sections.account"), body: account %>
+
+  <% completeness = capture do %>
+    <progress class="h-3 w-full accent-app-primary" value="<%= @profile.completion_percentage %>" max="100"><%= @profile.completion_percentage %>%</progress>
+    <p class="mt-3 font-semibold"><%= t("teacher_profiles.completeness.value", value: @profile.completion_percentage) %></p>
+    <% if @profile.missing_required_fields.any? %><p class="mt-2 ds-caption"><%= t("teacher_profiles.completeness.missing", fields: @profile.missing_required_fields.map { |field| t("teacher_profiles.fields.#{field}") }.to_sentence) %></p><% end %>
+  <% end %>
+  <%= render "shared/components/card", title: t("teacher_profiles.sections.completeness"), body: completeness %>
+
+  <% identity = capture do %><dl class="grid gap-4 sm:grid-cols-2">
+    <% %i[display_name gender date_of_birth nationality country_of_residence city phone_number whatsapp_number bio].each do |field| %>
+      <div class="<%= "sm:col-span-2" if field == :bio %>"><dt class="ds-caption"><%= t("teacher_profiles.fields.#{field}") %></dt><dd class="mt-1 whitespace-pre-line"><%= field == :gender ? teacher_catalog_badge(:genders, @profile.gender) : teacher_value(@profile.public_send(field)) %></dd></div>
+    <% end %>
+  </dl><% end %>
+  <%= render "shared/components/card", title: t("teacher_profiles.sections.identity"), body: identity %>
+
+  <% qualifications = capture do %><dl class="grid gap-4 sm:grid-cols-2">
+    <% %i[highest_qualification qualification_details years_of_teaching_experience quran_teaching_experience_years tajweed_qualification ijazah_status ijazah_details].each do |field| %>
+      <div><dt class="ds-caption"><%= t("teacher_profiles.fields.#{field}") %></dt><dd class="mt-1"><%= field == :ijazah_status ? teacher_catalog_badge(:ijazah_statuses, @profile.ijazah_status) : teacher_value(@profile.public_send(field)) %></dd></div>
+    <% end %>
+  </dl><% end %>
+  <%= render "shared/components/card", title: t("teacher_profiles.sections.qualifications"), body: qualifications %>
+
+  <% capabilities = capture do %><dl class="space-y-4">
+    <% { teaching_languages: :teaching_languages, teaching_specializations: :specializations, student_age_groups: :age_groups }.each do |field, scope| %>
+      <div><dt class="ds-caption"><%= t("teacher_profiles.fields.#{field}") %></dt><dd class="mt-2 flex flex-wrap gap-2"><%= teacher_collection(@profile, field, scope) %></dd></div>
+    <% end %>
+  </dl><% end %>
+  <%= render "shared/components/card", title: t("teacher_profiles.sections.capabilities"), body: capabilities %>
+
+  <% admin_only = capture do %><dl class="grid gap-4 sm:grid-cols-2">
+    <% %i[default_lesson_rate compensation_currency compensation_unit internal_notes emergency_contact_name emergency_contact_phone left_on].each do |field| %>
+      <div><dt class="ds-caption"><%= t("teacher_profiles.fields.#{field}") %></dt><dd class="mt-1 whitespace-pre-line"><%= field == :compensation_unit ? teacher_catalog_badge(:compensation_units, @profile.compensation_unit) : teacher_value(@profile.public_send(field)) %></dd></div>
+    <% end %>
+  </dl><% end %>
+  <%= render "shared/components/card", title: t("teacher_profiles.sections.administration"), body: admin_only %>
+</div>
+
+<div class="mt-6">
+  <% actions = capture do %><div class="flex flex-wrap gap-3">
+    <% actions = @profile.archived? ? %i[restore] : %i[verify archive] %>
+    <% actions.each do |action| %>
+      <% body = capture { tag.p(t("teachers.confirmations.#{action}", name: @profile.display_name.presence || @profile.user.full_name)) } %>
+      <% primary = button_to t("teachers.actions.#{action}"), public_send("#{action}_admin_teacher_path", @profile), method: :patch, class: button_classes(variant: action == :archive ? :danger : :primary) %>
+      <%= render "shared/components/modal", open_label: t("teachers.actions.#{action}"),
+                 open_variant: action == :archive ? :danger : :secondary, title: t("teachers.confirmations.title"),
+                 description: @profile.public_id, body:, primary_action: primary %>
+    <% end %>
+  </div><% end %>
+  <%= render "shared/components/card", title: t("teachers.show.actions"), body: actions %>
+</div>
+
+<div class="mt-6">
+  <% history = capture do %>
+    <% if @events.any? %><ol class="divide-y divide-app-border"><% @events.each do |event| %><li class="py-3"><p class="font-semibold"><%= teacher_event_description(event) %></p><p class="mt-1 ds-caption"><%= localized_datetime(event.created_at) %></p></li><% end %></ol>
+    <% else %><%= render "shared/components/empty_state", icon: :reports, title: t("teacher_profiles.audit.empty"), description: t("teacher_profiles.audit.empty_description") %><% end %>
+  <% end %>
+  <%= render "shared/components/card", title: t("teacher_profiles.sections.audit"), body: history %>
+</div>

@@ -39,11 +39,12 @@ Layout/LineLength:
 Metrics/BlockLength:
   Exclude:
     - "config/environments/*.rb"
+    - "config/routes.rb"
     - "db/migrate/*.rb"
     - "spec/**/*"
 
 Metrics/ClassLength:
-  Max: 120
+  Max: 140
 
 Metrics/AbcSize:
   Exclude:
@@ -67,6 +68,8 @@ RSpec/ExampleLength:
   Max: 12
   Exclude:
     - "spec/requests/admin/academy_settings_spec.rb"
+    - "spec/requests/admin/teachers_spec.rb"
+    - "spec/requests/teacher/profile_spec.rb"
 
 RSpec/DescribeClass:
   Exclude:

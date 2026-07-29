@@ -1,0 +1,6 @@
+<% if profile.errors.any? %>
+  <%= render "shared/components/alert",
+             variant: :error,
+             title: t("teacher_profiles.form.errors_title"),
+             message: profile.errors.full_messages.to_sentence %>
+<% end %>

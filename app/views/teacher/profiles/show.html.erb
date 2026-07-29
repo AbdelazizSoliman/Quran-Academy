@@ -1,0 +1,31 @@
+<% if @profile %>
+  <% edit_action = render("shared/components/button", label: t("actions.edit"), href: edit_teacher_profile_path, icon: :settings) %>
+  <%= render "shared/page_header", title: t("teacher.profile.show.title"), description: @profile.public_id,
+             badge: teacher_profile_status_badge(@profile), primary_action: edit_action %>
+  <div class="mb-6 ds-card p-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div><p class="ds-caption"><%= t("teacher_profiles.fields.completion") %></p><p class="mt-1 text-2xl font-bold"><%= @profile.completion_percentage %>%</p></div>
+      <div><%= teacher_employment_badge(@profile) %></div>
+    </div>
+    <progress class="mt-4 h-3 w-full accent-app-primary" value="<%= @profile.completion_percentage %>" max="100"><%= @profile.completion_percentage %>%</progress>
+    <% if @profile.missing_required_fields.any? %><p class="mt-3 ds-caption"><%= t("teacher_profiles.completeness.missing", fields: @profile.missing_required_fields.map { |field| t("teacher_profiles.fields.#{field}") }.to_sentence) %></p><% end %>
+  </div>
+  <div class="grid gap-6 lg:grid-cols-2">
+    <% summary = capture do %><dl class="grid gap-4 sm:grid-cols-2">
+      <% %i[display_name gender nationality country_of_residence city phone_number whatsapp_number bio joined_on].each do |field| %>
+        <div class="<%= "sm:col-span-2" if field == :bio %>"><dt class="ds-caption"><%= t("teacher_profiles.fields.#{field}") %></dt><dd class="mt-1 whitespace-pre-line"><%= field == :gender ? teacher_catalog_badge(:genders, @profile.gender) : teacher_value(@profile.public_send(field)) %></dd></div>
+      <% end %>
+    </dl><% end %>
+    <%= render "shared/components/card", title: t("teacher_profiles.sections.identity"), body: summary %>
+    <% professional = capture do %><dl class="grid gap-4 sm:grid-cols-2">
+      <% %i[highest_qualification qualification_details years_of_teaching_experience quran_teaching_experience_years tajweed_qualification ijazah_status ijazah_details].each do |field| %>
+        <div><dt class="ds-caption"><%= t("teacher_profiles.fields.#{field}") %></dt><dd class="mt-1"><%= field == :ijazah_status ? teacher_catalog_badge(:ijazah_statuses, @profile.ijazah_status) : teacher_value(@profile.public_send(field)) %></dd></div>
+      <% end %>
+    </dl><% end %>
+    <%= render "shared/components/card", title: t("teacher_profiles.sections.qualifications"), body: professional %>
+    <% capabilities = capture do %><dl class="space-y-4"><% { teaching_languages: :teaching_languages, teaching_specializations: :specializations, student_age_groups: :age_groups }.each do |field, scope| %><div><dt class="ds-caption"><%= t("teacher_profiles.fields.#{field}") %></dt><dd class="mt-2 flex flex-wrap gap-2"><%= teacher_collection(@profile, field, scope) %></dd></div><% end %></dl><% end %>
+    <%= render "shared/components/card", title: t("teacher_profiles.sections.capabilities"), body: capabilities %>
+  </div>
+<% else %>
+  <%= render template: "teacher/profiles/missing" %>
+<% end %>

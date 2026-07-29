@@ -5,6 +5,13 @@ Rails.application.routes.draw do
              skip: :registrations
   namespace :admin do
     resource :settings, only: %i[show edit update], controller: :academy_settings
+    resources :teachers, except: :destroy do
+      member do
+        patch :verify
+        patch :archive
+        patch :restore
+      end
+    end
     resources :users, except: :destroy do
       member do
         patch :approve
@@ -16,6 +23,9 @@ Rails.application.routes.draw do
         patch :reset_password, action: :update_password
       end
     end
+  end
+  namespace :teacher do
+    resource :profile, only: %i[show edit update], controller: :profiles
   end
   root "dashboard#index"
   constraints LocalEnvironmentConstraint.new do
