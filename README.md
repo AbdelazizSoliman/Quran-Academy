@@ -46,6 +46,30 @@ http://localhost:3000/ui
 
 Use `/ui?locale=en` to inspect the English LTR version. The route is intentionally absent in production. Business modules remain intentionally unimplemented at this stage.
 
+## Authentication and accounts
+
+Authentication uses Devise with `database_authenticatable`, `recoverable`, `rememberable`, `validatable`, `trackable`, and `timeoutable`. Sessions expire after 45 minutes of inactivity. Public registration, profile editing, account cancellation, third-party authentication, and email confirmation are not enabled.
+
+The initial roles are `admin`, `staff`, `teacher`, and `student`. Account statuses are `pending`, `active`, `suspended`, and `disabled`; only active accounts may sign in. These roles currently control navigation presentation only. Resource permissions and authorization policies are intentionally deferred.
+
+Each account stores a preferred locale and ActiveSupport-compatible time zone. Student accounts default to English, other roles default to Arabic, and all accounts default to Cairo time unless explicitly configured. Locale and time zone are safely scoped to each authenticated request.
+
+Create the first administrator using environment variables:
+
+```bash
+ADMIN_EMAIL=admin@example.test \
+ADMIN_PASSWORD='use-a-secure-value' \
+ADMIN_FIRST_NAME=Foundation \
+ADMIN_LAST_NAME=Administrator \
+bin/rails users:create_admin
+```
+
+The task creates an active Arabic administrator in the Cairo time zone, refuses to modify an existing email, and never prints the password. Do not store bootstrap credentials in source control.
+
+Password-reset delivery is provider-neutral. Reset URLs use `APP_HOST`, optional `APP_PORT`, and `DEFAULT_URL_OPTIONS_PROTOCOL`; production must supply the correct public host and protocol before email delivery is enabled. `MAILER_SENDER` controls the sender address.
+
+Academy business modules and user-administration screens remain intentionally out of scope.
+
 ## Technology stack
 
 - Ruby 3.4.6

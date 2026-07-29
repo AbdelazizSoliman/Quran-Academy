@@ -41,8 +41,20 @@ Metrics/BlockLength:
     - "config/environments/*.rb"
     - "spec/**/*"
 
+Metrics/AbcSize:
+  Exclude:
+    - "db/migrate/*.rb"
+
+Metrics/MethodLength:
+  Exclude:
+    - "db/migrate/*.rb"
+
 RSpec/MultipleExpectations:
   Max: 8
 
 RSpec/ExampleLength:
   Max: 10
+
+RSpec/DescribeClass:
+  Exclude:
+    - "spec/tasks/**/*"

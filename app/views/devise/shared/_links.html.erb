@@ -1,0 +1,8 @@
+<div class="mt-6 border-t border-app-border pt-5 text-center">
+  <% if controller_name != "sessions" %>
+    <%= link_to t("authentication.links.sign_in"), new_session_path(resource_name, locale: I18n.locale), class: "text-sm font-semibold text-app-primary hover:text-app-primary-hover" %>
+  <% end %>
+  <% if devise_mapping.recoverable? && controller_name != "passwords" %>
+    <%= link_to t("authentication.links.forgot_password"), new_password_path(resource_name, locale: I18n.locale), class: "text-sm font-semibold text-app-primary hover:text-app-primary-hover" %>
+  <% end %>
+</div>

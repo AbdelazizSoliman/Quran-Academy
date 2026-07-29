@@ -100,14 +100,4 @@ module ApplicationHelper
 
     tag.svg(**attributes) { ICON_PATHS.fetch(name.to_sym).html_safe } # rubocop:disable Rails/OutputSafety
   end
-
-  def nav_item_classes(active: false)
-    base = "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition " \
-           "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 " \
-           "focus-visible:outline-app-primary"
-
-    return "#{base} bg-app-primary-soft text-app-primary" if active
-
-    "#{base} text-app-secondary hover:bg-app-muted hover:text-app-text"
-  end
 end

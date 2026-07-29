@@ -21,21 +21,13 @@
   <nav class="flex-1 overflow-y-auto px-4 py-6">
     <p class="mb-3 px-3 text-xs font-semibold text-app-subtle"><%= t("navigation.main") %></p>
     <ul class="space-y-1">
-      <% [
-        [t("navigation.dashboard"), :home, root_path, true],
-        [t("navigation.students"), :users, "#", false],
-        [t("navigation.teachers"), :users, "#", false],
-        [t("navigation.schedule"), :calendar, "#", false],
-        [t("navigation.attendance"), :check_circle, "#", false],
-        [t("navigation.whatsapp"), :message, "#", false],
-        [t("navigation.payroll"), :wallet, "#", false],
-        [t("navigation.reports"), :reports, "#", false],
-        [t("navigation.settings"), :settings, "#", false]
-      ].each do |label, icon_name, path, active| %>
+      <% navigation_items_for(current_user).each do |key, item| %>
+        <% active = key == :dashboard %>
+        <% path = active ? root_path : "#" %>
         <li>
           <%= link_to path, class: nav_item_classes(active: active), aria: (active ? { current: "page" } : {}) do %>
-            <span class="grid size-8 place-items-center rounded-lg bg-app-muted text-app-secondary group-hover:bg-white"><%= icon icon_name, size: 4 %></span>
-            <span><%= label %></span>
+            <span class="grid size-8 place-items-center rounded-lg bg-app-muted text-app-secondary group-hover:bg-white"><%= icon item[:icon], size: 4 %></span>
+            <span><%= t("navigation.#{key}") %></span>
             <% unless active %>
               <span class="ms-auto text-[10px] font-normal text-app-subtle"><%= t("navigation.coming_soon") %></span>
             <% end %>

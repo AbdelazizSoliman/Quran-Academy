@@ -34,6 +34,18 @@ en:
     delete: "Delete"
     search: "Search"
     view_all: "View all"
+  roles:
+    admin: "Administrator"
+    staff: "Staff"
+    teacher: "Teacher"
+    student: "Student"
+  statuses:
+    pending: "Pending"
+    active: "Active"
+    suspended: "Suspended"
+    disabled: "Disabled"
+  account:
+    signed_in_as: "Signed in as %{name}"
   accessibility:
     skip_to_content: "Skip to main content"
     open_menu: "Open menu"
@@ -45,8 +57,74 @@ en:
     pagination: "Pagination"
     loading: "Loading"
     row_actions: "Row actions"
+    account_menu: "Account menu"
   forms:
     required: "Required"
+  authentication:
+    title: "Secure access | %{app}"
+    secure_access: "Secure academy access"
+    switch_locale: "العربية"
+    no_public_registration: "Accounts are created only through academy administration."
+    errors:
+      title: "Please review the information"
+    fields:
+      email: "Email address"
+      password: "Password"
+      remember_me: "Remember me"
+      new_password: "New password"
+      password_confirmation: "Confirm password"
+    links:
+      sign_in: "Back to sign in"
+      forgot_password: "Forgot your password?"
+    sign_in:
+      page_title: "Sign in | %{app}"
+      title: "Welcome back"
+      description: "Enter your account details to access the academy dashboard."
+      submit: "Sign in"
+    passwords:
+      forgot_page_title: "Recover password | %{app}"
+      forgot_title: "Recover your password"
+      forgot_description: "Enter your account email and we will send reset instructions if the account exists."
+      email_hint: "For account security, we do not reveal whether an email is registered."
+      send: "Send reset instructions"
+      reset_page_title: "Set a new password | %{app}"
+      reset_title: "Set a new password"
+      reset_description: "Choose a strong password to continue accessing your account."
+      minimum: "%{count} characters minimum."
+      update: "Update password"
+    mailer:
+      reset:
+        subject: "Password reset instructions"
+        title: "Reset your password"
+        greeting: "Hello %{name},"
+        instructions: "We received a request to reset your account password. Use the link below to continue."
+        action: "Set a new password"
+        ignore: "If you did not request this, you can safely ignore this email."
+        expiry: "The reset link expires in six hours."
+  devise:
+    mailer:
+      reset_password_instructions:
+        subject: "Password reset instructions"
+    sessions:
+      signed_in: "Signed in successfully."
+      signed_out: "Signed out successfully."
+      already_signed_out: "You are signed out."
+    passwords:
+      send_instructions: "If the email is registered, reset instructions will arrive shortly."
+      send_paranoid_instructions: "If the email is registered, reset instructions will arrive shortly."
+      updated: "Your password was updated successfully."
+      updated_not_active: "Your password was updated."
+      no_token: "This page can only be opened from a valid password-reset link."
+    failure:
+      already_authenticated: "You are already signed in."
+      invalid: "Invalid email or password."
+      not_found_in_database: "Invalid email or password."
+      unauthenticated: "Please sign in to continue."
+      timeout: "Your session expired. Please sign in again."
+      pending_account: "This account is awaiting approval and cannot sign in yet."
+      suspended_account: "This account is temporarily suspended. Contact academy administration."
+      disabled_account: "This account is disabled. Contact academy administration."
+      inactive: "This account is currently unavailable."
   pagination:
     previous: "Previous page"
     next: "Next page"

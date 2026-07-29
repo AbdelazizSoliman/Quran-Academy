@@ -18,12 +18,18 @@
     <% local_assigns.fetch(:items).each do |item| %>
       <% if item[:divider] %>
         <div class="my-1 border-t border-app-border" role="separator"></div>
+      <% elsif item[:disabled] %>
+        <span class="flex cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm text-app-subtle"
+              role="menuitem"
+              aria-disabled="true">
+          <% if item[:icon] %><%= icon item[:icon], size: 4 %><% end %><%= item.fetch(:label) %>
+        </span>
       <% else %>
         <%= link_to item.fetch(:href, "#"),
                     class: "flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-app-secondary hover:bg-app-muted hover:text-app-text focus:bg-app-muted focus:outline-none",
                     role: "menuitem",
                     tabindex: "-1",
-                    data: { dropdown_target: "item", action: "keydown->dropdown#navigate" } do %>
+                    data: { dropdown_target: "item", action: "keydown->dropdown#navigate" }.merge(item.fetch(:data, {})) do %>
           <% if item[:icon] %><%= icon item[:icon], size: 4 %><% end %><%= item.fetch(:label) %>
         <% end %>
       <% end %>

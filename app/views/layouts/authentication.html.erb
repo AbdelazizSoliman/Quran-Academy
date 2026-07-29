@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" dir="<%= I18n.locale == :ar ? "rtl" : "ltr" %>">
+  <head>
+    <title><%= content_for(:title) || t("authentication.title", app: t("app.name")) %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="<%= t("app.description") %>">
+    <meta name="application-name" content="<%= t("app.name") %>">
+    <meta name="theme-color" content="#087a55">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-app-background text-app-text antialiased" data-time-zone="<%= Time.zone.name %>">
+    <main class="grid min-h-screen place-items-center px-4 py-10 sm:px-6">
+      <div class="w-full max-w-md">
+        <div class="mb-6 flex items-center justify-between gap-4">
+          <%= link_to root_path, class: "flex items-center gap-3 rounded-xl" do %>
+            <span class="grid size-11 place-items-center rounded-xl bg-app-primary text-lg font-bold text-white"><%= I18n.locale == :ar ? "ق" : "Q" %></span>
+            <span>
+              <span class="block font-bold text-app-text"><%= t("app.name") %></span>
+              <span class="block ds-caption"><%= t("authentication.secure_access") %></span>
+            </span>
+          <% end %>
+          <%= link_to t("authentication.switch_locale"),
+                      url_for(request.query_parameters.merge(locale: I18n.locale == :ar ? :en : :ar)),
+                      class: button_classes(variant: :ghost, size: :small) %>
+        </div>
+
+        <div class="ds-card overflow-hidden">
+          <div class="p-6 sm:p-8">
+            <%= render "shared/flash" %>
+            <%= yield %>
+          </div>
+        </div>
+
+        <p class="mt-5 text-center ds-caption"><%= t("authentication.no_public_registration") %></p>
+      </div>
+    </main>
+  </body>
+</html>

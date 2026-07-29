@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Design system showcase" do
+RSpec.describe "Design system showcase", type: :request do
   it "renders the reusable component variants in Arabic RTL" do
     get ui_path(locale: :ar)
 
