@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  devise_for :users,
+             path: "account",
+             path_names: { sign_in: "sign-in", sign_out: "sign-out", password: "password" },
+             skip: :registrations
   root "dashboard#index"
   constraints LocalEnvironmentConstraint.new do
     get "ui", to: "ui#index", as: :ui

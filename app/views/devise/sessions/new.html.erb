@@ -1,0 +1,26 @@
+<% content_for :title, t("authentication.sign_in.page_title", app: t("app.name")) %>
+<header class="mb-6">
+  <h1 class="ds-page-title"><%= t("authentication.sign_in.title") %></h1>
+  <p class="mt-2 ds-supporting"><%= t("authentication.sign_in.description") %></p>
+</header>
+
+<%= form_with model: resource, as: resource_name, url: session_path(resource_name, locale: I18n.locale), class: "space-y-5", data: { turbo: false } do |form| %>
+  <div class="space-y-1.5">
+    <%= form.label :email, t("authentication.fields.email"), class: "ds-label" %>
+    <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true, class: "ds-control", dir: "ltr" %>
+  </div>
+  <div class="space-y-1.5">
+    <div class="flex items-center justify-between gap-3">
+      <%= form.label :password, t("authentication.fields.password"), class: "ds-label" %>
+      <%= link_to t("authentication.links.forgot_password"), new_password_path(resource_name, locale: I18n.locale), class: "text-xs font-semibold text-app-primary hover:text-app-primary-hover" %>
+    </div>
+    <%= form.password_field :password, autocomplete: "current-password", required: true, class: "ds-control" %>
+  </div>
+  <% if devise_mapping.rememberable? %>
+    <div class="flex items-center gap-2.5">
+      <%= form.check_box :remember_me, class: "ds-checkbox" %>
+      <%= form.label :remember_me, t("authentication.fields.remember_me"), class: "text-sm text-app-secondary" %>
+    </div>
+  <% end %>
+  <%= render "shared/components/button", label: t("authentication.sign_in.submit"), type: "submit", class: "w-full" %>
+<% end %>

@@ -1,0 +1,8 @@
+<% if resource.errors.any? %>
+  <div class="mb-5">
+    <%= render "shared/components/alert",
+               variant: :error,
+               title: t("authentication.errors.title"),
+               message: resource.errors.full_messages.to_sentence %>
+  </div>
+<% end %>

@@ -34,6 +34,18 @@ ar:
     delete: "حذف"
     search: "بحث"
     view_all: "عرض الكل"
+  roles:
+    admin: "مدير"
+    staff: "موظف"
+    teacher: "معلم"
+    student: "طالب"
+  statuses:
+    pending: "قيد الانتظار"
+    active: "نشط"
+    suspended: "موقوف مؤقتاً"
+    disabled: "معطل"
+  account:
+    signed_in_as: "مسجل باسم %{name}"
   accessibility:
     skip_to_content: "انتقل إلى المحتوى الرئيسي"
     open_menu: "فتح القائمة"
@@ -45,8 +57,74 @@ ar:
     pagination: "ترقيم الصفحات"
     loading: "جارٍ التحميل"
     row_actions: "إجراءات الصف"
+    account_menu: "قائمة الحساب"
   forms:
     required: "مطلوب"
+  authentication:
+    title: "الدخول الآمن | %{app}"
+    secure_access: "دخول آمن إلى الأكاديمية"
+    switch_locale: "English"
+    no_public_registration: "يتم إنشاء الحسابات من خلال إدارة الأكاديمية فقط."
+    errors:
+      title: "يرجى مراجعة المعلومات"
+    fields:
+      email: "البريد الإلكتروني"
+      password: "كلمة المرور"
+      remember_me: "تذكرني"
+      new_password: "كلمة المرور الجديدة"
+      password_confirmation: "تأكيد كلمة المرور"
+    links:
+      sign_in: "العودة إلى تسجيل الدخول"
+      forgot_password: "نسيت كلمة المرور؟"
+    sign_in:
+      page_title: "تسجيل الدخول | %{app}"
+      title: "مرحباً بعودتك"
+      description: "أدخل بيانات حسابك للوصول إلى لوحة الأكاديمية."
+      submit: "تسجيل الدخول"
+    passwords:
+      forgot_page_title: "استعادة كلمة المرور | %{app}"
+      forgot_title: "استعادة كلمة المرور"
+      forgot_description: "أدخل بريد حسابك وسنرسل تعليمات إعادة التعيين إن كان الحساب موجوداً."
+      email_hint: "لن نكشف ما إذا كان البريد مسجلاً حفاظاً على أمان الحسابات."
+      send: "إرسال تعليمات الاستعادة"
+      reset_page_title: "تعيين كلمة مرور جديدة | %{app}"
+      reset_title: "تعيين كلمة مرور جديدة"
+      reset_description: "اختر كلمة مرور قوية لمتابعة الدخول إلى حسابك."
+      minimum: "%{count} أحرف على الأقل."
+      update: "تحديث كلمة المرور"
+    mailer:
+      reset:
+        subject: "تعليمات إعادة تعيين كلمة المرور"
+        title: "إعادة تعيين كلمة المرور"
+        greeting: "مرحباً %{name}،"
+        instructions: "تلقينا طلباً لإعادة تعيين كلمة مرور حسابك. استخدم الرابط التالي للمتابعة."
+        action: "تعيين كلمة مرور جديدة"
+        ignore: "إن لم تطلب ذلك، يمكنك تجاهل هذه الرسالة بأمان."
+        expiry: "تنتهي صلاحية رابط الاستعادة خلال ست ساعات."
+  devise:
+    mailer:
+      reset_password_instructions:
+        subject: "تعليمات إعادة تعيين كلمة المرور"
+    sessions:
+      signed_in: "تم تسجيل الدخول بنجاح."
+      signed_out: "تم تسجيل الخروج بنجاح."
+      already_signed_out: "تم تسجيل الخروج."
+    passwords:
+      send_instructions: "إذا كان البريد مسجلاً، فستصل تعليمات إعادة التعيين خلال دقائق."
+      send_paranoid_instructions: "إذا كان البريد مسجلاً، فستصل تعليمات إعادة التعيين خلال دقائق."
+      updated: "تم تحديث كلمة المرور بنجاح."
+      updated_not_active: "تم تحديث كلمة المرور."
+      no_token: "لا يمكن فتح هذه الصفحة إلا من رابط استعادة صالح."
+    failure:
+      already_authenticated: "أنت مسجل الدخول بالفعل."
+      invalid: "بيانات الدخول غير صحيحة."
+      not_found_in_database: "بيانات الدخول غير صحيحة."
+      unauthenticated: "يرجى تسجيل الدخول للمتابعة."
+      timeout: "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى."
+      pending_account: "الحساب بانتظار الموافقة ولا يمكنه الدخول بعد."
+      suspended_account: "الحساب موقوف مؤقتاً. تواصل مع إدارة الأكاديمية."
+      disabled_account: "الحساب معطل. تواصل مع إدارة الأكاديمية."
+      inactive: "الحساب غير متاح حالياً."
   pagination:
     previous: "الصفحة السابقة"
     next: "الصفحة التالية"

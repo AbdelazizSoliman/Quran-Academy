@@ -2,6 +2,8 @@ require "rails_helper"
 
 RSpec.describe "Dashboard" do
   it "loads the application home page in Arabic RTL by default" do
+    sign_in create(:user, :arabic_locale)
+
     I18n.with_locale(:ar) do
       get root_path
 
@@ -13,6 +15,8 @@ RSpec.describe "Dashboard" do
   end
 
   it "renders English as LTR when the locale changes" do
+    sign_in create(:user, :english_locale)
+
     I18n.with_locale(:en) do
       get root_path
 

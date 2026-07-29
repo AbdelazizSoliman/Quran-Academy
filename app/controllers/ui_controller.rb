@@ -1,4 +1,5 @@
 class UiController < ApplicationController
+  skip_before_action :authenticate_user!
   around_action :use_requested_locale
 
   def index; end
