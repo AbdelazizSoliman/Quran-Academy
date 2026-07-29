@@ -1,11 +1,35 @@
-<div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-  <div>
-    <h1 class="text-2xl font-bold tracking-tight text-slate-950"><%= local_assigns.fetch(:title) %></h1>
-    <% if local_assigns[:subtitle].present? %>
-      <p class="mt-1 text-sm text-slate-500"><%= subtitle %></p>
+<header class="mb-6">
+  <% if local_assigns[:breadcrumbs].present? %>
+    <nav aria-label="<%= t("accessibility.breadcrumbs") %>" class="mb-3">
+      <ol class="flex flex-wrap items-center gap-2 text-sm text-app-subtle">
+        <% breadcrumbs.each_with_index do |crumb, index| %>
+          <li class="flex items-center gap-2">
+            <% if crumb[:href].present? && index < breadcrumbs.length - 1 %>
+              <%= link_to crumb[:label], crumb[:href], class: "hover:text-app-primary" %>
+            <% else %>
+              <span <%= "aria-current=\"page\"".html_safe if index == breadcrumbs.length - 1 %>><%= crumb[:label] %></span>
+            <% end %>
+            <% if index < breadcrumbs.length - 1 %><span aria-hidden="true">/</span><% end %>
+          </li>
+        <% end %>
+      </ol>
+    </nav>
+  <% end %>
+  <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+    <div class="min-w-0">
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="ds-page-title"><%= local_assigns.fetch(:title) %></h1>
+        <%= local_assigns[:badge] %>
+      </div>
+      <% if local_assigns[:description].present? || local_assigns[:subtitle].present? %>
+        <p class="mt-2 max-w-3xl ds-supporting"><%= local_assigns[:description] || local_assigns[:subtitle] %></p>
+      <% end %>
+    </div>
+    <% if local_assigns[:primary_action].present? || local_assigns[:secondary_action].present? || local_assigns[:action].present? %>
+      <div class="flex flex-wrap gap-2">
+        <%= local_assigns[:secondary_action] %>
+        <%= local_assigns[:primary_action] || local_assigns[:action] %>
+      </div>
     <% end %>
   </div>
-  <% if local_assigns[:action].present? %>
-    <div><%= action %></div>
-  <% end %>
-</div>
+</header>

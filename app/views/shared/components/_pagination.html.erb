@@ -1,0 +1,18 @@
+<nav aria-label="<%= t("accessibility.pagination") %>" class="flex flex-wrap items-center justify-between gap-3">
+  <p class="hidden ds-caption sm:block"><%= local_assigns[:summary] %></p>
+  <div class="flex items-center gap-1">
+    <% previous_disabled = local_assigns.fetch(:current, 1) <= 1 %>
+    <%= button_tag type: "button", disabled: previous_disabled, class: "#{button_classes(variant: :secondary, size: :small, icon_only: true)} rtl:rotate-180", aria: { label: t("pagination.previous") } do %>
+      <%= icon(:arrow, size: 4) %>
+    <% end %>
+    <% 1.upto(local_assigns.fetch(:pages, 3)) do |page| %>
+      <%= button_tag page, type: "button",
+                     class: page == local_assigns.fetch(:current, 1) ? button_classes(variant: :primary, size: :small, icon_only: true) : button_classes(variant: :ghost, size: :small, icon_only: true),
+                     aria: { label: t("pagination.page", page:), current: ("page" if page == local_assigns.fetch(:current, 1)) } %>
+    <% end %>
+    <% next_disabled = local_assigns.fetch(:current, 1) >= local_assigns.fetch(:pages, 3) %>
+    <%= button_tag type: "button", disabled: next_disabled, class: "#{button_classes(variant: :secondary, size: :small, icon_only: true)} rotate-180 rtl:rotate-0", aria: { label: t("pagination.next") } do %>
+      <%= icon(:arrow, size: 4) %>
+    <% end %>
+  </div>
+</nav>

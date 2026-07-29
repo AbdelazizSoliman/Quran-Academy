@@ -3,7 +3,7 @@
   <head>
     <title><%= content_for(:title) || t("app.name") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="منصة متكاملة لإدارة أكاديميات تعليم القرآن الكريم">
+    <meta name="description" content="<%= t("app.description") %>">
     <meta name="application-name" content="<%= t("app.name") %>">
     <meta name="theme-color" content="#065f46">
     <%= csrf_meta_tags %>
@@ -19,7 +19,7 @@
         data-controller="sidebar"
         data-sidebar-hidden-class-value="<%= I18n.locale == :ar ? "translate-x-full" : "-translate-x-full" %>">
     <a href="#main-content" class="sr-only z-50 rounded-md bg-white px-4 py-2 text-emerald-800 focus:not-sr-only focus:fixed focus:right-4 focus:top-4">
-      انتقل إلى المحتوى الرئيسي
+      <%= t("accessibility.skip_to_content") %>
     </a>
 
     <div data-sidebar-target="overlay"

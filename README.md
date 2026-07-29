@@ -23,6 +23,29 @@ Quran Academy is being built as a modular academy management platform. Planned m
 
 The current stage focuses exclusively on establishing a solid, secure, and maintainable technical foundation before any business modules are implemented.
 
+## Design system
+
+Reusable interface partials live in `app/views/shared/components`, with shared class and icon APIs in `app/helpers/application_helper.rb`. Render components through their locals-based APIs, for example:
+
+```erb
+<%= render "shared/components/button",
+           label: t("actions.save"),
+           variant: :primary,
+           icon: :check %>
+```
+
+Semantic colors, typography, spacing, radius, shadow, control height, and page-width tokens are defined as CSS variables in `app/assets/tailwind/application.css`. Components consume those tokens through Tailwind utilities instead of embedding product colors repeatedly.
+
+The application layout derives `lang` and `dir` from `I18n.locale`. Components use logical positioning and spacing utilities so Arabic renders RTL and English renders LTR without separate templates.
+
+In development and test, the live component showcase is available at:
+
+```text
+http://localhost:3000/ui
+```
+
+Use `/ui?locale=en` to inspect the English LTR version. The route is intentionally absent in production. Business modules remain intentionally unimplemented at this stage.
+
 ## Technology stack
 
 - Ruby 3.4.6

@@ -1,29 +1,29 @@
-<header class="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8">
+<header class="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-app-border bg-app-surface/95 px-4 sm:px-6 lg:px-8">
   <div class="flex items-center gap-3">
     <button type="button"
             data-action="sidebar#open"
-            class="rounded-xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-500 lg:hidden"
-            aria-label="فتح القائمة"
+            class="rounded-xl border border-app-border p-2.5 text-app-secondary hover:bg-app-muted lg:hidden"
+            aria-label="<%= t("accessibility.open_menu") %>"
             aria-controls="application-sidebar"
             aria-expanded="false"
             data-sidebar-target="trigger">
-      <span aria-hidden="true" class="block text-xl">☰</span>
+      <%= icon :bars %>
     </button>
     <div>
-      <p class="text-sm font-bold text-slate-900"><%= t("app.academy_placeholder") %></p>
-      <p class="text-xs text-slate-500"><%= I18n.l(Date.current, format: :long) %></p>
+      <p class="text-sm font-bold text-app-text"><%= t("app.academy_placeholder") %></p>
+      <p class="ds-caption"><%= I18n.l(Date.current, format: :long) %></p>
     </div>
   </div>
 
   <div class="flex items-center gap-3">
-    <button type="button" class="relative rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-500" aria-label="الإشعارات">
-      <span aria-hidden="true">♢</span>
-      <span class="absolute left-2 top-2 size-2 rounded-full bg-amber-500"></span>
+    <button type="button" class="relative rounded-xl p-2.5 text-app-subtle hover:bg-app-muted" aria-label="<%= t("accessibility.notifications") %>">
+      <%= icon :bell %>
+      <span class="absolute end-2 top-2 size-2 rounded-full bg-amber-500"></span>
     </button>
-    <div class="hidden text-left sm:block">
-      <p class="text-sm font-semibold text-slate-800">مدير الأكاديمية</p>
-      <p class="text-xs text-slate-500">حساب تجريبي</p>
+    <div class="hidden text-start sm:block">
+      <p class="text-sm font-semibold text-app-text"><%= t("shell.account_name") %></p>
+      <p class="ds-caption"><%= t("shell.demo_account") %></p>
     </div>
-    <div class="grid size-10 place-items-center rounded-full bg-emerald-100 font-bold text-emerald-800" aria-hidden="true">م</div>
+    <div class="grid size-10 place-items-center rounded-full bg-app-primary-soft font-bold text-app-primary" aria-hidden="true"><%= I18n.locale == :ar ? "م" : "A" %></div>
   </div>
 </header>

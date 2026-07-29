@@ -8,6 +8,7 @@ RSpec.describe "Dashboard" do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('<html lang="ar" dir="rtl">')
       expect(response.body).to include(I18n.t("app.name"))
+      expect(response.body).to include('data-component="stat-card"')
     end
   end
 
@@ -18,6 +19,7 @@ RSpec.describe "Dashboard" do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('<html lang="en" dir="ltr">')
       expect(response.body).to include(I18n.t("navigation.coming_soon"))
+      expect(response.body).not_to include("translation missing")
     end
   end
 end

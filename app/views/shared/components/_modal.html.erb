@@ -1,0 +1,28 @@
+<div data-controller="dialog">
+  <%= render "shared/components/button",
+             label: local_assigns.fetch(:open_label),
+             variant: local_assigns.fetch(:open_variant, :secondary),
+             icon: local_assigns.fetch(:open_icon, :plus),
+             data: { action: "dialog#open" } %>
+
+  <dialog data-dialog-target="dialog"
+          data-action="click->dialog#backdropClose cancel->dialog#cancel"
+          class="m-auto w-[min(32rem,calc(100%-2rem))] rounded-2xl border border-app-border bg-app-surface p-0 text-app-text shadow-2xl backdrop:bg-slate-950/45">
+    <div data-dialog-target="content">
+      <header class="flex items-start justify-between gap-4 border-b border-app-border px-5 py-4">
+        <div>
+          <h2 class="ds-section-title"><%= local_assigns.fetch(:title) %></h2>
+          <% if local_assigns[:description] %><p class="mt-1 ds-supporting"><%= description %></p><% end %>
+        </div>
+        <button type="button" data-action="dialog#close" class="rounded-lg p-2 text-app-subtle hover:bg-app-muted" aria-label="<%= t("accessibility.close_dialog") %>">
+          <%= icon :close %>
+        </button>
+      </header>
+      <div class="p-5 ds-body"><%= local_assigns[:body] %></div>
+      <footer class="flex flex-wrap justify-end gap-2 border-t border-app-border bg-app-muted/50 px-5 py-4">
+        <%= render "shared/components/button", label: t("actions.cancel"), variant: :ghost, data: { action: "dialog#close" } %>
+        <%= local_assigns[:primary_action] %>
+      </footer>
+    </div>
+  </dialog>
+</div>

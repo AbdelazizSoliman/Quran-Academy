@@ -1,15 +1,135 @@
 @import "tailwindcss";
 
+:root {
+  --color-background: #f8faf9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f5f3;
+  --color-border: #dce5e0;
+  --color-text-primary: #17201c;
+  --color-text-secondary: #52615a;
+  --color-text-muted: #7a8981;
+  --color-primary: #087a55;
+  --color-primary-hover: #066344;
+  --color-primary-soft: #e8f7f0;
+  --color-success: #087a55;
+  --color-warning: #a85d09;
+  --color-danger: #b42318;
+  --color-information: #175cd3;
+  --color-focus-ring: #15966a;
+
+  --font-sans: "Noto Sans Arabic", "Noto Sans", "Segoe UI", Tahoma, Arial, sans-serif;
+  --radius-control: 0.75rem;
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.04);
+  --control-height: 2.75rem;
+  --card-padding: 1.25rem;
+  --section-space: 1.5rem;
+  --page-width: 80rem;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --color-app-background: var(--color-background);
+  --color-app-surface: var(--color-surface);
+  --color-app-muted: var(--color-surface-muted);
+  --color-app-border: var(--color-border);
+  --color-app-text: var(--color-text-primary);
+  --color-app-secondary: var(--color-text-secondary);
+  --color-app-subtle: var(--color-text-muted);
+  --color-app-primary: var(--color-primary);
+  --color-app-primary-hover: var(--color-primary-hover);
+  --color-app-primary-soft: var(--color-primary-soft);
+  --color-app-success: var(--color-success);
+  --color-app-warning: var(--color-warning);
+  --color-app-danger: var(--color-danger);
+  --color-app-info: var(--color-information);
+}
+
+@layer base {
+  body {
+    @apply bg-app-background font-sans text-app-text;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
 @layer components {
+  .ds-page-title {
+    @apply text-2xl font-bold tracking-tight text-app-text sm:text-3xl;
+  }
+
+  .ds-section-title {
+    @apply text-lg font-bold text-app-text;
+  }
+
+  .ds-card-title {
+    @apply text-base font-semibold text-app-text;
+  }
+
+  .ds-body {
+    @apply text-sm leading-6 text-app-secondary;
+  }
+
+  .ds-supporting {
+    @apply text-sm text-app-subtle;
+  }
+
+  .ds-label {
+    @apply text-sm font-semibold text-app-text;
+  }
+
+  .ds-caption {
+    @apply text-xs leading-5 text-app-subtle;
+  }
+
+  .ds-table-heading {
+    @apply text-xs font-semibold uppercase tracking-wide text-app-secondary;
+  }
+
+  .ds-card,
   .card {
-    @apply rounded-2xl border border-slate-200 bg-white shadow-sm;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    @apply border border-app-border bg-app-surface;
+  }
+
+  .ds-control {
+    min-height: var(--control-height);
+    border-radius: var(--radius-control);
+    @apply w-full border border-app-border bg-app-surface px-3 py-2 text-sm text-app-text shadow-sm transition placeholder:text-app-subtle hover:border-slate-400 focus:border-app-primary focus:outline-none focus:ring-2 focus:ring-app-primary/20 disabled:cursor-not-allowed disabled:bg-app-muted disabled:text-app-subtle;
+  }
+
+  .ds-control[aria-invalid="true"] {
+    @apply border-app-danger focus:border-app-danger focus:ring-app-danger/15;
+  }
+
+  .ds-checkbox {
+    @apply size-4 rounded border-app-border text-app-primary focus:ring-2 focus:ring-app-primary/25;
   }
 
   .button-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-app-primary-hover focus-visible:outline-app-primary disabled:cursor-not-allowed disabled:opacity-55;
   }
 
   .button-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-app-border bg-app-surface px-4 py-2.5 text-sm font-semibold text-app-text shadow-sm transition hover:bg-app-muted focus-visible:outline-app-primary disabled:cursor-not-allowed disabled:opacity-55;
+  }
+
+  .ds-skeleton {
+    @apply animate-pulse rounded-lg bg-slate-200;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -1,0 +1,34 @@
+<div class="overflow-hidden rounded-xl border border-app-border">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-app-border">
+      <% if local_assigns[:caption].present? %><caption class="sr-only"><%= caption %></caption><% end %>
+      <thead class="bg-app-muted">
+        <tr>
+          <% local_assigns.fetch(:headers).each do |header| %>
+            <th scope="col" class="whitespace-nowrap px-4 py-3 text-start ds-table-heading"><%= header %></th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-app-border bg-app-surface">
+        <% local_assigns.fetch(:rows, []).each do |row| %>
+          <tr class="transition hover:bg-app-muted/60">
+            <% row.each_with_index do |cell, index| %>
+              <%= content_tag(index.zero? ? :th : :td,
+                              class: "whitespace-nowrap px-4 py-3 text-start text-sm #{index.zero? ? "font-semibold text-app-text" : "text-app-secondary"}",
+                              scope: (index.zero? ? "row" : nil)) do %>
+                <% if cell.is_a?(Hash) && cell[:badge] %>
+                  <%= render "shared/components/badge", label: cell[:badge], variant: cell.fetch(:variant, :neutral) %>
+                <% else %>
+                  <%= cell %>
+                <% end %>
+              <% end %>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <% if local_assigns.fetch(:rows, []).empty? %>
+    <div class="p-5"><%= render "shared/components/empty_state", **local_assigns.fetch(:empty_state) %></div>
+  <% end %>
+</div>

@@ -1,0 +1,32 @@
+<div class="relative inline-block" data-controller="dropdown">
+  <button type="button"
+          class="<%= button_classes(variant: local_assigns.fetch(:variant, :ghost), size: :small, icon_only: local_assigns.fetch(:icon_only, false)) %>"
+          data-dropdown-target="trigger"
+          data-action="dropdown#toggle"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-label="<%= local_assigns[:aria_label] %>">
+    <% if local_assigns.fetch(:icon_only, false) %>
+      <%= icon local_assigns.fetch(:icon, :dots) %>
+    <% else %>
+      <span><%= local_assigns.fetch(:label) %></span><%= icon(:chevron_down, size: 4) %>
+    <% end %>
+  </button>
+  <div class="absolute end-0 z-30 mt-2 hidden min-w-48 rounded-xl border border-app-border bg-app-surface p-1.5 shadow-lg"
+       data-dropdown-target="menu"
+       role="menu">
+    <% local_assigns.fetch(:items).each do |item| %>
+      <% if item[:divider] %>
+        <div class="my-1 border-t border-app-border" role="separator"></div>
+      <% else %>
+        <%= link_to item.fetch(:href, "#"),
+                    class: "flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-app-secondary hover:bg-app-muted hover:text-app-text focus:bg-app-muted focus:outline-none",
+                    role: "menuitem",
+                    tabindex: "-1",
+                    data: { dropdown_target: "item", action: "keydown->dropdown#navigate" } do %>
+          <% if item[:icon] %><%= icon item[:icon], size: 4 %><% end %><%= item.fetch(:label) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

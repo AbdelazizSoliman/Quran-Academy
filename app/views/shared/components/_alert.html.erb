@@ -1,0 +1,15 @@
+<% config = alert_config(local_assigns.fetch(:variant, :information)) %>
+<div class="flex items-start gap-3 rounded-xl border px-4 py-3 <%= config[:classes] %>"
+     role="<%= config[:role] %>"
+     <% if local_assigns.fetch(:dismissible, false) %>data-controller="dismissible"<% end %>>
+  <%= icon config[:icon], classes: "mt-0.5" %>
+  <div class="min-w-0 flex-1">
+    <% if local_assigns[:title].present? %><p class="text-sm font-semibold"><%= title %></p><% end %>
+    <p class="text-sm leading-6"><%= local_assigns.fetch(:message) %></p>
+  </div>
+  <% if local_assigns.fetch(:dismissible, false) %>
+    <button type="button" class="rounded-lg p-1 hover:bg-black/5" data-action="dismissible#dismiss" aria-label="<%= t("accessibility.dismiss") %>">
+      <%= icon(:close, size: 4) %>
+    </button>
+  <% end %>
+</div>
