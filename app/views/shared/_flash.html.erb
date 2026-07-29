@@ -1,0 +1,8 @@
+<div aria-live="polite" class="mb-5 space-y-2">
+  <% flash.each do |type, message| %>
+    <% colors = type.to_s == "alert" ? "border-red-200 bg-red-50 text-red-800" : "border-emerald-200 bg-emerald-50 text-emerald-800" %>
+    <div class="rounded-xl border px-4 py-3 text-sm <%= colors %>" role="<%= type.to_s == "alert" ? "alert" : "status" %>">
+      <%= message %>
+    </div>
+  <% end %>
+</div>

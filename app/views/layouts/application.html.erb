@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" dir="<%= I18n.locale == :ar ? "rtl" : "ltr" %>">
+  <head>
+    <title><%= content_for(:title) || t("app.name") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="منصة متكاملة لإدارة أكاديميات تعليم القرآن الكريم">
+    <meta name="application-name" content="<%= t("app.name") %>">
+    <meta name="theme-color" content="#065f46">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-slate-50 text-slate-900 antialiased"
+        data-controller="sidebar"
+        data-sidebar-hidden-class-value="<%= I18n.locale == :ar ? "translate-x-full" : "-translate-x-full" %>">
+    <a href="#main-content" class="sr-only z-50 rounded-md bg-white px-4 py-2 text-emerald-800 focus:not-sr-only focus:fixed focus:right-4 focus:top-4">
+      انتقل إلى المحتوى الرئيسي
+    </a>
+
+    <div data-sidebar-target="overlay"
+         data-action="click->sidebar#close"
+         class="fixed inset-0 z-30 hidden bg-slate-950/40 backdrop-blur-sm lg:hidden"
+         aria-hidden="true"></div>
+
+    <%= render "shared/sidebar" %>
+
+    <div class="min-h-screen lg:ms-72">
+      <%= render "shared/topbar" %>
+
+      <main id="main-content" class="px-4 py-6 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl">
+          <%= render "shared/flash" %>
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
