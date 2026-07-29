@@ -1,0 +1,75 @@
+<% edit_action = render("shared/components/button", label: t("actions.edit"), href: edit_admin_user_path(@user), variant: :secondary, icon: :settings) %>
+<%= render "shared/page_header",
+           title: @user.full_name,
+           description: @user.email,
+           badge: user_status_badge(@user),
+           secondary_action: render("shared/components/button", label: t("admin.users.actions.back"), href: admin_users_path, variant: :ghost),
+           primary_action: edit_action %>
+
+<div class="grid gap-6 lg:grid-cols-2">
+  <% identity_body = capture do %>
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <% { first_name: @user.first_name, last_name: @user.last_name, email: @user.email }.each do |field, value| %>
+        <div><dt class="ds-caption"><%= t("admin.users.fields.#{field}") %></dt><dd class="mt-1 font-semibold"><%= value %></dd></div>
+      <% end %>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.users.show.identity"), body: identity_body %>
+
+  <% access_body = capture do %>
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <div><dt class="ds-caption"><%= t("admin.users.fields.role") %></dt><dd class="mt-1"><%= user_role_badge(@user) %></dd></div>
+      <div><dt class="ds-caption"><%= t("admin.users.fields.status") %></dt><dd class="mt-1"><%= user_status_badge(@user) %></dd></div>
+      <div><dt class="ds-caption"><%= t("admin.users.fields.preferred_locale") %></dt><dd class="mt-1 font-semibold"><%= t("admin.users.locales.#{@user.preferred_locale}") %></dd></div>
+      <div><dt class="ds-caption"><%= t("admin.users.fields.time_zone") %></dt><dd class="mt-1 font-semibold"><%= @user.time_zone %></dd></div>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.users.show.access"), body: access_body %>
+
+  <% activity_body = capture do %>
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <% %i[sign_in_count current_sign_in_at last_sign_in_at current_sign_in_ip last_sign_in_ip created_at updated_at].each do |field| %>
+        <% value = @user.public_send(field) %>
+        <div><dt class="ds-caption"><%= t("admin.users.fields.#{field}") %></dt><dd class="mt-1 font-semibold"><%= field.to_s.end_with?("_at") ? localized_datetime(value) : (value.presence || t("admin.users.not_available")) %></dd></div>
+      <% end %>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.users.show.activity"), body: activity_body %>
+
+  <% actions_body = capture do %>
+    <div class="flex flex-wrap gap-3">
+      <% admin_user_transition_actions(@user).each do |action| %>
+        <% action_body = capture do %><p><%= t("admin.users.confirmations.#{action}", name: @user.full_name) %></p><% end %>
+        <% primary = button_to t("admin.users.actions.#{action}"), public_send("#{action}_admin_user_path", @user), method: :patch, class: button_classes(variant: action.in?(%i[suspend disable]) ? :danger : :primary, size: :medium) %>
+        <%= render "shared/components/modal",
+                   open_label: t("admin.users.actions.#{action}"),
+                   open_variant: action.in?(%i[suspend disable]) ? :danger : :secondary,
+                   open_icon: action.in?(%i[approve activate enable]) ? :check_circle : :warning,
+                   title: t("admin.users.confirmations.title"),
+                   description: @user.full_name,
+                   body: action_body,
+                   primary_action: primary %>
+      <% end %>
+      <%= render "shared/components/button", label: t("admin.users.actions.reset_password"), href: reset_password_admin_user_path(@user), variant: :outline %>
+    </div>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.users.show.actions"), body: actions_body %>
+</div>
+
+<div class="mt-6">
+  <% history_body = capture do %>
+    <% if @events.any? %>
+      <ol class="divide-y divide-app-border">
+        <% @events.each do |event| %>
+          <li class="py-3 first:pt-0 last:pb-0">
+            <p class="text-sm font-semibold"><%= audit_event_description(event) %></p>
+            <p class="mt-1 ds-caption"><%= localized_datetime(event.created_at) %></p>
+          </li>
+        <% end %>
+      </ol>
+    <% else %>
+      <%= render "shared/components/empty_state", icon: :reports, title: t("admin.audit.empty.title"), description: t("admin.audit.empty.description") %>
+    <% end %>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.users.show.history"), body: history_body %>
+</div>

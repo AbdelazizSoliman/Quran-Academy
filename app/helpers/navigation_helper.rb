@@ -1,6 +1,7 @@
 module NavigationHelper
   NAVIGATION_ITEMS = {
     dashboard: { icon: :home, roles: %i[admin staff teacher student] },
+    users: { icon: :users, roles: %i[admin], path: :admin_users_path },
     students: { icon: :users, roles: %i[admin staff] },
     teachers: { icon: :users, roles: %i[admin staff] },
     schedule: { icon: :calendar, roles: %i[admin staff teacher student] },
@@ -24,5 +25,12 @@ module NavigationHelper
   def navigation_items_for(user)
     role = user&.role&.to_sym
     NAVIGATION_ITEMS.select { |_key, item| role.nil? || item[:roles].include?(role) }
+  end
+
+  def navigation_path(key, item)
+    return public_send(item[:path]) if item[:path]
+    return root_path if key == :dashboard
+
+    "#"
   end
 end

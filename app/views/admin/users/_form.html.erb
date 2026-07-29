@@ -1,0 +1,67 @@
+<% if user.errors.any? %>
+  <%= render "shared/components/alert",
+             variant: :error,
+             title: t("admin.users.form.errors_title"),
+             message: user.errors.full_messages.to_sentence %>
+<% end %>
+
+<%= form_with model: [:admin, user], class: "mt-5 space-y-6", data: { component: "admin-user-form" } do |form| %>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <% { first_name: "given-name", last_name: "family-name", email: "email" }.each do |field, autocomplete| %>
+      <div>
+        <%= form.label field, t("admin.users.fields.#{field}"), class: "ds-label" %>
+        <%= form.public_send(field == :email ? :email_field : :text_field, field,
+                             class: "ds-control mt-2", required: true, autocomplete:,
+                             aria: { invalid: user.errors[field].any? }) %>
+        <% if user.errors[field].any? %><p class="mt-1 text-sm text-app-danger"><%= user.errors[field].to_sentence %></p><% end %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :role, t("admin.users.fields.role"), class: "ds-label" %>
+      <%= form.select :role, User.roles.keys.map { |role| [t("roles.#{role}"), role] }, {}, class: "ds-control mt-2" %>
+    </div>
+
+    <% if user.new_record? %>
+      <div>
+        <%= form.label :status, t("admin.users.fields.status"), class: "ds-label" %>
+        <%= form.select :status, User.statuses.keys.map { |status| [t("statuses.#{status}"), status] }, {}, class: "ds-control mt-2" %>
+      </div>
+    <% else %>
+      <div>
+        <span class="ds-label"><%= t("admin.users.fields.status") %></span>
+        <div class="mt-3"><%= user_status_badge(user) %></div>
+        <p class="mt-2 ds-caption"><%= t("admin.users.form.status_hint") %></p>
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :preferred_locale, t("admin.users.fields.preferred_locale"), class: "ds-label" %>
+      <% locale_options = [[t("admin.users.form.locale_automatic"), ""]] + I18n.available_locales.map { |locale| [t("admin.users.locales.#{locale}"), locale] } %>
+      <%= form.select :preferred_locale, locale_options, {}, class: "ds-control mt-2" %>
+    </div>
+
+    <div>
+      <%= form.label :time_zone, t("admin.users.fields.time_zone"), class: "ds-label" %>
+      <%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.all, { default: "Cairo" }, class: "ds-control mt-2" %>
+    </div>
+
+    <% if user.new_record? %>
+      <div>
+        <%= form.label :password, t("admin.users.fields.password"), class: "ds-label" %>
+        <%= form.password_field :password, class: "ds-control mt-2", required: true,
+                                           autocomplete: "new-password", value: nil %>
+      </div>
+      <div>
+        <%= form.label :password_confirmation, t("admin.users.fields.password_confirmation"), class: "ds-label" %>
+        <%= form.password_field :password_confirmation, class: "ds-control mt-2", required: true,
+                                                        autocomplete: "new-password", value: nil %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex flex-wrap justify-end gap-3 border-t border-app-border pt-5">
+    <%= render "shared/components/button", label: t("actions.cancel"), href: admin_users_path, variant: :secondary %>
+    <%= render "shared/components/button", label: t("actions.save"), type: "submit" %>
+  </div>
+<% end %>

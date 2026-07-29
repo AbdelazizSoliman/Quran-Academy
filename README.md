@@ -68,7 +68,33 @@ The task creates an active Arabic administrator in the Cairo time zone, refuses 
 
 Password-reset delivery is provider-neutral. Reset URLs use `APP_HOST`, optional `APP_PORT`, and `DEFAULT_URL_OPTIONS_PROTOCOL`; production must supply the correct public host and protocol before email delivery is enabled. `MAILER_SENDER` controls the sender address.
 
-Academy business modules and user-administration screens remain intentionally out of scope.
+Academy business modules remain intentionally out of scope.
+
+## User administration
+
+Active administrators manage controlled accounts at `/admin/users`. The area supports search,
+allowlisted sorting, role/status/language filters, pagination, account creation, identity and
+preference editing, pending-account approval, explicit status transitions, role assignment,
+and administrative password resets. Public registration remains disabled.
+
+Status changes use explicit transitions: pending accounts may be approved or disabled; active
+accounts may be suspended or disabled; suspended accounts may be reactivated or disabled; and
+disabled accounts may be enabled. Normal editing cannot bypass these transitions.
+
+Server-side protections prevent administrators from demoting or blocking themselves and
+prevent removal of the last active administrator. Sensitive operations lock administrator
+rows within a transaction. Application-level row locking is strong practical protection but
+does not replace operational database controls in every distributed failure scenario.
+
+Accounts are never hard-deleted. Disabling preserves authentication and administrative
+history. Administrative password resets never record the password and increment the target
+account's session version. Suspension and disabling also increment that version, so only that
+user's existing sessions are rejected on their next authenticated request.
+
+`UserAccountEvent` records creation, meaningful updates, approval, status changes, role
+changes, and password resets with safe JSON metadata. It is intentionally account-specific,
+not a general auditing or granular permissions framework. Teacher, student, staff, and
+guardian profile models remain intentionally unimplemented.
 
 ## Technology stack
 

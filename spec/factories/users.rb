@@ -24,5 +24,17 @@ FactoryBot.define do
     trait(:disabled) { status { :disabled } }
     trait(:arabic_locale) { preferred_locale { "ar" } }
     trait(:english_locale) { preferred_locale { "en" } }
+    trait :with_sign_in_history do
+      sign_in_count { 3 }
+      current_sign_in_at { 1.hour.ago }
+      last_sign_in_at { 1.day.ago }
+      current_sign_in_ip { "192.0.2.10" }
+      last_sign_in_ip { "192.0.2.9" }
+    end
+    trait :approved do
+      status { :active }
+      approved_at { 1.day.ago }
+      association :approved_by, factory: %i[user admin]
+    end
   end
 end

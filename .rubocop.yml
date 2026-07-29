@@ -53,8 +53,14 @@ RSpec/MultipleExpectations:
   Max: 8
 
 RSpec/ExampleLength:
-  Max: 10
+  Max: 12
 
 RSpec/DescribeClass:
   Exclude:
     - "spec/tasks/**/*"
+    - "spec/requests/**/*"
+    - "spec/services/**/*"
+
+Rails/BulkChangeTable:
+  Exclude:
+    - "db/migrate/*.rb"

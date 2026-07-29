@@ -3,6 +3,19 @@ Rails.application.routes.draw do
              path: "account",
              path_names: { sign_in: "sign-in", sign_out: "sign-out", password: "password" },
              skip: :registrations
+  namespace :admin do
+    resources :users, except: :destroy do
+      member do
+        patch :approve
+        patch :suspend
+        patch :activate
+        patch :disable
+        patch :enable
+        get :reset_password, action: :edit_password
+        patch :reset_password, action: :update_password
+      end
+    end
+  end
   root "dashboard#index"
   constraints LocalEnvironmentConstraint.new do
     get "ui", to: "ui#index", as: :ui
