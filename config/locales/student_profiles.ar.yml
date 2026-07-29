@@ -1,0 +1,125 @@
+ar:
+  authorization:
+    forbidden: "ليس لديك صلاحية للوصول إلى هذه المنطقة."
+  navigation:
+    guardians: "أولياء الأمور"
+    teacher_profile: "ملفي الشخصي"
+    student_profile: "ملفي الشخصي"
+  actions:
+    verify: "توثيق"
+    archive: "أرشفة"
+    restore: "استعادة"
+  forms:
+    errors_title: "يرجى مراجعة البيانات المحددة"
+  errors:
+    messages:
+      must_be_student: "يجب أن ينتمي إلى حساب طالب"
+      student_profile_exists: "لا يمكن تغيير الدور مع وجود ملف طالب"
+      contact_required: "يتطلب وسيلة اتصال واحدة على الأقل"
+      required_for_preference: "مطلوب لوسيلة الاتصال المختارة"
+      age_mismatch: "لا يطابق العمر المحسوب من تاريخ الميلاد"
+      requirements_not_met: "لا تستوفي متطلبات القاصر الموثق"
+      duplicate_active_relationship: "لديه هذه العلاقة النشطة بالفعل"
+      before_starts_on: "لا يمكن أن يسبق بداية العلاقة"
+      required_for_ended: "مطلوب للعلاقة المنتهية"
+      replacement_required: "يتطلب ولي أمر أساسي بديل قبل الإنهاء"
+      active_minor_dependency: "لا يمكن أرشفته مع اعتماد قاصر موثق عليه"
+  students:
+    index: { title: "الطلاب", description: "إدارة هويات الطلاب وملفات التعلم وجاهزية أولياء الأمور." }
+    new: { title: "إنشاء ملف طالب", description: "ربط حساب طالب موجود بملفه الأكاديمي." }
+    edit: { title: "تعديل ملف الطالب" }
+    actions: { new: "ملف طالب جديد", create_profile: "إنشاء ملف طالب", view_profile: "عرض ملف الطالب" }
+    filters: { all: "الكل", guardian: "ولي الأمر", has_guardian: "لديه ولي أمر", missing_guardian: "بدون ولي أمر", sort: "الترتيب", clear: "مسح المرشحات" }
+    sorts: { name: "الاسم", public_id: "المعرف", created_at: "تاريخ الإنشاء", joined_on: "تاريخ الانضمام", date_of_birth: "تاريخ الميلاد", profile_status: "حالة الملف", learning_status: "حالة التعلم" }
+    empty: { title: "لا توجد ملفات طلاب", description: "أنشئ ملفاً لحساب طالب موجود." }
+    form: { select_student: "اختر حساب طالب مؤهلاً" }
+    messages: { created: "تم إنشاء ملف الطالب.", updated: "تم تحديث ملف الطالب.", verify: "تم توثيق ملف الطالب.", archive: "تمت أرشفة ملف الطالب.", restore: "تمت استعادة ملف الطالب." }
+    user_card: { title: "ملف الطالب" }
+  student:
+    profile:
+      messages: { updated: "تم تحديث ملفك." }
+      edit: { title: "تعديل ملفي", description: "حدّث بيانات الاتصال وتفضيلات التعلم الآمنة." }
+      missing: { title: "ملف الطالب غير جاهز بعد", description: "حسابك نشط، لكن الإدارة لم تنشئ ملفك الأكاديمي بعد.", help: "تواصل مع إدارة الأكاديمية لتهيئة ملفك." }
+  student_profiles:
+    not_configured: "غير مُعد"
+    sections: { account: "ربط الحساب", identity: "الهوية والبيانات", contact: "بيانات الاتصال", learning: "ملف التعلم", lifecycle: "دورة التعلم", sensitive: "معلومات حساسة — للإدارة فقط", guardians: "أولياء الأمور", audit: "سجل التغييرات", profile: "ملفي", completeness: "اكتمال الملف" }
+    fields:
+      user: "حساب الطالب"
+      student: "الطالب"
+      public_id: "المعرف"
+      display_name: "اسم العرض"
+      gender: "الجنس"
+      date_of_birth: "تاريخ الميلاد"
+      age: "العمر"
+      nationality: "الجنسية"
+      country_of_residence: "بلد الإقامة"
+      city: "المدينة"
+      phone_number: "رقم الهاتف"
+      whatsapp_number: "رقم واتساب"
+      preferred_contact_method: "وسيلة الاتصال المفضلة"
+      preferred_interface_locale: "لغة الواجهة"
+      preferred_learning_language: "لغة التعلم"
+      native_language: "اللغة الأم"
+      current_quran_level: "المستوى القرآني"
+      reading_level: "مستوى القراءة"
+      tajweed_level: "مستوى التجويد"
+      memorization_level: "مستوى الحفظ"
+      memorized_surahs: "السور المحفوظة"
+      memorized_juz_count: "عدد الأجزاء المحفوظة"
+      learning_goals: "أهداف التعلم"
+      learning_notes: "ملاحظات التعلم"
+      special_learning_needs: "احتياجات التعلم الخاصة"
+      medical_notes: "ملاحظات طبية"
+      safeguarding_notes: "ملاحظات الحماية"
+      emergency_contact_name: "اسم جهة اتصال الطوارئ"
+      emergency_contact_phone: "هاتف الطوارئ"
+      student_type: "نوع الطالب"
+      profile_status: "حالة الملف"
+      learning_status: "حالة التعلم"
+      joined_on: "تاريخ الانضمام"
+      left_on: "تاريخ المغادرة"
+      internal_notes: "ملاحظات داخلية"
+      completion: "الاكتمال"
+      actions: "الإجراءات"
+      guardian_requirements: "متطلبات ولي الأمر"
+    form: { sensitive_hint: "هذه القيم خاصة بالإدارة وتُحجب في سجل التغييرات." }
+    completeness: { missing: "النواقص: %{fields}", age_mismatch: "نوع الطالب المخزن لا يطابق العمر المحسوب ويجب مراجعته قبل التوثيق." }
+    catalogs:
+      genders: { male: "ذكر", female: "أنثى", unspecified: "غير محدد" }
+      student_types: { minor: "قاصر", adult: "بالغ" }
+      profile_statuses: { draft: "مسودة", complete: "مكتمل", verified: "موثق", archived: "مؤرشف" }
+      learning_statuses: { prospective: "محتمل", active: "نشط", paused: "متوقف مؤقتاً", inactive: "غير نشط", departed: "غادر" }
+      contact_methods: { email: "البريد", phone: "الهاتف", whatsapp: "واتساب", guardian: "ولي الأمر" }
+      quran_levels: { beginner: "مبتدئ", foundation: "تأسيس", reading: "قراءة", intermediate: "متوسط", advanced: "متقدم", memorization: "حفظ", revision: "مراجعة" }
+      reading_levels: { not_started: "لم يبدأ", letters: "حروف", words: "كلمات", sentences: "جمل", fluent: "طليق", advanced: "متقدم" }
+      tajweed_levels: { none: "لا يوجد", basic: "أساسي", intermediate: "متوسط", advanced: "متقدم", qualified: "مؤهل" }
+      memorization_levels: { none: "لا يوجد", short_surahs: "سور قصيرة", partial_juz: "جزء جزئي", multiple_juz: "عدة أجزاء", half_quran: "نصف القرآن", most_quran: "معظم القرآن", complete_quran: "القرآن كاملاً", revision: "مراجعة" }
+    audit:
+      created: "أنشأ %{actor} هذا الملف"
+      updated: "حدّث %{actor} هذا الملف"
+      verified: "وثّق %{actor} هذا الملف"
+      archived: "أرشف %{actor} هذا الملف"
+      restored: "استعاد %{actor} هذا الملف"
+      learning_status_changed: "غيّر %{actor} حالة التعلم"
+      student_type_changed: "غيّر %{actor} نوع الطالب"
+      self_updated: "حدّث %{actor} حقول الملف الآمنة"
+      sensitive_information_updated: "حدّث %{actor} المعلومات المقيدة"
+  guardians:
+    index: { title: "أولياء الأمور", description: "إدارة بيانات أولياء الأمور غير المسجلين وعلاقات الطلاب." }
+    new: { title: "إنشاء ولي أمر", description: "إنشاء سجل ولي أمر دون حساب دخول." }
+    edit: { title: "تعديل ولي الأمر" }
+    actions: { new: "ولي أمر جديد" }
+    empty: { title: "لا يوجد أولياء أمور", description: "أنشئ ولي أمر واربطه بطالب." }
+    sections: { identity: "هوية ولي الأمر", contact: "الاتصال والتواصل", students: "الطلاب المرتبطون", audit: "سجل التغييرات" }
+    fields: { full_name: "الاسم الكامل", gender: "الجنس", email: "البريد الإلكتروني", phone_number: "الهاتف", whatsapp_number: "واتساب", preferred_contact_method: "وسيلة الاتصال المفضلة", preferred_language: "اللغة المفضلة", country: "الدولة", city: "المدينة", occupation: "المهنة", status: "الحالة", internal_notes: "ملاحظات داخلية" }
+    catalogs:
+      statuses: { active: "نشط", inactive: "غير نشط", archived: "مؤرشف" }
+      contact_methods: { email: "البريد", phone: "الهاتف", whatsapp: "واتساب" }
+    messages: { created: "تم إنشاء ولي الأمر.", updated: "تم تحديث ولي الأمر.", archive: "تمت أرشفة ولي الأمر.", restore: "تمت استعادة ولي الأمر." }
+    audit: { created: "أنشأ %{actor} ولي الأمر", updated: "حدّث %{actor} ولي الأمر", archived: "أرشف %{actor} ولي الأمر", restored: "استعاد %{actor} ولي الأمر", contact_information_changed: "حدّث %{actor} بيانات الاتصال" }
+  guardianships:
+    primary: "جهة الاتصال الأساسية"
+    actions: { attach: "ربط ولي الأمر", create_and_attach: "إنشاء ولي أمر وربطه", make_primary: "تعيين كأساسي", end: "إنهاء العلاقة" }
+    form: { select_guardian: "اختر ولي أمر موجوداً" }
+    relationships: { father: "الأب", mother: "الأم", stepfather: "زوج الأم", stepmother: "زوجة الأب", grandfather: "الجد", grandmother: "الجدة", brother: "الأخ", sister: "الأخت", uncle: "العم أو الخال", aunt: "العمة أو الخالة", legal_guardian: "الوصي القانوني", sponsor: "الكفيل", other: "أخرى" }
+    messages: { created: "تم إنشاء علاقة ولي الأمر.", updated: "تم تحديث علاقة ولي الأمر.", failed: "تعذر تغيير علاقة ولي الأمر." }

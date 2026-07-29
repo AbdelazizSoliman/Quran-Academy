@@ -2,9 +2,11 @@ module NavigationHelper
   NAVIGATION_ITEMS = {
     dashboard: { icon: :home, roles: %i[admin staff teacher student] },
     users: { icon: :users, roles: %i[admin], path: :admin_users_path },
-    students: { icon: :users, roles: %i[admin staff] },
+    students: { icon: :users, roles: %i[admin], path: :admin_students_path },
+    guardians: { icon: :users, roles: %i[admin], path: :admin_guardians_path },
     teachers: { icon: :users, roles: %i[admin], path: :admin_teachers_path },
-    my_profile: { icon: :users, roles: %i[teacher], path: :teacher_profile_path },
+    teacher_profile: { icon: :users, roles: %i[teacher], path: :teacher_profile_path },
+    student_profile: { icon: :users, roles: %i[student], path: :student_profile_path },
     schedule: { icon: :calendar, roles: %i[admin staff teacher student] },
     attendance: { icon: :check_circle, roles: %i[admin staff teacher student] },
     whatsapp: { icon: :message, roles: %i[admin staff] },

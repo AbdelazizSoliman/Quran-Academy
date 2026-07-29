@@ -24,8 +24,11 @@
       <% navigation_items_for(current_user).each do |key, item| %>
         <% active = (key == :dashboard && current_page?(root_path)) ||
                     (key == :users && controller_path.start_with?("admin/users")) ||
+                    (key == :students && controller_path.start_with?("admin/students")) ||
+                    (key == :guardians && controller_path.start_with?("admin/guardians")) ||
                     (key == :teachers && controller_path.start_with?("admin/teachers")) ||
-                    (key == :my_profile && controller_path.start_with?("teacher/profiles")) ||
+                    (key == :teacher_profile && controller_path.start_with?("teacher/profiles")) ||
+                    (key == :student_profile && controller_path.start_with?("student/profiles")) ||
                     (key == :settings && controller_path == "admin/academy_settings") %>
         <% path = navigation_path(key, item) %>
         <li>

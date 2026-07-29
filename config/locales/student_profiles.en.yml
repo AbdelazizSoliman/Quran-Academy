@@ -1,0 +1,188 @@
+en:
+  authorization:
+    forbidden: "You do not have permission to access this area."
+  navigation:
+    guardians: "Guardians"
+    teacher_profile: "My Profile"
+    student_profile: "My Profile"
+  actions:
+    verify: "Verify"
+    archive: "Archive"
+    restore: "Restore"
+  forms:
+    errors_title: "Please review the highlighted information"
+  errors:
+    messages:
+      must_be_student: "must belong to a student account"
+      student_profile_exists: "cannot change while a student profile exists"
+      contact_required: "requires at least one contact method"
+      required_for_preference: "is required for the selected contact method"
+      age_mismatch: "does not match the age calculated from the birth date"
+      requirements_not_met: "do not meet the verified minor requirements"
+      duplicate_active_relationship: "already has this active relationship"
+      before_starts_on: "cannot be before the relationship start"
+      required_for_ended: "is required for an ended relationship"
+      replacement_required: "requires another primary guardian before ending"
+      active_minor_dependency: "cannot be archived while a verified minor depends on this guardian"
+  students:
+    index: { title: "Students", description: "Manage student identities, learning profiles, and guardian readiness." }
+    new: { title: "Create student profile", description: "Link an existing student account to its academy profile." }
+    edit: { title: "Edit student profile" }
+    actions: { new: "New student profile", create_profile: "Create student profile", view_profile: "View student profile" }
+    filters:
+      all: "All"
+      guardian: "Guardian"
+      has_guardian: "Has guardian"
+      missing_guardian: "Missing guardian"
+      sort: "Sort"
+      clear: "Clear filters"
+    sorts:
+      name: "Name"
+      public_id: "Public ID"
+      created_at: "Created date"
+      joined_on: "Joined date"
+      date_of_birth: "Date of birth"
+      profile_status: "Profile status"
+      learning_status: "Learning status"
+    empty: { title: "No student profiles", description: "Create a profile for an existing student account." }
+    form: { select_student: "Select an eligible student account" }
+    messages:
+      created: "Student profile created."
+      updated: "Student profile updated."
+      verify: "Student profile verified."
+      archive: "Student profile archived."
+      restore: "Student profile restored."
+    user_card: { title: "Student profile" }
+  student:
+    profile:
+      messages: { updated: "Your profile was updated." }
+      edit: { title: "Edit my profile", description: "Update safe contact and learning preferences." }
+      missing:
+        title: "Your student profile is not ready yet"
+        description: "Your account is active, but administration has not initialized your academy profile."
+        help: "Contact academy administration to initialize your profile."
+  student_profiles:
+    not_configured: "Not configured"
+    sections:
+      account: "Account association"
+      identity: "Identity and demographics"
+      contact: "Contact information"
+      learning: "Learning profile"
+      lifecycle: "Learning lifecycle"
+      sensitive: "Sensitive information — administrators only"
+      guardians: "Guardians"
+      audit: "Audit history"
+      profile: "My profile"
+      completeness: "Profile completeness"
+    fields:
+      user: "Student account"
+      student: "Student"
+      public_id: "Public ID"
+      display_name: "Display name"
+      gender: "Gender"
+      date_of_birth: "Date of birth"
+      age: "Age"
+      nationality: "Nationality"
+      country_of_residence: "Country of residence"
+      city: "City"
+      phone_number: "Phone number"
+      whatsapp_number: "WhatsApp number"
+      preferred_contact_method: "Preferred contact method"
+      preferred_interface_locale: "Interface language"
+      preferred_learning_language: "Learning language"
+      native_language: "Native language"
+      current_quran_level: "Current Quran level"
+      reading_level: "Reading level"
+      tajweed_level: "Tajweed level"
+      memorization_level: "Memorization level"
+      memorized_surahs: "Memorized surahs"
+      memorized_juz_count: "Memorized Juz count"
+      learning_goals: "Learning goals"
+      learning_notes: "Learning notes"
+      special_learning_needs: "Special learning needs"
+      medical_notes: "Medical notes"
+      safeguarding_notes: "Safeguarding notes"
+      emergency_contact_name: "Emergency contact name"
+      emergency_contact_phone: "Emergency contact phone"
+      student_type: "Student type"
+      profile_status: "Profile status"
+      learning_status: "Learning status"
+      joined_on: "Joined on"
+      left_on: "Left on"
+      internal_notes: "Internal notes"
+      completion: "Completion"
+      actions: "Actions"
+      guardian_requirements: "Guardian requirements"
+    form: { sensitive_hint: "These values are restricted to administrators and are masked in audit history." }
+    completeness:
+      missing: "Missing: %{fields}"
+      age_mismatch: "The stored student type does not match the calculated age and must be reviewed before verification."
+    catalogs:
+      genders: { male: "Male", female: "Female", unspecified: "Unspecified" }
+      student_types: { minor: "Minor", adult: "Adult" }
+      profile_statuses: { draft: "Draft", complete: "Complete", verified: "Verified", archived: "Archived" }
+      learning_statuses: { prospective: "Prospective", active: "Active", paused: "Paused", inactive: "Inactive", departed: "Departed" }
+      contact_methods: { email: "Email", phone: "Phone", whatsapp: "WhatsApp", guardian: "Guardian" }
+      quran_levels: { beginner: "Beginner", foundation: "Foundation", reading: "Reading", intermediate: "Intermediate", advanced: "Advanced", memorization: "Memorization", revision: "Revision" }
+      reading_levels: { not_started: "Not started", letters: "Letters", words: "Words", sentences: "Sentences", fluent: "Fluent", advanced: "Advanced" }
+      tajweed_levels: { none: "None", basic: "Basic", intermediate: "Intermediate", advanced: "Advanced", qualified: "Qualified" }
+      memorization_levels: { none: "None", short_surahs: "Short surahs", partial_juz: "Partial Juz", multiple_juz: "Multiple Juz", half_quran: "Half Quran", most_quran: "Most Quran", complete_quran: "Complete Quran", revision: "Revision" }
+    audit:
+      created: "%{actor} created this profile"
+      updated: "%{actor} updated this profile"
+      verified: "%{actor} verified this profile"
+      archived: "%{actor} archived this profile"
+      restored: "%{actor} restored this profile"
+      learning_status_changed: "%{actor} changed learning status"
+      student_type_changed: "%{actor} changed student type"
+      self_updated: "%{actor} updated safe profile fields"
+      sensitive_information_updated: "%{actor} updated restricted information"
+  guardians:
+    index: { title: "Guardians", description: "Manage non-authenticated guardian contacts and student relationships." }
+    new: { title: "Create guardian", description: "Create a guardian record without a login account." }
+    edit: { title: "Edit guardian" }
+    actions: { new: "New guardian" }
+    empty: { title: "No guardians", description: "Create a guardian and attach them to a student." }
+    sections: { identity: "Guardian identity", contact: "Contact and communication", students: "Connected students", audit: "Audit history" }
+    fields:
+      full_name: "Full name"
+      gender: "Gender"
+      email: "Email"
+      phone_number: "Phone"
+      whatsapp_number: "WhatsApp"
+      preferred_contact_method: "Preferred contact method"
+      preferred_language: "Preferred language"
+      country: "Country"
+      city: "City"
+      occupation: "Occupation"
+      status: "Status"
+      internal_notes: "Internal notes"
+    catalogs:
+      statuses: { active: "Active", inactive: "Inactive", archived: "Archived" }
+      contact_methods: { email: "Email", phone: "Phone", whatsapp: "WhatsApp" }
+    messages: { created: "Guardian created.", updated: "Guardian updated.", archive: "Guardian archived.", restore: "Guardian restored." }
+    audit:
+      created: "%{actor} created this guardian"
+      updated: "%{actor} updated this guardian"
+      archived: "%{actor} archived this guardian"
+      restored: "%{actor} restored this guardian"
+      contact_information_changed: "%{actor} updated contact information"
+  guardianships:
+    primary: "Primary contact"
+    actions: { attach: "Attach guardian", create_and_attach: "Create and attach guardian", make_primary: "Make primary", end: "End relationship" }
+    form: { select_guardian: "Select an existing guardian" }
+    relationships:
+      father: "Father"
+      mother: "Mother"
+      stepfather: "Stepfather"
+      stepmother: "Stepmother"
+      grandfather: "Grandfather"
+      grandmother: "Grandmother"
+      brother: "Brother"
+      sister: "Sister"
+      uncle: "Uncle"
+      aunt: "Aunt"
+      legal_guardian: "Legal guardian"
+      sponsor: "Sponsor"
+      other: "Other"
+    messages: { created: "Guardian relationship created.", updated: "Guardian relationship updated.", failed: "The guardian relationship could not be changed." }

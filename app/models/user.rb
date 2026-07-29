@@ -25,11 +25,31 @@ class User < ApplicationRecord
                                       inverse_of: :updated_by, dependent: :nullify
   has_many :teacher_profile_events, foreign_key: :actor_id, inverse_of: :actor,
                                     dependent: :restrict_with_exception
+  has_one :student_profile, inverse_of: :user, dependent: :restrict_with_exception
+  has_many :created_student_profiles, class_name: "StudentProfile", foreign_key: :created_by_id,
+                                      inverse_of: :created_by, dependent: :nullify
+  has_many :updated_student_profiles, class_name: "StudentProfile", foreign_key: :updated_by_id,
+                                      inverse_of: :updated_by, dependent: :nullify
+  has_many :student_profile_events, foreign_key: :actor_id, inverse_of: :actor,
+                                    dependent: :restrict_with_exception
+  has_many :created_guardians, class_name: "Guardian", foreign_key: :created_by_id,
+                               inverse_of: :created_by, dependent: :nullify
+  has_many :updated_guardians, class_name: "Guardian", foreign_key: :updated_by_id,
+                               inverse_of: :updated_by, dependent: :nullify
+  has_many :guardian_events, foreign_key: :actor_id, inverse_of: :actor,
+                             dependent: :restrict_with_exception
+  has_many :created_student_guardianships, class_name: "StudentGuardianship", foreign_key: :created_by_id,
+                                           inverse_of: :created_by, dependent: :nullify
+  has_many :updated_student_guardianships, class_name: "StudentGuardianship", foreign_key: :updated_by_id,
+                                           inverse_of: :updated_by, dependent: :nullify
+  has_many :student_guardianship_events, foreign_key: :actor_id, inverse_of: :actor,
+                                         dependent: :restrict_with_exception
 
   validates :first_name, :last_name, presence: true
   validates :preferred_locale, inclusion: { in: %w[ar en] }
   validates :time_zone, inclusion: { in: ->(_user) { ActiveSupport::TimeZone.all.map(&:name) } }
   validate :teacher_profile_role_integrity, if: :will_save_change_to_role?
+  validate :student_profile_role_integrity, if: :will_save_change_to_role?
 
   def full_name
     [first_name, last_name].compact_blank.join(" ").presence || email.to_s.split("@").first.presence || "User"
@@ -49,6 +69,10 @@ class User < ApplicationRecord
     teacher_profile.present?
   end
 
+  def student_profile?
+    student_profile.present?
+  end
+
   private
 
   def apply_preference_defaults
@@ -58,5 +82,9 @@ class User < ApplicationRecord
 
   def teacher_profile_role_integrity
     errors.add(:role, :teacher_profile_exists) if persisted? && !teacher? && teacher_profile?
+  end
+
+  def student_profile_role_integrity
+    errors.add(:role, :student_profile_exists) if persisted? && !student? && student_profile?
   end
 end

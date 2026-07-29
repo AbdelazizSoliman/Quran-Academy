@@ -65,6 +65,16 @@
     <% end %>
     <%= render "shared/components/card", title: t("teachers.user_card.title"), body: teacher_body %>
   <% end %>
+  <% if @user.student? %>
+    <% student_body = capture do %>
+      <% if @user.student_profile %>
+        <%= render "shared/components/button", label: t("students.actions.view_profile"), href: admin_student_path(@user.student_profile), icon: :users %>
+      <% else %>
+        <%= render "shared/components/button", label: t("students.actions.create_profile"), href: new_admin_student_path(user_id: @user.id), icon: :plus %>
+      <% end %>
+    <% end %>
+    <%= render "shared/components/card", title: t("students.user_card.title"), body: student_body %>
+  <% end %>
 </div>
 
 <div class="mt-6">

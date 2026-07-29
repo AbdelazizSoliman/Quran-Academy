@@ -1,0 +1,63 @@
+<%= render "shared/student_profiles/errors", profile: %>
+<% form_url = admin_mode ? (profile.persisted? ? admin_student_path(profile) : admin_students_path) : student_profile_path %>
+<%= form_with model: profile, url: form_url, class: "space-y-6" do |form| %>
+  <% if admin_mode && !profile.persisted? %>
+    <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.account") %></legend>
+      <%= form.label :user_id, t("student_profiles.fields.user"), class: "ds-label mt-3" %>
+      <%= form.collection_select :user_id, eligible_users, :id, :full_name, { include_blank: t("students.form.select_student") }, class: "ds-control mt-2" %>
+    </fieldset>
+  <% end %>
+
+  <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.identity") %></legend>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <% fields = admin_mode ? %i[display_name gender date_of_birth nationality country_of_residence city student_type] : %i[display_name country_of_residence city] %>
+      <% fields.each do |field| %><div>
+        <%= form.label field, t("student_profiles.fields.#{field}"), class: "ds-label" %>
+        <% if field == :gender %><%= form.select field, StudentProfile::GENDERS.map { |v| [t("student_profiles.catalogs.genders.#{v}"), v] }, {}, class: "ds-control mt-2" %>
+        <% elsif field == :student_type %><%= form.select field, StudentProfile::STUDENT_TYPES.map { |v| [t("student_profiles.catalogs.student_types.#{v}"), v] }, {}, class: "ds-control mt-2" %>
+        <% elsif field == :date_of_birth %><%= form.date_field field, class: "ds-control mt-2" %>
+        <% else %><%= form.text_field field, class: "ds-control mt-2" %><% end %>
+      </div><% end %>
+    </div>
+  </fieldset>
+
+  <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.contact") %></legend>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <% %i[phone_number whatsapp_number].each do |field| %><div><%= form.label field, t("student_profiles.fields.#{field}"), class: "ds-label" %><%= form.telephone_field field, class: "ds-control mt-2", dir: "ltr" %></div><% end %>
+      <% if admin_mode %><div><%= form.label :preferred_contact_method, t("student_profiles.fields.preferred_contact_method"), class: "ds-label" %><%= form.select :preferred_contact_method, StudentProfile::CONTACT_METHODS.map { |v| [t("student_profiles.catalogs.contact_methods.#{v}"), v] }, {}, class: "ds-control mt-2" %></div><% end %>
+    </div>
+  </fieldset>
+
+  <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.learning") %></legend>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div><%= form.label :preferred_learning_language, t("student_profiles.fields.preferred_learning_language"), class: "ds-label" %><%= form.select :preferred_learning_language, (AcademySetting.current_or_nil&.teaching_languages || []).map { |v| [t("academy.languages.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
+      <div><%= form.label :native_language, t("student_profiles.fields.native_language"), class: "ds-label" %><%= form.text_field :native_language, class: "ds-control mt-2" %></div>
+      <% if admin_mode %>
+        <% { current_quran_level: StudentProfile::QURAN_LEVELS, reading_level: StudentProfile::READING_LEVELS, tajweed_level: StudentProfile::TAJWEED_LEVELS, memorization_level: StudentProfile::MEMORIZATION_LEVELS }.each do |field, values| %>
+          <div><%= form.label field, t("student_profiles.fields.#{field}"), class: "ds-label" %><%= form.select field, values.map { |v| [t("student_profiles.catalogs.#{field.to_s.sub(/_level$/, "").pluralize}_levels.#{v}", default: v.humanize), v] }, {}, class: "ds-control mt-2" %></div>
+        <% end %>
+        <div><%= form.label :memorized_juz_count, t("student_profiles.fields.memorized_juz_count"), class: "ds-label" %><%= form.number_field :memorized_juz_count, min: 0, max: 30, class: "ds-control mt-2" %></div>
+        <div><%= form.label :memorized_surahs, t("student_profiles.fields.memorized_surahs"), class: "ds-label" %><%= form.text_field :memorized_surahs, class: "ds-control mt-2" %></div>
+      <% end %>
+      <div class="sm:col-span-2"><%= form.label :learning_goals, t("student_profiles.fields.learning_goals"), class: "ds-label" %><%= form.text_area :learning_goals, rows: 3, class: "ds-control mt-2" %></div>
+    </div>
+  </fieldset>
+
+  <% if admin_mode %>
+    <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.lifecycle") %></legend>
+      <div class="mt-4 grid gap-4 sm:grid-cols-3">
+        <div><%= form.label :learning_status, t("student_profiles.fields.learning_status"), class: "ds-label" %><%= form.select :learning_status, StudentProfile::LEARNING_STATUSES.map { |v| [t("student_profiles.catalogs.learning_statuses.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
+        <% %i[joined_on left_on].each do |field| %><div><%= form.label field, t("student_profiles.fields.#{field}"), class: "ds-label" %><%= form.date_field field, class: "ds-control mt-2" %></div><% end %>
+      </div>
+    </fieldset>
+    <fieldset class="ds-card border-red-200 p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.sensitive") %></legend>
+      <p class="mt-2 ds-caption"><%= t("student_profiles.form.sensitive_hint") %></p>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <% %i[special_learning_needs medical_notes safeguarding_notes emergency_contact_name emergency_contact_phone internal_notes learning_notes].each do |field| %>
+          <div class="<%= "sm:col-span-2" if field.to_s.end_with?("notes") %>"><%= form.label field, t("student_profiles.fields.#{field}"), class: "ds-label" %><%= field.to_s.end_with?("notes") ? form.text_area(field, rows: 3, class: "ds-control mt-2") : form.text_field(field, class: "ds-control mt-2") %></div>
+        <% end %>
+      </div>
+    </fieldset>
+  <% end %>
+  <div class="flex flex-wrap gap-3"><%= render "shared/components/button", label: t("actions.save"), type: "submit" %><%= render "shared/components/button", label: t("actions.cancel"), href: admin_mode ? admin_students_path : student_profile_path, variant: :secondary %></div>
+<% end %>

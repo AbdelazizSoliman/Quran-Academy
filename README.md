@@ -158,6 +158,31 @@ before/after metadata. Schedules, recurring availability, lessons, attendance, s
 assignments, payroll entries, payments, public directories, uploads, and performance reports
 remain out of scope.
 
+## Student and guardian profiles
+
+Authentication identities remain in `User`; student demographic, contact, learning, and
+safeguarding data lives in a one-to-one `StudentProfile`. Administrators explicitly create
+profiles for existing student-role accounts. Profiles use immutable public IDs and protect
+their owning user from an invalid role change.
+
+Guardians are deliberately non-authenticated domain records: there is no guardian role,
+login, invitation, or portal. `StudentGuardianship` provides many-to-many relationships with
+relationship type, one transactional active primary contact per student, emergency/legal/
+academic authority flags, communication-readiness flags, and effective dates. Adults may
+have no guardian; verified minors require a usable active guardian, exactly one primary
+contact, emergency coverage, and legal or academic authority.
+
+Account status, profile status, learning status, guardian status, and relationship status
+remain separate. Completeness and age are derived. Sensitive medical, safeguarding,
+learning-needs, emergency, and internal fields are administrator-only; audit history stores
+masked change markers instead of duplicating their contents. Students can edit only their
+own safe contact and learning-preference fields. Profiles, guardians, and relationships are
+archived or ended rather than hard-deleted.
+
+Programs, courses, enrollment, teacher assignment, scheduling, lessons, attendance, billing,
+payments, communications, uploads, background jobs, and guardian authentication remain out
+of scope.
+
 ## Technology stack
 
 - Ruby 3.4.6
