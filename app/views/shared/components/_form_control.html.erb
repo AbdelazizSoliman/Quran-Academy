@@ -1,0 +1,66 @@
+<% name = local_assigns.fetch(:name) %>
+<% id = local_assigns.fetch(:id, name.to_s.parameterize(separator: "_")) %>
+<% type = local_assigns.fetch(:type, :text).to_sym %>
+<% invalid = local_assigns[:error].present? %>
+<% described_by = [] %>
+<% described_by << "#{id}_hint" if local_assigns[:hint] %>
+<% described_by << "#{id}_error" if invalid %>
+<% described_by = described_by.join(" ") %>
+<div class="space-y-1.5">
+  <% unless %i[checkbox radio toggle].include?(type) %>
+    <%= label_tag id, class: "ds-label" do %>
+      <%= local_assigns.fetch(:label) %>
+      <% if local_assigns.fetch(:required, false) %><span class="text-app-danger" aria-hidden="true">*</span><span class="sr-only"><%= t("forms.required") %></span><% end %>
+    <% end %>
+  <% end %>
+
+  <% common = {
+    id:,
+    name:,
+    disabled: local_assigns.fetch(:disabled, false),
+    readonly: local_assigns.fetch(:readonly, false),
+    required: local_assigns.fetch(:required, false),
+    aria: { invalid:, describedby: described_by.presence },
+    class: "ds-control"
+  } %>
+  <% case type %>
+  <% when :textarea %>
+    <%= text_area_tag name, local_assigns[:value], common.merge(rows: local_assigns.fetch(:rows, 4), placeholder: local_assigns[:placeholder]) %>
+  <% when :select %>
+    <%= select_tag name, options_for_select(local_assigns.fetch(:options), local_assigns[:value]), common.merge(include_blank: local_assigns[:include_blank]) %>
+  <% when :checkbox, :radio %>
+    <div class="flex items-start gap-2.5">
+      <% if type == :checkbox %>
+        <%= check_box_tag name, local_assigns.fetch(:checked_value, "1"), local_assigns.fetch(:checked, false), common.except(:class, :readonly).merge(class: "ds-checkbox mt-0.5") %>
+      <% else %>
+        <%= radio_button_tag name, local_assigns.fetch(:value, "1"), local_assigns.fetch(:checked, false), common.except(:class, :readonly).merge(class: "ds-checkbox mt-0.5") %>
+      <% end %>
+      <%= label_tag id, class: "text-sm text-app-text" do %>
+        <span class="font-medium"><%= local_assigns.fetch(:label) %></span>
+        <% if local_assigns[:hint] %><span id="<%= id %>_hint" class="mt-0.5 block ds-caption"><%= hint %></span><% end %>
+      <% end %>
+    </div>
+  <% when :toggle %>
+    <label for="<%= id %>" class="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-app-border p-3">
+      <span>
+        <span class="block text-sm font-medium text-app-text"><%= local_assigns.fetch(:label) %></span>
+        <% if local_assigns[:hint] %><span id="<%= id %>_hint" class="mt-0.5 block ds-caption"><%= hint %></span><% end %>
+      </span>
+      <span class="relative inline-flex">
+        <%= check_box_tag name, "1", local_assigns.fetch(:checked, false), common.except(:class, :readonly).merge(class: "peer sr-only") %>
+        <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-app-primary peer-focus-visible:ring-2 peer-focus-visible:ring-app-primary peer-focus-visible:ring-offset-2"></span>
+        <span class="absolute start-1 top-1 size-4 rounded-full bg-white shadow transition peer-checked:translate-x-5 rtl:peer-checked:-translate-x-5"></span>
+      </span>
+    </label>
+  <% when :search %>
+    <div class="relative">
+      <span class="pointer-events-none absolute inset-y-0 start-0 grid w-11 place-items-center text-app-subtle"><%= icon(:search, size: 4) %></span>
+      <%= search_field_tag name, local_assigns[:value], common.merge(placeholder: local_assigns[:placeholder], class: "ds-control ps-11") %>
+    </div>
+  <% else %>
+    <%= tag.input(**common.merge(type:, value: local_assigns[:value], placeholder: local_assigns[:placeholder])) %>
+  <% end %>
+
+  <% if local_assigns[:hint] && !%i[checkbox radio toggle].include?(type) %><p id="<%= id %>_hint" class="ds-caption"><%= hint %></p><% end %>
+  <% if invalid %><p id="<%= id %>_error" class="text-xs font-medium text-app-danger"><%= error %></p><% end %>
+</div>

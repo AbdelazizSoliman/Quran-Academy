@@ -1,0 +1,4 @@
+<span class="inline-flex items-center gap-2 text-sm text-app-secondary" role="status">
+  <%= icon(:spinner, classes: "animate-spin") %>
+  <% if local_assigns[:label].present? %><span><%= label %></span><% else %><span class="sr-only"><%= t("accessibility.loading") %></span><% end %>
+</span>

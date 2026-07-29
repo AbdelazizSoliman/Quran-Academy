@@ -1,0 +1,4 @@
+<span class="<%= badge_classes(local_assigns.fetch(:variant, :default)) %>" data-component="badge" data-variant="<%= local_assigns.fetch(:variant, :default) %>">
+  <% if local_assigns[:dot] %><span class="size-1.5 rounded-full bg-current" aria-hidden="true"></span><% end %>
+  <%= local_assigns.fetch(:label) %>
+</span>

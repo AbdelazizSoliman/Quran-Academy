@@ -1,0 +1,146 @@
+<% content_for :title, "#{t("ui.title")} | #{t("app.name")}" %>
+<% locale_action = render("shared/components/button",
+                          label: t("ui.switch_locale"),
+                          variant: :outline,
+                          size: :small,
+                          href: ui_path(locale: I18n.locale == :ar ? :en : :ar)) %>
+<%= render "shared/page_header",
+           title: t("ui.title"),
+           description: t("ui.description"),
+           breadcrumbs: [{ label: t("navigation.dashboard"), href: root_path }, { label: t("ui.title") }],
+           badge: render("shared/components/badge", label: t("ui.development_only"), variant: :warning),
+           primary_action: locale_action %>
+
+<div class="space-y-8">
+  <section aria-labelledby="buttons-heading">
+    <h2 id="buttons-heading" class="mb-4 ds-section-title"><%= t("ui.sections.buttons") %></h2>
+    <div class="ds-card p-5">
+      <div class="flex flex-wrap items-center gap-3">
+        <% %i[primary secondary outline ghost danger].each do |variant| %>
+          <%= render "shared/components/button", label: t("ui.button_variants.#{variant}"), variant: %>
+        <% end %>
+      </div>
+      <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-app-border pt-5">
+        <%= render "shared/components/button", label: t("ui.examples.small"), size: :small, icon: :plus %>
+        <%= render "shared/components/button", label: t("ui.examples.medium"), size: :medium, icon: :plus %>
+        <%= render "shared/components/button", label: t("ui.examples.large"), size: :large, icon: :plus %>
+        <%= render "shared/components/button", label: t("ui.examples.disabled"), disabled: true %>
+        <%= render "shared/components/button", label: t("ui.examples.loading"), loading: true, disabled: true %>
+        <%= render "shared/components/button", label: t("ui.examples.add"), icon: :plus, icon_only: true, aria_label: t("ui.examples.add") %>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="badges-heading">
+    <h2 id="badges-heading" class="mb-4 ds-section-title"><%= t("ui.sections.badges") %></h2>
+    <div class="ds-card flex flex-wrap gap-3 p-5">
+      <% %i[default success warning danger information neutral].each do |variant| %>
+        <%= render "shared/components/badge", label: t("ui.badge_variants.#{variant}"), variant:, dot: true %>
+      <% end %>
+    </div>
+  </section>
+
+  <section aria-labelledby="cards-heading">
+    <h2 id="cards-heading" class="mb-4 ds-section-title"><%= t("ui.sections.cards") %></h2>
+    <div class="grid gap-4 lg:grid-cols-3">
+      <%= render "shared/components/card",
+                 title: t("ui.examples.standard_card"),
+                 subtitle: t("ui.examples.card_subtitle"),
+                 icon: :information,
+                 body: tag.p(t("ui.examples.card_body"), class: "ds-body"),
+                 footer: tag.p(t("ui.examples.card_footer"), class: "ds-caption") %>
+      <%= render "shared/components/stat_card", label: t("ui.examples.placeholder_metric"), value: "128", note: t("ui.examples.placeholder_note"), icon: :calendar %>
+      <%= render "shared/components/card",
+                 title: t("ui.examples.clickable_card"),
+                 subtitle: t("ui.examples.clickable_subtitle"),
+                 href: "#",
+                 icon: :arrow,
+                 body: tag.p(t("ui.examples.card_body"), class: "ds-body") %>
+    </div>
+  </section>
+
+  <section aria-labelledby="alerts-heading">
+    <h2 id="alerts-heading" class="mb-4 ds-section-title"><%= t("ui.sections.alerts") %></h2>
+    <div class="space-y-3">
+      <% %i[success warning error information].each do |variant| %>
+        <%= render "shared/components/alert",
+                   title: t("ui.alerts.#{variant}.title"),
+                   message: t("ui.alerts.#{variant}.message"),
+                   variant:,
+                   dismissible: true %>
+      <% end %>
+    </div>
+  </section>
+
+  <section aria-labelledby="forms-heading">
+    <h2 id="forms-heading" class="mb-4 ds-section-title"><%= t("ui.sections.forms") %></h2>
+    <form class="ds-card grid gap-5 p-5 md:grid-cols-2" action="#" method="get">
+      <%= render "shared/components/form_control", type: :text, name: :demo_name, label: t("ui.forms.text"), required: true, hint: t("ui.forms.hint"), placeholder: t("ui.forms.placeholder") %>
+      <%= render "shared/components/form_control", type: :email, name: :demo_email, label: t("ui.forms.email"), value: "example@academy.test" %>
+      <%= render "shared/components/form_control", type: :password, name: :demo_password, label: t("ui.forms.password"), value: "password" %>
+      <%= render "shared/components/form_control", type: :number, name: :demo_number, label: t("ui.forms.number"), value: 12, readonly: true %>
+      <%= render "shared/components/form_control", type: :date, name: :demo_date, label: t("ui.forms.date") %>
+      <%= render "shared/components/form_control", type: :time, name: :demo_time, label: t("ui.forms.time") %>
+      <%= render "shared/components/form_control", type: :select, name: :demo_select, label: t("ui.forms.select"), options: [[t("ui.forms.option_one"), "one"], [t("ui.forms.option_two"), "two"]] %>
+      <%= render "shared/components/form_control", type: :search, name: :demo_search, label: t("ui.forms.search"), placeholder: t("actions.search") %>
+      <div class="md:col-span-2"><%= render "shared/components/form_control", type: :textarea, name: :demo_notes, label: t("ui.forms.textarea"), error: t("ui.forms.error"), value: "" %></div>
+      <%= render "shared/components/form_control", type: :checkbox, name: :demo_checkbox, id: :demo_checkbox, label: t("ui.forms.checkbox"), hint: t("ui.forms.checkbox_hint"), checked: true %>
+      <%= render "shared/components/form_control", type: :radio, name: :demo_radio, id: :demo_radio, label: t("ui.forms.radio"), value: "selected", checked: true %>
+      <div class="md:col-span-2"><%= render "shared/components/form_control", type: :toggle, name: :demo_toggle, id: :demo_toggle, label: t("ui.forms.toggle"), hint: t("ui.forms.toggle_hint") %></div>
+      <div class="md:col-span-2"><%= render "shared/components/form_control", type: :text, name: :demo_disabled, label: t("ui.forms.disabled"), disabled: true, value: t("ui.examples.disabled") %></div>
+    </form>
+  </section>
+
+  <section aria-labelledby="table-heading">
+    <h2 id="table-heading" class="mb-4 ds-section-title"><%= t("ui.sections.table") %></h2>
+    <%= render "shared/components/table",
+               caption: t("ui.table.caption"),
+               headers: [t("ui.table.name"), t("ui.table.category"), t("ui.table.status"), t("ui.table.action")],
+               rows: [
+                 [t("ui.table.record_one"), t("ui.table.example"), { badge: t("ui.badge_variants.success"), variant: :success }, render("shared/components/dropdown", icon_only: true, aria_label: t("accessibility.row_actions"), items: [{ label: t("actions.edit"), icon: :information }, { label: t("actions.delete"), icon: :close }])],
+                 [t("ui.table.record_two"), t("ui.table.example"), { badge: t("ui.badge_variants.neutral"), variant: :neutral }, "—"]
+               ] %>
+    <div class="mt-4">
+      <%= render "shared/components/pagination", current: 2, pages: 4, summary: t("pagination.summary", from: 11, to: 20, total: 40) %>
+    </div>
+  </section>
+
+  <section aria-labelledby="empty-heading">
+    <h2 id="empty-heading" class="mb-4 ds-section-title"><%= t("ui.sections.empty_state") %></h2>
+    <%= render "shared/components/empty_state",
+               title: t("ui.empty.title"),
+               description: t("ui.empty.description"),
+               primary_action: render("shared/components/button", label: t("ui.empty.primary"), icon: :plus),
+               secondary_action: render("shared/components/button", label: t("ui.empty.secondary"), variant: :secondary) %>
+  </section>
+
+  <section class="grid gap-6 lg:grid-cols-2" aria-labelledby="interactions-heading">
+    <div>
+      <h2 id="interactions-heading" class="mb-4 ds-section-title"><%= t("ui.sections.interactions") %></h2>
+      <div class="ds-card flex flex-wrap items-start gap-4 p-5">
+        <%= render "shared/components/modal",
+                   open_label: t("ui.modal.open"),
+                   title: t("ui.modal.title"),
+                   description: t("ui.modal.description"),
+                   body: tag.p(t("ui.modal.body")),
+                   primary_action: render("shared/components/button", label: t("actions.save")) %>
+        <%= render "shared/components/dropdown",
+                   label: t("ui.dropdown.open"),
+                   items: [
+                     { label: t("ui.dropdown.first"), icon: :information },
+                     { label: t("ui.dropdown.second"), icon: :calendar },
+                     { divider: true },
+                     { label: t("actions.cancel"), icon: :close }
+                   ] %>
+      </div>
+    </div>
+    <div>
+      <h2 class="mb-4 ds-section-title"><%= t("ui.sections.loading") %></h2>
+      <div class="ds-card space-y-6 p-5">
+        <%= render "shared/components/spinner", label: t("accessibility.loading") %>
+        <%= render "shared/components/skeleton", type: :card %>
+        <%= render "shared/components/skeleton", type: :table, rows: 2 %>
+      </div>
+    </div>
+  </section>
+</div>

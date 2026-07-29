@@ -1,0 +1,28 @@
+<% variant = local_assigns.fetch(:variant, :primary) %>
+<% size = local_assigns.fetch(:size, :medium) %>
+<% icon_only = local_assigns.fetch(:icon_only, false) %>
+<% disabled = local_assigns.fetch(:disabled, false) %>
+<% loading = local_assigns.fetch(:loading, false) %>
+<% classes = [button_classes(variant:, size:, icon_only:), local_assigns[:class]].compact.join(" ") %>
+<% content = capture do %>
+  <% if loading %>
+    <%= icon(:spinner, classes: "animate-spin", decorative: true) %>
+  <% elsif local_assigns[:icon] %>
+    <%= icon local_assigns[:icon], decorative: true %>
+  <% end %>
+  <% unless icon_only %><span><%= local_assigns.fetch(:label) %></span><% end %>
+<% end %>
+
+<% if local_assigns[:href].present? && !disabled %>
+  <%= link_to href, class: classes, aria: (icon_only ? { label: local_assigns.fetch(:aria_label, local_assigns[:label]) } : {}), data: local_assigns.fetch(:data, {}).merge(component: "button", variant:) do %>
+    <%= content %>
+  <% end %>
+<% else %>
+  <%= button_tag type: local_assigns.fetch(:type, "button"),
+                 class: classes,
+                 disabled: disabled,
+                 aria: { label: (icon_only ? local_assigns.fetch(:aria_label, local_assigns[:label]) : nil), busy: loading },
+                 data: local_assigns.fetch(:data, {}).merge(component: "button", variant:) do %>
+    <%= content %>
+  <% end %>
+<% end %>

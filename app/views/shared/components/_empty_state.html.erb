@@ -1,0 +1,11 @@
+<div class="rounded-xl border border-dashed border-app-border bg-app-muted/40 px-5 py-10 text-center">
+  <span class="mx-auto grid size-12 place-items-center rounded-full bg-app-primary-soft text-app-primary"><%= icon local_assigns.fetch(:icon, :empty), size: 6 %></span>
+  <h3 class="mt-4 ds-card-title"><%= local_assigns.fetch(:title) %></h3>
+  <p class="mx-auto mt-2 max-w-md ds-supporting"><%= local_assigns.fetch(:description) %></p>
+  <% if local_assigns[:primary_action].present? || local_assigns[:secondary_action].present? %>
+    <div class="mt-5 flex flex-wrap justify-center gap-3">
+      <%= primary_action if local_assigns[:primary_action] %>
+      <%= secondary_action if local_assigns[:secondary_action] %>
+    </div>
+  <% end %>
+</div>

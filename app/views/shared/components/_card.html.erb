@@ -1,0 +1,25 @@
+<% clickable = local_assigns[:href].present? %>
+<% tag_name = clickable ? :a : local_assigns.fetch(:as, :article) %>
+<%= content_tag tag_name,
+                href: (local_assigns[:href] if clickable),
+                data: { component: "card" },
+                class: ["ds-card block overflow-hidden", ("transition hover:-translate-y-0.5 hover:shadow-md" if clickable), local_assigns[:class]].compact.join(" ") do %>
+  <% if local_assigns[:title].present? || local_assigns[:subtitle].present? || local_assigns[:header_action].present? %>
+    <header class="flex flex-wrap items-start justify-between gap-3 border-b border-app-border px-5 py-4">
+      <div class="flex min-w-0 items-start gap-3">
+        <% if local_assigns[:icon] %>
+          <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-app-primary-soft text-app-primary"><%= icon local_assigns[:icon] %></span>
+        <% end %>
+        <div>
+          <% if local_assigns[:title].present? %><h2 class="ds-card-title"><%= title %></h2><% end %>
+          <% if local_assigns[:subtitle].present? %><p class="mt-1 ds-caption"><%= subtitle %></p><% end %>
+        </div>
+      </div>
+      <% if local_assigns[:header_action].present? %><div><%= header_action %></div><% end %>
+    </header>
+  <% end %>
+  <div class="<%= local_assigns.fetch(:body_class, "p-5") %>"><%= local_assigns[:body] %></div>
+  <% if local_assigns[:footer].present? %>
+    <footer class="border-t border-app-border bg-app-muted/50 px-5 py-3"><%= footer %></footer>
+  <% end %>
+<% end %>

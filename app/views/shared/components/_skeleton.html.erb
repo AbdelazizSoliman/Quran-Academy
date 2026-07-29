@@ -1,0 +1,16 @@
+<div class="space-y-4" aria-hidden="true">
+  <% if local_assigns.fetch(:type, :card).to_sym == :table %>
+    <% local_assigns.fetch(:rows, 3).times do %>
+      <div class="flex gap-4 border-b border-app-border py-3">
+        <div class="ds-skeleton h-5 w-1/3"></div><div class="ds-skeleton h-5 w-1/4"></div><div class="ds-skeleton h-5 flex-1"></div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="ds-card p-5">
+      <div class="ds-skeleton h-5 w-1/3"></div>
+      <div class="mt-4 ds-skeleton h-4 w-full"></div>
+      <div class="mt-2 ds-skeleton h-4 w-4/5"></div>
+      <div class="mt-5 ds-skeleton h-10 w-28"></div>
+    </div>
+  <% end %>
+</div>
