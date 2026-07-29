@@ -1,4 +1,7 @@
 en:
+  time:
+    formats:
+      long: "%B %d, %Y at %H:%M"
   date:
     formats:
       long: "%B %d, %Y"
@@ -24,6 +27,7 @@ en:
     payroll: "Payroll"
     reports: "Reports"
     settings: "Settings"
+    users: "User administration"
     coming_soon: "Coming Soon"
   actions:
     login: "Log in"
@@ -34,6 +38,7 @@ en:
     delete: "Delete"
     search: "Search"
     view_all: "View all"
+    view: "View"
   roles:
     admin: "Administrator"
     staff: "Staff"
@@ -125,6 +130,109 @@ en:
       suspended_account: "This account is temporarily suspended. Contact academy administration."
       disabled_account: "This account is disabled. Contact academy administration."
       inactive: "This account is currently unavailable."
+      session_invalidated: "Your session ended because account security settings changed. Please sign in again."
+  admin:
+    authorization:
+      forbidden: "You do not have permission to access user administration."
+    users:
+      index:
+        title: "User administration"
+        description: "Create and manage controlled academy accounts."
+        caption: "Academy user accounts"
+      new:
+        title: "Create user"
+        description: "Create a controlled account without sending an invitation."
+      edit:
+        title: "Edit %{name}"
+        description: "Update identity, role, language, and time-zone settings."
+      show:
+        identity: "Identity"
+        access: "Access settings"
+        activity: "Authentication activity"
+        actions: "Account actions"
+        history: "Administrative history"
+      password:
+        title: "Reset password for %{name}"
+        description: "Set a new password without revealing or emailing it."
+        session_warning: "All existing sessions for this account will end."
+      fields:
+        first_name: "First name"
+        last_name: "Last name"
+        name: "Name"
+        email: "Email"
+        role: "Role"
+        status: "Status"
+        preferred_locale: "Language"
+        time_zone: "Time zone"
+        password: "New password"
+        password_confirmation: "Confirm new password"
+        sign_in_count: "Sign-ins"
+        current_sign_in_at: "Current sign-in"
+        last_sign_in_at: "Last sign-in"
+        current_sign_in_ip: "Current sign-in IP"
+        last_sign_in_ip: "Last sign-in IP"
+        created_at: "Created"
+        updated_at: "Updated"
+        actions: "Actions"
+      locales:
+        ar: "Arabic"
+        en: "English"
+      filters:
+        query: "Search name or email"
+        all: "All"
+        clear: "Clear filters"
+      form:
+        errors_title: "Please review the account details"
+        status_hint: "Use explicit account actions to change status safely."
+        locale_automatic: "Automatic default for role"
+      actions:
+        new: "Create user"
+        back: "Back to users"
+        approve: "Approve"
+        suspend: "Suspend"
+        activate: "Reactivate"
+        disable: "Disable"
+        enable: "Enable"
+        reset_password: "Reset password"
+      confirmations:
+        title: "Confirm account action"
+        approve: "Approve %{name} and allow this account to sign in?"
+        suspend: "Suspend %{name}? Existing sessions will end."
+        activate: "Reactivate %{name} and restore sign-in access?"
+        disable: "Disable %{name}? Existing sessions will end and history will be retained."
+        enable: "Enable %{name} and restore sign-in access?"
+      messages:
+        created: "The user account was created."
+        updated: "The user account was updated."
+        approved: "The account was approved."
+        suspended: "The account was suspended."
+        activated: "The account was reactivated."
+        disabled: "The account was disabled."
+        enabled: "The account was enabled."
+        password_reset: "The account password was reset securely."
+      errors:
+        self_demotion: "You cannot remove your own administrator role."
+        self_lockout: "You cannot block your own account."
+        last_admin: "The last active administrator cannot be removed or blocked."
+        invalid_transition: "That account-status transition is not allowed."
+      empty:
+        title: "No users found"
+        description: "Adjust the filters or create a controlled account."
+      not_available: "Not available"
+    audit:
+      empty:
+        title: "No administrative history"
+        description: "Account changes will appear here."
+      events:
+        created: "%{actor} created this account."
+        updated: "%{actor} updated account details."
+        approved: "%{actor} approved this account."
+        suspended: "%{actor} suspended this account."
+        activated: "%{actor} reactivated this account."
+        disabled: "%{actor} disabled this account."
+        enabled: "%{actor} enabled this account."
+        role_changed: "%{actor} changed the account role."
+        password_reset: "%{actor} reset the account password."
   pagination:
     previous: "Previous page"
     next: "Next page"

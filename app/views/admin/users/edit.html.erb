@@ -1,0 +1,9 @@
+<%= render "shared/page_header",
+           title: t("admin.users.edit.title", name: @user.full_name),
+           description: t("admin.users.edit.description"),
+           breadcrumbs: [
+             { label: t("admin.users.index.title"), href: admin_users_path },
+             { label: @user.full_name, href: admin_user_path(@user) },
+             { label: t("actions.edit") }
+           ] %>
+<%= render "shared/components/card", body: capture { render "form", user: @user } %>

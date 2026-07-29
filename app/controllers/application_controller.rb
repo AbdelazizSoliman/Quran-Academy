@@ -2,6 +2,8 @@ class ApplicationController < ActionController::Base
   include Pagy::Method
 
   before_action :authenticate_user!, unless: :devise_controller?
+  before_action :verify_session_version!, unless: :devise_controller?
+  after_action :remember_session_version
   around_action :use_locale
   around_action :use_time_zone
   layout :application_layout
@@ -33,5 +35,17 @@ class ApplicationController < ActionController::Base
 
   def application_layout
     devise_controller? ? "authentication" : "application"
+  end
+
+  def verify_session_version!
+    return unless current_user
+    return if session[:user_session_version].nil? || session[:user_session_version] == current_user.session_version
+
+    sign_out(current_user)
+    redirect_to new_user_session_path, alert: I18n.t("devise.failure.session_invalidated")
+  end
+
+  def remember_session_version
+    session[:user_session_version] = current_user.session_version if current_user
   end
 end

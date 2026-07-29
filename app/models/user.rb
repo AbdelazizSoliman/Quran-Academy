@@ -7,6 +7,14 @@ class User < ApplicationRecord
 
   before_validation :apply_preference_defaults
 
+  belongs_to :approved_by, class_name: "User", optional: true, inverse_of: :approved_users
+  has_many :approved_users, class_name: "User", foreign_key: :approved_by_id,
+                            inverse_of: :approved_by, dependent: :nullify
+  has_many :account_events, class_name: "UserAccountEvent", foreign_key: :target_user_id,
+                            inverse_of: :target_user, dependent: :restrict_with_exception
+  has_many :performed_account_events, class_name: "UserAccountEvent", foreign_key: :actor_id,
+                                      inverse_of: :actor, dependent: :restrict_with_exception
+
   validates :first_name, :last_name, presence: true
   validates :preferred_locale, inclusion: { in: %w[ar en] }
   validates :time_zone, inclusion: { in: ->(_user) { ActiveSupport::TimeZone.all.map(&:name) } }
@@ -28,7 +36,7 @@ class User < ApplicationRecord
   private
 
   def apply_preference_defaults
-    self.preferred_locale ||= student? ? "en" : "ar"
+    self.preferred_locale = student? ? "en" : "ar" if preferred_locale.blank?
     self.time_zone = "Cairo" if time_zone.blank?
   end
 end

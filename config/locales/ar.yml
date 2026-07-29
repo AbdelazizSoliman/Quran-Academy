@@ -1,4 +1,7 @@
 ar:
+  time:
+    formats:
+      long: "%d/%m/%Y، %H:%M"
   date:
     formats:
       long: "%d/%m/%Y"
@@ -24,6 +27,7 @@ ar:
     payroll: "الرواتب"
     reports: "التقارير"
     settings: "الإعدادات"
+    users: "إدارة المستخدمين"
     coming_soon: "قريباً"
   actions:
     login: "تسجيل الدخول"
@@ -34,6 +38,7 @@ ar:
     delete: "حذف"
     search: "بحث"
     view_all: "عرض الكل"
+    view: "عرض"
   roles:
     admin: "مدير"
     staff: "موظف"
@@ -125,6 +130,109 @@ ar:
       suspended_account: "الحساب موقوف مؤقتاً. تواصل مع إدارة الأكاديمية."
       disabled_account: "الحساب معطل. تواصل مع إدارة الأكاديمية."
       inactive: "الحساب غير متاح حالياً."
+      session_invalidated: "انتهت جلستك بسبب تغيير إعدادات أمان الحساب. يرجى تسجيل الدخول مرة أخرى."
+  admin:
+    authorization:
+      forbidden: "ليس لديك صلاحية الوصول إلى إدارة المستخدمين."
+    users:
+      index:
+        title: "إدارة المستخدمين"
+        description: "إنشاء حسابات الأكاديمية المُدارة والتحكم بها."
+        caption: "حسابات مستخدمي الأكاديمية"
+      new:
+        title: "إنشاء مستخدم"
+        description: "إنشاء حساب مُدار دون إرسال دعوة."
+      edit:
+        title: "تعديل %{name}"
+        description: "تحديث الهوية والدور واللغة والمنطقة الزمنية."
+      show:
+        identity: "الهوية"
+        access: "إعدادات الوصول"
+        activity: "نشاط المصادقة"
+        actions: "إجراءات الحساب"
+        history: "السجل الإداري"
+      password:
+        title: "إعادة تعيين كلمة مرور %{name}"
+        description: "تعيين كلمة مرور جديدة دون عرضها أو إرسالها بالبريد."
+        session_warning: "ستنتهي جميع الجلسات الحالية لهذا الحساب."
+      fields:
+        first_name: "الاسم الأول"
+        last_name: "اسم العائلة"
+        name: "الاسم"
+        email: "البريد الإلكتروني"
+        role: "الدور"
+        status: "الحالة"
+        preferred_locale: "اللغة"
+        time_zone: "المنطقة الزمنية"
+        password: "كلمة المرور الجديدة"
+        password_confirmation: "تأكيد كلمة المرور الجديدة"
+        sign_in_count: "مرات الدخول"
+        current_sign_in_at: "الدخول الحالي"
+        last_sign_in_at: "آخر دخول"
+        current_sign_in_ip: "عنوان IP الحالي"
+        last_sign_in_ip: "عنوان IP السابق"
+        created_at: "تاريخ الإنشاء"
+        updated_at: "آخر تحديث"
+        actions: "الإجراءات"
+      locales:
+        ar: "العربية"
+        en: "الإنجليزية"
+      filters:
+        query: "البحث بالاسم أو البريد"
+        all: "الكل"
+        clear: "مسح المرشحات"
+      form:
+        errors_title: "يرجى مراجعة بيانات الحساب"
+        status_hint: "استخدم إجراءات الحساب الصريحة لتغيير الحالة بأمان."
+        locale_automatic: "الافتراضي التلقائي حسب الدور"
+      actions:
+        new: "إنشاء مستخدم"
+        back: "العودة إلى المستخدمين"
+        approve: "موافقة"
+        suspend: "إيقاف مؤقت"
+        activate: "إعادة تنشيط"
+        disable: "تعطيل"
+        enable: "تمكين"
+        reset_password: "إعادة تعيين كلمة المرور"
+      confirmations:
+        title: "تأكيد إجراء الحساب"
+        approve: "هل تريد الموافقة على %{name} والسماح للحساب بالدخول؟"
+        suspend: "هل تريد إيقاف %{name} مؤقتاً؟ ستنتهي الجلسات الحالية."
+        activate: "هل تريد إعادة تنشيط %{name} واستعادة الوصول؟"
+        disable: "هل تريد تعطيل %{name}؟ ستنتهي الجلسات ويُحتفظ بالسجل."
+        enable: "هل تريد تمكين %{name} واستعادة الوصول؟"
+      messages:
+        created: "تم إنشاء حساب المستخدم."
+        updated: "تم تحديث حساب المستخدم."
+        approved: "تمت الموافقة على الحساب."
+        suspended: "تم إيقاف الحساب مؤقتاً."
+        activated: "تمت إعادة تنشيط الحساب."
+        disabled: "تم تعطيل الحساب."
+        enabled: "تم تمكين الحساب."
+        password_reset: "تمت إعادة تعيين كلمة مرور الحساب بأمان."
+      errors:
+        self_demotion: "لا يمكنك إزالة دور المدير من حسابك."
+        self_lockout: "لا يمكنك حظر حسابك."
+        last_admin: "لا يمكن إزالة أو حظر آخر مدير نشط."
+        invalid_transition: "انتقال حالة الحساب هذا غير مسموح."
+      empty:
+        title: "لم يتم العثور على مستخدمين"
+        description: "عدّل المرشحات أو أنشئ حساباً مُداراً."
+      not_available: "غير متاح"
+    audit:
+      empty:
+        title: "لا يوجد سجل إداري"
+        description: "ستظهر تغييرات الحساب هنا."
+      events:
+        created: "أنشأ %{actor} هذا الحساب."
+        updated: "حدّث %{actor} بيانات الحساب."
+        approved: "وافق %{actor} على هذا الحساب."
+        suspended: "أوقف %{actor} هذا الحساب مؤقتاً."
+        activated: "أعاد %{actor} تنشيط هذا الحساب."
+        disabled: "عطّل %{actor} هذا الحساب."
+        enabled: "مكّن %{actor} هذا الحساب."
+        role_changed: "غيّر %{actor} دور الحساب."
+        password_reset: "أعاد %{actor} تعيين كلمة مرور الحساب."
   pagination:
     previous: "الصفحة السابقة"
     next: "الصفحة التالية"
