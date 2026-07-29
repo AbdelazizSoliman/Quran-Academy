@@ -1,0 +1,33 @@
+ar:
+  date:
+    formats:
+      long: "%d/%m/%Y"
+  app:
+    name: "أكاديمية القرآن"
+    english_name: "Quran Academy"
+    academy_placeholder: "أكاديمية النور"
+  navigation:
+    dashboard: "لوحة المتابعة"
+    students: "الطلاب"
+    teachers: "المعلمون"
+    schedule: "الجدول"
+    lessons: "الحلقات"
+    attendance: "الحضور"
+    whatsapp: "واتساب"
+    payroll: "الرواتب"
+    reports: "التقارير"
+    settings: "الإعدادات"
+    coming_soon: "قريباً"
+  actions:
+    login: "تسجيل الدخول"
+    logout: "تسجيل الخروج"
+    save: "حفظ"
+    cancel: "إلغاء"
+    edit: "تعديل"
+    delete: "حذف"
+    search: "بحث"
+  dashboard:
+    title: "لوحة المتابعة"
+    subtitle: "نظرة عامة على نشاط الأكاديمية اليوم"
+    welcome: "مرحباً بك في أكاديمية القرآن"
+    welcome_message: "تابع الحلقات والحضور وأهم مؤشرات الأكاديمية من مكان واحد."

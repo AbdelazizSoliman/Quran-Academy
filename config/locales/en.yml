@@ -1,0 +1,33 @@
+en:
+  date:
+    formats:
+      long: "%B %d, %Y"
+  app:
+    name: "Quran Academy"
+    english_name: "Quran Academy"
+    academy_placeholder: "Al-Noor Academy"
+  navigation:
+    dashboard: "Dashboard"
+    students: "Students"
+    teachers: "Teachers"
+    schedule: "Schedule"
+    lessons: "Lessons"
+    attendance: "Attendance"
+    whatsapp: "WhatsApp"
+    payroll: "Payroll"
+    reports: "Reports"
+    settings: "Settings"
+    coming_soon: "Coming Soon"
+  actions:
+    login: "Log in"
+    logout: "Log out"
+    save: "Save"
+    cancel: "Cancel"
+    edit: "Edit"
+    delete: "Delete"
+    search: "Search"
+  dashboard:
+    title: "Dashboard"
+    subtitle: "An overview of today's academy activity"
+    welcome: "Welcome to Quran Academy"
+    welcome_message: "Monitor lessons, attendance, and academy highlights in one place."

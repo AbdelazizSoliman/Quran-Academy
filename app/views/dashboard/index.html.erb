@@ -1,0 +1,96 @@
+<% content_for :title, "#{t("dashboard.title")} | #{t("app.name")}" %>
+
+<%= render "shared/page_header", title: t("dashboard.title"), subtitle: t("dashboard.subtitle") %>
+
+<section class="card relative mb-6 overflow-hidden bg-gradient-to-l from-emerald-800 to-emerald-600 p-6 text-white sm:p-8" aria-labelledby="welcome-title">
+  <div class="relative z-10 max-w-2xl">
+    <p class="mb-2 text-sm font-medium text-emerald-100">بسم الله الرحمن الرحيم</p>
+    <h2 id="welcome-title" class="text-2xl font-bold sm:text-3xl"><%= t("dashboard.welcome") %></h2>
+    <p class="mt-3 max-w-xl text-sm leading-7 text-emerald-50"><%= t("dashboard.welcome_message") %></p>
+    <div class="mt-5 flex flex-wrap gap-3">
+      <button type="button" class="button-secondary border-white/30 bg-white text-emerald-800 hover:bg-emerald-50">عرض جدول اليوم</button>
+      <button type="button" class="inline-flex items-center rounded-xl border border-white/30 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">تقرير الحضور</button>
+    </div>
+  </div>
+  <div class="absolute -bottom-16 -left-12 size-56 rounded-full border-[32px] border-white/10" aria-hidden="true"></div>
+</section>
+
+<section aria-labelledby="statistics-title">
+  <h2 id="statistics-title" class="sr-only">إحصاءات الأكاديمية</h2>
+  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <% [
+      ["إجمالي الطلاب", "١٢٨", "↑ ٨ هذا الشهر", "bg-blue-50 text-blue-700"],
+      ["المعلمون", "١٢", "جميعهم نشطون", "bg-violet-50 text-violet-700"],
+      ["حلقات اليوم", "١٨", "٦ حلقات متبقية", "bg-amber-50 text-amber-700"],
+      ["نسبة الحضور", "٩٢٪", "↑ ٣٪ عن الأمس", "bg-emerald-50 text-emerald-700"]
+    ].each do |label, value, note, colors| %>
+      <article class="card p-5">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm text-slate-500"><%= label %></p>
+            <p class="mt-2 text-3xl font-bold text-slate-950"><%= value %></p>
+          </div>
+          <span class="grid size-10 place-items-center rounded-xl <%= colors %>" aria-hidden="true">◆</span>
+        </div>
+        <p class="mt-4 text-xs text-slate-500"><%= note %></p>
+      </article>
+    <% end %>
+  </div>
+</section>
+
+<div class="mt-6 grid gap-6 xl:grid-cols-3">
+  <section class="card xl:col-span-2" aria-labelledby="lessons-title">
+    <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+      <div>
+        <h2 id="lessons-title" class="font-bold text-slate-900">حلقات اليوم</h2>
+        <p class="mt-1 text-xs text-slate-500">مواعيد الحلقات القادمة</p>
+      </div>
+      <button type="button" class="text-sm font-semibold text-emerald-700 hover:text-emerald-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-500">عرض الكل</button>
+    </div>
+    <div class="divide-y divide-slate-100">
+      <% [
+        ["حلقة الحفظ المتقدم", "الشيخ أحمد محمود", "١٠:٠٠ ص", "قاعة النور", "بعد ٣٠ دقيقة"],
+        ["حلقة التلاوة والتجويد", "الشيخ عمر حسن", "١١:٣٠ ص", "قاعة الفرقان", "قادمة"],
+        ["حلقة جزء عمّ", "المعلمة مريم علي", "٠١:٠٠ م", "عن بُعد", "قادمة"]
+      ].each do |lesson, teacher, time, room, status| %>
+        <article class="flex flex-col gap-3 p-5 sm:flex-row sm:items-center">
+          <time class="w-20 text-sm font-bold text-emerald-800"><%= time %></time>
+          <div class="min-w-0 flex-1">
+            <h3 class="truncate text-sm font-semibold text-slate-900"><%= lesson %></h3>
+            <p class="mt-1 text-xs text-slate-500"><%= teacher %> · <%= room %></p>
+          </div>
+          <span class="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"><%= status %></span>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="late-title">
+    <div class="border-b border-slate-100 px-5 py-4">
+      <h2 id="late-title" class="font-bold text-slate-900">الطلاب المتأخرون</h2>
+      <p class="mt-1 text-xs text-slate-500">متابعة حضور اليوم</p>
+    </div>
+    <div class="p-5">
+      <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center">
+        <span class="mx-auto grid size-11 place-items-center rounded-full bg-emerald-100 text-emerald-700" aria-hidden="true">✓</span>
+        <p class="mt-3 text-sm font-semibold text-slate-800">لا توجد حالات متأخرة</p>
+        <p class="mt-1 text-xs text-slate-500">سيظهر الطلاب المتأخرون هنا</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<section class="mt-6 card p-5" aria-labelledby="quick-actions-title">
+  <div class="mb-4">
+    <h2 id="quick-actions-title" class="font-bold text-slate-900">إجراءات سريعة</h2>
+    <p class="mt-1 text-xs text-slate-500">اختصارات للمهام المتكررة</p>
+  </div>
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <% ["تسجيل الحضور", "إضافة حلقة", "إرسال تذكير واتساب", "عرض التقارير"].each do |label| %>
+      <button type="button" disabled class="button-secondary justify-start opacity-70 disabled:cursor-not-allowed" title="ستتوفر في مهمة لاحقة">
+        <span class="grid size-7 place-items-center rounded-lg bg-emerald-50 text-emerald-700" aria-hidden="true">+</span>
+        <%= label %>
+      </button>
+    <% end %>
+  </div>
+</section>
