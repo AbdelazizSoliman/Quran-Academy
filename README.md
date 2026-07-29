@@ -96,6 +96,36 @@ changes, and password resets with safe JSON metadata. It is intentionally accoun
 not a general auditing or granular permissions framework. Teacher, student, staff, and
 guardian profile models remain intentionally unimplemented.
 
+## Academy settings
+
+The application uses one fixed-key `AcademySetting` record for the current academy. The
+database enforces the `current` singleton key and a unique index; `AcademySetting.current`
+creates valid defaults idempotently and safely retries a concurrent unique-key race. The
+same operation is available explicitly through:
+
+```bash
+bin/rails academy_settings:ensure
+```
+
+Active administrators manage the singular record at `/admin/settings`. It contains academy
+identity and optional contact details, interface and teaching languages, default time zone,
+working days and operating hours, lesson-duration boundaries, booking and cancellation
+defaults, attendance thresholds, and future communication, payroll, and billing preferences.
+
+User locale and time-zone preferences remain the first authenticated fallback. Academy
+defaults are used when no user preference is available, followed by the Rails Arabic/Cairo
+defaults. Time-only operating hours are stored without time-zone conversion.
+
+Communication channel flags indicate readiness preferences only. No email, WhatsApp, or SMS
+provider is configured and no messages or jobs are created. Payroll rates and lesson prices
+are decimal defaults only; no payroll, invoice, subscription, charge, or payment calculation
+exists.
+
+Meaningful updates atomically record the acting administrator and an `AcademySettingEvent`
+containing only changed safe fields. No-op and failed updates create no event. Multi-tenancy,
+academy switching, provider secrets, and all academy business modules remain intentionally
+out of scope.
+
 ## Technology stack
 
 - Ruby 3.4.6

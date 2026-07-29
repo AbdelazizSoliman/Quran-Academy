@@ -1,0 +1,13 @@
+<div class="grid gap-5 sm:grid-cols-2">
+  <% fields.each do |field, type| %>
+    <div class="<%= "sm:col-span-2" if type == :textarea %>">
+      <%= form.label field, t("admin.settings.fields.#{field}"), class: "ds-label" %>
+      <% if type == :textarea %>
+        <%= form.text_area field, class: "ds-control mt-2", rows: 4, aria: { invalid: setting.errors[field].any? } %>
+      <% else %>
+        <%= form.public_send(type, field, class: "ds-control mt-2", aria: { invalid: setting.errors[field].any? }) %>
+      <% end %>
+      <% if setting.errors[field].any? %><p class="mt-1 text-sm text-app-danger"><%= setting.errors[field].to_sentence %></p><% end %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,79 @@
+<%= render "shared/page_header",
+           title: t("admin.settings.show.title"),
+           description: t("admin.settings.show.description"),
+           primary_action: render("shared/components/button", label: t("actions.edit"), href: edit_admin_settings_path, icon: :settings) %>
+
+<div class="grid gap-6 lg:grid-cols-2">
+  <% identity = capture do %>
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <% %i[academy_name legal_name short_name description].each do |field| %>
+        <div class="<%= "sm:col-span-2" if field == :description %>"><dt class="ds-caption"><%= t("admin.settings.fields.#{field}") %></dt><dd class="mt-1 font-semibold"><%= setting_value(@setting.public_send(field)) %></dd></div>
+      <% end %>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.identity"), body: identity %>
+
+  <% contact = capture do %>
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <% %i[contact_email contact_phone whatsapp_number website_url address_line_1 address_line_2 city state_or_region postal_code country_code].each do |field| %>
+        <div><dt class="ds-caption"><%= t("admin.settings.fields.#{field}") %></dt><dd class="mt-1 font-semibold"><%= setting_value(@setting.public_send(field)) %></dd></div>
+      <% end %>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.contact"), body: contact %>
+
+  <% locale_body = capture do %>
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <div><dt class="ds-caption"><%= t("admin.settings.fields.default_locale") %></dt><dd class="mt-1 font-semibold"><%= t("admin.settings.languages.#{@setting.default_locale}") %></dd></div>
+      <div><dt class="ds-caption"><%= t("admin.settings.fields.default_time_zone") %></dt><dd class="mt-1 font-semibold"><%= @setting.default_time_zone %></dd></div>
+      <div><dt class="ds-caption"><%= t("admin.settings.fields.supported_locales") %></dt><dd class="mt-2"><%= setting_collection_badges(@setting.supported_locales, "admin.settings.languages") %></dd></div>
+      <div><dt class="ds-caption"><%= t("admin.settings.fields.teaching_languages") %></dt><dd class="mt-2"><%= setting_collection_badges(@setting.teaching_languages, "admin.settings.languages") %></dd></div>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.locale"), body: locale_body %>
+
+  <% calendar_body = capture do %>
+    <p class="ds-caption"><%= t("admin.settings.fields.working_days") %></p><div class="mt-2 flex flex-wrap gap-2"><%= setting_collection_badges(@setting.working_days, "admin.settings.weekdays") %></div>
+    <dl class="mt-5 grid grid-cols-2 gap-4">
+      <div><dt class="ds-caption"><%= t("admin.settings.fields.day_starts_at") %></dt><dd class="font-semibold"><%= setting_time(@setting.day_starts_at) %></dd></div>
+      <div><dt class="ds-caption"><%= t("admin.settings.fields.day_ends_at") %></dt><dd class="font-semibold"><%= setting_time(@setting.day_ends_at) %></dd></div>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.calendar"), body: calendar_body %>
+
+  <% %i[lessons cancellation attendance communication finance].each do |section| %>
+    <% fields = {
+      lessons: %i[minimum_lesson_duration_minutes default_lesson_duration_minutes maximum_lesson_duration_minutes lesson_duration_step_minutes minimum_booking_notice_hours maximum_booking_window_days reschedule_notice_hours],
+      cancellation: %i[student_cancellation_notice_hours teacher_cancellation_notice_hours late_cancellation_window_hours allow_student_self_cancellation allow_teacher_self_cancellation],
+      attendance: %i[student_late_after_minutes teacher_late_after_minutes absence_after_minutes allow_manual_attendance_adjustment],
+      communication: %i[email_notifications_enabled whatsapp_notifications_enabled sms_notifications_enabled lesson_reminders_enabled attendance_notifications_enabled payment_notifications_enabled lesson_reminder_hours_before second_lesson_reminder_minutes_before],
+      finance: %i[default_teacher_compensation_type default_teacher_rate payroll_currency payroll_period billing_currency default_lesson_price billing_cycle]
+    }.fetch(section) %>
+    <% body = capture do %>
+      <dl class="grid gap-4 sm:grid-cols-2">
+        <% fields.each do |field| %>
+          <% value = @setting.public_send(field) %>
+          <div><dt class="ds-caption"><%= t("admin.settings.fields.#{field}") %></dt>
+          <dd class="mt-1 font-semibold"><%= value.in?([true, false]) ? setting_boolean_badge(value) : setting_value(value) %></dd></div>
+        <% end %>
+      </dl>
+      <% if section == :communication %><p class="mt-4 ds-supporting"><%= t("admin.settings.provider.description") %></p><% end %>
+      <% if section == :finance %><p class="mt-4 ds-supporting"><%= t("admin.settings.hints.financial_defaults") %></p><% end %>
+    <% end %>
+    <%= render "shared/components/card", title: t("admin.settings.sections.#{section}"), body: body %>
+  <% end %>
+</div>
+
+<div class="mt-6">
+  <% audit_body = capture do %>
+    <p class="mb-4 ds-supporting"><%= t("admin.settings.show.updated", time: l(@setting.updated_at, format: :long), actor: @setting.updated_by&.full_name || t("admin.settings.not_configured")) %></p>
+    <% if @events.any? %>
+      <ol class="divide-y divide-app-border"><% @events.each do |event| %>
+        <li class="py-3"><p class="text-sm font-semibold"><%= audit_setting_description(event) %></p><p class="mt-1 ds-caption"><%= l(event.created_at, format: :long) %></p></li>
+      <% end %></ol>
+    <% else %>
+      <%= render "shared/components/empty_state", icon: :reports, title: t("admin.settings.audit.empty_title"), description: t("admin.settings.audit.empty_description") %>
+    <% end %>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.audit"), body: audit_body %>
+</div>

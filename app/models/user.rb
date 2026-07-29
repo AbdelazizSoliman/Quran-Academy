@@ -14,6 +14,10 @@ class User < ApplicationRecord
                             inverse_of: :target_user, dependent: :restrict_with_exception
   has_many :performed_account_events, class_name: "UserAccountEvent", foreign_key: :actor_id,
                                       inverse_of: :actor, dependent: :restrict_with_exception
+  has_many :updated_academy_settings, class_name: "AcademySetting", foreign_key: :updated_by_id,
+                                      inverse_of: :updated_by, dependent: :nullify
+  has_many :academy_setting_events, foreign_key: :actor_id, inverse_of: :actor,
+                                    dependent: :restrict_with_exception
 
   validates :first_name, :last_name, presence: true
   validates :preferred_locale, inclusion: { in: %w[ar en] }

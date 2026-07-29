@@ -39,7 +39,11 @@ Layout/LineLength:
 Metrics/BlockLength:
   Exclude:
     - "config/environments/*.rb"
+    - "db/migrate/*.rb"
     - "spec/**/*"
+
+Metrics/ClassLength:
+  Max: 120
 
 Metrics/AbcSize:
   Exclude:
@@ -48,12 +52,21 @@ Metrics/AbcSize:
 Metrics/MethodLength:
   Exclude:
     - "db/migrate/*.rb"
+    - "app/controllers/admin/academy_settings_controller.rb"
+    - "spec/requests/admin/academy_settings_spec.rb"
+
+Naming/VariableNumber:
+  Exclude:
+    - "app/controllers/admin/academy_settings_controller.rb"
+    - "db/migrate/*.rb"
 
 RSpec/MultipleExpectations:
   Max: 8
 
 RSpec/ExampleLength:
   Max: 12
+  Exclude:
+    - "spec/requests/admin/academy_settings_spec.rb"
 
 RSpec/DescribeClass:
   Exclude:

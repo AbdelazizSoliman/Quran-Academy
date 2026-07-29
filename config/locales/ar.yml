@@ -1,4 +1,13 @@
 ar:
+  errors:
+    messages:
+      not_supported: "يجب أن تكون ضمن اللغات المدعومة"
+      after_start: "يجب أن تكون بعد وقت البداية؛ لا تُدعم الساعات الليلية"
+      outside_range: "يجب أن تكون بين الحد الأدنى والأقصى"
+      misaligned: "يجب أن تتوافق المدة الافتراضية مع خطوة المدة"
+      too_large: "تتجاوز مهلة الإشعار المرتبطة"
+      too_small: "يجب ألا تقل عن حد التأخر المحدد"
+      sensitive: "تحتوي على مفتاح حساس محظور"
   time:
     formats:
       long: "%d/%m/%Y، %H:%M"
@@ -134,6 +143,129 @@ ar:
   admin:
     authorization:
       forbidden: "ليس لديك صلاحية الوصول إلى إدارة المستخدمين."
+    settings:
+      show:
+        title: "إعدادات الأكاديمية"
+        description: "الإعدادات التشغيلية الافتراضية لوحدات الأكاديمية المستقبلية."
+        updated: "آخر تحديث %{time} بواسطة %{actor}."
+      edit:
+        title: "تعديل إعدادات الأكاديمية"
+        description: "تعمل التغييرات كقيم افتراضية فقط ولا تنشئ سجلات تشغيلية."
+      sections:
+        identity: "هوية الأكاديمية"
+        contact: "بيانات التواصل"
+        locale: "اللغة ولغات التدريس"
+        calendar: "تقويم العمل"
+        lessons: "قواعد الحلقات والحجز"
+        cancellation: "قواعد الإلغاء"
+        attendance: "حدود الحضور والتأخر"
+        communication: "جاهزية التواصل"
+        finance: "إعدادات الرواتب والفوترة المستقبلية"
+        audit: "سجل الإعدادات"
+      fields:
+        academy_name: "اسم الأكاديمية"
+        legal_name: "الاسم القانوني"
+        short_name: "الاسم المختصر"
+        description: "الوصف"
+        contact_email: "بريد التواصل"
+        contact_phone: "هاتف التواصل"
+        whatsapp_number: "رقم واتساب"
+        website_url: "رابط الموقع"
+        address_line_1: "العنوان الأول"
+        address_line_2: "العنوان الثاني"
+        city: "المدينة"
+        state_or_region: "المحافظة أو المنطقة"
+        postal_code: "الرمز البريدي"
+        country_code: "رمز الدولة"
+        default_locale: "لغة الواجهة الافتراضية"
+        supported_locales: "لغات الواجهة المدعومة"
+        default_time_zone: "المنطقة الزمنية الافتراضية"
+        teaching_languages: "لغات التدريس"
+        working_days: "أيام العمل"
+        day_starts_at: "بداية يوم العمل"
+        day_ends_at: "نهاية يوم العمل"
+        default_lesson_duration_minutes: "مدة الحلقة الافتراضية (دقيقة)"
+        minimum_lesson_duration_minutes: "أقل مدة للحلقة (دقيقة)"
+        maximum_lesson_duration_minutes: "أقصى مدة للحلقة (دقيقة)"
+        lesson_duration_step_minutes: "خطوة المدة (دقيقة)"
+        minimum_booking_notice_hours: "أقل مهلة للحجز (ساعة)"
+        maximum_booking_window_days: "أقصى نافذة للحجز (يوم)"
+        reschedule_notice_hours: "مهلة إعادة الجدولة (ساعة)"
+        student_cancellation_notice_hours: "مهلة إلغاء الطالب (ساعة)"
+        teacher_cancellation_notice_hours: "مهلة إلغاء المعلم (ساعة)"
+        late_cancellation_window_hours: "نافذة الإلغاء المتأخر (ساعة)"
+        allow_student_self_cancellation: "السماح للطالب بالإلغاء الذاتي"
+        allow_teacher_self_cancellation: "السماح للمعلم بالإلغاء الذاتي"
+        student_late_after_minutes: "تأخر الطالب بعد (دقيقة)"
+        teacher_late_after_minutes: "تأخر المعلم بعد (دقيقة)"
+        absence_after_minutes: "الغياب بعد (دقيقة)"
+        allow_manual_attendance_adjustment: "السماح بتعديل الحضور يدوياً"
+        email_notifications_enabled: "تفضيل قناة البريد"
+        whatsapp_notifications_enabled: "تفضيل قناة واتساب"
+        sms_notifications_enabled: "تفضيل قناة الرسائل النصية"
+        lesson_reminders_enabled: "تفضيل تذكيرات الحلقات"
+        attendance_notifications_enabled: "تفضيل إشعارات الحضور"
+        payment_notifications_enabled: "تفضيل إشعارات الدفع"
+        lesson_reminder_hours_before: "التذكير الأول (ساعات قبل)"
+        second_lesson_reminder_minutes_before: "التذكير الثاني (دقائق قبل)"
+        default_teacher_compensation_type: "نوع تعويض المعلم الافتراضي"
+        default_teacher_rate: "أجر المعلم الافتراضي"
+        payroll_currency: "عملة الرواتب"
+        payroll_period: "دورة الرواتب"
+        billing_currency: "عملة الفوترة"
+        default_lesson_price: "سعر الحلقة الافتراضي"
+        billing_cycle: "دورة الفوترة"
+      languages:
+        ar: "العربية"
+        en: "الإنجليزية"
+        fr: "الفرنسية"
+        de: "الألمانية"
+        tr: "التركية"
+        ur: "الأردية"
+      weekdays:
+        sunday: "الأحد"
+        monday: "الاثنين"
+        tuesday: "الثلاثاء"
+        wednesday: "الأربعاء"
+        thursday: "الخميس"
+        friday: "الجمعة"
+        saturday: "السبت"
+      boolean:
+        enabled: "مفعّل"
+        disabled: "غير مفعّل"
+      provider:
+        title: "مزود الخدمة غير مهيأ"
+        description: "هذه الأعلام تفضيلات مستقبلية فقط. لا يوجد مزود بريد أو واتساب أو رسائل نصية ولن تُرسل رسائل."
+      hints:
+        operational_default: "قيمة تشغيلية مستقبلية؛ لا يتم تنفيذ أي إجراء حالياً."
+        readiness_only: "تفضيل جاهزية فقط؛ لا يوجد مزود أو تشغيل آلي."
+        financial_defaults: "لا تحسب هذه القيم الرواتب ولا تنشئ رسوماً أو فواتير أو مدفوعات."
+        minimum_booking_notice_hours: "أقل مهلة للحجوزات المستقبلية."
+        maximum_booking_window_days: "أبعد نطاق زمني للحجز المستقبلي."
+        reschedule_notice_hours: "المهلة المطلوبة لإعادة الجدولة مستقبلاً."
+      options:
+        default_teacher_compensation_type:
+          per_lesson: "لكل حلقة"
+          hourly: "بالساعة"
+          monthly: "شهري"
+        payroll_period:
+          weekly: "أسبوعي"
+          biweekly: "كل أسبوعين"
+          monthly: "شهري"
+        billing_cycle:
+          per_lesson: "لكل حلقة"
+          weekly: "أسبوعي"
+          monthly: "شهري"
+          package: "باقة"
+      messages:
+        updated: "تم تحديث إعدادات الأكاديمية."
+      errors:
+        title: "يرجى مراجعة الإعدادات"
+      audit:
+        updated: "حدّث %{actor}: %{fields}."
+        empty_title: "لا يوجد سجل للإعدادات"
+        empty_description: "ستظهر تغييرات المدير ذات المعنى هنا."
+      not_configured: "غير مهيأ"
     users:
       index:
         title: "إدارة المستخدمين"

@@ -1,0 +1,10 @@
+<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  <% fields.each do |field| %>
+    <div>
+      <%= form.label field, t("admin.settings.fields.#{field}"), class: "ds-label" %>
+      <%= form.number_field field, class: "ds-control mt-2", min: 0, step: field.to_s.include?("rate") || field.to_s.include?("price") ? "0.01" : 1,
+                                   aria: { invalid: setting.errors[field].any? } %>
+      <p class="mt-1 ds-caption"><%= t("admin.settings.hints.#{field}", default: t("admin.settings.hints.operational_default")) %></p>
+    </div>
+  <% end %>
+</div>

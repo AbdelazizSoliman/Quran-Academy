@@ -9,7 +9,7 @@ module NavigationHelper
     whatsapp: { icon: :message, roles: %i[admin staff] },
     payroll: { icon: :wallet, roles: %i[admin] },
     reports: { icon: :reports, roles: %i[admin staff teacher] },
-    settings: { icon: :settings, roles: %i[admin] }
+    settings: { icon: :settings, roles: %i[admin], path: :admin_settings_path }
   }.freeze
 
   def nav_item_classes(active: false)

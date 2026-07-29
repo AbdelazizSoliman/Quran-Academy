@@ -4,6 +4,7 @@ Rails.application.routes.draw do
              path_names: { sign_in: "sign-in", sign_out: "sign-out", password: "password" },
              skip: :registrations
   namespace :admin do
+    resource :settings, only: %i[show edit update], controller: :academy_settings
     resources :users, except: :destroy do
       member do
         patch :approve

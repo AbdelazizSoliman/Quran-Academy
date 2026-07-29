@@ -1,4 +1,13 @@
 en:
+  errors:
+    messages:
+      not_supported: "must be included in the supported languages"
+      after_start: "must be later than the start time; overnight hours are not supported"
+      outside_range: "must be between the minimum and maximum"
+      misaligned: "must align the default duration with the configured step"
+      too_large: "exceeds the related notice window"
+      too_small: "must be at least the configured lateness threshold"
+      sensitive: "contains a prohibited sensitive key"
   time:
     formats:
       long: "%B %d, %Y at %H:%M"
@@ -134,6 +143,129 @@ en:
   admin:
     authorization:
       forbidden: "You do not have permission to access user administration."
+    settings:
+      show:
+        title: "Academy settings"
+        description: "Operational defaults for future academy modules."
+        updated: "Last updated %{time} by %{actor}."
+      edit:
+        title: "Edit academy settings"
+        description: "Changes apply as defaults only; they do not create or modify business records."
+      sections:
+        identity: "Academy identity"
+        contact: "Contact information"
+        locale: "Locale and teaching languages"
+        calendar: "Working calendar"
+        lessons: "Lesson and booking rules"
+        cancellation: "Cancellation rules"
+        attendance: "Attendance thresholds"
+        communication: "Communication readiness"
+        finance: "Future payroll and billing defaults"
+        audit: "Settings history"
+      fields:
+        academy_name: "Academy name"
+        legal_name: "Legal name"
+        short_name: "Short name"
+        description: "Description"
+        contact_email: "Contact email"
+        contact_phone: "Contact phone"
+        whatsapp_number: "WhatsApp number"
+        website_url: "Website URL"
+        address_line_1: "Address line 1"
+        address_line_2: "Address line 2"
+        city: "City"
+        state_or_region: "State or region"
+        postal_code: "Postal code"
+        country_code: "Country code"
+        default_locale: "Default interface language"
+        supported_locales: "Supported interface languages"
+        default_time_zone: "Default time zone"
+        teaching_languages: "Teaching languages"
+        working_days: "Working days"
+        day_starts_at: "Day starts at"
+        day_ends_at: "Day ends at"
+        default_lesson_duration_minutes: "Default lesson duration (minutes)"
+        minimum_lesson_duration_minutes: "Minimum lesson duration (minutes)"
+        maximum_lesson_duration_minutes: "Maximum lesson duration (minutes)"
+        lesson_duration_step_minutes: "Duration step (minutes)"
+        minimum_booking_notice_hours: "Minimum booking notice (hours)"
+        maximum_booking_window_days: "Maximum booking window (days)"
+        reschedule_notice_hours: "Reschedule notice (hours)"
+        student_cancellation_notice_hours: "Student cancellation notice (hours)"
+        teacher_cancellation_notice_hours: "Teacher cancellation notice (hours)"
+        late_cancellation_window_hours: "Late-cancellation window (hours)"
+        allow_student_self_cancellation: "Allow student self-cancellation"
+        allow_teacher_self_cancellation: "Allow teacher self-cancellation"
+        student_late_after_minutes: "Student late after (minutes)"
+        teacher_late_after_minutes: "Teacher late after (minutes)"
+        absence_after_minutes: "Absence after (minutes)"
+        allow_manual_attendance_adjustment: "Allow manual attendance adjustment"
+        email_notifications_enabled: "Email channel preference"
+        whatsapp_notifications_enabled: "WhatsApp channel preference"
+        sms_notifications_enabled: "SMS channel preference"
+        lesson_reminders_enabled: "Lesson reminder preference"
+        attendance_notifications_enabled: "Attendance notification preference"
+        payment_notifications_enabled: "Payment notification preference"
+        lesson_reminder_hours_before: "First reminder (hours before)"
+        second_lesson_reminder_minutes_before: "Second reminder (minutes before)"
+        default_teacher_compensation_type: "Default compensation type"
+        default_teacher_rate: "Default teacher rate"
+        payroll_currency: "Payroll currency"
+        payroll_period: "Payroll period"
+        billing_currency: "Billing currency"
+        default_lesson_price: "Default lesson price"
+        billing_cycle: "Billing cycle"
+      languages:
+        ar: "Arabic"
+        en: "English"
+        fr: "French"
+        de: "German"
+        tr: "Turkish"
+        ur: "Urdu"
+      weekdays:
+        sunday: "Sunday"
+        monday: "Monday"
+        tuesday: "Tuesday"
+        wednesday: "Wednesday"
+        thursday: "Thursday"
+        friday: "Friday"
+        saturday: "Saturday"
+      boolean:
+        enabled: "Enabled"
+        disabled: "Disabled"
+      provider:
+        title: "Provider not configured"
+        description: "These flags express future preferences only. No email, WhatsApp, or SMS provider is connected and no messages will be sent."
+      hints:
+        operational_default: "A future operational default; no workflow is executed yet."
+        readiness_only: "Readiness preference only; no provider or automation is configured."
+        financial_defaults: "These values do not calculate payroll, create charges, invoices, or payments."
+        minimum_booking_notice_hours: "Earliest future booking lead time."
+        maximum_booking_window_days: "Furthest future booking horizon."
+        reschedule_notice_hours: "Required notice for future rescheduling workflows."
+      options:
+        default_teacher_compensation_type:
+          per_lesson: "Per lesson"
+          hourly: "Hourly"
+          monthly: "Monthly"
+        payroll_period:
+          weekly: "Weekly"
+          biweekly: "Biweekly"
+          monthly: "Monthly"
+        billing_cycle:
+          per_lesson: "Per lesson"
+          weekly: "Weekly"
+          monthly: "Monthly"
+          package: "Package"
+      messages:
+        updated: "Academy settings were updated."
+      errors:
+        title: "Please review the settings"
+      audit:
+        updated: "%{actor} updated: %{fields}."
+        empty_title: "No settings history"
+        empty_description: "Meaningful administrator changes will appear here."
+      not_configured: "Not configured"
     users:
       index:
         title: "User administration"

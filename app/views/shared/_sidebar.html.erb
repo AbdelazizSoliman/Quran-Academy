@@ -22,7 +22,9 @@
     <p class="mb-3 px-3 text-xs font-semibold text-app-subtle"><%= t("navigation.main") %></p>
     <ul class="space-y-1">
       <% navigation_items_for(current_user).each do |key, item| %>
-        <% active = (key == :dashboard && current_page?(root_path)) || (key == :users && controller_path.start_with?("admin/users")) %>
+        <% active = (key == :dashboard && current_page?(root_path)) ||
+                    (key == :users && controller_path.start_with?("admin/users")) ||
+                    (key == :settings && controller_path == "admin/academy_settings") %>
         <% path = navigation_path(key, item) %>
         <li>
           <%= link_to path, class: nav_item_classes(active: active), aria: (active ? { current: "page" } : {}) do %>

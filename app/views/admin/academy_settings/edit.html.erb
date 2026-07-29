@@ -1,0 +1,90 @@
+<%= render "shared/page_header",
+           title: t("admin.settings.edit.title"),
+           description: t("admin.settings.edit.description"),
+           secondary_action: render("shared/components/button", label: t("actions.cancel"), href: admin_settings_path, variant: :secondary) %>
+
+<%= render "errors", setting: @setting %>
+<%= form_with model: @setting, url: admin_settings_path, method: :patch, class: "space-y-6", data: { component: "academy-settings-form" } do |form| %>
+  <% identity = capture { render "text_fields", form:, setting: @setting, fields: { academy_name: :text_field, legal_name: :text_field, short_name: :text_field, description: :textarea } } %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.identity"), body: identity %>
+
+  <% contact = capture { render "text_fields", form:, setting: @setting, fields: { contact_email: :email_field, contact_phone: :telephone_field, whatsapp_number: :telephone_field, website_url: :url_field, address_line_1: :text_field, address_line_2: :text_field, city: :text_field, state_or_region: :text_field, postal_code: :text_field, country_code: :text_field } } %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.contact"), body: contact %>
+
+  <% locale_body = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div><%= form.label :default_locale, t("admin.settings.fields.default_locale"), class: "ds-label" %>
+      <%= form.select :default_locale, AcademySetting::INTERFACE_LOCALES.map { |code| [t("admin.settings.languages.#{code}"), code] }, {}, class: "ds-control mt-2" %></div>
+      <div><%= form.label :default_time_zone, t("admin.settings.fields.default_time_zone"), class: "ds-label" %>
+      <%= form.time_zone_select :default_time_zone, ActiveSupport::TimeZone.all, {}, class: "ds-control mt-2" %></div>
+    </div>
+    <% { supported_locales: AcademySetting::INTERFACE_LOCALES, teaching_languages: AcademySetting::TEACHING_LANGUAGES }.each do |field, options| %>
+      <fieldset class="mt-5"><legend class="ds-label"><%= t("admin.settings.fields.#{field}") %></legend>
+        <%= hidden_field_tag "academy_setting[#{field}][]", "" %>
+        <div class="mt-3 flex flex-wrap gap-4">
+          <% options.each do |code| %>
+            <label class="flex items-center gap-2"><%= check_box_tag "academy_setting[#{field}][]", code, code.in?(@setting.public_send(field)), class: "ds-checkbox" %>
+            <span class="text-sm"><%= t("admin.settings.languages.#{code}") %></span></label>
+          <% end %>
+        </div>
+      </fieldset>
+    <% end %>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.locale"), body: locale_body %>
+
+  <% calendar_body = capture do %>
+    <fieldset><legend class="ds-label"><%= t("admin.settings.fields.working_days") %></legend>
+      <%= hidden_field_tag "academy_setting[working_days][]", "" %>
+      <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <% AcademySetting::WEEKDAYS.each do |day| %>
+          <label class="flex items-center gap-2 rounded-lg border border-app-border p-3"><%= check_box_tag "academy_setting[working_days][]", day, day.in?(@setting.working_days), class: "ds-checkbox" %>
+          <span class="text-sm"><%= t("admin.settings.weekdays.#{day}") %></span></label>
+        <% end %>
+      </div>
+    </fieldset>
+    <div class="mt-5 grid gap-5 sm:grid-cols-2">
+      <% %i[day_starts_at day_ends_at].each do |field| %><div><%= form.label field, t("admin.settings.fields.#{field}"), class: "ds-label" %><%= form.time_field field, class: "ds-control mt-2" %></div><% end %>
+    </div>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.calendar"), body: calendar_body %>
+
+  <% lesson_body = capture { render "number_fields", form:, setting: @setting, fields: %i[minimum_lesson_duration_minutes default_lesson_duration_minutes maximum_lesson_duration_minutes lesson_duration_step_minutes minimum_booking_notice_hours maximum_booking_window_days reschedule_notice_hours] } %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.lessons"), body: lesson_body %>
+
+  <% cancellation_body = capture do %>
+    <%= render "number_fields", form:, setting: @setting, fields: %i[student_cancellation_notice_hours teacher_cancellation_notice_hours late_cancellation_window_hours] %>
+    <div class="mt-5"><%= render "boolean_fields", form:, fields: %i[allow_student_self_cancellation allow_teacher_self_cancellation] %></div>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.cancellation"), body: cancellation_body %>
+
+  <% attendance_body = capture do %>
+    <%= render "number_fields", form:, setting: @setting, fields: %i[student_late_after_minutes teacher_late_after_minutes absence_after_minutes] %>
+    <div class="mt-5"><%= render "boolean_fields", form:, fields: %i[allow_manual_attendance_adjustment] %></div>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.attendance"), body: attendance_body %>
+
+  <% communication_body = capture do %>
+    <%= render "boolean_fields", form:, fields: %i[email_notifications_enabled whatsapp_notifications_enabled sms_notifications_enabled lesson_reminders_enabled attendance_notifications_enabled payment_notifications_enabled] %>
+    <div class="mt-5"><%= render "number_fields", form:, setting: @setting, fields: %i[lesson_reminder_hours_before second_lesson_reminder_minutes_before] %></div>
+    <%= render "shared/components/alert", variant: :information, title: t("admin.settings.provider.title"), message: t("admin.settings.provider.description") %>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.communication"), body: communication_body %>
+
+  <% finance_body = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <% { default_teacher_compensation_type: AcademySetting::COMPENSATION_TYPES, payroll_period: AcademySetting::PAYROLL_PERIODS, billing_cycle: AcademySetting::BILLING_CYCLES }.each do |field, values| %>
+        <div><%= form.label field, t("admin.settings.fields.#{field}"), class: "ds-label" %><%= form.select field, values.map { |value| [t("admin.settings.options.#{field}.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+      <% end %>
+      <% %i[default_teacher_rate payroll_currency default_lesson_price billing_currency].each do |field| %>
+        <div><%= form.label field, t("admin.settings.fields.#{field}"), class: "ds-label" %>
+        <%= field.to_s.include?("currency") ? form.text_field(field, class: "ds-control mt-2", maxlength: 3) : form.number_field(field, class: "ds-control mt-2", min: 0, step: "0.01") %></div>
+      <% end %>
+    </div>
+    <p class="mt-4 ds-supporting"><%= t("admin.settings.hints.financial_defaults") %></p>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.settings.sections.finance"), body: finance_body %>
+
+  <div class="sticky bottom-4 flex justify-end rounded-xl border border-app-border bg-app-surface/95 p-4 shadow-lg">
+    <%= render "shared/components/button", label: t("actions.save"), type: "submit" %>
+  </div>
+<% end %>

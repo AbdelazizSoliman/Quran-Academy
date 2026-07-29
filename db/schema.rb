@@ -10,9 +10,86 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_29_220000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "academy_setting_events", force: :cascade do |t|
+    t.bigint "academy_setting_id", null: false
+    t.bigint "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["academy_setting_id", "created_at"], name: "idx_on_academy_setting_id_created_at_3f745e7160"
+    t.index ["academy_setting_id"], name: "index_academy_setting_events_on_academy_setting_id"
+    t.index ["actor_id"], name: "index_academy_setting_events_on_actor_id"
+  end
+
+  create_table "academy_settings", force: :cascade do |t|
+    t.integer "absence_after_minutes", default: 15, null: false
+    t.string "academy_name", default: "Quran Academy", null: false
+    t.string "address_line_1"
+    t.string "address_line_2"
+    t.boolean "allow_manual_attendance_adjustment", default: true, null: false
+    t.boolean "allow_student_self_cancellation", default: true, null: false
+    t.boolean "allow_teacher_self_cancellation", default: false, null: false
+    t.boolean "attendance_notifications_enabled", default: true, null: false
+    t.string "billing_currency", default: "EGP", null: false
+    t.string "billing_cycle", default: "monthly", null: false
+    t.string "city"
+    t.string "contact_email"
+    t.string "contact_phone"
+    t.string "country_code", default: "EG", null: false
+    t.datetime "created_at", null: false
+    t.time "day_ends_at", default: "2000-01-01 22:00:00", null: false
+    t.time "day_starts_at", default: "2000-01-01 08:00:00", null: false
+    t.integer "default_lesson_duration_minutes", default: 30, null: false
+    t.decimal "default_lesson_price", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "default_locale", default: "ar", null: false
+    t.string "default_teacher_compensation_type", default: "per_lesson", null: false
+    t.decimal "default_teacher_rate", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "default_time_zone", default: "Cairo", null: false
+    t.text "description"
+    t.boolean "email_notifications_enabled", default: true, null: false
+    t.integer "late_cancellation_window_hours", default: 2, null: false
+    t.string "legal_name"
+    t.integer "lesson_duration_step_minutes", default: 15, null: false
+    t.integer "lesson_reminder_hours_before", default: 24, null: false
+    t.boolean "lesson_reminders_enabled", default: true, null: false
+    t.integer "maximum_booking_window_days", default: 90, null: false
+    t.integer "maximum_lesson_duration_minutes", default: 120, null: false
+    t.integer "minimum_booking_notice_hours", default: 2, null: false
+    t.integer "minimum_lesson_duration_minutes", default: 15, null: false
+    t.boolean "payment_notifications_enabled", default: false, null: false
+    t.string "payroll_currency", default: "EGP", null: false
+    t.string "payroll_period", default: "monthly", null: false
+    t.string "postal_code"
+    t.integer "reschedule_notice_hours", default: 12, null: false
+    t.integer "second_lesson_reminder_minutes_before", default: 60, null: false
+    t.string "short_name"
+    t.string "singleton_key", default: "current", null: false
+    t.boolean "sms_notifications_enabled", default: false, null: false
+    t.string "state_or_region"
+    t.integer "student_cancellation_notice_hours", default: 12, null: false
+    t.integer "student_late_after_minutes", default: 5, null: false
+    t.string "supported_locales", default: ["ar", "en"], null: false, array: true
+    t.integer "teacher_cancellation_notice_hours", default: 12, null: false
+    t.integer "teacher_late_after_minutes", default: 5, null: false
+    t.string "teaching_languages", default: ["ar", "en"], null: false, array: true
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.string "website_url"
+    t.boolean "whatsapp_notifications_enabled", default: false, null: false
+    t.string "whatsapp_number"
+    t.string "working_days", default: ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday"], null: false, array: true
+    t.index ["singleton_key"], name: "index_academy_settings_on_singleton_key", unique: true
+    t.index ["updated_by_id"], name: "index_academy_settings_on_updated_by_id"
+    t.check_constraint "day_starts_at < day_ends_at", name: "academy_settings_operating_hours"
+    t.check_constraint "default_teacher_rate >= 0::numeric AND default_lesson_price >= 0::numeric", name: "academy_settings_nonnegative_money"
+    t.check_constraint "minimum_lesson_duration_minutes <= default_lesson_duration_minutes AND default_lesson_duration_minutes <= maximum_lesson_duration_minutes", name: "academy_settings_lesson_duration_order"
+    t.check_constraint "singleton_key::text = 'current'::text", name: "academy_settings_singleton"
+  end
 
   create_table "user_account_events", force: :cascade do |t|
     t.bigint "actor_id", null: false
@@ -60,6 +137,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_190000) do
     t.check_constraint "session_version >= 0", name: "users_session_version_nonnegative"
   end
 
+  add_foreign_key "academy_setting_events", "academy_settings", on_delete: :restrict
+  add_foreign_key "academy_setting_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "academy_settings", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "user_account_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "user_account_events", "users", column: "target_user_id", on_delete: :restrict
   add_foreign_key "users", "users", column: "approved_by_id", on_delete: :nullify

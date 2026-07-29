@@ -20,12 +20,16 @@ class ApplicationController < ActionController::Base
     requested_locale = request.query_parameters["locale"] if devise_controller?
     locale = supported_locale(requested_locale) ||
              supported_locale(current_user&.preferred_locale) ||
+             supported_locale(academy_setting&.default_locale) ||
              I18n.default_locale
     I18n.with_locale(locale, &)
   end
 
   def use_time_zone(&)
-    zone = current_user&.time_zone.presence_in(ActiveSupport::TimeZone.all.map(&:name)) || "Cairo"
+    zones = ActiveSupport::TimeZone.all.map(&:name)
+    zone = current_user&.time_zone.presence_in(zones) ||
+           academy_setting&.default_time_zone.presence_in(zones) ||
+           "Cairo"
     Time.use_zone(zone, &)
   end
 
@@ -47,5 +51,11 @@ class ApplicationController < ActionController::Base
 
   def remember_session_version
     session[:user_session_version] = current_user.session_version if current_user
+  end
+
+  def academy_setting
+    return @academy_setting if defined?(@academy_setting)
+
+    @academy_setting = AcademySetting.current_or_nil
   end
 end

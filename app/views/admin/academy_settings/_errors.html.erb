@@ -1,0 +1,6 @@
+<% if setting.errors.any? %>
+  <%= render "shared/components/alert",
+             variant: :error,
+             title: t("admin.settings.errors.title"),
+             message: setting.errors.full_messages.to_sentence %>
+<% end %>

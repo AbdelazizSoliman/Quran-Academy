@@ -29,6 +29,7 @@ module QuranAcademy
     config.autoload_lib(ignore: %w[assets tasks])
 
     config.time_zone = "Cairo"
+    config.active_record.time_zone_aware_types = [:datetime]
     config.active_record.default_timezone = :utc
     config.i18n.available_locales = %i[ar en]
     config.i18n.default_locale = :ar
