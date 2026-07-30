@@ -1,0 +1,149 @@
+en:
+  navigation:
+    programs: "Programs"
+    course_offerings: "Course Offerings"
+    enrollments: "Enrollments"
+    my_enrollments: "My Enrollments"
+  actions:
+    activate: "Activate"
+    deactivate: "Deactivate"
+    archive: "Archive"
+    restore: "Restore"
+    open: "Open"
+    close: "Close"
+    start: "Start"
+    complete: "Complete"
+    cancel: "Cancel"
+  academic:
+    not_configured: "Not configured"
+    catalogs:
+      program_categories:
+        quran_reading: "Quran reading"
+        quran_memorization: "Quran memorization"
+        tajweed: "Tajweed"
+        qaida_noorania: "Qaida Noorania"
+        arabic_language: "Arabic language"
+        islamic_studies: "Islamic studies"
+        recitation: "Recitation"
+        revision: "Revision"
+        new_muslim_foundations: "New Muslim foundations"
+        other: "Other"
+      program_statuses: { draft: "Draft", active: "Active", inactive: "Inactive", archived: "Archived" }
+      offering_statuses: { draft: "Draft", open: "Open", closed: "Closed", in_progress: "In progress", completed: "Completed", cancelled: "Cancelled", archived: "Archived" }
+      enrollment_statuses: { pending: "Pending", approved: "Approved", waitlisted: "Waitlisted", active: "Active", paused: "Paused", completed: "Completed", withdrawn: "Withdrawn", rejected: "Rejected", cancelled: "Cancelled", transferred: "Transferred" }
+      delivery_modes: { online: "Online", in_person: "In person", hybrid: "Hybrid" }
+      age_groups: { children: "Children", teenagers: "Teenagers", adults: "Adults", seniors: "Seniors" }
+      levels: { not_started: "Not started", foundation: "Foundation", beginner: "Beginner", elementary: "Elementary", intermediate: "Intermediate", advanced: "Advanced", memorization: "Memorization", revision: "Revision", qualified: "Qualified" }
+      placement_statuses: { not_required: "Not required", pending: "Pending", in_review: "In review", completed: "Completed", waived: "Waived" }
+      placement_methods: { profile_review: "Profile review", teacher_assessment: "Teacher assessment", student_self_report: "Student self-report", guardian_report: "Guardian report", previous_academy_record: "Previous academy record", administrator_override: "Administrator override" }
+      application_sources: { administrator: "Administrator", student_request: "Student request", guardian_request: "Guardian request", referral: "Referral", transfer: "Transfer", imported: "Imported", other: "Other" }
+    events:
+      created: "Created"
+      updated: "Updated"
+      approved: "Approved"
+      waitlisted: "Waitlisted"
+      rejected: "Rejected"
+      activated: "Activated"
+      paused: "Paused"
+      resumed: "Resumed"
+      completed: "Completed"
+      withdrawn: "Withdrawn"
+      cancelled: "Cancelled"
+      transferred: "Transferred"
+      placement_completed: "Placement completed"
+      placement_waived: "Placement waived"
+  programs:
+    index: { title: "Programs", description: "Reusable academic definitions." }
+    new: { title: "New program", description: "Define an academic program without scheduling lessons." }
+    edit: { title: "Edit program" }
+    empty: { title: "No programs", description: "Create the first academic program." }
+    actions: { new: "New program" }
+    offerings_count: "%{count} offerings"
+    sections: { identity: "Identity", eligibility: "Eligibility", defaults: "Operational defaults", details: "Program details", description: "Description", offerings: "Course offerings", audit: "Audit history" }
+    fields:
+      code: "Code"
+      name_ar: "Arabic name"
+      name_en: "English name"
+      short_description_ar: "Arabic short description"
+      short_description_en: "English short description"
+      description_ar: "Arabic description"
+      description_en: "English description"
+      category: "Category"
+      status: "Status"
+      default_learning_language: "Default learning language"
+      supported_learning_languages: "Supported learning languages"
+      target_age_groups: "Target age groups"
+      allows_minor_students: "Allows minor students"
+      allows_adult_students: "Allows adult students"
+      requires_placement: "Requires placement"
+      entry_level: "Entry level"
+      completion_level: "Completion level"
+      default_lesson_duration_minutes: "Default lesson duration (minutes)"
+      recommended_lessons_per_week: "Recommended lessons per week"
+      estimated_duration_weeks: "Estimated duration (weeks)"
+      display_order: "Display order"
+      internal_notes: "Internal notes"
+    messages: { created: "Program created.", updated: "Program updated.", activate: "Program activated.", deactivate: "Program deactivated.", archive: "Program archived.", restore: "Program restored." }
+    audit: { created: "Created by %{actor}", updated: "Updated by %{actor}", activated: "Activated by %{actor}", deactivated: "Deactivated by %{actor}", archived: "Archived by %{actor}", restored: "Restored by %{actor}" }
+  course_offerings:
+    index: { title: "Course offerings", description: "Operational offerings without schedules or teacher assignments." }
+    new: { title: "New course offering", description: "Snapshot program defaults for enrollment." }
+    edit: { title: "Edit course offering" }
+    empty: { title: "No course offerings", description: "Create an offering from an active program." }
+    actions: { new: "New offering" }
+    sections: { identity: "Identity", operation: "Operational details", enrollments: "Enrollments", audit: "Audit history" }
+    capacity: { used: "Capacity used", available: "Capacity available" }
+    fields:
+      program: "Program"
+      title: "Title"
+      code: "Code"
+      title_ar: "Arabic title"
+      title_en: "English title"
+      description_ar: "Arabic description"
+      description_en: "English description"
+      status: "Status"
+      learning_language: "Learning language"
+      delivery_mode: "Delivery mode"
+      target_age_groups: "Target age groups"
+      enrollment_opens_on: "Enrollment opens"
+      enrollment_closes_on: "Enrollment closes"
+      planned_start_on: "Planned start"
+      planned_start: "Planned start"
+      planned_end_on: "Planned end"
+      capacity: "Capacity"
+      default_lesson_duration_minutes: "Session duration (minutes)"
+      intended_lessons_per_week: "Intended lessons per week"
+      placement_required: "Placement required"
+      internal_notes: "Internal notes"
+      actions: "Actions"
+    messages: { created: "Offering created.", updated: "Offering updated.", open: "Offering opened.", close: "Offering closed.", start: "Offering started.", complete: "Offering completed.", cancel: "Offering cancelled.", archive: "Offering archived.", restore: "Offering restored." }
+    audit: { created: "Created by %{actor}", updated: "Updated by %{actor}", opened: "Opened by %{actor}", closed: "Closed by %{actor}", started: "Started by %{actor}", completed: "Completed by %{actor}", cancelled: "Cancelled by %{actor}", archived: "Archived by %{actor}", restored: "Restored by %{actor}" }
+  enrollments:
+    index: { title: "Enrollments", description: "Student membership and placement records." }
+    new: { title: "New enrollment", description: "Create a controlled enrollment record." }
+    edit: { title: "Edit enrollment" }
+    empty: { title: "No enrollments", description: "No records match the current filters.", audit: "No lifecycle events yet." }
+    sections: { membership: "Membership", notes: "Placement and notes", lifecycle: "Lifecycle actions", audit: "Audit history" }
+    actions: { new: "New enrollment", approve: "Approve", waitlist: "Waitlist", reject: "Reject", activate: "Activate", pause: "Pause", resume: "Resume", complete: "Complete", withdraw: "Withdraw", cancel: "Cancel", transfer: "Mark transferred", complete_placement: "Complete placement", waive_placement: "Waive placement" }
+    fields:
+      public_id: "Enrollment ID"
+      student: "Student"
+      offering: "Course offering"
+      status: "Status"
+      application_source: "Application source"
+      placement_status: "Placement status"
+      learning_language: "Learning language"
+      starting_quran_level: "Starting Quran level"
+      starting_reading_level: "Starting reading level"
+      starting_tajweed_level: "Starting Tajweed level"
+      starting_memorization_level: "Starting memorization level"
+      starting_memorized_juz_count: "Starting memorized Juz"
+      student_goals_snapshot: "Student goals snapshot"
+      preferred_schedule_notes: "Preferred schedule notes (informational only)"
+      placement_notes: "Placement notes"
+      waiver_reason: "Waiver reason"
+      administrator_notes: "Administrator notes"
+    messages: { created: "Enrollment created.", updated: "Enrollment updated.", approve: "Enrollment approved.", waitlist: "Enrollment waitlisted.", reject: "Enrollment rejected.", activate: "Enrollment activated.", pause: "Enrollment paused.", resume: "Enrollment resumed.", complete: "Enrollment completed.", withdraw: "Enrollment withdrawn.", cancel: "Enrollment cancelled.", transfer: "Enrollment marked transferred.", complete_placement: "Placement completed.", waive_placement: "Placement waived." }
+  student_enrollments:
+    index: { title: "My enrollments", description: "Your current and historical academy enrollments." }
+    empty: { title: "No enrollments", description: "You do not have enrollment records yet." }

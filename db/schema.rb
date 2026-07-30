@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,6 +91,131 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_140000) do
     t.check_constraint "singleton_key::text = 'current'::text", name: "academy_settings_singleton"
   end
 
+  create_table "course_offering_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.bigint "course_offering_id", null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_course_offering_events_on_actor_id"
+    t.index ["course_offering_id", "created_at"], name: "idx_on_course_offering_id_created_at_f05a4c6e71"
+    t.index ["course_offering_id"], name: "index_course_offering_events_on_course_offering_id"
+    t.index ["event_type"], name: "index_course_offering_events_on_event_type"
+  end
+
+  create_table "course_offerings", force: :cascade do |t|
+    t.boolean "accepts_new_enrollments", default: false, null: false
+    t.integer "capacity"
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.integer "default_lesson_duration_minutes", null: false
+    t.string "delivery_mode", default: "online", null: false
+    t.text "description_ar"
+    t.text "description_en"
+    t.date "enrollment_closes_on"
+    t.date "enrollment_opens_on"
+    t.integer "intended_lessons_per_week", null: false
+    t.text "internal_notes"
+    t.string "learning_language", null: false
+    t.boolean "placement_required", default: false, null: false
+    t.date "planned_end_on"
+    t.date "planned_start_on"
+    t.bigint "program_id", null: false
+    t.string "public_id", null: false
+    t.string "status", default: "draft", null: false
+    t.string "target_age_groups", default: [], null: false, array: true
+    t.string "title_ar", null: false
+    t.string "title_en", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.index "lower((code)::text)", name: "index_course_offerings_on_lower_code", unique: true
+    t.index ["accepts_new_enrollments"], name: "index_course_offerings_on_accepts_new_enrollments"
+    t.index ["created_by_id"], name: "index_course_offerings_on_created_by_id"
+    t.index ["delivery_mode"], name: "index_course_offerings_on_delivery_mode"
+    t.index ["enrollment_closes_on"], name: "index_course_offerings_on_enrollment_closes_on"
+    t.index ["learning_language"], name: "index_course_offerings_on_learning_language"
+    t.index ["planned_start_on"], name: "index_course_offerings_on_planned_start_on"
+    t.index ["program_id"], name: "index_course_offerings_on_program_id"
+    t.index ["public_id"], name: "index_course_offerings_on_public_id", unique: true
+    t.index ["status"], name: "index_course_offerings_on_status"
+    t.index ["target_age_groups"], name: "index_course_offerings_on_target_age_groups", using: :gin
+    t.index ["updated_by_id"], name: "index_course_offerings_on_updated_by_id"
+    t.check_constraint "capacity IS NULL OR capacity > 0", name: "offerings_capacity_positive"
+    t.check_constraint "default_lesson_duration_minutes > 0", name: "offerings_duration_positive"
+    t.check_constraint "enrollment_closes_on IS NULL OR enrollment_opens_on IS NULL OR enrollment_closes_on >= enrollment_opens_on", name: "offerings_enrollment_date_order"
+    t.check_constraint "intended_lessons_per_week > 0", name: "offerings_frequency_positive"
+    t.check_constraint "planned_end_on IS NULL OR planned_start_on IS NULL OR planned_end_on >= planned_start_on", name: "offerings_planned_date_order"
+  end
+
+  create_table "enrollment_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "enrollment_id", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_enrollment_events_on_actor_id"
+    t.index ["enrollment_id", "created_at"], name: "index_enrollment_events_on_enrollment_id_and_created_at"
+    t.index ["enrollment_id"], name: "index_enrollment_events_on_enrollment_id"
+    t.index ["event_type"], name: "index_enrollment_events_on_event_type"
+  end
+
+  create_table "enrollments", force: :cascade do |t|
+    t.text "administrator_notes"
+    t.string "application_source", default: "administrator", null: false
+    t.date "applied_on", null: false
+    t.bigint "approved_by_id"
+    t.date "approved_on"
+    t.date "cancelled_on"
+    t.date "completed_on"
+    t.bigint "course_offering_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.bigint "ended_by_id"
+    t.date "ended_on"
+    t.text "exit_notes"
+    t.string "exit_reason"
+    t.date "paused_on"
+    t.date "placement_completed_on"
+    t.string "placement_method"
+    t.text "placement_notes"
+    t.string "placement_status", default: "not_required", null: false
+    t.text "preferred_schedule_notes"
+    t.string "public_id", null: false
+    t.date "rejected_on"
+    t.date "resumed_on"
+    t.date "started_on"
+    t.string "starting_memorization_level"
+    t.integer "starting_memorized_juz_count"
+    t.string "starting_quran_level"
+    t.string "starting_reading_level"
+    t.string "starting_tajweed_level"
+    t.string "status", default: "pending", null: false
+    t.text "student_goals_snapshot"
+    t.bigint "student_profile_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.date "withdrawn_on"
+    t.index ["application_source"], name: "index_enrollments_on_application_source"
+    t.index ["applied_on"], name: "index_enrollments_on_applied_on"
+    t.index ["approved_by_id"], name: "index_enrollments_on_approved_by_id"
+    t.index ["course_offering_id", "status"], name: "index_enrollments_on_course_offering_id_and_status"
+    t.index ["course_offering_id"], name: "index_enrollments_on_course_offering_id"
+    t.index ["created_by_id"], name: "index_enrollments_on_created_by_id"
+    t.index ["ended_by_id"], name: "index_enrollments_on_ended_by_id"
+    t.index ["placement_status"], name: "index_enrollments_on_placement_status"
+    t.index ["public_id"], name: "index_enrollments_on_public_id", unique: true
+    t.index ["started_on"], name: "index_enrollments_on_started_on"
+    t.index ["status"], name: "index_enrollments_on_status"
+    t.index ["student_profile_id", "course_offering_id"], name: "index_enrollments_unique_membership", unique: true
+    t.index ["student_profile_id", "created_at"], name: "index_enrollments_on_student_profile_id_and_created_at"
+    t.index ["student_profile_id"], name: "index_enrollments_on_student_profile_id"
+    t.index ["updated_by_id"], name: "index_enrollments_on_updated_by_id"
+    t.check_constraint "starting_memorized_juz_count IS NULL OR starting_memorized_juz_count >= 0 AND starting_memorized_juz_count <= 30", name: "enrollments_starting_juz_range"
+  end
+
   create_table "guardian_events", force: :cascade do |t|
     t.bigint "actor_id", null: false
     t.datetime "created_at", null: false
@@ -128,6 +253,61 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_140000) do
     t.index ["public_id"], name: "index_guardians_on_public_id", unique: true
     t.index ["status"], name: "index_guardians_on_status"
     t.index ["updated_by_id"], name: "index_guardians_on_updated_by_id"
+  end
+
+  create_table "program_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "program_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_program_events_on_actor_id"
+    t.index ["event_type"], name: "index_program_events_on_event_type"
+    t.index ["program_id", "created_at"], name: "index_program_events_on_program_id_and_created_at"
+    t.index ["program_id"], name: "index_program_events_on_program_id"
+  end
+
+  create_table "programs", force: :cascade do |t|
+    t.boolean "allows_adult_students", default: true, null: false
+    t.boolean "allows_minor_students", default: true, null: false
+    t.string "category", null: false
+    t.string "code", null: false
+    t.string "completion_level", default: "intermediate", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.string "default_learning_language", null: false
+    t.integer "default_lesson_duration_minutes", default: 30, null: false
+    t.text "description_ar"
+    t.text "description_en"
+    t.integer "display_order", default: 0, null: false
+    t.string "entry_level", default: "not_started", null: false
+    t.integer "estimated_duration_weeks"
+    t.text "internal_notes"
+    t.string "name_ar", null: false
+    t.string "name_en", null: false
+    t.string "public_id", null: false
+    t.integer "recommended_lessons_per_week", default: 2, null: false
+    t.boolean "requires_placement", default: false, null: false
+    t.text "short_description_ar"
+    t.text "short_description_en"
+    t.string "status", default: "draft", null: false
+    t.string "supported_learning_languages", default: [], null: false, array: true
+    t.string "target_age_groups", default: [], null: false, array: true
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.index "lower((code)::text)", name: "index_programs_on_lower_code", unique: true
+    t.index ["category"], name: "index_programs_on_category"
+    t.index ["created_by_id"], name: "index_programs_on_created_by_id"
+    t.index ["display_order"], name: "index_programs_on_display_order"
+    t.index ["public_id"], name: "index_programs_on_public_id", unique: true
+    t.index ["status"], name: "index_programs_on_status"
+    t.index ["supported_learning_languages"], name: "index_programs_on_supported_learning_languages", using: :gin
+    t.index ["target_age_groups"], name: "index_programs_on_target_age_groups", using: :gin
+    t.index ["updated_by_id"], name: "index_programs_on_updated_by_id"
+    t.check_constraint "default_lesson_duration_minutes > 0", name: "programs_duration_positive"
+    t.check_constraint "estimated_duration_weeks IS NULL OR estimated_duration_weeks >= 0", name: "programs_duration_weeks_nonnegative"
+    t.check_constraint "recommended_lessons_per_week > 0", name: "programs_frequency_positive"
   end
 
   create_table "student_guardianship_events", force: :cascade do |t|
@@ -348,17 +528,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_140000) do
     t.index ["role"], name: "index_users_on_role"
     t.index ["status", "role", "created_at"], name: "index_users_on_status_and_role_and_created_at"
     t.index ["status"], name: "index_users_on_status"
-    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying::text, 'en'::character varying::text])", name: "users_preferred_locale"
+    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying, 'en'::character varying]::text[])", name: "users_preferred_locale"
     t.check_constraint "session_version >= 0", name: "users_session_version_nonnegative"
   end
 
   add_foreign_key "academy_setting_events", "academy_settings", on_delete: :restrict
   add_foreign_key "academy_setting_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "academy_settings", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "course_offering_events", "course_offerings", on_delete: :restrict
+  add_foreign_key "course_offering_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "course_offerings", "programs", on_delete: :restrict
+  add_foreign_key "course_offerings", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "course_offerings", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "enrollment_events", "enrollments", on_delete: :restrict
+  add_foreign_key "enrollment_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "enrollments", "course_offerings", on_delete: :restrict
+  add_foreign_key "enrollments", "student_profiles", on_delete: :restrict
+  add_foreign_key "enrollments", "users", column: "approved_by_id", on_delete: :nullify
+  add_foreign_key "enrollments", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "enrollments", "users", column: "ended_by_id", on_delete: :nullify
+  add_foreign_key "enrollments", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "guardian_events", "guardians", on_delete: :restrict
   add_foreign_key "guardian_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "guardians", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "guardians", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "program_events", "programs", on_delete: :restrict
+  add_foreign_key "program_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "programs", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "programs", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "student_guardianship_events", "student_guardianships", on_delete: :restrict
   add_foreign_key "student_guardianship_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "student_guardianships", "guardians", on_delete: :restrict

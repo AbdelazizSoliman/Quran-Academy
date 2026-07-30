@@ -1,0 +1,25 @@
+<%= render "shared/academic/errors", record: program %>
+<%= form_with model: [:admin, program], class: "space-y-6" do |f| %>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("programs.sections.identity") %></legend>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <% %i[code name_ar name_en].each do |field| %><div><%= f.label field, t("programs.fields.#{field}"), class: "ds-label" %><%= f.text_field field, class: "ds-control mt-2", dir: field == :code ? "ltr" : nil %></div><% end %>
+      <div><%= f.label :category, t("programs.fields.category"), class: "ds-label" %><%= f.select :category, Program::CATEGORIES.map { |v| [t("academic.catalogs.program_categories.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
+      <% %i[short_description_ar short_description_en description_ar description_en].each do |field| %><div><%= f.label field, t("programs.fields.#{field}"), class: "ds-label" %><%= f.text_area field, rows: 3, class: "ds-control mt-2" %></div><% end %>
+    </div>
+  </fieldset>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("programs.sections.eligibility") %></legend>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div><%= f.label :default_learning_language, t("programs.fields.default_learning_language"), class: "ds-label" %><%= f.select :default_learning_language, (AcademySetting.current_or_nil&.teaching_languages || []).map { |v| [t("academy.languages.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
+      <% { supported_learning_languages: (AcademySetting.current_or_nil&.teaching_languages || []), target_age_groups: Program::AGE_GROUPS }.each do |field, values| %>
+        <fieldset><legend class="ds-label"><%= t("programs.fields.#{field}") %></legend><%= hidden_field_tag "program[#{field}][]", "" %><div class="mt-2 grid grid-cols-2 gap-2"><% values.each do |v| %><label class="flex items-center gap-2"><%= check_box_tag "program[#{field}][]", v, program.public_send(field).include?(v) %><%= t(field == :target_age_groups ? "academic.catalogs.age_groups.#{v}" : "academy.languages.#{v}") %></label><% end %></div></fieldset>
+      <% end %>
+      <% %i[allows_minor_students allows_adult_students requires_placement].each do |field| %><label class="flex items-center gap-2"><%= f.check_box field %><%= t("programs.fields.#{field}") %></label><% end %>
+      <% { entry_level: Program::LEVELS, completion_level: Program::LEVELS }.each do |field, values| %><div><%= f.label field, t("programs.fields.#{field}"), class: "ds-label" %><%= f.select field, values.map { |v| [t("academic.catalogs.levels.#{v}"), v] }, {}, class: "ds-control mt-2" %></div><% end %>
+    </div>
+  </fieldset>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("programs.sections.defaults") %></legend>
+    <div class="mt-4 grid gap-4 sm:grid-cols-3"><% %i[default_lesson_duration_minutes recommended_lessons_per_week estimated_duration_weeks display_order].each do |field| %><div><%= f.label field, t("programs.fields.#{field}"), class: "ds-label" %><%= f.number_field field, min: 0, class: "ds-control mt-2" %></div><% end %></div>
+    <div class="mt-4"><%= f.label :internal_notes, t("programs.fields.internal_notes"), class: "ds-label" %><%= f.text_area :internal_notes, rows: 3, class: "ds-control mt-2" %></div>
+  </fieldset>
+  <div class="flex gap-3"><%= render "shared/components/button", label: t("actions.save"), type: "submit" %><%= render "shared/components/button", label: t("actions.cancel"), href: admin_programs_path, variant: :secondary %></div>
+<% end %>

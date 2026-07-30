@@ -23,4 +23,21 @@
     <% end %>
   </details>
   </div><% end %><%= render "shared/components/card", title: t("student_profiles.sections.guardians"), body: guardian_body %></div>
+<div class="mt-6">
+  <% enrollment_body = capture do %>
+    <div class="space-y-3">
+      <% @profile.enrollments.includes(course_offering: :program).recent_first.limit(5).each do |enrollment| %>
+        <%= link_to admin_enrollment_path(enrollment), class: "flex items-center justify-between rounded-xl border border-app-border p-3" do %>
+          <span><strong><%= localized_program_name(enrollment.course_offering.program) %></strong><span class="block ds-caption"><%= enrollment.public_id %></span></span>
+          <%= enrollment_status_badge(enrollment) %>
+        <% end %>
+      <% end %>
+      <div class="flex flex-wrap gap-3">
+        <%= render "shared/components/button", label: t("enrollments.actions.new"), href: new_admin_enrollment_path(student_profile_id: @profile.id), icon: :plus %>
+        <%= render "shared/components/button", label: t("enrollments.index.title"), href: admin_enrollments_path(student_profile_id: @profile.id), variant: :secondary %>
+      </div>
+    </div>
+  <% end %>
+  <%= render "shared/components/card", title: t("enrollments.index.title"), body: enrollment_body %>
+</div>
 <div class="mt-6"><% history = capture do %><ol class="divide-y divide-app-border"><% @events.each do |e| %><li class="py-3"><%= t("student_profiles.audit.#{e.event_type}", actor: e.actor.full_name) %><p class="ds-caption"><%= localized_datetime(e.created_at) %></p></li><% end %></ol><% end %><%= render "shared/components/card", title: t("student_profiles.sections.audit"), body: history %></div>

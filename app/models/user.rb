@@ -44,6 +44,18 @@ class User < ApplicationRecord
                                            inverse_of: :updated_by, dependent: :nullify
   has_many :student_guardianship_events, foreign_key: :actor_id, inverse_of: :actor,
                                          dependent: :restrict_with_exception
+  has_many :created_programs, class_name: "Program", foreign_key: :created_by_id,
+                              inverse_of: :created_by, dependent: :nullify
+  has_many :updated_programs, class_name: "Program", foreign_key: :updated_by_id,
+                              inverse_of: :updated_by, dependent: :nullify
+  has_many :created_course_offerings, class_name: "CourseOffering", foreign_key: :created_by_id,
+                                      inverse_of: :created_by, dependent: :nullify
+  has_many :updated_course_offerings, class_name: "CourseOffering", foreign_key: :updated_by_id,
+                                      inverse_of: :updated_by, dependent: :nullify
+  has_many :created_enrollments, class_name: "Enrollment", foreign_key: :created_by_id,
+                                 inverse_of: :created_by, dependent: :nullify
+  has_many :updated_enrollments, class_name: "Enrollment", foreign_key: :updated_by_id,
+                                 inverse_of: :updated_by, dependent: :nullify
 
   validates :first_name, :last_name, presence: true
   validates :preferred_locale, inclusion: { in: %w[ar en] }

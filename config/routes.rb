@@ -4,6 +4,41 @@ Rails.application.routes.draw do
              path_names: { sign_in: "sign-in", sign_out: "sign-out", password: "password" },
              skip: :registrations
   namespace :admin do
+    resources :programs, except: :destroy do
+      member do
+        patch :activate
+        patch :deactivate
+        patch :archive
+        patch :restore
+      end
+    end
+    resources :course_offerings, except: :destroy do
+      member do
+        patch :open
+        patch :close
+        patch :start
+        patch :complete
+        patch :cancel
+        patch :archive
+        patch :restore
+      end
+    end
+    resources :enrollments, except: :destroy do
+      member do
+        patch :approve
+        patch :waitlist
+        patch :reject
+        patch :activate
+        patch :pause
+        patch :resume
+        patch :complete
+        patch :withdraw
+        patch :cancel
+        patch :transfer
+        patch :complete_placement
+        patch :waive_placement
+      end
+    end
     resource :settings, only: %i[show edit update], controller: :academy_settings
     resources :teachers, except: :destroy do
       member do
@@ -50,6 +85,7 @@ Rails.application.routes.draw do
   end
   namespace :student do
     resource :profile, only: %i[show edit update], controller: :profiles
+    resources :enrollments, only: %i[index show]
   end
   root "dashboard#index"
   constraints LocalEnvironmentConstraint.new do

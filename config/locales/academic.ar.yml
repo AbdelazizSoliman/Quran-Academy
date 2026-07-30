@@ -1,0 +1,74 @@
+ar:
+  navigation:
+    programs: "البرامج"
+    course_offerings: "العروض التعليمية"
+    enrollments: "التسجيلات"
+    my_enrollments: "تسجيلاتي"
+  actions:
+    activate: "تفعيل"
+    deactivate: "إلغاء التفعيل"
+    archive: "أرشفة"
+    restore: "استعادة"
+    open: "فتح"
+    close: "إغلاق"
+    start: "بدء"
+    complete: "إكمال"
+    cancel: "إلغاء"
+  academic:
+    not_configured: "غير مُعد"
+    catalogs:
+      program_categories:
+        quran_reading: "قراءة القرآن"
+        quran_memorization: "حفظ القرآن"
+        tajweed: "التجويد"
+        qaida_noorania: "القاعدة النورانية"
+        arabic_language: "اللغة العربية"
+        islamic_studies: "الدراسات الإسلامية"
+        recitation: "التلاوة"
+        revision: "المراجعة"
+        new_muslim_foundations: "أسس المسلم الجديد"
+        other: "أخرى"
+      program_statuses: { draft: "مسودة", active: "نشط", inactive: "غير نشط", archived: "مؤرشف" }
+      offering_statuses: { draft: "مسودة", open: "مفتوح", closed: "مغلق", in_progress: "قيد التنفيذ", completed: "مكتمل", cancelled: "ملغي", archived: "مؤرشف" }
+      enrollment_statuses: { pending: "قيد المراجعة", approved: "مقبول", waitlisted: "قائمة الانتظار", active: "نشط", paused: "متوقف مؤقتًا", completed: "مكتمل", withdrawn: "منسحب", rejected: "مرفوض", cancelled: "ملغي", transferred: "منقول" }
+      delivery_modes: { online: "عن بُعد", in_person: "حضوري", hybrid: "هجين" }
+      age_groups: { children: "أطفال", teenagers: "يافعون", adults: "بالغون", seniors: "كبار السن" }
+      levels: { not_started: "لم يبدأ", foundation: "تأسيسي", beginner: "مبتدئ", elementary: "أولي", intermediate: "متوسط", advanced: "متقدم", memorization: "حفظ", revision: "مراجعة", qualified: "مؤهل" }
+      placement_statuses: { not_required: "غير مطلوب", pending: "معلق", in_review: "قيد التقييم", completed: "مكتمل", waived: "معفى" }
+      placement_methods: { profile_review: "مراجعة الملف", teacher_assessment: "تقييم معلم", student_self_report: "تقييم الطالب", guardian_report: "إفادة ولي الأمر", previous_academy_record: "سجل أكاديمية سابقة", administrator_override: "قرار إداري" }
+      application_sources: { administrator: "الإدارة", student_request: "طلب الطالب", guardian_request: "طلب ولي الأمر", referral: "إحالة", transfer: "نقل", imported: "مستورد", other: "أخرى" }
+    events: { created: "تم الإنشاء", updated: "تم التحديث", approved: "تم القبول", waitlisted: "أضيف للانتظار", rejected: "تم الرفض", activated: "تم التفعيل", paused: "تم الإيقاف مؤقتًا", resumed: "تم الاستئناف", completed: "تم الإكمال", withdrawn: "تم الانسحاب", cancelled: "تم الإلغاء", transferred: "تم النقل", placement_completed: "اكتمل تحديد المستوى", placement_waived: "أُعفي من تحديد المستوى" }
+  programs:
+    index: { title: "البرامج", description: "تعريفات أكاديمية قابلة لإعادة الاستخدام." }
+    new: { title: "برنامج جديد", description: "عرّف برنامجًا أكاديميًا دون إنشاء دروس أو جداول." }
+    edit: { title: "تعديل البرنامج" }
+    empty: { title: "لا توجد برامج", description: "أنشئ أول برنامج أكاديمي." }
+    actions: { new: "برنامج جديد" }
+    offerings_count: "%{count} عرض"
+    sections: { identity: "الهوية", eligibility: "الأهلية", defaults: "الإعدادات التشغيلية", details: "تفاصيل البرنامج", description: "الوصف", offerings: "العروض التعليمية", audit: "سجل التغييرات" }
+    fields: { code: "الرمز", name_ar: "الاسم بالعربية", name_en: "الاسم بالإنجليزية", short_description_ar: "الوصف المختصر بالعربية", short_description_en: "الوصف المختصر بالإنجليزية", description_ar: "الوصف بالعربية", description_en: "الوصف بالإنجليزية", category: "التصنيف", status: "الحالة", default_learning_language: "لغة التعلم الافتراضية", supported_learning_languages: "لغات التعلم المدعومة", target_age_groups: "الفئات العمرية", allows_minor_students: "يسمح بالقُصّر", allows_adult_students: "يسمح بالبالغين", requires_placement: "يتطلب تحديد مستوى", entry_level: "مستوى الدخول", completion_level: "مستوى الإكمال", default_lesson_duration_minutes: "مدة الدرس الافتراضية بالدقائق", recommended_lessons_per_week: "الدروس الأسبوعية المقترحة", estimated_duration_weeks: "المدة التقديرية بالأسابيع", display_order: "ترتيب العرض", internal_notes: "ملاحظات داخلية" }
+    messages: { created: "تم إنشاء البرنامج.", updated: "تم تحديث البرنامج.", activate: "تم تفعيل البرنامج.", deactivate: "تم إلغاء تفعيل البرنامج.", archive: "تمت أرشفة البرنامج.", restore: "تمت استعادة البرنامج." }
+    audit: { created: "أنشأه %{actor}", updated: "حدّثه %{actor}", activated: "فعّله %{actor}", deactivated: "ألغى تفعيله %{actor}", archived: "أرشفه %{actor}", restored: "استعاده %{actor}" }
+  course_offerings:
+    index: { title: "العروض التعليمية", description: "عروض تشغيلية دون جداول أو تعيين معلمين." }
+    new: { title: "عرض تعليمي جديد", description: "نسخ إعدادات البرنامج الأولية للتسجيل." }
+    edit: { title: "تعديل العرض التعليمي" }
+    empty: { title: "لا توجد عروض", description: "أنشئ عرضًا من برنامج نشط." }
+    actions: { new: "عرض جديد" }
+    sections: { identity: "الهوية", operation: "التفاصيل التشغيلية", enrollments: "التسجيلات", audit: "سجل التغييرات" }
+    capacity: { used: "السعة المستخدمة", available: "السعة المتاحة" }
+    fields: { program: "البرنامج", code: "الرمز", title: "العنوان", title_ar: "العنوان بالعربية", title_en: "العنوان بالإنجليزية", description_ar: "الوصف بالعربية", description_en: "الوصف بالإنجليزية", status: "الحالة", learning_language: "لغة التعلم", delivery_mode: "نمط التقديم", target_age_groups: "الفئات العمرية", enrollment_opens_on: "فتح التسجيل", enrollment_closes_on: "إغلاق التسجيل", planned_start_on: "البداية المخططة", planned_start: "البداية المخططة", planned_end_on: "النهاية المخططة", capacity: "السعة", default_lesson_duration_minutes: "مدة الجلسة بالدقائق", intended_lessons_per_week: "الدروس الأسبوعية", placement_required: "يتطلب تحديد مستوى", internal_notes: "ملاحظات داخلية", actions: "الإجراءات" }
+    messages: { created: "تم إنشاء العرض.", updated: "تم تحديث العرض.", open: "تم فتح العرض.", close: "تم إغلاق العرض.", start: "تم بدء العرض.", complete: "تم إكمال العرض.", cancel: "تم إلغاء العرض.", archive: "تمت أرشفة العرض.", restore: "تمت استعادة العرض." }
+    audit: { created: "أنشأه %{actor}", updated: "حدّثه %{actor}", opened: "فتحه %{actor}", closed: "أغلقه %{actor}", started: "بدأه %{actor}", completed: "أكمله %{actor}", cancelled: "ألغاه %{actor}", archived: "أرشفه %{actor}", restored: "استعاده %{actor}" }
+  enrollments:
+    index: { title: "التسجيلات", description: "عضوية الطلاب وبيانات تحديد المستوى." }
+    new: { title: "تسجيل جديد", description: "إنشاء سجل تسجيل منضبط." }
+    edit: { title: "تعديل التسجيل" }
+    empty: { title: "لا توجد تسجيلات", description: "لا توجد نتائج مطابقة.", audit: "لا توجد أحداث بعد." }
+    sections: { membership: "العضوية", notes: "المستوى والملاحظات", lifecycle: "إجراءات دورة الحياة", audit: "سجل التغييرات" }
+    actions: { new: "تسجيل جديد", approve: "قبول", waitlist: "إضافة للانتظار", reject: "رفض", activate: "تفعيل", pause: "إيقاف مؤقت", resume: "استئناف", complete: "إكمال", withdraw: "انسحاب", cancel: "إلغاء", transfer: "تحديد كمنقول", complete_placement: "إكمال تحديد المستوى", waive_placement: "إعفاء تحديد المستوى" }
+    fields: { public_id: "رقم التسجيل", student: "الطالب", offering: "العرض التعليمي", status: "الحالة", application_source: "مصدر الطلب", placement_status: "حالة تحديد المستوى", learning_language: "لغة التعلم", starting_quran_level: "مستوى القرآن عند البداية", starting_reading_level: "مستوى القراءة عند البداية", starting_tajweed_level: "مستوى التجويد عند البداية", starting_memorization_level: "مستوى الحفظ عند البداية", starting_memorized_juz_count: "الأجزاء المحفوظة عند البداية", student_goals_snapshot: "نسخة أهداف الطالب", preferred_schedule_notes: "تفضيلات الجدول (للمعلومات فقط)", placement_notes: "ملاحظات تحديد المستوى", waiver_reason: "سبب الإعفاء", administrator_notes: "ملاحظات الإدارة" }
+    messages: { created: "تم إنشاء التسجيل.", updated: "تم تحديث التسجيل.", approve: "تم قبول التسجيل.", waitlist: "أضيف التسجيل للانتظار.", reject: "تم رفض التسجيل.", activate: "تم تفعيل التسجيل.", pause: "تم إيقاف التسجيل مؤقتًا.", resume: "تم استئناف التسجيل.", complete: "تم إكمال التسجيل.", withdraw: "تم انسحاب التسجيل.", cancel: "تم إلغاء التسجيل.", transfer: "تم تحديد التسجيل كمنقول.", complete_placement: "اكتمل تحديد المستوى.", waive_placement: "تم الإعفاء من تحديد المستوى." }
+  student_enrollments:
+    index: { title: "تسجيلاتي", description: "تسجيلاتك الحالية والسابقة في الأكاديمية." }
+    empty: { title: "لا توجد تسجيلات", description: "ليس لديك سجلات تسجيل بعد." }

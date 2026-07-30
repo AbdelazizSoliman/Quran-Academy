@@ -1,0 +1,17 @@
+<% action = render("shared/components/button", label: t("enrollments.actions.new"), href: new_admin_enrollment_path, icon: :plus) %>
+<%= render "shared/page_header", title: t("enrollments.index.title"), description: t("enrollments.index.description"), primary_action: action %>
+<% filters = capture do %>
+  <%= form_with url: admin_enrollments_path, method: :get, class: "grid gap-4 md:grid-cols-4" do |f| %>
+    <div><%= f.label :q, t("actions.search"), class: "ds-label" %><%= f.search_field :q, value: params[:q], class: "ds-control mt-2" %></div>
+    <div><%= f.label :status, t("enrollments.fields.status"), class: "ds-label" %><%= f.select :status, [["—", ""]] + Enrollment::STATUSES.map { |v| [t("academic.catalogs.enrollment_statuses.#{v}"), v] }, { selected: params[:status] }, class: "ds-control mt-2" %></div>
+    <div><%= f.label :placement_status, t("enrollments.fields.placement_status"), class: "ds-label" %><%= f.select :placement_status, [["—", ""]] + Enrollment::PLACEMENT_STATUSES.map { |v| [t("academic.catalogs.placement_statuses.#{v}"), v] }, { selected: params[:placement_status] }, class: "ds-control mt-2" %></div>
+    <div class="flex items-end"><%= render "shared/components/button", label: t("actions.search"), type: "submit" %></div>
+  <% end %>
+<% end %>
+<%= render "shared/components/card", body: filters %>
+<div class="mt-6 overflow-x-auto rounded-2xl border border-app-border bg-app-surface">
+  <table class="min-w-full text-sm"><thead class="bg-app-muted"><tr><th class="px-4 py-3 text-start"><%= t("enrollments.fields.public_id") %></th><th class="px-4 py-3 text-start"><%= t("enrollments.fields.student") %></th><th class="px-4 py-3 text-start"><%= t("enrollments.fields.offering") %></th><th class="px-4 py-3 text-start"><%= t("enrollments.fields.status") %></th></tr></thead>
+    <tbody class="divide-y divide-app-border"><% @enrollments.each do |enrollment| %><tr><td class="px-4 py-3"><%= link_to enrollment.public_id, admin_enrollment_path(enrollment), class: "font-semibold text-app-primary" %></td><td class="px-4 py-3"><%= enrollment.student_profile.display_name %></td><td class="px-4 py-3"><%= localized_offering_title(enrollment.course_offering) %></td><td class="px-4 py-3"><%= enrollment_status_badge(enrollment) %></td></tr><% end %></tbody>
+  </table>
+</div>
+<% if @enrollments.empty? %><div class="mt-6"><%= render "shared/components/empty_state", icon: :reports, title: t("enrollments.empty.title"), description: t("enrollments.empty.description"), primary_action: action %></div><% else %><div class="mt-6"><%== @pagy.series_nav %></div><% end %>

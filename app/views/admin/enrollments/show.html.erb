@@ -1,0 +1,13 @@
+<%= render "shared/page_header", title: @enrollment.public_id, description: localized_program_name(@enrollment.course_offering.program), badge: enrollment_status_badge(@enrollment) %>
+<div class="grid gap-6 lg:grid-cols-2">
+  <%= render "shared/components/card", title: t("enrollments.sections.membership") do %>
+    <dl class="space-y-3 text-sm"><div><dt class="ds-caption"><%= t("enrollments.fields.student") %></dt><dd><%= link_to @enrollment.student_profile.display_name, admin_student_path(@enrollment.student_profile), class: "text-app-primary" %></dd></div><div><dt class="ds-caption"><%= t("enrollments.fields.offering") %></dt><dd><%= link_to localized_offering_title(@enrollment.course_offering), admin_course_offering_path(@enrollment.course_offering), class: "text-app-primary" %></dd></div><div><dt class="ds-caption"><%= t("enrollments.fields.placement_status") %></dt><dd><%= academic_badge(:placement_statuses, @enrollment.placement_status) %></dd></div></dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("enrollments.sections.lifecycle") do %>
+    <div class="flex flex-wrap gap-2">
+      <% enrollment_actions(@enrollment).each do |action| %><%= button_to t("enrollments.actions.#{action}"), public_send("#{action}_admin_enrollment_path", @enrollment), method: :patch, class: button_classes(variant: :outline, size: :small) %><% end %>
+      <% if @enrollment.placement_status.in?(%w[pending in_review]) %><%= button_to t("enrollments.actions.complete_placement"), complete_placement_admin_enrollment_path(@enrollment), method: :patch, params: { placement_method: "administrator_override" }, class: button_classes(size: :small) %><%= form_with url: waive_placement_admin_enrollment_path(@enrollment), method: :patch, class: "flex gap-2" do |form| %><%= form.hidden_field :placement_method, value: "administrator_override" %><%= form.text_field :placement_notes, required: true, placeholder: t("enrollments.fields.waiver_reason"), class: "ds-control" %><%= form.submit t("enrollments.actions.waive_placement"), class: button_classes(variant: :outline, size: :small) %><% end %><% end %>
+    </div>
+  <% end %>
+</div>
+<div class="mt-6"><%= render "shared/components/card", title: t("enrollments.sections.audit") do %><div class="space-y-3"><% @events.each do |event| %><p class="text-sm"><%= t("academic.events.#{event.event_type}") %> · <%= event.actor.full_name %> · <%= l(event.created_at, format: :short) %></p><% end %><% if @events.empty? %><p class="ds-caption"><%= t("enrollments.empty.audit") %></p><% end %></div><% end %></div>

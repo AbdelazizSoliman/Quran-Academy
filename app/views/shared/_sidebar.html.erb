@@ -29,6 +29,10 @@
                     (key == :teachers && controller_path.start_with?("admin/teachers")) ||
                     (key == :teacher_profile && controller_path.start_with?("teacher/profiles")) ||
                     (key == :student_profile && controller_path.start_with?("student/profiles")) ||
+                    (key == :programs && controller_path == "admin/programs") ||
+                    (key == :course_offerings && controller_path == "admin/course_offerings") ||
+                    (key == :enrollments && controller_path == "admin/enrollments") ||
+                    (key == :my_enrollments && controller_path == "student/enrollments") ||
                     (key == :settings && controller_path == "admin/academy_settings") %>
         <% path = navigation_path(key, item) %>
         <li>

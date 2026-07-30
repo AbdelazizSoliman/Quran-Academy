@@ -262,3 +262,34 @@ feature branches → dev → main
 - `main` is the stable production branch.
 - `dev` is the integration branch.
 - Feature branches are created from `dev` and merged back through review.
+
+## Programs, course offerings, and enrollment
+
+The academic catalog separates reusable academic definitions (`Program`) from operational
+enrollment containers (`CourseOffering`). An `Enrollment` connects one `StudentProfile` to
+one offering and stores its own placement and starting-level snapshot. Program defaults
+initialize new offerings; later program changes never silently rewrite existing offerings.
+
+Programs use draft, active, inactive, and archived lifecycle states. Offerings use explicit
+draft, open, closed, in-progress, completed, cancelled, and archived transitions. Records are
+archived rather than hard-deleted so offering and enrollment history remains intact.
+
+Enrollment status is independent of the student profile, user account, and offering status.
+Lifecycle changes use transactional services and audit events. Approved, active, and paused
+enrollments consume configured offering capacity; pending and waitlisted records do not.
+Approval locks the offering and recalculates capacity from persisted records.
+
+Adult students can be approved without guardians. Minor approval requires the existing
+student-profile guardian-readiness rules. Placement-required offerings require completed or
+explicitly waived placement before activation. Placement data and student goals are snapshots,
+not assessment or progress-tracking systems.
+
+Administrators manage the catalog and enrollments under `/admin`. Students can view only their
+own enrollment summaries and cannot self-enroll. Internal administrative notes and audit
+metadata are never exposed on student pages. Teachers and staff receive no catalog-management
+access in this foundation.
+
+This stage intentionally does not implement teacher assignment, availability, scheduling,
+lessons, attendance, assessments, progress tracking, payroll, billing, invoices, payments,
+communications, providers, or background jobs. A transfer action currently records the
+terminal transferred state; creating and linking a target enrollment is deliberately deferred.

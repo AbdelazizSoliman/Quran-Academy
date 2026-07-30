@@ -1,0 +1,27 @@
+<%= render "shared/academic/errors", record: enrollment %>
+<%= form_with model: [:admin, enrollment], class: "space-y-6" do |f| %>
+  <fieldset class="ds-card p-5">
+    <legend class="ds-section-title"><%= t("enrollments.sections.membership") %></legend>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <% unless enrollment.persisted? %>
+        <div><%= f.label :student_profile_id, t("enrollments.fields.student"), class: "ds-label" %><%= f.collection_select :student_profile_id, students, :id, :display_name, { selected: enrollment.student_profile_id, include_blank: true }, class: "ds-control mt-2" %></div>
+        <div><%= f.label :course_offering_id, t("enrollments.fields.offering"), class: "ds-label" %><%= f.collection_select :course_offering_id, offerings, :id, :title_en, { selected: enrollment.course_offering_id, include_blank: true }, class: "ds-control mt-2" %></div>
+      <% end %>
+      <div><%= f.label :application_source, t("enrollments.fields.application_source"), class: "ds-label" %><%= f.select :application_source, Enrollment::APPLICATION_SOURCES.map { |value| [t("academic.catalogs.application_sources.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+      <div><%= f.label :starting_memorized_juz_count, t("enrollments.fields.starting_memorized_juz_count"), class: "ds-label" %><%= f.number_field :starting_memorized_juz_count, min: 0, max: 30, class: "ds-control mt-2" %></div>
+      <% %i[starting_quran_level starting_reading_level starting_tajweed_level starting_memorization_level].each do |field| %>
+        <% catalog = field.to_s.sub("starting_", "").sub("_level", "").upcase + "_LEVELS" %>
+        <div><%= f.label field, t("enrollments.fields.#{field}"), class: "ds-label" %><%= f.select field, StudentProfile.const_get(catalog).map { |value| [t("students.catalogs.#{field.to_s.sub("starting_", "").sub("_level", "")}_levels.#{value}"), value] }, { include_blank: true }, class: "ds-control mt-2" %></div>
+      <% end %>
+    </div>
+  </fieldset>
+  <fieldset class="ds-card p-5">
+    <legend class="ds-section-title"><%= t("enrollments.sections.notes") %></legend>
+    <div class="mt-4 grid gap-4">
+      <% %i[student_goals_snapshot preferred_schedule_notes placement_notes administrator_notes].each do |field| %>
+        <div><%= f.label field, t("enrollments.fields.#{field}"), class: "ds-label" %><%= f.text_area field, rows: 3, class: "ds-control mt-2" %></div>
+      <% end %>
+    </div>
+  </fieldset>
+  <div class="flex flex-wrap gap-3"><%= render "shared/components/button", label: t("actions.save"), type: "submit" %><%= render "shared/components/button", label: t("actions.cancel"), href: admin_enrollments_path, variant: :secondary %></div>
+<% end %>

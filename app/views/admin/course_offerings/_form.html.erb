@@ -1,0 +1,17 @@
+<%= render "shared/academic/errors", record: offering %>
+<%= form_with model: [:admin, offering], class: "space-y-6" do |f| %>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("course_offerings.sections.identity") %></legend><div class="mt-4 grid gap-4 sm:grid-cols-2">
+    <% unless offering.persisted? %><div><%= f.label :program_id, t("course_offerings.fields.program"), class: "ds-label" %><%= f.collection_select :program_id, programs, :id, :name_en, { include_blank: true }, class: "ds-control mt-2" %></div><% end %>
+    <% %i[code title_ar title_en].each do |field| %><div><%= f.label field, t("course_offerings.fields.#{field}"), class: "ds-label" %><%= f.text_field field, class: "ds-control mt-2", dir: field == :code ? "ltr" : nil %></div><% end %>
+    <% %i[description_ar description_en].each do |field| %><div><%= f.label field, t("course_offerings.fields.#{field}"), class: "ds-label" %><%= f.text_area field, rows: 3, class: "ds-control mt-2" %></div><% end %>
+  </div></fieldset>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("course_offerings.sections.operation") %></legend><div class="mt-4 grid gap-4 sm:grid-cols-3">
+    <div><%= f.label :learning_language, t("course_offerings.fields.learning_language"), class: "ds-label" %><%= f.select :learning_language, (offering.program&.supported_learning_languages || []).map { |v| [t("academy.languages.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
+    <div><%= f.label :delivery_mode, t("course_offerings.fields.delivery_mode"), class: "ds-label" %><%= f.select :delivery_mode, CourseOffering::DELIVERY_MODES.map { |v| [t("academic.catalogs.delivery_modes.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
+    <% %i[capacity default_lesson_duration_minutes intended_lessons_per_week].each do |field| %><div><%= f.label field, t("course_offerings.fields.#{field}"), class: "ds-label" %><%= f.number_field field, min: 1, class: "ds-control mt-2" %></div><% end %>
+    <% %i[enrollment_opens_on enrollment_closes_on planned_start_on planned_end_on].each do |field| %><div><%= f.label field, t("course_offerings.fields.#{field}"), class: "ds-label" %><%= f.date_field field, class: "ds-control mt-2" %></div><% end %>
+    <label class="flex items-center gap-2"><%= f.check_box :placement_required %><%= t("course_offerings.fields.placement_required") %></label>
+    <fieldset class="sm:col-span-3"><legend class="ds-label"><%= t("course_offerings.fields.target_age_groups") %></legend><%= hidden_field_tag "course_offering[target_age_groups][]", "" %><div class="mt-2 flex flex-wrap gap-4"><% (offering.program&.target_age_groups || Program::AGE_GROUPS).each do |v| %><label><%= check_box_tag "course_offering[target_age_groups][]", v, offering.target_age_groups.include?(v) %> <%= t("academic.catalogs.age_groups.#{v}") %></label><% end %></div></fieldset>
+  </div><div class="mt-4"><%= f.label :internal_notes, t("course_offerings.fields.internal_notes"), class: "ds-label" %><%= f.text_area :internal_notes, rows: 3, class: "ds-control mt-2" %></div></fieldset>
+  <div class="flex gap-3"><%= render "shared/components/button", label: t("actions.save"), type: "submit" %><%= render "shared/components/button", label: t("actions.cancel"), href: admin_course_offerings_path, variant: :secondary %></div>
+<% end %>
