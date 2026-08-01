@@ -65,7 +65,7 @@
 
   <% communication_body = capture do %>
     <%= render "boolean_fields", form:, fields: %i[email_notifications_enabled whatsapp_notifications_enabled sms_notifications_enabled lesson_reminders_enabled attendance_notifications_enabled payment_notifications_enabled] %>
-    <div class="mt-5"><%= render "number_fields", form:, setting: @setting, fields: %i[lesson_reminder_hours_before second_lesson_reminder_minutes_before] %></div>
+    <div class="mt-5"><%= render "number_fields", form:, setting: @setting, fields: %i[lesson_reminder_hours_before second_lesson_reminder_minutes_before invitation_expires_after_hours] %></div>
     <%= render "shared/components/alert", variant: :information, title: t("admin.settings.provider.title"), message: t("admin.settings.provider.description") %>
   <% end %>
   <%= render "shared/components/card", title: t("admin.settings.sections.communication"), body: communication_body %>

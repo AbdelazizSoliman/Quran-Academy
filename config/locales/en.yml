@@ -58,6 +58,7 @@ en:
     reports: "Reports"
     settings: "Settings"
     users: "User administration"
+    invitations: "Account invitations"
     my_profile: "My Profile"
     coming_soon: "Coming Soon"
   actions:
@@ -200,6 +201,7 @@ en:
         postal_code: "Postal code"
         country_code: "Country code"
         default_locale: "Default interface language"
+        invitation_expires_after_hours: "Invitation validity (hours)"
         supported_locales: "Supported interface languages"
         default_time_zone: "Default time zone"
         teaching_languages: "Teaching languages"

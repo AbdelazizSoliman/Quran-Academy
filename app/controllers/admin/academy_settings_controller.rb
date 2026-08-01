@@ -47,6 +47,7 @@ module Admin
         lesson_reminders_enabled attendance_notifications_enabled payment_notifications_enabled
         lesson_reminder_hours_before second_lesson_reminder_minutes_before default_teacher_compensation_type
         default_teacher_rate payroll_currency payroll_period billing_currency default_lesson_price billing_cycle
+        invitation_expires_after_hours
       ]
     end
   end

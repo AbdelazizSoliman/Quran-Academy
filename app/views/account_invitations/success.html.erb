@@ -1,0 +1,4 @@
+<h1 class="text-2xl font-bold"><%= t("invitations.accepted.title") %></h1>
+<p class="mt-3 ds-supporting"><%= t("invitations.accepted.message") %></p>
+<div class="mt-6"><%= render "shared/components/button", label: t("invitations.accept.sign_in"), href: new_user_session_path,
+                             classes: "w-full justify-center" %></div>

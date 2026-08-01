@@ -1,0 +1,65 @@
+ar:
+  invitations:
+    statuses: { pending: "قيد الانتظار", sent: "أُرسلت", accepted: "قُبلت", expired: "منتهية", cancelled: "ملغاة" }
+    sorts: { created: "الإنشاء", expires: "الانتهاء", accepted: "القبول" }
+    events: { created: "أُنشئت الدعوة", sent: "أُرسلت الدعوة", resent: "أُعيد إرسال الدعوة", accepted: "قُبلت الدعوة", expired: "انتهت الدعوة", cancelled: "أُلغيت الدعوة" }
+    mailer:
+      subject: "دعوتك للانضمام إلى %{academy}"
+      heading: "مرحبًا %{name}"
+      introduction: "تدعوك %{academy} للانضمام بصفة %{role}. اختر كلمة مرورك عبر الرابط الآمن أدناه."
+      action: "إعداد كلمة المرور"
+      expiration: "تنتهي صلاحية هذه الدعوة أحادية الاستخدام في %{time}."
+      support: "تحتاج مساعدة؟ تواصل مع %{contact}."
+    accept:
+      title: "تفعيل حسابك"
+      description: "أنشئ كلمة مرورك للدخول الآمن إلى %{academy}. لا يمكن تغيير البريد أو الدور هنا."
+      expires: "تنتهي الدعوة في %{time}."
+      errors_title: "تعذر تفعيل حسابك"
+      password: "كلمة المرور"
+      password_confirmation: "تأكيد كلمة المرور"
+      action: "تفعيل الحساب"
+      sign_in: "تسجيل الدخول"
+    accepted:
+      title: "حسابك مفعّل"
+      message: "أُنشئت كلمة مرورك بنجاح، ويمكنك الآن تسجيل الدخول."
+      notice: "تم تفعيل حسابك."
+    expired:
+      title: "انتهت صلاحية الدعوة"
+      message: "انتهت هذه الدعوة. تواصل مع الأكاديمية واطلب من المسؤول إعادة إرسالها."
+    invalid:
+      title: "الدعوة غير متاحة"
+      message: "هذه الدعوة غير صالحة أو ملغاة أو سبق استخدامها. تواصل مع الأكاديمية للمساعدة."
+    admin:
+      creation_title: "دعوة آمنة"
+      creation_hint: "سيبقى الحساب قيد الانتظار. يتلقى المستخدم بريدًا ويختار كلمة مروره، ولا تُرسل كلمة مرور مؤقتة."
+      index_title: "دعوات الحسابات"
+      index_description: "راجع تهيئة الحسابات الآمنة وأعد إرسال الدعوات غير المستخدمة أو ألغها."
+      search: "البحث بالاسم أو البريد أو الدور"
+      status: "الحالة"
+      sort: "الترتيب حسب"
+      all: "كل الحالات"
+      created: "أُنشئت"
+      expires: "تنتهي"
+      accepted: "قُبلت"
+      recipient: "المستلم"
+      role: "الدور"
+      sent: "آخر إرسال"
+      resends: "مرات الإعادة"
+      details: "تفاصيل الدعوة"
+      actions: "الإجراءات"
+      history: "سجل التدقيق"
+      system: "النظام"
+      resend: "إعادة إرسال الدعوة"
+      cancel: "إلغاء الدعوة"
+      resent: "أُرسل رابط دعوة جديد وأصبح الرابط السابق غير صالح."
+      cancelled: "أُلغيت الدعوة."
+      empty: "لا توجد دعوات"
+  activerecord:
+    errors:
+      models:
+        account_invitation:
+          attributes:
+            base:
+              expired: "انتهت صلاحية الدعوة"
+              not_usable: "لا يمكن استخدام الدعوة"
+              already_accepted: "لا يمكن إلغاء دعوة مقبولة"

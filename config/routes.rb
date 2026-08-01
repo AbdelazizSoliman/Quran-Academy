@@ -1,9 +1,18 @@
 Rails.application.routes.draw do
+  get "account/invitation/:token", to: "account_invitations#edit", as: :edit_account_invitation
+  patch "account/invitation/:token", to: "account_invitations#update", as: :account_invitation
+  get "account/invitation-success", to: "account_invitations#success", as: :account_invitation_success
   devise_for :users,
              path: "account",
              path_names: { sign_in: "sign-in", sign_out: "sign-out", password: "password" },
              skip: :registrations
   namespace :admin do
+    resources :account_invitations, only: %i[index show] do
+      member do
+        patch :resend
+        patch :cancel
+      end
+    end
     resources :programs, except: :destroy do
       member do
         patch :activate

@@ -1,0 +1,20 @@
+<%= render "shared/page_header", title: @invitation.public_id, description: @invitation.user.email,
+           secondary_action: render("shared/components/button", label: t("actions.back"), href: admin_account_invitations_path, variant: :ghost) %>
+<div class="grid gap-6 lg:grid-cols-2">
+  <% details = capture do %><dl class="grid gap-4 sm:grid-cols-2">
+    <% { recipient: @invitation.user.full_name, role: t("roles.#{@invitation.user.role}"), status: t("invitations.statuses.#{@invitation.status}"), expires: localized_datetime(@invitation.expires_at), sent: localized_datetime(@invitation.last_sent_at), resends: @invitation.resent_count }.each do |key, value| %>
+      <div><dt class="ds-caption"><%= t("invitations.admin.#{key}") %></dt><dd class="mt-1 font-semibold"><%= value %></dd></div>
+    <% end %>
+  </dl><% end %>
+  <%= render "shared/components/card", title: t("invitations.admin.details"), body: details %>
+  <% actions = capture do %><div class="flex flex-wrap gap-3">
+    <% unless @invitation.accepted? || @invitation.cancelled? %>
+      <%= button_to t("invitations.admin.resend"), resend_admin_account_invitation_path(@invitation), method: :patch, class: button_classes %>
+      <%= button_to t("invitations.admin.cancel"), cancel_admin_account_invitation_path(@invitation), method: :patch, class: button_classes(variant: :danger) %>
+    <% end %>
+  </div><% end %>
+  <%= render "shared/components/card", title: t("invitations.admin.actions"), body: actions %>
+</div>
+<div class="mt-6"><% history = capture do %><ol class="divide-y divide-app-border">
+  <% @events.each do |event| %><li class="py-3"><strong><%= t("invitations.events.#{event.event_type}") %></strong><p class="ds-caption"><%= localized_datetime(event.created_at) %> · <%= event.actor&.full_name || t("invitations.admin.system") %></p></li><% end %>
+</ol><% end %><%= render "shared/components/card", title: t("invitations.admin.history"), body: history %></div>

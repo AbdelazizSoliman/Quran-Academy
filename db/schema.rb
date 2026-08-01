@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,6 +52,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_160000) do
     t.string "default_time_zone", default: "Cairo", null: false
     t.text "description"
     t.boolean "email_notifications_enabled", default: true, null: false
+    t.integer "invitation_expires_after_hours", default: 72, null: false
     t.integer "late_cancellation_window_hours", default: 2, null: false
     t.integer "left_early_threshold_minutes", default: 5, null: false
     t.string "legal_name"
@@ -90,8 +91,46 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_160000) do
     t.index ["updated_by_id"], name: "index_academy_settings_on_updated_by_id"
     t.check_constraint "day_starts_at < day_ends_at", name: "academy_settings_operating_hours"
     t.check_constraint "default_teacher_rate >= 0::numeric AND default_lesson_price >= 0::numeric", name: "academy_settings_nonnegative_money"
+    t.check_constraint "invitation_expires_after_hours >= 1 AND invitation_expires_after_hours <= 8760", name: "academy_invitation_expiry_range"
     t.check_constraint "minimum_lesson_duration_minutes <= default_lesson_duration_minutes AND default_lesson_duration_minutes <= maximum_lesson_duration_minutes", name: "academy_settings_lesson_duration_order"
     t.check_constraint "singleton_key::text = 'current'::text", name: "academy_settings_singleton"
+  end
+
+  create_table "account_invitation_events", force: :cascade do |t|
+    t.bigint "account_invitation_id", null: false
+    t.bigint "actor_id"
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.index ["account_invitation_id", "created_at"], name: "idx_invitation_events_history"
+    t.index ["account_invitation_id"], name: "index_account_invitation_events_on_account_invitation_id"
+    t.index ["actor_id"], name: "index_account_invitation_events_on_actor_id"
+  end
+
+  create_table "account_invitations", force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.string "accepted_ip"
+    t.string "accepted_user_agent", limit: 500
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "last_sent_at"
+    t.integer "lock_version", default: 0, null: false
+    t.string "public_id", null: false
+    t.integer "resent_count", default: 0, null: false
+    t.datetime "sent_at"
+    t.string "status", default: "pending", null: false
+    t.string "token_digest", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["created_by_id"], name: "index_account_invitations_on_created_by_id"
+    t.index ["public_id"], name: "index_account_invitations_on_public_id", unique: true
+    t.index ["status", "expires_at"], name: "index_account_invitations_on_status_and_expires_at"
+    t.index ["token_digest"], name: "index_account_invitations_on_token_digest", unique: true
+    t.index ["user_id"], name: "index_account_invitations_on_user_id", unique: true
+    t.check_constraint "resent_count >= 0", name: "invitation_resent_count_nonnegative"
   end
 
   create_table "communication_log_events", force: :cascade do |t|
@@ -986,6 +1025,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_160000) do
   add_foreign_key "academy_setting_events", "academy_settings", on_delete: :restrict
   add_foreign_key "academy_setting_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "academy_settings", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "account_invitation_events", "account_invitations", on_delete: :restrict
+  add_foreign_key "account_invitation_events", "users", column: "actor_id", on_delete: :nullify
+  add_foreign_key "account_invitations", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "account_invitations", "users", on_delete: :restrict
   add_foreign_key "communication_log_events", "communication_logs", on_delete: :restrict
   add_foreign_key "communication_log_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "communication_logs", "guardians", on_delete: :restrict

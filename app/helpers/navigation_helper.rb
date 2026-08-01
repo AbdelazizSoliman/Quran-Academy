@@ -2,6 +2,7 @@ module NavigationHelper
   NAVIGATION_ITEMS = {
     dashboard: { icon: :home, roles: %i[admin staff teacher student] },
     users: { icon: :users, roles: %i[admin], path: :admin_users_path },
+    invitations: { icon: :users, roles: %i[admin], path: :admin_account_invitations_path },
     students: { icon: :users, roles: %i[admin], path: :admin_students_path },
     guardians: { icon: :users, roles: %i[admin], path: :admin_guardians_path },
     teachers: { icon: :users, roles: %i[admin], path: :admin_teachers_path },
