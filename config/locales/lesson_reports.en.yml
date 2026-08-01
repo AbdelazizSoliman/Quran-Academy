@@ -1,0 +1,50 @@
+en:
+  lesson_reports:
+    admin: { index: { title: "Lesson reports", description: "Review structured academic lesson reports." }, show: { title: "Lesson report review" } }
+    teacher: { title: "Lesson report" }
+    student: { index_title: "My lesson reports", description: "Your finalized academic progress reports." }
+    statuses: { draft: "Draft", submitted: "Submitted", reviewed: "Reviewed", locked: "Locked", reopened: "Reopened", archived: "Archived" }
+    student_statuses: { pending: "Pending", completed: "Completed", not_applicable: "Not applicable", withheld: "Withheld" }
+    actions: { open: "Open report", edit: "Edit", save: "Save report", submit: "Submit report", review: "Mark reviewed", lock: "Lock report", reopen: "Reopen report", relock: "Relock report" }
+    sections: { students: "Student entries", reading: "Quran reading", memorization: "Memorization", revision: "Revision", tajweed: "Tajweed", progress: "Academic progress" }
+    fields: { lesson_summary: "Lesson summary", topics_covered: "Topics covered", general_homework: "General homework", next_lesson_plan: "Next lesson plan", engagement: "Engagement", progress: "Progress", material: "Material", strengths: "Strengths", areas_for_improvement: "Areas for improvement", homework: "Homework", next_lesson_target: "Next lesson target", student_visible_notes: "Student-visible notes", guardian_visible_notes: "Guardian-visible notes", private_teacher_notes: "Private teacher notes", status: "Entry status" }
+    engagement: { not_assessed: "Not assessed", low: "Low", inconsistent: "Inconsistent", engaged: "Engaged", highly_engaged: "Highly engaged" }
+    performance: { not_assessed: "Not assessed", needs_support: "Needs support", developing: "Developing", meeting_expectations: "Meeting expectations", above_expectations: "Above expectations", excellent: "Excellent" }
+    reading_quality: { not_assessed: "Not assessed", needs_support: "Needs support", developing: "Developing", good: "Good", very_good: "Very good", excellent: "Excellent" }
+    memorization: { not_assessed: "Not assessed", new_assignment: "New assignment", needs_revision: "Needs revision", partially_memorized: "Partially memorized", memorized_with_prompts: "Memorized with prompts", memorized: "Memorized", excellent: "Excellent" }
+    revision: { not_assessed: "Not assessed", weak: "Weak", needs_repetition: "Needs repetition", acceptable: "Acceptable", good: "Good", very_good: "Very good", excellent: "Excellent" }
+    tajweed: { makharij: "Makharij", sifat: "Sifat", madd: "Madd", ghunnah: "Ghunnah", qalqalah: "Qalqalah", noon_sakinah_tanween: "Noon sakinah and tanween", meem_sakinah: "Meem sakinah", waqf_ibtida: "Waqf and ibtida", general_recitation: "General recitation", other: "Other" }
+    messages: { updated: "Lesson report updated." }
+    empty: { summary: "No summary has been added yet." }
+    defaults: { reopening_reason: "Correction requested by academy administration" }
+  communications:
+    admin: { index: { title: "Manual communication logs", description: "Prepared external communication actions without delivery claims." }, show: { title: "Communication preview" } }
+    teacher: { show: { title: "Communication preview" } }
+    channels: { whatsapp: "WhatsApp", email: "Email" }
+    statuses: { prepared: "Prepared", opened: "Opened", confirmed_sent: "Confirmed sent", cancelled: "Cancelled", failed: "Preparation failed" }
+    fields: { recipient: "Recipient", status: "Status", preview: "Safe message preview" }
+    actions: { student_whatsapp: "Prepare student WhatsApp", student_email: "Prepare student email", guardian_whatsapp: "Prepare guardian WhatsApp", guardian_email: "Prepare guardian email", open_whatsapp: "Open WhatsApp", open_email: "Open email", confirm_sent: "Confirm I sent it" }
+    messages: { prepared: "Manual communication prepared; it has not been sent.", updated: "Communication log updated." }
+  manual_communications:
+    subject: "%{academy}: lesson update for %{student}"
+    failed: "The communication could not be prepared because recipient details are unavailable."
+    messages:
+      lesson_summary: "%{academy}\nLesson update for %{student}\n%{lesson} — %{date}\nTeacher: %{teacher}\n%{summary}"
+      student_progress: "%{academy}\nProgress update for %{student}\nLesson: %{lesson} (%{date})\nAttendance: %{attendance}\n%{summary}\nHomework: %{homework}\nNext target: %{target}"
+      guardian_progress: "%{academy}\nProgress update for %{student}\nAttendance: %{attendance}\n%{summary}\nHomework: %{homework}\nNext target: %{target}"
+      homework: "%{academy}\nHomework for %{student}: %{homework}\nNext target: %{target}"
+      absence_notice: "%{academy}\n%{student} was marked absent for %{lesson} on %{date}."
+      lateness_notice: "%{academy}\n%{student} was marked late for %{lesson} on %{date}."
+      missed_lesson_follow_up: "%{academy}\nFollow-up for %{student} after %{lesson}. Homework: %{homework}"
+      custom: "%{academy}\nLesson update for %{student}: %{summary}"
+  activerecord:
+    errors:
+      models:
+        lesson_report:
+          attributes:
+            teacher_profile: { different_teacher: "must match the assigned lesson teacher" }
+            base: { ineligible_lesson: "Reports are available only for active or completed lessons", initialization_failed: "Report could not be initialized", forbidden: "You cannot change this report", report_locked: "Report is not editable", stale_record: "Report changed; reload and try again", lesson_not_completed: "Lesson must be completed", attendance_not_locked: "Attendance must be locked", summary_required: "A meaningful lesson summary is required", unresolved_entries: "Complete all expected student entries", invalid_status: "Report is not in the required state", invalid_transition: "Report lifecycle transition is not allowed", reopening_reason_required: "A reopening reason is required" }
+        lesson_student_report:
+          attributes:
+            scheduled_lesson_enrollment: { different_lesson: "must belong to the reported lesson" }
+            base: { forbidden: "You cannot change this student report", report_locked: "Report is not editable", stale_record: "Student report changed; reload and try again" }

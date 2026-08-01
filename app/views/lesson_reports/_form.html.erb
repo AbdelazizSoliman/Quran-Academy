@@ -1,0 +1,9 @@
+<%= form_with model: report, url:, class: "space-y-5" do |form| %>
+  <% if report.errors.any? %><div role="alert" class="rounded-xl border border-red-200 bg-red-50 p-4"><%= report.errors.full_messages.to_sentence %></div><% end %>
+  <div><%= form.label :lesson_summary, t("lesson_reports.fields.lesson_summary"), class: "ds-label" %><%= form.text_area :lesson_summary, rows: 5, class: "ds-control mt-2" %></div>
+  <div><%= form.label :topics_covered, t("lesson_reports.fields.topics_covered"), class: "ds-label" %><%= form.text_area :topics_covered, rows: 3, class: "ds-control mt-2" %></div>
+  <div><%= form.label :general_homework, t("lesson_reports.fields.general_homework"), class: "ds-label" %><%= form.text_area :general_homework, rows: 3, class: "ds-control mt-2" %></div>
+  <div><%= form.label :next_lesson_plan, t("lesson_reports.fields.next_lesson_plan"), class: "ds-label" %><%= form.text_area :next_lesson_plan, rows: 3, class: "ds-control mt-2" %></div>
+  <div class="grid gap-4 sm:grid-cols-2"><div><%= form.label :overall_engagement, t("lesson_reports.fields.engagement"), class: "ds-label" %><%= form.select :overall_engagement, LessonReport::ENGAGEMENT_LEVELS.map { |value| [t("lesson_reports.engagement.#{value}"), value] }, {}, class: "ds-control mt-2" %></div><div><%= form.label :overall_progress, t("lesson_reports.fields.progress"), class: "ds-label" %><%= form.select :overall_progress, LessonReport::PROGRESS_LEVELS.map { |value| [t("lesson_reports.performance.#{value}"), value] }, {}, class: "ds-control mt-2" %></div></div>
+  <%= render "shared/components/button", label: t("lesson_reports.actions.save"), type: :submit %>
+<% end %>

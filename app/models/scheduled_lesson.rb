@@ -16,6 +16,8 @@ class ScheduledLesson < ApplicationRecord
   has_many :scheduled_lesson_enrollments, inverse_of: :scheduled_lesson, dependent: :restrict_with_exception
   has_many :enrollments, through: :scheduled_lesson_enrollments
   has_many :lesson_attendances, inverse_of: :scheduled_lesson, dependent: :restrict_with_exception
+  has_one :lesson_report, inverse_of: :scheduled_lesson, dependent: :restrict_with_exception
+  has_many :communication_logs, dependent: :restrict_with_exception
   has_many :events, class_name: "ScheduledLessonEvent", inverse_of: :scheduled_lesson,
                     dependent: :restrict_with_exception
 

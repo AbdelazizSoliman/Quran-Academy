@@ -1,0 +1,39 @@
+ar:
+  lesson_reports:
+    admin: { index: { title: "تقارير الدروس", description: "مراجعة التقارير الأكاديمية المنظمة للدروس." }, show: { title: "مراجعة تقرير الدرس" } }
+    teacher: { title: "تقرير الدرس" }
+    student: { index_title: "تقارير دروسي", description: "تقارير تقدمك الأكاديمي النهائية." }
+    statuses: { draft: "مسودة", submitted: "مقدم", reviewed: "تمت مراجعته", locked: "مقفل", reopened: "أعيد فتحه", archived: "مؤرشف" }
+    student_statuses: { pending: "قيد الإكمال", completed: "مكتمل", not_applicable: "لا ينطبق", withheld: "محجوب" }
+    actions: { open: "فتح التقرير", edit: "تعديل", save: "حفظ التقرير", submit: "تقديم التقرير", review: "تأكيد المراجعة", lock: "قفل التقرير", reopen: "إعادة فتح التقرير", relock: "إعادة قفل التقرير" }
+    sections: { students: "تقارير الطلاب", reading: "قراءة القرآن", memorization: "الحفظ", revision: "المراجعة", tajweed: "التجويد", progress: "التقدم الأكاديمي" }
+    fields: { lesson_summary: "ملخص الدرس", topics_covered: "الموضوعات المغطاة", general_homework: "الواجب العام", next_lesson_plan: "خطة الدرس القادم", engagement: "التفاعل", progress: "التقدم", material: "المادة", strengths: "نقاط القوة", areas_for_improvement: "مجالات التحسين", homework: "الواجب", next_lesson_target: "هدف الدرس القادم", student_visible_notes: "ملاحظات ظاهرة للطالب", guardian_visible_notes: "ملاحظات موجهة لولي الأمر", private_teacher_notes: "ملاحظات المعلم الخاصة", status: "حالة التقرير" }
+    engagement: { not_assessed: "لم يقيم", low: "منخفض", inconsistent: "متفاوت", engaged: "متفاعل", highly_engaged: "شديد التفاعل" }
+    performance: { not_assessed: "لم يقيم", needs_support: "يحتاج دعمًا", developing: "قيد التطور", meeting_expectations: "يحقق المتوقع", above_expectations: "فوق المتوقع", excellent: "ممتاز" }
+    reading_quality: { not_assessed: "لم تقيم", needs_support: "تحتاج دعمًا", developing: "قيد التطور", good: "جيدة", very_good: "جيدة جدًا", excellent: "ممتازة" }
+    memorization: { not_assessed: "لم يقيم", new_assignment: "تكليف جديد", needs_revision: "يحتاج مراجعة", partially_memorized: "محفوظ جزئيًا", memorized_with_prompts: "محفوظ مع تلقين", memorized: "محفوظ", excellent: "ممتاز" }
+    revision: { not_assessed: "لم تقيم", weak: "ضعيفة", needs_repetition: "تحتاج تكرارًا", acceptable: "مقبولة", good: "جيدة", very_good: "جيدة جدًا", excellent: "ممتازة" }
+    tajweed: { makharij: "المخارج", sifat: "الصفات", madd: "المد", ghunnah: "الغنة", qalqalah: "القلقلة", noon_sakinah_tanween: "النون الساكنة والتنوين", meem_sakinah: "الميم الساكنة", waqf_ibtida: "الوقف والابتداء", general_recitation: "التلاوة العامة", other: "أخرى" }
+    messages: { updated: "تم تحديث تقرير الدرس." }
+    empty: { summary: "لم يضف ملخص بعد." }
+    defaults: { reopening_reason: "طلب تصحيح من إدارة الأكاديمية" }
+  communications:
+    teacher: { show: { title: "معاينة التواصل" } }
+    admin: { index: { title: "سجل التواصل اليدوي", description: "إجراءات تواصل خارجي محضرة دون ادعاء التسليم." }, show: { title: "معاينة التواصل" } }
+    channels: { whatsapp: "واتساب", email: "البريد الإلكتروني" }
+    statuses: { prepared: "محضر", opened: "فُتح", confirmed_sent: "تم تأكيد الإرسال", cancelled: "ملغي", failed: "فشل التحضير" }
+    fields: { recipient: "المستلم", status: "الحالة", preview: "معاينة الرسالة الآمنة" }
+    actions: { student_whatsapp: "تحضير واتساب للطالب", student_email: "تحضير بريد للطالب", guardian_whatsapp: "تحضير واتساب لولي الأمر", guardian_email: "تحضير بريد لولي الأمر", open_whatsapp: "فتح واتساب", open_email: "فتح البريد", confirm_sent: "أؤكد أنني أرسلتها" }
+    messages: { prepared: "تم تحضير التواصل اليدوي ولم يُرسل بعد.", updated: "تم تحديث سجل التواصل." }
+  manual_communications:
+    subject: "%{academy}: تحديث درس %{student}"
+    failed: "تعذر تحضير التواصل لعدم توفر بيانات المستلم."
+    messages:
+      lesson_summary: "%{academy}\nتحديث درس %{student}\n%{lesson} — %{date}\nالمعلم: %{teacher}\n%{summary}"
+      student_progress: "%{academy}\nتحديث تقدم %{student}\nالدرس: %{lesson} (%{date})\nالحضور: %{attendance}\n%{summary}\nالواجب: %{homework}\nالهدف القادم: %{target}"
+      guardian_progress: "%{academy}\nتحديث تقدم %{student}\nالحضور: %{attendance}\n%{summary}\nالواجب: %{homework}\nالهدف القادم: %{target}"
+      homework: "%{academy}\nواجب %{student}: %{homework}\nالهدف القادم: %{target}"
+      absence_notice: "%{academy}\nسُجل غياب %{student} عن %{lesson} بتاريخ %{date}."
+      lateness_notice: "%{academy}\nسُجل تأخر %{student} عن %{lesson} بتاريخ %{date}."
+      missed_lesson_follow_up: "%{academy}\nمتابعة %{student} بعد %{lesson}. الواجب: %{homework}"
+      custom: "%{academy}\nتحديث درس %{student}: %{summary}"
