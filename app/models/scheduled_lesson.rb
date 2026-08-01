@@ -3,14 +3,19 @@ class ScheduledLesson < ApplicationRecord
   DELIVERY_MODES = %w[online onsite hybrid].freeze
   SCHEDULING_SOURCES = %w[manual rescheduled imported].freeze
   OPERATIONAL_STATUSES = %w[scheduled in_progress].freeze
+  ATTENDANCE_STATUSES = %w[not_opened open locked reopened].freeze
+  TEACHER_ATTENDANCE_STATUSES = %w[not_checked_in on_time late absent administrator_override].freeze
 
   belongs_to :course_offering, inverse_of: :scheduled_lessons
   belongs_to :teacher_profile, inverse_of: :scheduled_lessons
   belongs_to :created_by, class_name: "User", optional: true, inverse_of: :created_scheduled_lessons
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_scheduled_lessons
   belongs_to :cancelled_by, class_name: "User", optional: true
+  belongs_to :attendance_locked_by, class_name: "User", optional: true
+  belongs_to :attendance_reopened_by, class_name: "User", optional: true
   has_many :scheduled_lesson_enrollments, inverse_of: :scheduled_lesson, dependent: :restrict_with_exception
   has_many :enrollments, through: :scheduled_lesson_enrollments
+  has_many :lesson_attendances, inverse_of: :scheduled_lesson, dependent: :restrict_with_exception
   has_many :events, class_name: "ScheduledLessonEvent", inverse_of: :scheduled_lesson,
                     dependent: :restrict_with_exception
 
@@ -24,6 +29,9 @@ class ScheduledLesson < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :delivery_mode, inclusion: { in: DELIVERY_MODES }
   validates :scheduling_source, inclusion: { in: SCHEDULING_SOURCES }
+  validates :attendance_status, inclusion: { in: ATTENDANCE_STATUSES }
+  validates :teacher_attendance_status, inclusion: { in: TEACHER_ATTENDANCE_STATUSES }
+  validates :completion_notes, :operation_notes, length: { maximum: 2_000 }, allow_blank: true
   validates :academy_time_zone, inclusion: { in: ->(_) { ActiveSupport::TimeZone.all.map(&:name) } }
   validates :online_meeting_url, format: { with: %r{\Ahttps?://\S+\z} }, allow_blank: true
   validates :cancellation_reason, presence: true, if: :cancelled?
@@ -32,6 +40,10 @@ class ScheduledLesson < ApplicationRecord
 
   scope :operational, -> { where(status: OPERATIONAL_STATUSES) }
   scope :chronological, -> { order(starts_at: :asc, id: :asc) }
+
+  def attendance_editable? = attendance_status.in?(%w[open reopened])
+  def attendance_locked? = attendance_status == "locked"
+  def unresolved_attendance_count = lesson_attendances.unresolved.count
 
   STATUSES.each { |value| define_method(:"#{value}?") { status == value } }
 

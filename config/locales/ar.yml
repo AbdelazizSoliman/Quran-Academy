@@ -31,6 +31,7 @@ ar:
   time:
     formats:
       long: "%d/%m/%Y، %H:%M"
+      short: "%d/%m/%Y، %H:%M"
   date:
     formats:
       long: "%d/%m/%Y"
@@ -220,6 +221,9 @@ ar:
         student_late_after_minutes: "تأخر الطالب بعد (دقيقة)"
         teacher_late_after_minutes: "تأخر المعلم بعد (دقيقة)"
         absence_after_minutes: "الغياب بعد (دقيقة)"
+        teacher_check_in_opens_minutes_before: "فتح تسجيل حضور المعلم (دقائق قبل)"
+        teacher_check_in_closes_minutes_after: "إغلاق تسجيل حضور المعلم (دقائق بعد)"
+        left_early_threshold_minutes: "حد المغادرة المبكرة (دقيقة)"
         allow_manual_attendance_adjustment: "السماح بتعديل الحضور يدوياً"
         email_notifications_enabled: "تفضيل قناة البريد"
         whatsapp_notifications_enabled: "تفضيل قناة واتساب"

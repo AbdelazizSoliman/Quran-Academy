@@ -1,0 +1,17 @@
+<%= render "shared/page_header", title: t("attendance.admin.index.title"), description: t("attendance.admin.index.description") %>
+<%= form_with url: admin_lesson_attendances_path, method: :get, class: "ds-card mb-6 grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4" do |form| %>
+  <div><%= form.label :from, t("attendance.fields.from"), class: "ds-label" %><%= form.date_field :from, value: params[:from], class: "ds-control mt-2" %></div>
+  <div><%= form.label :to, t("attendance.fields.to"), class: "ds-label" %><%= form.date_field :to, value: params[:to], class: "ds-control mt-2" %></div>
+  <div><%= form.label :status, t("attendance.fields.status"), class: "ds-label" %><%= form.select :status, LessonAttendance::STATUSES.map { |status| [t("attendance.statuses.#{status}"), status] }, { include_blank: true }, class: "ds-control mt-2" %></div>
+  <div class="flex items-end"><%= render "shared/components/button", label: t("attendance.actions.filter"), type: :submit %></div>
+<% end %>
+<div class="space-y-3">
+  <% @attendances.each do |attendance| %>
+    <article class="ds-card grid gap-2 p-4 sm:grid-cols-4" aria-label="<%= attendance.student_profile.display_name %>">
+      <div><strong><%= attendance.student_profile.display_name %></strong><p class="ds-caption"><%= attendance.scheduled_lesson.title_en %></p></div>
+      <div><%= attendance.scheduled_lesson.teacher_profile.display_name %></div>
+      <div dir="ltr"><%= l(attendance.scheduled_lesson.starts_at.in_time_zone(current_user.time_zone), format: :short) %></div>
+      <div><%= t("attendance.statuses.#{attendance.status}") %><% if attendance.minutes_late.positive? %> · <%= t("attendance.minutes_late", count: attendance.minutes_late) %><% end %></div>
+    </article>
+  <% end %>
+</div>

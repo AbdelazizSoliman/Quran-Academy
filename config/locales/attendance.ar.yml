@@ -1,0 +1,29 @@
+ar:
+  attendance:
+    admin:
+      index: { title: "مراجعة الحضور", description: "مراجعة حضور الدروس التشغيلي ضمن فترة زمنية محددة." }
+      show: { title: "حضور الدرس" }
+    teacher: { title: "حضور الدرس" }
+    student: { index_title: "حضوري", description: "سجل حضورك للدروس.", outcome: "نتيجة الحضور" }
+    sections: { participants: "المشاركون" }
+    fields: { from: "من", to: "إلى", status: "الحالة", arrival: "الوصول", departure: "المغادرة", minutes_late: "دقائق التأخر", teacher: "المعلم", reason: "السبب" }
+    statuses: { pending: "قيد الانتظار", present: "حاضر", late: "متأخر", absent: "غائب", excused_absence: "غياب بعذر", left_early: "غادر مبكرًا", lesson_cancelled: "الدرس ملغي", not_applicable: "لا ينطبق" }
+    teacher_statuses: { not_checked_in: "لم يسجل الحضور", on_time: "في الموعد", late: "متأخر", absent: "غائب", administrator_override: "تجاوز إداري" }
+    workflow: { not_opened: "الحضور غير مفتوح", open: "الحضور مفتوح", locked: "الحضور مقفل", reopened: "أعيد فتح الحضور" }
+    actions: { filter: "تصفية", manage: "إدارة الحضور", check_in: "تسجيل الحضور", check_in_override: "تسجيل حضور المعلم", start: "بدء الدرس", start_override: "بدء بتجاوز إداري", complete: "إكمال الدرس", lock: "قفل الحضور", reopen: "إعادة فتح الحضور", arrival: "تسجيل الوصول", present: "تحديد حاضر", absent: "تحديد غائب", excuse: "تسجيل عذر", departure: "تسجيل المغادرة", adjust: "تعديل" }
+    messages: { updated: "تم تحديث حضور الدرس.", locked: "الحضور مقفل.", unresolved: "أكمل حالات الحضور قبل إنهاء الدرس.", forbidden: "لا يسمح لك بتنفيذ إجراء الحضور هذا." }
+    defaults: { admin_override: "تجاوز تشغيلي بواسطة الإدارة", completion_confirmation: "تم تأكيد غياب الطلاب غير المحسومين عند الإكمال", admin_adjustment: "تصحيح حضور بواسطة الإدارة" }
+    unresolved: { one: "حالة حضور واحدة غير محسومة", other: "%{count} حالات حضور غير محسومة" }
+    minutes_late: { one: "دقيقة تأخر واحدة", other: "%{count} دقائق تأخر" }
+  activerecord:
+    errors:
+      models:
+        lesson_attendance:
+          attributes:
+            scheduled_lesson_enrollment: { different_lesson: "يجب أن ينتمي إلى الدرس" }
+            departure_at: { before_arrival: "يجب أن تكون بعد الوصول", invalid_status: "تتطلب حالة حاضر أو متأخر" }
+            arrival_at: { already_recorded: "مسجل بالفعل؛ استخدم التعديل" }
+            base: { attendance_locked: "الحضور مقفل", absence_threshold_not_reached: "لم يحن حد الغياب", stale_record: "تغير الحضور؛ أعد التحميل", invalid_adjustment: "حالة التعديل وسببه مطلوبان" }
+        scheduled_lesson:
+          attributes:
+            base: { forbidden: "لا يسمح لك بتشغيل هذا الدرس", invalid_status: "الدرس ليس في الحالة المطلوبة", override_reason_required: "سبب التجاوز الإداري مطلوب", outside_check_in_window: "تسجيل الحضور خارج الوقت المسموح", teacher_check_in_required: "تسجيل حضور المعلم مطلوب", stale_record: "تغير الدرس؛ أعد التحميل", unresolved_attendance: "احسم الحضور أو أكد الغياب صراحة", lesson_not_started: "يجب بدء الدرس أولًا", reopen_reason_required: "سبب إعادة الفتح مطلوب", invalid_attendance_status: "يجب قفل الحضور قبل إعادة فتحه" }

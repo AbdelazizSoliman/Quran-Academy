@@ -1,0 +1,33 @@
+en:
+  attendance:
+    admin:
+      index: { title: "Attendance review", description: "Review operational lesson attendance in a finite date range." }
+      show: { title: "Lesson attendance" }
+    teacher: { title: "Lesson attendance" }
+    student: { index_title: "My attendance", description: "Your lesson attendance history.", outcome: "Attendance outcome" }
+    sections: { participants: "Participants" }
+    fields: { from: "From", to: "To", status: "Status", arrival: "Arrival", departure: "Departure", minutes_late: "Minutes late", teacher: "Teacher", reason: "Reason" }
+    statuses: { pending: "Pending", present: "Present", late: "Late", absent: "Absent", excused_absence: "Excused absence", left_early: "Left early", lesson_cancelled: "Lesson cancelled", not_applicable: "Not applicable" }
+    teacher_statuses: { not_checked_in: "Not checked in", on_time: "On time", late: "Late", absent: "Absent", administrator_override: "Administrator override" }
+    workflow: { not_opened: "Attendance not opened", open: "Attendance open", locked: "Attendance locked", reopened: "Attendance reopened" }
+    actions: { filter: "Filter", manage: "Manage attendance", check_in: "Check in", check_in_override: "Check in teacher", start: "Start lesson", start_override: "Start with override", complete: "Complete lesson", lock: "Lock attendance", reopen: "Reopen attendance", arrival: "Record arrival", present: "Mark present", absent: "Mark absent", excuse: "Excuse absence", departure: "Record departure", adjust: "Adjust" }
+    messages: { updated: "Lesson attendance updated.", locked: "Attendance is locked.", unresolved: "Resolve attendance before completing.", forbidden: "You are not allowed to perform this attendance action." }
+    defaults: { admin_override: "Administrator operational override", completion_confirmation: "Confirmed unresolved students absent at completion", admin_adjustment: "Administrator attendance correction" }
+    unresolved:
+      one: "1 unresolved attendance"
+      other: "%{count} unresolved attendances"
+    minutes_late:
+      one: "1 minute late"
+      other: "%{count} minutes late"
+  activerecord:
+    errors:
+      models:
+        lesson_attendance:
+          attributes:
+            scheduled_lesson_enrollment: { different_lesson: "must belong to the lesson" }
+            departure_at: { before_arrival: "must be after arrival", invalid_status: "requires a present or late attendance" }
+            arrival_at: { already_recorded: "has already been recorded; use an adjustment" }
+            base: { attendance_locked: "Attendance is locked", absence_threshold_not_reached: "Absence threshold has not been reached", stale_record: "Attendance changed; reload and try again", invalid_adjustment: "Adjustment status and reason are required" }
+        scheduled_lesson:
+          attributes:
+            base: { forbidden: "You are not allowed to operate this lesson", invalid_status: "Lesson is not in the required state", override_reason_required: "An administrator override reason is required", outside_check_in_window: "Check-in is outside the permitted window", teacher_check_in_required: "Teacher check-in is required", stale_record: "Lesson changed; reload and try again", unresolved_attendance: "Resolve attendance or explicitly confirm absences", lesson_not_started: "Lesson must be started first", reopen_reason_required: "A reopening reason is required", invalid_attendance_status: "Attendance must be locked before reopening" }

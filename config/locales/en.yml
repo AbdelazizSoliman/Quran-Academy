@@ -31,6 +31,7 @@ en:
   time:
     formats:
       long: "%B %d, %Y at %H:%M"
+      short: "%b %d, %Y at %H:%M"
   date:
     formats:
       long: "%B %d, %Y"
@@ -220,6 +221,9 @@ en:
         student_late_after_minutes: "Student late after (minutes)"
         teacher_late_after_minutes: "Teacher late after (minutes)"
         absence_after_minutes: "Absence after (minutes)"
+        teacher_check_in_opens_minutes_before: "Teacher check-in opens (minutes before)"
+        teacher_check_in_closes_minutes_after: "Teacher check-in closes (minutes after)"
+        left_early_threshold_minutes: "Left-early threshold (minutes)"
         allow_manual_attendance_adjustment: "Allow manual attendance adjustment"
         email_notifications_enabled: "Email channel preference"
         whatsapp_notifications_enabled: "WhatsApp channel preference"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -53,6 +53,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
     t.text "description"
     t.boolean "email_notifications_enabled", default: true, null: false
     t.integer "late_cancellation_window_hours", default: 2, null: false
+    t.integer "left_early_threshold_minutes", default: 5, null: false
     t.string "legal_name"
     t.integer "lesson_duration_step_minutes", default: 15, null: false
     t.integer "lesson_reminder_hours_before", default: 24, null: false
@@ -75,6 +76,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
     t.integer "student_late_after_minutes", default: 5, null: false
     t.string "supported_locales", default: ["ar", "en"], null: false, array: true
     t.integer "teacher_cancellation_notice_hours", default: 12, null: false
+    t.integer "teacher_check_in_closes_minutes_after", default: 30, null: false
+    t.integer "teacher_check_in_opens_minutes_before", default: 15, null: false
     t.integer "teacher_late_after_minutes", default: 5, null: false
     t.string "teaching_languages", default: ["ar", "en"], null: false, array: true
     t.datetime "updated_at", null: false
@@ -255,6 +258,51 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
     t.index ["updated_by_id"], name: "index_guardians_on_updated_by_id"
   end
 
+  create_table "lesson_attendance_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.bigint "lesson_attendance_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_lesson_attendance_events_on_actor_id"
+    t.index ["event_type"], name: "index_lesson_attendance_events_on_event_type"
+    t.index ["lesson_attendance_id", "created_at"], name: "idx_attendance_events_record_created"
+    t.index ["lesson_attendance_id"], name: "index_lesson_attendance_events_on_lesson_attendance_id"
+  end
+
+  create_table "lesson_attendances", force: :cascade do |t|
+    t.string "adjustment_reason"
+    t.datetime "arrival_at"
+    t.datetime "created_at", null: false
+    t.datetime "departure_at"
+    t.string "excuse_reason"
+    t.datetime "last_adjusted_at"
+    t.bigint "last_adjusted_by_id"
+    t.integer "lock_version", default: 0, null: false
+    t.integer "minutes_late", default: 0, null: false
+    t.text "notes"
+    t.string "public_id", null: false
+    t.datetime "recorded_at"
+    t.bigint "recorded_by_id"
+    t.bigint "scheduled_lesson_enrollment_id", null: false
+    t.bigint "scheduled_lesson_id", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["last_adjusted_by_id"], name: "index_lesson_attendances_on_last_adjusted_by_id"
+    t.index ["public_id"], name: "index_lesson_attendances_on_public_id", unique: true
+    t.index ["recorded_by_id"], name: "index_lesson_attendances_on_recorded_by_id"
+    t.index ["scheduled_lesson_enrollment_id"], name: "idx_lesson_attendance_participant_unique", unique: true
+    t.index ["scheduled_lesson_enrollment_id"], name: "index_lesson_attendances_on_scheduled_lesson_enrollment_id"
+    t.index ["scheduled_lesson_id"], name: "index_lesson_attendances_on_scheduled_lesson_id"
+    t.index ["status", "arrival_at"], name: "index_lesson_attendances_on_status_and_arrival_at"
+    t.check_constraint "departure_at IS NULL OR arrival_at IS NULL OR departure_at >= arrival_at", name: "lesson_attendances_time_order"
+    t.check_constraint "minutes_late >= 0", name: "lesson_attendances_nonnegative_lateness"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'present'::character varying, 'late'::character varying, 'absent'::character varying, 'excused_absence'::character varying, 'left_early'::character varying, 'lesson_cancelled'::character varying, 'not_applicable'::character varying]::text[])", name: "lesson_attendances_status"
+  end
+
   create_table "program_events", force: :cascade do |t|
     t.bigint "actor_id", null: false
     t.datetime "created_at", null: false
@@ -341,27 +389,42 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
 
   create_table "scheduled_lessons", force: :cascade do |t|
     t.string "academy_time_zone", default: "Cairo", null: false
+    t.datetime "attendance_locked_at"
+    t.bigint "attendance_locked_by_id"
+    t.datetime "attendance_opened_at"
+    t.datetime "attendance_reopened_at"
+    t.bigint "attendance_reopened_by_id"
+    t.string "attendance_status", default: "not_opened", null: false
     t.text "cancellation_reason"
     t.datetime "cancelled_at"
     t.bigint "cancelled_by_id"
     t.datetime "completed_at"
+    t.text "completion_notes"
     t.bigint "course_offering_id", null: false
     t.datetime "created_at", null: false
     t.bigint "created_by_id"
     t.string "delivery_mode", default: "online", null: false
+    t.datetime "ended_at"
     t.datetime "ends_at", null: false
     t.string "location_name"
     t.integer "lock_version", default: 0, null: false
     t.string "online_meeting_url"
+    t.text "operation_notes"
     t.string "public_id", null: false
     t.string "scheduling_source", default: "manual", null: false
+    t.datetime "started_at"
     t.datetime "starts_at", null: false
     t.string "status", default: "draft", null: false
+    t.string "teacher_attendance_status", default: "not_checked_in", null: false
+    t.datetime "teacher_checked_in_at"
     t.bigint "teacher_profile_id", null: false
     t.string "title_ar", null: false
     t.string "title_en", null: false
     t.datetime "updated_at", null: false
     t.bigint "updated_by_id"
+    t.index ["attendance_locked_by_id"], name: "index_scheduled_lessons_on_attendance_locked_by_id"
+    t.index ["attendance_reopened_by_id"], name: "index_scheduled_lessons_on_attendance_reopened_by_id"
+    t.index ["attendance_status", "starts_at"], name: "index_scheduled_lessons_on_attendance_status_and_starts_at"
     t.index ["cancelled_by_id"], name: "index_scheduled_lessons_on_cancelled_by_id"
     t.index ["course_offering_id", "starts_at"], name: "index_scheduled_lessons_on_course_offering_id_and_starts_at"
     t.index ["course_offering_id"], name: "index_scheduled_lessons_on_course_offering_id"
@@ -371,7 +434,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
     t.index ["teacher_profile_id", "starts_at", "ends_at"], name: "idx_on_teacher_profile_id_starts_at_ends_at_69d19f2e3b"
     t.index ["teacher_profile_id"], name: "index_scheduled_lessons_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_scheduled_lessons_on_updated_by_id"
+    t.check_constraint "attendance_status::text = ANY (ARRAY['not_opened'::character varying, 'open'::character varying, 'locked'::character varying, 'reopened'::character varying]::text[])", name: "scheduled_lessons_attendance_status"
     t.check_constraint "ends_at > starts_at", name: "scheduled_lesson_time_order"
+    t.check_constraint "teacher_attendance_status::text = ANY (ARRAY['not_checked_in'::character varying, 'on_time'::character varying, 'late'::character varying, 'absent'::character varying, 'administrator_override'::character varying]::text[])", name: "scheduled_lessons_teacher_attendance_status"
   end
 
   create_table "student_guardianship_events", force: :cascade do |t|
@@ -669,7 +734,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
     t.index ["role"], name: "index_users_on_role"
     t.index ["status", "role", "created_at"], name: "index_users_on_status_and_role_and_created_at"
     t.index ["status"], name: "index_users_on_status"
-    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying, 'en'::character varying]::text[])", name: "users_preferred_locale"
+    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying::text, 'en'::character varying::text])", name: "users_preferred_locale"
     t.check_constraint "session_version >= 0", name: "users_session_version_nonnegative"
   end
 
@@ -693,6 +758,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
   add_foreign_key "guardian_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "guardians", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "guardians", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "lesson_attendance_events", "lesson_attendances", on_delete: :restrict
+  add_foreign_key "lesson_attendance_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "lesson_attendances", "scheduled_lesson_enrollments", on_delete: :restrict
+  add_foreign_key "lesson_attendances", "scheduled_lessons", on_delete: :restrict
+  add_foreign_key "lesson_attendances", "users", column: "last_adjusted_by_id", on_delete: :nullify
+  add_foreign_key "lesson_attendances", "users", column: "recorded_by_id", on_delete: :nullify
   add_foreign_key "program_events", "programs", on_delete: :restrict
   add_foreign_key "program_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "programs", "users", column: "created_by_id", on_delete: :nullify
@@ -704,6 +775,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
   add_foreign_key "scheduled_lesson_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "scheduled_lessons", "course_offerings", on_delete: :restrict
   add_foreign_key "scheduled_lessons", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "scheduled_lessons", "users", column: "attendance_locked_by_id", on_delete: :nullify
+  add_foreign_key "scheduled_lessons", "users", column: "attendance_reopened_by_id", on_delete: :nullify
   add_foreign_key "scheduled_lessons", "users", column: "cancelled_by_id", on_delete: :nullify
   add_foreign_key "scheduled_lessons", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "scheduled_lessons", "users", column: "updated_by_id", on_delete: :nullify

@@ -58,7 +58,7 @@
   <%= render "shared/components/card", title: t("admin.settings.sections.cancellation"), body: cancellation_body %>
 
   <% attendance_body = capture do %>
-    <%= render "number_fields", form:, setting: @setting, fields: %i[student_late_after_minutes teacher_late_after_minutes absence_after_minutes] %>
+    <%= render "number_fields", form:, setting: @setting, fields: %i[student_late_after_minutes teacher_late_after_minutes absence_after_minutes teacher_check_in_opens_minutes_before teacher_check_in_closes_minutes_after left_early_threshold_minutes] %>
     <div class="mt-5"><%= render "boolean_fields", form:, fields: %i[allow_manual_attendance_adjustment] %></div>
   <% end %>
   <%= render "shared/components/card", title: t("admin.settings.sections.attendance"), body: attendance_body %>
