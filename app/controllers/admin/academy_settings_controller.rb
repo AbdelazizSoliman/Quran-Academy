@@ -42,6 +42,7 @@ module Admin
         student_cancellation_notice_hours teacher_cancellation_notice_hours late_cancellation_window_hours
         allow_student_self_cancellation allow_teacher_self_cancellation student_late_after_minutes
         teacher_late_after_minutes absence_after_minutes allow_manual_attendance_adjustment
+        teacher_check_in_opens_minutes_before teacher_check_in_closes_minutes_after left_early_threshold_minutes
         email_notifications_enabled whatsapp_notifications_enabled sms_notifications_enabled
         lesson_reminders_enabled attendance_notifications_enabled payment_notifications_enabled
         lesson_reminder_hours_before second_lesson_reminder_minutes_before default_teacher_compensation_type

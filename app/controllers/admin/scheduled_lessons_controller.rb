@@ -1,6 +1,6 @@
 module Admin
   class ScheduledLessonsController < SchedulingBaseController
-    before_action :require_admin!, except: %i[index show]
+    before_action :require_admin!, except: %i[index show attendance]
     before_action :set_lesson, except: %i[index new create]
 
     def index
@@ -34,11 +34,42 @@ module Admin
       respond_to_save(:updated, :edit)
     end
 
-    %i[schedule start complete].each do |action|
+    %i[schedule].each do |action|
       define_method(action) do
         @lesson = ScheduledLessons::Transition.new(actor: current_user, lesson: @lesson, action:).call
         respond_to_save(action, :show)
       end
+    end
+
+    def check_in_teacher
+      operate LessonOperations::CheckIn.new(actor: current_user, lesson: @lesson, override: true,
+                                            reason: params[:reason])
+    end
+
+    def start
+      operate LessonOperations::Start.new(actor: current_user, lesson: @lesson, override: true,
+                                          reason: params[:reason])
+    end
+
+    def complete
+      options = { override: true, reason: params[:reason], mark_unresolved_absent: params[:mark_unresolved_absent],
+                  notes: params[:completion_notes] }
+      operate LessonOperations::Complete.new(actor: current_user, lesson: @lesson, options:)
+    end
+
+    def lock_attendance
+      operate LessonOperations::LockAttendance.new(actor: current_user, lesson: @lesson)
+    end
+
+    def reopen_attendance
+      operate LessonOperations::ReopenAttendance.new(actor: current_user, lesson: @lesson, reason: params[:reason])
+    end
+
+    def attendance
+      @attendances = @lesson.lesson_attendances.includes(:events,
+                                                         scheduled_lesson_enrollment: { enrollment: :student_profile })
+      @events = @lesson.events.includes(:actor).recent_first.limit(50)
+      render "admin/lesson_attendances/show"
     end
 
     def cancel
@@ -86,6 +117,17 @@ module Admin
       else
         load_options
         render template, status: :unprocessable_content
+      end
+    end
+
+    def operate(operation)
+      @lesson = operation.call
+      if @lesson.errors.empty?
+        redirect_to attendance_admin_scheduled_lesson_path(@lesson), notice: t("attendance.messages.updated"),
+                                                                     status: :see_other
+      else
+        redirect_to admin_scheduled_lesson_path(@lesson), alert: @lesson.errors.full_messages.to_sentence,
+                                                          status: :see_other
       end
     end
   end

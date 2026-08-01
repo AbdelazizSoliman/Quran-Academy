@@ -101,20 +101,52 @@ Rails.application.routes.draw do
         get :reschedule
         patch :apply_reschedule
         patch :archive
+        patch :check_in_teacher
+        patch :lock_attendance
+        patch :reopen_attendance
+        get :attendance
       end
       resources :participants, only: %i[create update], controller: :scheduled_lesson_participants
+      resources :lesson_attendances, only: [] do
+        member do
+          patch :record_arrival
+          patch :mark_present
+          patch :mark_absent
+          patch :excuse
+          patch :record_departure
+          patch :adjust
+        end
+      end
     end
+    resources :lesson_attendances, only: :index
   end
   namespace :teacher do
     resource :profile, only: %i[show edit update], controller: :profiles
     resources :availabilities, only: %i[index new create edit update]
     resources :availability_exceptions, only: %i[index new create edit update]
-    resources :schedule, only: %i[index show]
+    resources :schedule, only: %i[index show] do
+      member do
+        patch :check_in
+        patch :start
+        patch :complete
+        get :attendance
+      end
+      resources :lesson_attendances, only: [], controller: :lesson_attendances do
+        member do
+          patch :record_arrival
+          patch :mark_present
+          patch :mark_absent
+          patch :excuse
+          patch :record_departure
+        end
+      end
+    end
   end
   namespace :student do
     resource :profile, only: %i[show edit update], controller: :profiles
     resources :enrollments, only: %i[index show]
     resources :schedule, only: %i[index show]
+    resources :attendances, only: %i[index show]
   end
   root "dashboard#index"
   constraints LocalEnvironmentConstraint.new do

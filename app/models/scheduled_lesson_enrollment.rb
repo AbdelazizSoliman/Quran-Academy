@@ -4,6 +4,7 @@ class ScheduledLessonEnrollment < ApplicationRecord
   belongs_to :scheduled_lesson, inverse_of: :scheduled_lesson_enrollments
   belongs_to :enrollment, inverse_of: :scheduled_lesson_enrollments
   belongs_to :added_by, class_name: "User", optional: true
+  has_one :lesson_attendance, inverse_of: :scheduled_lesson_enrollment, dependent: :restrict_with_exception
 
   validates :participation_status, inclusion: { in: PARTICIPATION_STATUSES }
   validates :enrollment_id, uniqueness: { scope: :scheduled_lesson_id }

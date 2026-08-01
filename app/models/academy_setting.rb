@@ -38,7 +38,9 @@ class AcademySetting < ApplicationRecord
             numericality: { only_integer: true, in: 0..8_760 }
   validates :maximum_booking_window_days, numericality: { only_integer: true, in: 0..730 }
   validates :student_late_after_minutes, :teacher_late_after_minutes, :absence_after_minutes,
-            :second_lesson_reminder_minutes_before, numericality: { only_integer: true, in: 0..1_440 }
+            :second_lesson_reminder_minutes_before, :teacher_check_in_opens_minutes_before,
+            :teacher_check_in_closes_minutes_after, :left_early_threshold_minutes,
+            numericality: { only_integer: true, in: 0..1_440 }
 
   validate :validate_collections
   validate :validate_locale_relationship

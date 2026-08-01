@@ -45,7 +45,9 @@
     <% fields = {
       lessons: %i[minimum_lesson_duration_minutes default_lesson_duration_minutes maximum_lesson_duration_minutes lesson_duration_step_minutes minimum_booking_notice_hours maximum_booking_window_days reschedule_notice_hours],
       cancellation: %i[student_cancellation_notice_hours teacher_cancellation_notice_hours late_cancellation_window_hours allow_student_self_cancellation allow_teacher_self_cancellation],
-      attendance: %i[student_late_after_minutes teacher_late_after_minutes absence_after_minutes allow_manual_attendance_adjustment],
+      attendance: %i[student_late_after_minutes teacher_late_after_minutes absence_after_minutes
+                     teacher_check_in_opens_minutes_before teacher_check_in_closes_minutes_after
+                     left_early_threshold_minutes allow_manual_attendance_adjustment],
       communication: %i[email_notifications_enabled whatsapp_notifications_enabled sms_notifications_enabled lesson_reminders_enabled attendance_notifications_enabled payment_notifications_enabled lesson_reminder_hours_before second_lesson_reminder_minutes_before],
       finance: %i[default_teacher_compensation_type default_teacher_rate payroll_currency payroll_period billing_currency default_lesson_price billing_cycle]
     }.fetch(section) %>

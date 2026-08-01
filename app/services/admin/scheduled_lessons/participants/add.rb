@@ -12,6 +12,7 @@ module Admin
           record = @lesson.scheduled_lesson_enrollments.build(enrollment: @enrollment, added_by: @actor)
           ScheduledLessonEnrollment.transaction do
             record.save!
+            LessonAttendances::Initialize.new(actor: @actor, lesson: @lesson).call! if @lesson.attendance_editable?
             ScheduledLessonEvent.create!(scheduled_lesson: @lesson, actor: @actor, event_type: "participant_added",
                                          after_data: { "enrollment_id" => @enrollment.id })
           end
