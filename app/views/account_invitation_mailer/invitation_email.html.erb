@@ -1,0 +1,5 @@
+<h1><%= t("invitations.mailer.heading", name: @user.full_name) %></h1>
+<p><%= t("invitations.mailer.introduction", academy: @academy.academy_name, role: t("roles.#{@user.role}")) %></p>
+<p><%= link_to t("invitations.mailer.action"), @invitation_url %></p>
+<p><%= t("invitations.mailer.expiration", time: l(@invitation.expires_at, format: :long)) %></p>
+<p><%= t("invitations.mailer.support", contact: @academy.contact_email.presence || @academy.contact_phone.presence || @academy.academy_name) %></p>

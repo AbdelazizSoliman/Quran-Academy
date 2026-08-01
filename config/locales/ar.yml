@@ -58,6 +58,7 @@ ar:
     reports: "التقارير"
     settings: "الإعدادات"
     users: "إدارة المستخدمين"
+    invitations: "دعوات الحسابات"
     my_profile: "ملفي الشخصي"
     coming_soon: "قريباً"
   actions:
@@ -200,6 +201,7 @@ ar:
         postal_code: "الرمز البريدي"
         country_code: "رمز الدولة"
         default_locale: "لغة الواجهة الافتراضية"
+        invitation_expires_after_hours: "صلاحية الدعوة (بالساعات)"
         supported_locales: "لغات الواجهة المدعومة"
         default_time_zone: "المنطقة الزمنية الافتراضية"
         teaching_languages: "لغات التدريس"

@@ -17,12 +17,16 @@ class ApplicationController < ActionController::Base
   private
 
   def use_locale(&)
-    requested_locale = request.query_parameters["locale"] if devise_controller?
+    requested_locale = request.query_parameters["locale"] if public_locale_selection?
     locale = supported_locale(requested_locale) ||
              supported_locale(current_user&.preferred_locale) ||
              supported_locale(academy_setting&.default_locale) ||
              I18n.default_locale
     I18n.with_locale(locale, &)
+  end
+
+  def public_locale_selection?
+    devise_controller? || controller_name == "account_invitations"
   end
 
   def use_time_zone(&)

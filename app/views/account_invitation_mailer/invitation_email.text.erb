@@ -1,0 +1,8 @@
+<%= t("invitations.mailer.heading", name: @user.full_name) %>
+
+<%= t("invitations.mailer.introduction", academy: @academy.academy_name, role: t("roles.#{@user.role}")) %>
+
+<%= t("invitations.mailer.action") %>: <%= @invitation_url %>
+
+<%= t("invitations.mailer.expiration", time: l(@invitation.expires_at, format: :long)) %>
+<%= t("invitations.mailer.support", contact: @academy.contact_email.presence || @academy.contact_phone.presence || @academy.academy_name) %>

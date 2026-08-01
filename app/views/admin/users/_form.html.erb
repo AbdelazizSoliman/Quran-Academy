@@ -22,12 +22,7 @@
       <%= form.select :role, User.roles.keys.map { |role| [t("roles.#{role}"), role] }, {}, class: "ds-control mt-2" %>
     </div>
 
-    <% if user.new_record? %>
-      <div>
-        <%= form.label :status, t("admin.users.fields.status"), class: "ds-label" %>
-        <%= form.select :status, User.statuses.keys.map { |status| [t("statuses.#{status}"), status] }, {}, class: "ds-control mt-2" %>
-      </div>
-    <% else %>
+    <% unless user.new_record? %>
       <div>
         <span class="ds-label"><%= t("admin.users.fields.status") %></span>
         <div class="mt-3"><%= user_status_badge(user) %></div>
@@ -46,19 +41,12 @@
       <%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.all, { default: "Cairo" }, class: "ds-control mt-2" %>
     </div>
 
-    <% if user.new_record? %>
-      <div>
-        <%= form.label :password, t("admin.users.fields.password"), class: "ds-label" %>
-        <%= form.password_field :password, class: "ds-control mt-2", required: true,
-                                           autocomplete: "new-password", value: nil %>
-      </div>
-      <div>
-        <%= form.label :password_confirmation, t("admin.users.fields.password_confirmation"), class: "ds-label" %>
-        <%= form.password_field :password_confirmation, class: "ds-control mt-2", required: true,
-                                                        autocomplete: "new-password", value: nil %>
-      </div>
-    <% end %>
   </div>
+
+  <% if user.new_record? %>
+    <%= render "shared/components/alert", variant: :information, title: t("invitations.admin.creation_title"),
+               message: t("invitations.admin.creation_hint") %>
+  <% end %>
 
   <div class="flex flex-wrap justify-end gap-3 border-t border-app-border pt-5">
     <%= render "shared/components/button", label: t("actions.cancel"), href: admin_users_path, variant: :secondary %>

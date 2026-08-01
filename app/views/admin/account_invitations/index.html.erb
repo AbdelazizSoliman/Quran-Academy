@@ -1,0 +1,32 @@
+<%= render "shared/page_header", title: t("invitations.admin.index_title"),
+           description: t("invitations.admin.index_description") %>
+<% filters = capture do %>
+  <%= form_with url: admin_account_invitations_path, method: :get, class: "grid gap-4 sm:grid-cols-2 lg:grid-cols-5" do |form| %>
+    <div class="lg:col-span-2"><%= form.label :query, t("invitations.admin.search"), class: "ds-label" %>
+      <%= form.search_field :query, value: params[:query], class: "ds-control mt-2" %></div>
+    <div><%= form.label :status, t("invitations.admin.status"), class: "ds-label" %>
+      <%= form.select :status, [[t("invitations.admin.all"), ""]] + AccountInvitation::STATUSES.map { |value| [t("invitations.statuses.#{value}"), value] }, { selected: params[:status] }, class: "ds-control mt-2" %></div>
+    <div><%= form.label :sort, t("invitations.admin.sort"), class: "ds-label" %>
+      <%= form.select :sort, Admin::AccountInvitationsQuery::SORTS.keys.map { |value| [t("invitations.sorts.#{value}"), value] }, { selected: params[:sort] }, class: "ds-control mt-2" %></div>
+    <div class="flex items-end"><%= render "shared/components/button", label: t("actions.search"), type: "submit" %></div>
+  <% end %>
+<% end %>
+<%= render "shared/components/card", body: filters %>
+<div class="mt-6 grid gap-4">
+  <% @invitations.each do |invitation| %>
+    <article class="ds-card p-5">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div><h2 class="font-bold"><%= link_to invitation.user.full_name, admin_account_invitation_path(invitation), class: "text-app-primary hover:underline" %></h2>
+          <p class="mt-1 ds-caption"><%= invitation.user.email %> · <%= t("roles.#{invitation.user.role}") %></p></div>
+        <span class="ds-badge"><%= t("invitations.statuses.#{invitation.status}") %></span>
+      </div>
+      <dl class="mt-4 grid gap-3 sm:grid-cols-3">
+        <div><dt class="ds-caption"><%= t("invitations.admin.created") %></dt><dd><%= localized_datetime(invitation.created_at) %></dd></div>
+        <div><dt class="ds-caption"><%= t("invitations.admin.expires") %></dt><dd><%= localized_datetime(invitation.expires_at) %></dd></div>
+        <div><dt class="ds-caption"><%= t("invitations.admin.accepted") %></dt><dd><%= localized_datetime(invitation.accepted_at) %></dd></div>
+      </dl>
+    </article>
+  <% end %>
+  <% if @invitations.empty? %><%= render "shared/components/empty_state", icon: :users, title: t("invitations.admin.empty"), description: "" %><% end %>
+</div>
+<% if @pagy.pages > 1 %><div class="mt-5"><%== @pagy.series_nav %></div><% end %>

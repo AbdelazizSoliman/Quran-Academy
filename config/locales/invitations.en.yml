@@ -1,0 +1,65 @@
+en:
+  invitations:
+    statuses: { pending: "Pending", sent: "Sent", accepted: "Accepted", expired: "Expired", cancelled: "Cancelled" }
+    sorts: { created: "Created", expires: "Expiration", accepted: "Acceptance" }
+    events: { created: "Invitation created", sent: "Invitation sent", resent: "Invitation resent", accepted: "Invitation accepted", expired: "Invitation expired", cancelled: "Invitation cancelled" }
+    mailer:
+      subject: "Your invitation to %{academy}"
+      heading: "Welcome, %{name}"
+      introduction: "%{academy} invited you to join as %{role}. Choose your own password using the secure link below."
+      action: "Set up my password"
+      expiration: "This single-use invitation expires at %{time}."
+      support: "Need help? Contact %{contact}."
+    accept:
+      title: "Activate your account"
+      description: "Create your password to securely access %{academy}. Your email and role cannot be changed here."
+      expires: "Invitation expires at %{time}."
+      errors_title: "We could not activate your account"
+      password: "Password"
+      password_confirmation: "Confirm password"
+      action: "Activate account"
+      sign_in: "Sign in"
+    accepted:
+      title: "Your account is active"
+      message: "Your password was created successfully. You can now sign in."
+      notice: "Your account has been activated."
+    expired:
+      title: "Invitation expired"
+      message: "This invitation has expired. Contact the academy and ask an administrator to resend it."
+    invalid:
+      title: "Invitation unavailable"
+      message: "This invitation is invalid, cancelled, or has already been used. Contact the academy if you need help."
+    admin:
+      creation_title: "Secure invitation"
+      creation_hint: "The account will remain pending. The user will receive an email and choose their own password; no temporary password is sent."
+      index_title: "Account invitations"
+      index_description: "Review secure account onboarding and resend or cancel unused invitations."
+      search: "Search name, email, or role"
+      status: "Status"
+      sort: "Sort by"
+      all: "All statuses"
+      created: "Created"
+      expires: "Expires"
+      accepted: "Accepted"
+      recipient: "Recipient"
+      role: "Role"
+      sent: "Last sent"
+      resends: "Resends"
+      details: "Invitation details"
+      actions: "Actions"
+      history: "Audit history"
+      system: "System"
+      resend: "Resend invitation"
+      cancel: "Cancel invitation"
+      resent: "A new invitation link was sent; the previous link is invalid."
+      cancelled: "The invitation was cancelled."
+      empty: "No invitations found"
+  activerecord:
+    errors:
+      models:
+        account_invitation:
+          attributes:
+            base:
+              expired: "Invitation has expired"
+              not_usable: "Invitation cannot be used"
+              already_accepted: "Accepted invitations cannot be cancelled"

@@ -13,7 +13,7 @@ module Admin
     end
 
     def new
-      @user = User.new(status: :active, time_zone: "Cairo")
+      @user = User.new(status: :pending, time_zone: "Cairo")
     end
 
     def edit; end
@@ -63,8 +63,7 @@ module Admin
 
     def create_params
       params.expect(user: %i[
-                      first_name last_name email role status preferred_locale time_zone
-                      password password_confirmation
+                      first_name last_name email role preferred_locale time_zone
                     ])
     end
 

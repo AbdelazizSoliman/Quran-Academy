@@ -37,6 +37,7 @@ class AcademySetting < ApplicationRecord
             :late_cancellation_window_hours, :lesson_reminder_hours_before,
             numericality: { only_integer: true, in: 0..8_760 }
   validates :maximum_booking_window_days, numericality: { only_integer: true, in: 0..730 }
+  validates :invitation_expires_after_hours, numericality: { only_integer: true, in: 1..8_760 }
   validates :student_late_after_minutes, :teacher_late_after_minutes, :absence_after_minutes,
             :second_lesson_reminder_minutes_before, :teacher_check_in_opens_minutes_before,
             :teacher_check_in_closes_minutes_after, :left_early_threshold_minutes,
