@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -310,6 +310,70 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.check_constraint "recommended_lessons_per_week > 0", name: "programs_frequency_positive"
   end
 
+  create_table "scheduled_lesson_enrollments", force: :cascade do |t|
+    t.bigint "added_by_id"
+    t.datetime "created_at", null: false
+    t.bigint "enrollment_id", null: false
+    t.string "participation_status", default: "expected", null: false
+    t.bigint "scheduled_lesson_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["added_by_id"], name: "index_scheduled_lesson_enrollments_on_added_by_id"
+    t.index ["enrollment_id"], name: "index_scheduled_lesson_enrollments_on_enrollment_id"
+    t.index ["participation_status"], name: "index_scheduled_lesson_enrollments_on_participation_status"
+    t.index ["scheduled_lesson_id", "enrollment_id"], name: "index_scheduled_lesson_enrollments_unique", unique: true
+    t.index ["scheduled_lesson_id"], name: "index_scheduled_lesson_enrollments_on_scheduled_lesson_id"
+  end
+
+  create_table "scheduled_lesson_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "scheduled_lesson_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_scheduled_lesson_events_on_actor_id"
+    t.index ["event_type"], name: "index_scheduled_lesson_events_on_event_type"
+    t.index ["scheduled_lesson_id", "created_at"], name: "idx_on_scheduled_lesson_id_created_at_ee34dd8901"
+    t.index ["scheduled_lesson_id"], name: "index_scheduled_lesson_events_on_scheduled_lesson_id"
+  end
+
+  create_table "scheduled_lessons", force: :cascade do |t|
+    t.string "academy_time_zone", default: "Cairo", null: false
+    t.text "cancellation_reason"
+    t.datetime "cancelled_at"
+    t.bigint "cancelled_by_id"
+    t.datetime "completed_at"
+    t.bigint "course_offering_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.string "delivery_mode", default: "online", null: false
+    t.datetime "ends_at", null: false
+    t.string "location_name"
+    t.integer "lock_version", default: 0, null: false
+    t.string "online_meeting_url"
+    t.string "public_id", null: false
+    t.string "scheduling_source", default: "manual", null: false
+    t.datetime "starts_at", null: false
+    t.string "status", default: "draft", null: false
+    t.bigint "teacher_profile_id", null: false
+    t.string "title_ar", null: false
+    t.string "title_en", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.index ["cancelled_by_id"], name: "index_scheduled_lessons_on_cancelled_by_id"
+    t.index ["course_offering_id", "starts_at"], name: "index_scheduled_lessons_on_course_offering_id_and_starts_at"
+    t.index ["course_offering_id"], name: "index_scheduled_lessons_on_course_offering_id"
+    t.index ["created_by_id"], name: "index_scheduled_lessons_on_created_by_id"
+    t.index ["public_id"], name: "index_scheduled_lessons_on_public_id", unique: true
+    t.index ["status", "starts_at"], name: "index_scheduled_lessons_on_status_and_starts_at"
+    t.index ["teacher_profile_id", "starts_at", "ends_at"], name: "idx_on_teacher_profile_id_starts_at_ends_at_69d19f2e3b"
+    t.index ["teacher_profile_id"], name: "index_scheduled_lessons_on_teacher_profile_id"
+    t.index ["updated_by_id"], name: "index_scheduled_lessons_on_updated_by_id"
+    t.check_constraint "ends_at > starts_at", name: "scheduled_lesson_time_order"
+  end
+
   create_table "student_guardianship_events", force: :cascade do |t|
     t.bigint "actor_id", null: false
     t.datetime "created_at", null: false
@@ -417,6 +481,83 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.index ["user_id"], name: "index_student_profiles_on_user_id", unique: true
     t.check_constraint "left_on IS NULL OR joined_on IS NULL OR left_on >= joined_on", name: "student_profiles_date_order"
     t.check_constraint "memorized_juz_count IS NULL OR memorized_juz_count >= 0 AND memorized_juz_count <= 30", name: "student_profiles_juz_range"
+  end
+
+  create_table "teacher_availabilities", force: :cascade do |t|
+    t.string "availability_type", default: "teaching", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.date "effective_from", null: false
+    t.date "effective_until"
+    t.time "ends_at_local", null: false
+    t.text "notes"
+    t.string "public_id", null: false
+    t.time "starts_at_local", null: false
+    t.string "status", default: "active", null: false
+    t.bigint "teacher_profile_id", null: false
+    t.string "time_zone", default: "Cairo", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.string "weekday", null: false
+    t.index ["created_by_id"], name: "index_teacher_availabilities_on_created_by_id"
+    t.index ["public_id"], name: "index_teacher_availabilities_on_public_id", unique: true
+    t.index ["teacher_profile_id", "weekday", "status"], name: "idx_on_teacher_profile_id_weekday_status_afa2ad9ee9"
+    t.index ["teacher_profile_id"], name: "index_teacher_availabilities_on_teacher_profile_id"
+    t.index ["updated_by_id"], name: "index_teacher_availabilities_on_updated_by_id"
+    t.check_constraint "effective_until IS NULL OR effective_until >= effective_from", name: "teacher_availability_date_order"
+    t.check_constraint "ends_at_local > starts_at_local", name: "teacher_availability_time_order"
+  end
+
+  create_table "teacher_availability_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "teacher_availability_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_teacher_availability_events_on_actor_id"
+    t.index ["event_type"], name: "index_teacher_availability_events_on_event_type"
+    t.index ["teacher_availability_id", "created_at"], name: "idx_on_teacher_availability_id_created_at_d13f9d240b"
+    t.index ["teacher_availability_id"], name: "index_teacher_availability_events_on_teacher_availability_id"
+  end
+
+  create_table "teacher_availability_exception_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "teacher_availability_exception_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_teacher_availability_exception_events_on_actor_id"
+    t.index ["event_type"], name: "index_teacher_availability_exception_events_on_event_type"
+    t.index ["teacher_availability_exception_id", "created_at"], name: "idx_on_teacher_availability_exception_id_created_at_0c3df20b0c"
+    t.index ["teacher_availability_exception_id"], name: "idx_on_teacher_availability_exception_id_49df9153c1"
+  end
+
+  create_table "teacher_availability_exceptions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.time "ends_at_local"
+    t.date "exception_date", null: false
+    t.string "exception_type", null: false
+    t.string "public_id", null: false
+    t.string "reason"
+    t.time "starts_at_local"
+    t.string "status", default: "active", null: false
+    t.bigint "teacher_profile_id", null: false
+    t.string "time_zone", default: "Cairo", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.index ["created_by_id"], name: "index_teacher_availability_exceptions_on_created_by_id"
+    t.index ["public_id"], name: "index_teacher_availability_exceptions_on_public_id", unique: true
+    t.index ["teacher_profile_id", "exception_date", "status"], name: "idx_on_teacher_profile_id_exception_date_status_5559a35a4e"
+    t.index ["teacher_profile_id"], name: "index_teacher_availability_exceptions_on_teacher_profile_id"
+    t.index ["updated_by_id"], name: "index_teacher_availability_exceptions_on_updated_by_id"
+    t.check_constraint "starts_at_local IS NULL AND ends_at_local IS NULL OR starts_at_local IS NOT NULL AND ends_at_local IS NOT NULL AND ends_at_local > starts_at_local", name: "teacher_exception_time_order"
   end
 
   create_table "teacher_profile_events", force: :cascade do |t|
@@ -556,6 +697,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
   add_foreign_key "program_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "programs", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "programs", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "scheduled_lesson_enrollments", "enrollments", on_delete: :restrict
+  add_foreign_key "scheduled_lesson_enrollments", "scheduled_lessons", on_delete: :restrict
+  add_foreign_key "scheduled_lesson_enrollments", "users", column: "added_by_id", on_delete: :nullify
+  add_foreign_key "scheduled_lesson_events", "scheduled_lessons", on_delete: :restrict
+  add_foreign_key "scheduled_lesson_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "scheduled_lessons", "course_offerings", on_delete: :restrict
+  add_foreign_key "scheduled_lessons", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "scheduled_lessons", "users", column: "cancelled_by_id", on_delete: :nullify
+  add_foreign_key "scheduled_lessons", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "scheduled_lessons", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "student_guardianship_events", "student_guardianships", on_delete: :restrict
   add_foreign_key "student_guardianship_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "student_guardianships", "guardians", on_delete: :restrict
@@ -567,6 +718,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
   add_foreign_key "student_profiles", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "student_profiles", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "student_profiles", "users", on_delete: :restrict
+  add_foreign_key "teacher_availabilities", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "teacher_availabilities", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "teacher_availabilities", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "teacher_availability_events", "teacher_availabilities", on_delete: :restrict
+  add_foreign_key "teacher_availability_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "teacher_availability_exception_events", "teacher_availability_exceptions", on_delete: :restrict
+  add_foreign_key "teacher_availability_exception_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "teacher_availability_exceptions", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "teacher_availability_exceptions", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "teacher_availability_exceptions", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "teacher_profile_events", "teacher_profiles", on_delete: :restrict
   add_foreign_key "teacher_profile_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "teacher_profiles", "users", column: "created_by_id", on_delete: :nullify

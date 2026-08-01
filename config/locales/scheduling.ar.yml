@@ -1,0 +1,28 @@
+ar:
+  navigation:
+    schedule: "الجدولة"
+    teacher_availability: "إتاحة المعلمين"
+    teacher_schedule: "جدولي"
+    teacher_availability_self: "إتاحتي"
+    student_schedule: "جدولي"
+  scheduling:
+    not_configured: "غير مُعد"
+    availability: { title: "إتاحة المعلمين", description: "فترات التدريس المتكررة حسب المنطقة الزمنية للمعلم." }
+    exceptions: { title: "استثناءات الإتاحة", description: "تعديلات الإتاحة والإجازات الخاصة بالتاريخ." }
+    lessons: { title: "الجدولة", description: "خطط الدروس بتوقيت الأكاديمية مع حفظ المنطقة الزمنية للمعلم." }
+    teacher: { availability: "إتاحتي", schedule: "جدولي" }
+    student: { schedule: "جدولي" }
+    empty: { title: "لا توجد سجلات إتاحة", description: "أضف فترة تدريس متكررة للسماح بالجدولة.", lessons_title: "لا توجد دروس مجدولة", lessons_description: "لا توجد دروس في الفترة المحددة." }
+    sections: { availability: "الإتاحة المتكررة", exception: "استثناء الإتاحة", lesson: "تفاصيل الدرس", participants: "المشاركون", add_participant: "إضافة مشارك", audit: "سجل التغييرات" }
+    actions: { new_availability: "إتاحة جديدة", edit_availability: "تعديل الإتاحة", new_exception: "استثناء جديد", edit_exception: "تعديل الاستثناء", cancel_exception: "إلغاء الاستثناء", new_lesson: "درس جديد", edit_lesson: "تعديل الدرس", schedule: "جدولة", start: "بدء", complete: "إكمال", cancel: "إلغاء الدرس", archive: "أرشفة", reschedule: "إعادة الجدولة", join_online: "الانضمام عن بُعد", add_participant: "إضافة مشارك" }
+    fields: { teacher: "المعلم", offering: "العرض التعليمي", enrollment: "التسجيل", weekday: "اليوم", time: "الوقت", starts_at_local: "وقت البداية المحلي", ends_at_local: "وقت النهاية المحلي", starts_at: "يبدأ في", ends_at: "ينتهي في", time_zone: "المنطقة الزمنية", effective_from: "ساري من", effective_until: "ساري حتى", availability_type: "نوع الإتاحة", exception_date: "تاريخ الاستثناء", exception_type: "نوع الاستثناء", reason: "السبب", notes: "ملاحظات", status: "الحالة", title_ar: "العنوان بالعربية", title_en: "العنوان بالإنجليزية", delivery_mode: "نمط التقديم", location_name: "الموقع", online_meeting_url: "رابط الاجتماع", from: "من", to: "إلى" }
+    catalogs:
+      weekdays: { monday: "الاثنين", tuesday: "الثلاثاء", wednesday: "الأربعاء", thursday: "الخميس", friday: "الجمعة", saturday: "السبت", sunday: "الأحد" }
+      availability_types: { teaching: "تدريس", administrative: "إداري", general: "عام" }
+      exception_types: { unavailable: "غير متاح", available_override: "إتاحة استثنائية" }
+      statuses: { active: "نشط", inactive: "غير نشط", draft: "مسودة", scheduled: "مجدول", in_progress: "قيد التنفيذ", completed: "مكتمل", cancelled: "ملغي", archived: "مؤرشف" }
+      delivery_modes: { online: "عن بُعد", onsite: "حضوري", hybrid: "هجين" }
+      participation_statuses: { expected: "متوقع", removed: "مزال" }
+      events: { created: "تم الإنشاء", updated: "تم التحديث", activated: "تم التفعيل", deactivated: "تم إلغاء التفعيل", scheduled: "تمت الجدولة", rescheduled: "أعيدت الجدولة", started: "بدأ", completed: "اكتمل", cancelled: "أُلغي", archived: "أُرشف", participant_added: "أضيف مشارك", participant_removed: "أزيل مشارك" }
+    messages: { created: "تم الإنشاء بنجاح.", updated: "تم التحديث بنجاح.", activate: "تم تفعيل الإتاحة.", deactivate: "تم إلغاء تفعيل الإتاحة.", archive: "تمت الأرشفة.", cancel: "تم إلغاء الاستثناء.", cancelled: "تم إلغاء الدرس.", schedule: "تمت جدولة الدرس.", start: "بدأ الدرس.", complete: "اكتمل الدرس.", rescheduled: "أعيدت جدولة الدرس.", participant_updated: "تم تحديث المشارك." }
+    defaults: { admin_cancellation: "أُلغي بواسطة إدارة الأكاديمية" }

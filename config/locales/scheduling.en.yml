@@ -1,0 +1,66 @@
+en:
+  navigation:
+    schedule: "Scheduling"
+    teacher_availability: "Teacher availability"
+    teacher_schedule: "My schedule"
+    teacher_availability_self: "My availability"
+    student_schedule: "My schedule"
+  scheduling:
+    not_configured: "Not configured"
+    availability:
+      title: "Teacher availability"
+      description: "Recurring teaching windows in each teacher's local time zone."
+    exceptions:
+      title: "Availability exceptions"
+      description: "Date-specific availability overrides and time off."
+    lessons:
+      title: "Scheduling"
+      description: "Plan lessons in academy time while preserving each teacher's local availability."
+    teacher:
+      availability: "My availability"
+      schedule: "My schedule"
+    student:
+      schedule: "My schedule"
+    empty:
+      title: "No availability records"
+      description: "Create a recurring teaching window to make scheduling possible."
+      lessons_title: "No scheduled lessons"
+      lessons_description: "There are no lessons in the selected period."
+    sections: { availability: "Recurring availability", exception: "Availability exception", lesson: "Lesson details", participants: "Participants", add_participant: "Add participant", audit: "Audit history" }
+    actions: { new_availability: "New availability", edit_availability: "Edit availability", new_exception: "New exception", edit_exception: "Edit exception", cancel_exception: "Cancel exception", new_lesson: "New lesson", edit_lesson: "Edit lesson", schedule: "Schedule", start: "Start", complete: "Complete", cancel: "Cancel lesson", archive: "Archive", reschedule: "Reschedule", join_online: "Join online", add_participant: "Add participant" }
+    fields:
+      teacher: "Teacher"
+      offering: "Course offering"
+      weekday: "Weekday"
+      time: "Time"
+      starts_at_local: "Local start time"
+      ends_at_local: "Local end time"
+      starts_at: "Starts at"
+      ends_at: "Ends at"
+      time_zone: "Time zone"
+      effective_from: "Effective from"
+      effective_until: "Effective until"
+      availability_type: "Availability type"
+      exception_date: "Exception date"
+      exception_type: "Exception type"
+      reason: "Reason"
+      notes: "Notes"
+      status: "Status"
+      title_ar: "Arabic title"
+      title_en: "English title"
+      delivery_mode: "Delivery mode"
+      location_name: "Location"
+      online_meeting_url: "Online meeting URL"
+      enrollment: "Enrollment"
+      from: "From"
+      to: "To"
+    catalogs:
+      weekdays: { monday: "Monday", tuesday: "Tuesday", wednesday: "Wednesday", thursday: "Thursday", friday: "Friday", saturday: "Saturday", sunday: "Sunday" }
+      availability_types: { teaching: "Teaching", administrative: "Administrative", general: "General" }
+      exception_types: { unavailable: "Unavailable", available_override: "Available override" }
+      statuses: { active: "Active", inactive: "Inactive", draft: "Draft", scheduled: "Scheduled", in_progress: "In progress", completed: "Completed", cancelled: "Cancelled", archived: "Archived" }
+      delivery_modes: { online: "Online", onsite: "Onsite", hybrid: "Hybrid" }
+      participation_statuses: { expected: "Expected", removed: "Removed" }
+      events: { created: "Created", updated: "Updated", activated: "Activated", deactivated: "Deactivated", scheduled: "Scheduled", rescheduled: "Rescheduled", started: "Started", completed: "Completed", cancelled: "Cancelled", archived: "Archived", participant_added: "Participant added", participant_removed: "Participant removed" }
+    messages: { created: "Created successfully.", updated: "Updated successfully.", activate: "Availability activated.", deactivate: "Availability deactivated.", archive: "Archived successfully.", cancel: "Exception cancelled.", cancelled: "Lesson cancelled.", schedule: "Lesson scheduled.", start: "Lesson started.", complete: "Lesson completed.", rescheduled: "Lesson rescheduled.", participant_updated: "Participant updated." }
+    defaults: { admin_cancellation: "Cancelled by academy administration" }

@@ -293,3 +293,20 @@ This stage intentionally does not implement teacher assignment, availability, sc
 lessons, attendance, assessments, progress tracking, payroll, billing, invoices, payments,
 communications, providers, or background jobs. A transfer action currently records the
 terminal transferred state; creating and linking a target enrollment is deliberately deferred.
+
+## Teacher availability and scheduling
+
+Task 09 adds recurring teacher availability, date-specific exceptions, scheduled lessons, and
+soft lesson participation records. Recurring windows and exceptions retain local wall-clock
+times with explicit time zones; scheduled lesson timestamps are stored as UTC-capable Rails
+timestamps and snapshot the academy time zone used during scheduling.
+
+Scheduling uses explicit services for availability calculation, overlap detection, lifecycle
+transitions, rescheduling, cancellation, and participant changes. Teacher and student conflicts
+are checked transactionally before a draft becomes scheduled. Lesson history is preserved through
+immutable audit events and optimistic locking. Staff have read-only schedule access, administrators
+manage scheduling, teachers manage only their own availability and view their schedule, and
+students view only their own linked lessons.
+
+Attendance, reminders, payroll, billing, providers, calendar synchronization, recurring lesson
+generation, room inventory, and leave approval workflows remain intentionally out of scope.

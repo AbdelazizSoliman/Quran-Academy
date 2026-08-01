@@ -8,6 +8,7 @@ class CourseOffering < ApplicationRecord
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_course_offerings
   has_many :enrollments, dependent: :restrict_with_exception
   has_many :events, class_name: "CourseOfferingEvent", dependent: :restrict_with_exception
+  has_many :scheduled_lessons, dependent: :restrict_with_exception
 
   attr_readonly :public_id
   before_validation :normalize_values

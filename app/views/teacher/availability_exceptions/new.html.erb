@@ -1,0 +1,1 @@
+<%= render "shared/page_header", title: t("scheduling.actions.new_exception") %><%= render "admin/teacher_availability_exceptions/form", exception: @exception, teachers: [current_user.teacher_profile], form_model: @exception, form_url: teacher_availability_exceptions_path %>

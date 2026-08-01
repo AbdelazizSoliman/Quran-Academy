@@ -22,6 +22,8 @@ class Enrollment < ApplicationRecord
   belongs_to :approved_by, class_name: "User", optional: true
   belongs_to :ended_by, class_name: "User", optional: true
   has_many :events, class_name: "EnrollmentEvent", dependent: :restrict_with_exception
+  has_many :scheduled_lesson_enrollments, inverse_of: :enrollment, dependent: :restrict_with_exception
+  has_many :scheduled_lessons, through: :scheduled_lesson_enrollments
 
   attr_readonly :public_id, :student_profile_id, :course_offering_id
   before_validation :generate_public_id, on: :create

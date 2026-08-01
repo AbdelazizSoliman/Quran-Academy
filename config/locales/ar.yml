@@ -18,6 +18,16 @@ ar:
       invalid_transition: "لا تسمح الحالة الحالية بهذا الإجراء"
       must_be_available: "يجب اختيار حساب معلّم مؤهل لا يملك ملفاً"
       unsafe: "يحتوي على معلومات حساسة محظورة"
+      overlaps_existing: "يتداخل مع سجل نشط موجود"
+      times_must_be_paired: "يجب إدخالهما معاً أو تركهما فارغين للاستثناء الكامل"
+      not_active: "يجب أن يكون نشطاً وقابلاً للاستخدام"
+      different_offering: "يجب أن ينتمي إلى العرض التعليمي للدرس"
+      not_operational: "يجب أن يكون مقبولاً أو نشطاً أو متوقفاً مؤقتاً"
+      required: "مطلوب"
+      teacher_unavailable: "المعلم غير متاح في هذا الوقت"
+      schedule_conflict: "يتعارض مع درس مجدول آخر"
+      cancellation_reason_required: "مطلوب عند إلغاء الدرس"
+      stale_record: "تم تغييره بواسطة مسؤول آخر؛ أعد التحميل وحاول مجدداً"
   time:
     formats:
       long: "%d/%m/%Y، %H:%M"
