@@ -136,6 +136,18 @@ Rails.application.routes.draw do
         patch :cancel
       end
     end
+    resources :teacher_payrolls, except: :destroy do
+      member do
+        patch :prepare
+        patch :approve
+        patch :mark_paid
+        patch :reopen
+        patch :cancel
+      end
+    end
+    resources :operational_reports, only: %i[index show], param: :report do
+      get :export, on: :member
+    end
   end
   namespace :teacher do
     resource :profile, only: %i[show edit update], controller: :profiles
@@ -170,6 +182,8 @@ Rails.application.routes.draw do
         patch :cancel
       end
     end
+    resources :payrolls, only: %i[index show]
+    resource :reports, only: :show, controller: :reports
   end
   namespace :student do
     resource :profile, only: %i[show edit update], controller: :profiles

@@ -1,0 +1,37 @@
+en:
+  payroll:
+    admin:
+      index: { title: "Teacher payroll", description: "Prepare and review teacher compensation periods." }
+      new: { title: "Generate payroll" }
+      edit: { title: "Adjust payroll" }
+    teacher:
+      index: { title: "My payroll", description: "Your prepared, approved, and paid payroll history." }
+      show: { title: "Payroll details" }
+    statuses: { draft: "Draft", prepared: "Prepared", approved: "Approved", paid: "Paid", cancelled: "Cancelled" }
+    strategies: { per_lesson: "Per lesson", hourly: "Hourly", monthly_fixed: "Monthly fixed", manual_amount: "Manual amount" }
+    actions: { generate: "Generate payroll", adjust: "Adjust", save_adjustment: "Save adjustment", prepare: "Prepare", approve: "Approve", mark_paid: "Mark paid", reopen: "Reopen", cancel: "Cancel" }
+    fields: { teacher: "Teacher", period: "Period", period_start: "Period start", period_end: "Period end", calculation_strategy: "Calculation strategy", strategy: "Strategy", rate: "Rate", manual_base: "Manual base amount", base_amount: "Base amount", bonus_amount: "Bonus", deduction_amount: "Deduction", manual_adjustment_amount: "Manual adjustment", net_amount: "Net amount", notes: "Notes", adjustment_reason: "Adjustment reason", status: "Status" }
+    filters: { from: "From", to: "To" }
+    sections: { lessons: "Included completed lessons", audit: "Audit history" }
+    events: { generated: "Generated", prepared: "Prepared", approved: "Approved", paid: "Paid", cancelled: "Cancelled", reopened: "Reopened", adjusted: "Adjusted" }
+    defaults: { reopen_reason: "Reopened for payroll correction", cancel_reason: "Cancelled by academy administration" }
+    messages: { updated: "Payroll updated." }
+  reports:
+    admin: { title: "Operational dashboard", description: "Academy workload, attendance, academic, and payroll KPIs." }
+    teacher:
+      title: "My teaching statistics"
+      description: "Your current-month teaching workload and operations."
+      metrics: { lessons: "Lessons", completed: "Completed", cancelled: "Cancelled", hours: "Teaching hours", late_check_ins: "Late check-ins", submitted_reports: "Submitted reports" }
+    kpis: "Academy key performance indicators"
+    available: "Operational reports"
+    actions: { filter: "Apply filters", export_csv: "Export CSV" }
+    types: { teacher_workload: "Teacher workload", teacher_attendance: "Teacher attendance", student_attendance: "Student attendance", lesson_completion: "Lesson completion", lesson_reports: "Lesson reports", payroll_summary: "Payroll summary", programs: "Programs", course_offerings: "Course offerings", enrollments: "Enrollments" }
+    metrics: { active_students: "Active students", active_teachers: "Active teachers", lessons_today: "Lessons today", lessons_this_week: "Lessons this week", completed_lessons: "Completed lessons", cancelled_lessons: "Cancelled lessons", attendance_percentage: "Attendance", late_students: "Late students", late_teachers: "Late teachers", pending_reports: "Pending reports", locked_reports: "Locked reports", prepared_payrolls: "Prepared payrolls", approved_payrolls: "Approved payrolls", paid_payrolls: "Paid payrolls" }
+    columns: {}
+  activerecord:
+    errors:
+      models:
+        teacher_payroll:
+          attributes:
+            period_ends_on: { before_start: "must be on or after the period start" }
+            base: { forbidden: "You cannot change payroll", generation_failed: "Payroll could not be generated", not_editable: "Only draft payroll can be adjusted", stale_record: "Payroll changed; reload and try again", reason_required: "A reason is required", invalid_transition: "Payroll lifecycle transition is not allowed" }

@@ -1,0 +1,30 @@
+ar:
+  payroll:
+    admin:
+      index: { title: "رواتب المعلمين", description: "إعداد ومراجعة فترات تعويض المعلمين." }
+      new: { title: "إنشاء كشف راتب" }
+      edit: { title: "تعديل كشف الراتب" }
+    teacher:
+      index: { title: "رواتبي", description: "سجل كشوف الرواتب المعدة والمعتمدة والمدفوعة." }
+      show: { title: "تفاصيل الراتب" }
+    statuses: { draft: "مسودة", prepared: "معد", approved: "معتمد", paid: "مدفوع", cancelled: "ملغى" }
+    strategies: { per_lesson: "لكل درس", hourly: "بالساعة", monthly_fixed: "شهري ثابت", manual_amount: "مبلغ يدوي" }
+    actions: { generate: "إنشاء كشف الراتب", adjust: "تعديل", save_adjustment: "حفظ التعديل", prepare: "إعداد", approve: "اعتماد", mark_paid: "تحديد كمدفوع", reopen: "إعادة فتح", cancel: "إلغاء" }
+    fields: { teacher: "المعلم", period: "الفترة", period_start: "بداية الفترة", period_end: "نهاية الفترة", calculation_strategy: "طريقة الحساب", strategy: "طريقة الحساب", rate: "الأجر", manual_base: "المبلغ الأساسي اليدوي", base_amount: "المبلغ الأساسي", bonus_amount: "المكافآت", deduction_amount: "الخصومات", manual_adjustment_amount: "التعديل اليدوي", net_amount: "صافي المبلغ", notes: "ملاحظات", adjustment_reason: "سبب التعديل", status: "الحالة" }
+    filters: { from: "من", to: "إلى" }
+    sections: { lessons: "الدروس المكتملة المحتسبة", audit: "سجل التدقيق" }
+    events: { generated: "تم الإنشاء", prepared: "تم الإعداد", approved: "تم الاعتماد", paid: "تم الدفع", cancelled: "تم الإلغاء", reopened: "أعيد الفتح", adjusted: "تم التعديل" }
+    defaults: { reopen_reason: "إعادة فتح لتصحيح الراتب", cancel_reason: "أُلغي بواسطة إدارة الأكاديمية" }
+    messages: { updated: "تم تحديث الراتب." }
+  reports:
+    admin: { title: "لوحة العمليات", description: "مؤشرات الأكاديمية للتدريس والحضور والتقارير والرواتب." }
+    teacher:
+      title: "إحصاءات تدريسي"
+      description: "عبء التدريس والعمليات للشهر الحالي."
+      metrics: { lessons: "الدروس", completed: "المكتملة", cancelled: "الملغاة", hours: "ساعات التدريس", late_check_ins: "الحضور المتأخر", submitted_reports: "التقارير المقدمة" }
+    kpis: "مؤشرات أداء الأكاديمية"
+    available: "التقارير التشغيلية"
+    actions: { filter: "تطبيق المرشحات", export_csv: "تصدير CSV" }
+    types: { teacher_workload: "عبء المعلمين", teacher_attendance: "حضور المعلمين", student_attendance: "حضور الطلاب", lesson_completion: "إكمال الدروس", lesson_reports: "تقارير الدروس", payroll_summary: "ملخص الرواتب", programs: "البرامج", course_offerings: "العروض الدراسية", enrollments: "التسجيلات" }
+    metrics: { active_students: "الطلاب النشطون", active_teachers: "المعلمون النشطون", lessons_today: "دروس اليوم", lessons_this_week: "دروس الأسبوع", completed_lessons: "الدروس المكتملة", cancelled_lessons: "الدروس الملغاة", attendance_percentage: "نسبة الحضور", late_students: "الطلاب المتأخرون", late_teachers: "المعلمون المتأخرون", pending_reports: "التقارير المعلقة", locked_reports: "التقارير المقفلة", prepared_payrolls: "الرواتب المعدة", approved_payrolls: "الرواتب المعتمدة", paid_payrolls: "الرواتب المدفوعة" }
+    columns: {}

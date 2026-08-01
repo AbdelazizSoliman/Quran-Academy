@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -146,8 +146,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
     t.index ["recipient_user_id"], name: "index_communication_logs_on_recipient_user_id"
     t.index ["scheduled_lesson_id"], name: "index_communication_logs_on_scheduled_lesson_id"
     t.index ["student_profile_id"], name: "index_communication_logs_on_student_profile_id"
-    t.check_constraint "channel::text = ANY (ARRAY['whatsapp'::character varying, 'email'::character varying]::text[])", name: "communication_logs_channel"
-    t.check_constraint "status::text = ANY (ARRAY['prepared'::character varying, 'opened'::character varying, 'confirmed_sent'::character varying, 'cancelled'::character varying, 'failed'::character varying]::text[])", name: "communication_logs_status"
+    t.check_constraint "channel::text = ANY (ARRAY['whatsapp'::character varying::text, 'email'::character varying::text])", name: "communication_logs_channel"
+    t.check_constraint "status::text = ANY (ARRAY['prepared'::character varying::text, 'opened'::character varying::text, 'confirmed_sent'::character varying::text, 'cancelled'::character varying::text, 'failed'::character varying::text])", name: "communication_logs_status"
   end
 
   create_table "course_offering_events", force: :cascade do |t|
@@ -356,7 +356,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
     t.index ["status", "arrival_at"], name: "index_lesson_attendances_on_status_and_arrival_at"
     t.check_constraint "departure_at IS NULL OR arrival_at IS NULL OR departure_at >= arrival_at", name: "lesson_attendances_time_order"
     t.check_constraint "minutes_late >= 0", name: "lesson_attendances_nonnegative_lateness"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'present'::character varying, 'late'::character varying, 'absent'::character varying, 'excused_absence'::character varying, 'left_early'::character varying, 'lesson_cancelled'::character varying, 'not_applicable'::character varying]::text[])", name: "lesson_attendances_status"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'present'::character varying::text, 'late'::character varying::text, 'absent'::character varying::text, 'excused_absence'::character varying::text, 'left_early'::character varying::text, 'lesson_cancelled'::character varying::text, 'not_applicable'::character varying::text])", name: "lesson_attendances_status"
   end
 
   create_table "lesson_report_events", force: :cascade do |t|
@@ -414,7 +414,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
     t.index ["submitted_by_id"], name: "index_lesson_reports_on_submitted_by_id"
     t.index ["teacher_profile_id"], name: "index_lesson_reports_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_lesson_reports_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying, 'reviewed'::character varying, 'locked'::character varying, 'reopened'::character varying, 'archived'::character varying]::text[])", name: "lesson_reports_status"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'submitted'::character varying::text, 'reviewed'::character varying::text, 'locked'::character varying::text, 'reopened'::character varying::text, 'archived'::character varying::text])", name: "lesson_reports_status"
   end
 
   create_table "lesson_student_report_events", force: :cascade do |t|
@@ -474,7 +474,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
     t.index ["scheduled_lesson_enrollment_id"], name: "index_lesson_student_reports_on_scheduled_lesson_enrollment_id"
     t.index ["status", "engagement_level", "performance_level"], name: "idx_student_report_outcomes"
     t.index ["updated_by_id"], name: "index_lesson_student_reports_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'completed'::character varying, 'not_applicable'::character varying, 'withheld'::character varying]::text[])", name: "lesson_student_reports_status"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'completed'::character varying::text, 'not_applicable'::character varying::text, 'withheld'::character varying::text])", name: "lesson_student_reports_status"
   end
 
   create_table "program_events", force: :cascade do |t|
@@ -608,9 +608,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
     t.index ["teacher_profile_id", "starts_at", "ends_at"], name: "idx_on_teacher_profile_id_starts_at_ends_at_69d19f2e3b"
     t.index ["teacher_profile_id"], name: "index_scheduled_lessons_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_scheduled_lessons_on_updated_by_id"
-    t.check_constraint "attendance_status::text = ANY (ARRAY['not_opened'::character varying, 'open'::character varying, 'locked'::character varying, 'reopened'::character varying]::text[])", name: "scheduled_lessons_attendance_status"
+    t.check_constraint "attendance_status::text = ANY (ARRAY['not_opened'::character varying::text, 'open'::character varying::text, 'locked'::character varying::text, 'reopened'::character varying::text])", name: "scheduled_lessons_attendance_status"
     t.check_constraint "ends_at > starts_at", name: "scheduled_lesson_time_order"
-    t.check_constraint "teacher_attendance_status::text = ANY (ARRAY['not_checked_in'::character varying, 'on_time'::character varying, 'late'::character varying, 'absent'::character varying, 'administrator_override'::character varying]::text[])", name: "scheduled_lessons_teacher_attendance_status"
+    t.check_constraint "teacher_attendance_status::text = ANY (ARRAY['not_checked_in'::character varying::text, 'on_time'::character varying::text, 'late'::character varying::text, 'absent'::character varying::text, 'administrator_override'::character varying::text])", name: "scheduled_lessons_teacher_attendance_status"
   end
 
   create_table "student_guardianship_events", force: :cascade do |t|
@@ -799,6 +799,77 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
     t.check_constraint "starts_at_local IS NULL AND ends_at_local IS NULL OR starts_at_local IS NOT NULL AND ends_at_local IS NOT NULL AND ends_at_local > starts_at_local", name: "teacher_exception_time_order"
   end
 
+  create_table "teacher_payroll_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "teacher_payroll_id", null: false
+    t.index ["actor_id"], name: "index_teacher_payroll_events_on_actor_id"
+    t.index ["teacher_payroll_id", "created_at"], name: "idx_payroll_events_history"
+    t.index ["teacher_payroll_id"], name: "index_teacher_payroll_events_on_teacher_payroll_id"
+  end
+
+  create_table "teacher_payroll_items", force: :cascade do |t|
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.integer "duration_minutes", null: false
+    t.decimal "rate", precision: 12, scale: 2, null: false
+    t.bigint "scheduled_lesson_id", null: false
+    t.bigint "teacher_payroll_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["scheduled_lesson_id"], name: "index_teacher_payroll_items_on_scheduled_lesson_id"
+    t.index ["teacher_payroll_id", "scheduled_lesson_id"], name: "idx_payroll_lesson", unique: true
+    t.index ["teacher_payroll_id"], name: "index_teacher_payroll_items_on_teacher_payroll_id"
+    t.check_constraint "duration_minutes >= 0 AND rate >= 0::numeric AND amount >= 0::numeric", name: "payroll_items_nonnegative"
+  end
+
+  create_table "teacher_payrolls", force: :cascade do |t|
+    t.text "adjustment_reason"
+    t.datetime "approved_at"
+    t.bigint "approved_by_id"
+    t.decimal "base_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "bonus_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "calculation_strategy", null: false
+    t.string "cancellation_reason"
+    t.datetime "cancelled_at"
+    t.bigint "cancelled_by_id"
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "currency", null: false
+    t.decimal "deduction_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.decimal "manual_adjustment_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "net_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.text "notes"
+    t.datetime "paid_at"
+    t.bigint "paid_by_id"
+    t.date "period_ends_on", null: false
+    t.date "period_starts_on", null: false
+    t.datetime "prepared_at"
+    t.bigint "prepared_by_id"
+    t.string "public_id", null: false
+    t.decimal "rate", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "status", default: "draft", null: false
+    t.bigint "teacher_profile_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["approved_by_id"], name: "index_teacher_payrolls_on_approved_by_id"
+    t.index ["cancelled_by_id"], name: "index_teacher_payrolls_on_cancelled_by_id"
+    t.index ["created_by_id"], name: "index_teacher_payrolls_on_created_by_id"
+    t.index ["paid_by_id"], name: "index_teacher_payrolls_on_paid_by_id"
+    t.index ["prepared_by_id"], name: "index_teacher_payrolls_on_prepared_by_id"
+    t.index ["public_id"], name: "index_teacher_payrolls_on_public_id", unique: true
+    t.index ["status", "period_starts_on", "period_ends_on"], name: "idx_payroll_status_period"
+    t.index ["teacher_profile_id", "period_starts_on", "period_ends_on"], name: "idx_payroll_teacher_period", unique: true
+    t.index ["teacher_profile_id"], name: "index_teacher_payrolls_on_teacher_profile_id"
+    t.index ["updated_by_id"], name: "index_teacher_payrolls_on_updated_by_id"
+    t.check_constraint "base_amount >= 0::numeric AND bonus_amount >= 0::numeric AND deduction_amount >= 0::numeric AND rate >= 0::numeric", name: "payroll_nonnegative_amounts"
+    t.check_constraint "period_ends_on >= period_starts_on", name: "payroll_period_order"
+  end
+
   create_table "teacher_profile_events", force: :cascade do |t|
     t.bigint "actor_id", null: false
     t.datetime "created_at", null: false
@@ -908,7 +979,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
     t.index ["role"], name: "index_users_on_role"
     t.index ["status", "role", "created_at"], name: "index_users_on_status_and_role_and_created_at"
     t.index ["status"], name: "index_users_on_status"
-    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying, 'en'::character varying]::text[])", name: "users_preferred_locale"
+    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying::text, 'en'::character varying::text])", name: "users_preferred_locale"
     t.check_constraint "session_version >= 0", name: "users_session_version_nonnegative"
   end
 
@@ -1001,6 +1072,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
   add_foreign_key "teacher_availability_exceptions", "teacher_profiles", on_delete: :restrict
   add_foreign_key "teacher_availability_exceptions", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "teacher_availability_exceptions", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "teacher_payroll_events", "teacher_payrolls", on_delete: :restrict
+  add_foreign_key "teacher_payroll_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "teacher_payroll_items", "scheduled_lessons", on_delete: :restrict
+  add_foreign_key "teacher_payroll_items", "teacher_payrolls", on_delete: :restrict
+  add_foreign_key "teacher_payrolls", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "teacher_payrolls", "users", column: "approved_by_id", on_delete: :nullify
+  add_foreign_key "teacher_payrolls", "users", column: "cancelled_by_id", on_delete: :nullify
+  add_foreign_key "teacher_payrolls", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "teacher_payrolls", "users", column: "paid_by_id", on_delete: :nullify
+  add_foreign_key "teacher_payrolls", "users", column: "prepared_by_id", on_delete: :nullify
+  add_foreign_key "teacher_payrolls", "users", column: "updated_by_id", on_delete: :restrict
   add_foreign_key "teacher_profile_events", "teacher_profiles", on_delete: :restrict
   add_foreign_key "teacher_profile_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "teacher_profiles", "users", column: "created_by_id", on_delete: :nullify

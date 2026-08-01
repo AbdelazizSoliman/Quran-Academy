@@ -1,0 +1,8 @@
+<%= render "shared/page_header", title: t("payroll.admin.new.title") %>
+<div class="ds-card p-5"><%= form_with model: @payroll, url: admin_teacher_payrolls_path, class: "space-y-4" do |form| %>
+  <div><%= form.label :teacher_profile_id, t("payroll.fields.teacher"), class: "ds-label" %><%= form.collection_select :teacher_profile_id, TeacherProfile.available_for_scheduling.order(:display_name), :id, :display_name, {}, class: "ds-control mt-2" %></div>
+  <div class="grid gap-4 sm:grid-cols-2"><div><%= form.label :period_starts_on, t("payroll.fields.period_start"), class: "ds-label" %><%= form.date_field :period_starts_on, class: "ds-control mt-2" %></div><div><%= form.label :period_ends_on, t("payroll.fields.period_end"), class: "ds-label" %><%= form.date_field :period_ends_on, class: "ds-control mt-2" %></div></div>
+  <div><%= form.label :calculation_strategy, t("payroll.fields.strategy"), class: "ds-label" %><%= form.select :calculation_strategy, TeacherPayroll::STRATEGIES.map { |value| [t("payroll.strategies.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+  <div><%= form.label :base_amount, t("payroll.fields.manual_base"), class: "ds-label" %><%= form.number_field :base_amount, min: 0, step: "0.01", class: "ds-control mt-2" %></div>
+  <%= render "shared/components/button", label: t("payroll.actions.generate"), type: :submit %>
+<% end %></div>
