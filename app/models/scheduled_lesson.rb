@@ -1,0 +1,64 @@
+class ScheduledLesson < ApplicationRecord
+  STATUSES = %w[draft scheduled in_progress completed cancelled archived].freeze
+  DELIVERY_MODES = %w[online onsite hybrid].freeze
+  SCHEDULING_SOURCES = %w[manual rescheduled imported].freeze
+  OPERATIONAL_STATUSES = %w[scheduled in_progress].freeze
+
+  belongs_to :course_offering, inverse_of: :scheduled_lessons
+  belongs_to :teacher_profile, inverse_of: :scheduled_lessons
+  belongs_to :created_by, class_name: "User", optional: true, inverse_of: :created_scheduled_lessons
+  belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_scheduled_lessons
+  belongs_to :cancelled_by, class_name: "User", optional: true
+  has_many :scheduled_lesson_enrollments, inverse_of: :scheduled_lesson, dependent: :restrict_with_exception
+  has_many :enrollments, through: :scheduled_lesson_enrollments
+  has_many :events, class_name: "ScheduledLessonEvent", inverse_of: :scheduled_lesson,
+                    dependent: :restrict_with_exception
+
+  attr_readonly :public_id, :academy_time_zone
+  before_validation :normalize_values
+  before_validation :generate_public_id, on: :create
+  before_validation :snapshot_academy_zone, on: :create
+
+  validates :public_id, presence: true, uniqueness: true, format: { with: /\ALSN-[A-Z0-9]{10}\z/ }
+  validates :title_ar, :title_en, presence: true, length: { maximum: 200 }
+  validates :status, inclusion: { in: STATUSES }
+  validates :delivery_mode, inclusion: { in: DELIVERY_MODES }
+  validates :scheduling_source, inclusion: { in: SCHEDULING_SOURCES }
+  validates :academy_time_zone, inclusion: { in: ->(_) { ActiveSupport::TimeZone.all.map(&:name) } }
+  validates :online_meeting_url, format: { with: %r{\Ahttps?://\S+\z} }, allow_blank: true
+  validates :cancellation_reason, presence: true, if: :cancelled?
+  validate :time_order
+  validate :delivery_requirements, if: :scheduled_or_later?
+
+  scope :operational, -> { where(status: OPERATIONAL_STATUSES) }
+  scope :chronological, -> { order(starts_at: :asc, id: :asc) }
+
+  STATUSES.each { |value| define_method(:"#{value}?") { status == value } }
+
+  private
+
+  def normalize_values
+    self.academy_time_zone = "Cairo" if academy_time_zone.blank?
+  end
+
+  def generate_public_id
+    self.public_id ||= "LSN-#{SecureRandom.alphanumeric(10).upcase}"
+  end
+
+  def snapshot_academy_zone
+    self.academy_time_zone ||= AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+  end
+
+  def time_order
+    errors.add(:ends_at, :after_start) if starts_at && ends_at && ends_at <= starts_at
+  end
+
+  def scheduled_or_later?
+    status.in?(%w[scheduled in_progress completed])
+  end
+
+  def delivery_requirements
+    errors.add(:online_meeting_url, :required) if delivery_mode.in?(%w[online hybrid]) && online_meeting_url.blank?
+    errors.add(:location_name, :required) if delivery_mode.in?(%w[onsite hybrid]) && location_name.blank?
+  end
+end

@@ -56,6 +56,20 @@ class User < ApplicationRecord
                                  inverse_of: :created_by, dependent: :nullify
   has_many :updated_enrollments, class_name: "Enrollment", foreign_key: :updated_by_id,
                                  inverse_of: :updated_by, dependent: :nullify
+  has_many :created_teacher_availabilities, class_name: "TeacherAvailability", foreign_key: :created_by_id,
+                                            inverse_of: :created_by, dependent: :nullify
+  has_many :updated_teacher_availabilities, class_name: "TeacherAvailability", foreign_key: :updated_by_id,
+                                            inverse_of: :updated_by, dependent: :nullify
+  has_many :created_teacher_availability_exceptions, class_name: "TeacherAvailabilityException",
+                                                     foreign_key: :created_by_id, inverse_of: :created_by,
+                                                     dependent: :nullify
+  has_many :updated_teacher_availability_exceptions, class_name: "TeacherAvailabilityException",
+                                                     foreign_key: :updated_by_id, inverse_of: :updated_by,
+                                                     dependent: :nullify
+  has_many :created_scheduled_lessons, class_name: "ScheduledLesson", foreign_key: :created_by_id,
+                                       inverse_of: :created_by, dependent: :nullify
+  has_many :updated_scheduled_lessons, class_name: "ScheduledLesson", foreign_key: :updated_by_id,
+                                       inverse_of: :updated_by, dependent: :nullify
 
   validates :first_name, :last_name, presence: true
   validates :preferred_locale, inclusion: { in: %w[ar en] }

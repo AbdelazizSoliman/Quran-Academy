@@ -33,6 +33,11 @@
                     (key == :course_offerings && controller_path == "admin/course_offerings") ||
                     (key == :enrollments && controller_path == "admin/enrollments") ||
                     (key == :my_enrollments && controller_path == "student/enrollments") ||
+                    (key == :schedule && controller_path.start_with?("admin/scheduled_lessons")) ||
+                    (key == :teacher_availability && controller_path.start_with?("admin/teacher_availability")) ||
+                    (key == :teacher_schedule && controller_path == "teacher/schedule") ||
+                    (key == :teacher_availability_self && controller_path.start_with?("teacher/availabilities")) ||
+                    (key == :student_schedule && controller_path == "student/schedule") ||
                     (key == :settings && controller_path == "admin/academy_settings") %>
         <% path = navigation_path(key, item) %>
         <li>

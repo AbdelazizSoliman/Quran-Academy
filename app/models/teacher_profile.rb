@@ -6,10 +6,8 @@ class TeacherProfile < ApplicationRecord
   COMPENSATION_UNITS = %w[per_lesson per_hour monthly].freeze
   IJAZAH_STATUSES = %w[none in_progress partial full multiple].freeze
   AGE_GROUPS = %w[children teenagers adults seniors].freeze
-  SPECIALIZATIONS = %w[
-    quran_reading quran_memorization tajweed arabic_language islamic_studies
-    qaida_noorania revision recitation_correction new_muslim_foundations
-  ].freeze
+  SPECIALIZATIONS = %w[quran_reading quran_memorization tajweed arabic_language islamic_studies qaida_noorania
+                       revision recitation_correction new_muslim_foundations].freeze
   ARRAY_CATALOGS = {
     teaching_languages: lambda {
       AcademySetting.current_or_nil&.teaching_languages.presence || AcademySetting::TEACHING_LANGUAGES
@@ -17,15 +15,16 @@ class TeacherProfile < ApplicationRecord
     student_age_groups: -> { AGE_GROUPS },
     teaching_specializations: -> { SPECIALIZATIONS }
   }.freeze
-  COMPLETENESS_FIELDS = %i[
-    display_name bio contact country_of_residence teaching_languages teaching_specializations
-    student_age_groups experience employment_status compensation
-  ].freeze
+  COMPLETENESS_FIELDS = %i[display_name bio contact country_of_residence teaching_languages teaching_specializations
+                           student_age_groups experience employment_status compensation].freeze
 
   belongs_to :user, inverse_of: :teacher_profile
   belongs_to :created_by, class_name: "User", optional: true, inverse_of: :created_teacher_profiles
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_teacher_profiles
   has_many :events, class_name: "TeacherProfileEvent", dependent: :restrict_with_exception
+  has_many :availabilities, class_name: "TeacherAvailability", dependent: :restrict_with_exception
+  has_many :availability_exceptions, class_name: "TeacherAvailabilityException", dependent: :restrict_with_exception
+  has_many :scheduled_lessons, inverse_of: :teacher_profile, dependent: :restrict_with_exception
 
   attr_readonly :public_id
 
@@ -61,6 +60,7 @@ class TeacherProfile < ApplicationRecord
   validate :validate_complete_profile, if: :complete_or_verified?
 
   scope :recent_first, -> { order(created_at: :desc, id: :desc) }
+  scope :available_for_scheduling, -> { where(employment_status: "active").where.not(profile_status: "archived") }
 
   def completion_percentage
     completed = COMPLETENESS_FIELDS.count { |field| completeness_value?(field) }

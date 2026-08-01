@@ -79,13 +79,42 @@ Rails.application.routes.draw do
         patch :reset_password, action: :update_password
       end
     end
+    resources :teacher_availabilities, except: :destroy do
+      member do
+        patch :activate
+        patch :deactivate
+        patch :archive
+      end
+    end
+    resources :teacher_availability_exceptions, except: :destroy do
+      member do
+        patch :cancel
+        patch :archive
+      end
+    end
+    resources :scheduled_lessons, except: :destroy do
+      member do
+        patch :schedule
+        patch :start
+        patch :complete
+        patch :cancel
+        get :reschedule
+        patch :apply_reschedule
+        patch :archive
+      end
+      resources :participants, only: %i[create update], controller: :scheduled_lesson_participants
+    end
   end
   namespace :teacher do
     resource :profile, only: %i[show edit update], controller: :profiles
+    resources :availabilities, only: %i[index new create edit update]
+    resources :availability_exceptions, only: %i[index new create edit update]
+    resources :schedule, only: %i[index show]
   end
   namespace :student do
     resource :profile, only: %i[show edit update], controller: :profiles
     resources :enrollments, only: %i[index show]
+    resources :schedule, only: %i[index show]
   end
   root "dashboard#index"
   constraints LocalEnvironmentConstraint.new do

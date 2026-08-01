@@ -18,6 +18,16 @@ en:
       invalid_transition: "does not allow this transition"
       must_be_available: "must be an eligible teacher without a profile"
       unsafe: "contains prohibited sensitive information"
+      overlaps_existing: "overlaps an existing active record"
+      times_must_be_paired: "must be supplied together or both left blank for a full-day exception"
+      not_active: "must be active and usable"
+      different_offering: "must belong to the lesson's course offering"
+      not_operational: "must be approved, active, or paused"
+      required: "is required"
+      teacher_unavailable: "teacher is unavailable for this time"
+      schedule_conflict: "conflicts with another scheduled lesson"
+      cancellation_reason_required: "is required when cancelling a lesson"
+      stale_record: "was changed by another administrator; reload and try again"
   time:
     formats:
       long: "%B %d, %Y at %H:%M"

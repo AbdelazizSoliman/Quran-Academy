@@ -22,6 +22,12 @@ class StudentProfile < ApplicationRecord
   has_many :guardians, through: :student_guardianships
   has_many :events, class_name: "StudentProfileEvent", dependent: :restrict_with_exception
   has_many :enrollments, dependent: :restrict_with_exception
+  has_many :scheduled_lesson_enrollments,
+           through: :enrollments
+
+  has_many :scheduled_lessons,
+           -> { distinct },
+           through: :scheduled_lesson_enrollments
   has_many :course_offerings, through: :enrollments
   has_many :programs, through: :course_offerings
 
