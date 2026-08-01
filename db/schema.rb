@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_143000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -92,6 +92,62 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
     t.check_constraint "default_teacher_rate >= 0::numeric AND default_lesson_price >= 0::numeric", name: "academy_settings_nonnegative_money"
     t.check_constraint "minimum_lesson_duration_minutes <= default_lesson_duration_minutes AND default_lesson_duration_minutes <= maximum_lesson_duration_minutes", name: "academy_settings_lesson_duration_order"
     t.check_constraint "singleton_key::text = 'current'::text", name: "academy_settings_singleton"
+  end
+
+  create_table "communication_log_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.bigint "communication_log_id", null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_communication_log_events_on_actor_id"
+    t.index ["communication_log_id", "created_at"], name: "idx_on_communication_log_id_created_at_16ee263b65"
+    t.index ["communication_log_id"], name: "index_communication_log_events_on_communication_log_id"
+    t.index ["event_type"], name: "index_communication_log_events_on_event_type"
+  end
+
+  create_table "communication_logs", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.string "channel", null: false
+    t.bigint "confirmed_by_id"
+    t.datetime "confirmed_sent_at"
+    t.datetime "created_at", null: false
+    t.text "external_url"
+    t.string "failure_reason"
+    t.bigint "guardian_id"
+    t.bigint "lesson_report_id"
+    t.bigint "lesson_student_report_id"
+    t.text "message_snapshot", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "opened_at"
+    t.datetime "prepared_at", null: false
+    t.string "public_id", null: false
+    t.string "recipient_address_masked", null: false
+    t.string "recipient_locale", null: false
+    t.bigint "recipient_user_id"
+    t.bigint "scheduled_lesson_id"
+    t.string "status", default: "prepared", null: false
+    t.bigint "student_profile_id"
+    t.string "subject_snapshot"
+    t.string "template_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_communication_logs_on_actor_id"
+    t.index ["channel", "template_type", "status"], name: "idx_on_channel_template_type_status_5d2b83df4d"
+    t.index ["confirmed_by_id"], name: "index_communication_logs_on_confirmed_by_id"
+    t.index ["confirmed_sent_at"], name: "index_communication_logs_on_confirmed_sent_at"
+    t.index ["guardian_id"], name: "index_communication_logs_on_guardian_id"
+    t.index ["lesson_report_id"], name: "index_communication_logs_on_lesson_report_id"
+    t.index ["lesson_student_report_id"], name: "index_communication_logs_on_lesson_student_report_id"
+    t.index ["prepared_at"], name: "index_communication_logs_on_prepared_at"
+    t.index ["public_id"], name: "index_communication_logs_on_public_id", unique: true
+    t.index ["recipient_user_id"], name: "index_communication_logs_on_recipient_user_id"
+    t.index ["scheduled_lesson_id"], name: "index_communication_logs_on_scheduled_lesson_id"
+    t.index ["student_profile_id"], name: "index_communication_logs_on_student_profile_id"
+    t.check_constraint "channel::text = ANY (ARRAY['whatsapp'::character varying, 'email'::character varying]::text[])", name: "communication_logs_channel"
+    t.check_constraint "status::text = ANY (ARRAY['prepared'::character varying, 'opened'::character varying, 'confirmed_sent'::character varying, 'cancelled'::character varying, 'failed'::character varying]::text[])", name: "communication_logs_status"
   end
 
   create_table "course_offering_events", force: :cascade do |t|
@@ -301,6 +357,124 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
     t.check_constraint "departure_at IS NULL OR arrival_at IS NULL OR departure_at >= arrival_at", name: "lesson_attendances_time_order"
     t.check_constraint "minutes_late >= 0", name: "lesson_attendances_nonnegative_lateness"
     t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'present'::character varying, 'late'::character varying, 'absent'::character varying, 'excused_absence'::character varying, 'left_early'::character varying, 'lesson_cancelled'::character varying, 'not_applicable'::character varying]::text[])", name: "lesson_attendances_status"
+  end
+
+  create_table "lesson_report_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.bigint "lesson_report_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_lesson_report_events_on_actor_id"
+    t.index ["event_type"], name: "index_lesson_report_events_on_event_type"
+    t.index ["lesson_report_id", "created_at"], name: "index_lesson_report_events_on_lesson_report_id_and_created_at"
+    t.index ["lesson_report_id"], name: "index_lesson_report_events_on_lesson_report_id"
+  end
+
+  create_table "lesson_reports", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.text "general_homework"
+    t.text "general_teacher_notes"
+    t.text "lesson_summary"
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "locked_at"
+    t.bigint "locked_by_id"
+    t.text "next_lesson_plan"
+    t.string "overall_engagement", default: "not_assessed", null: false
+    t.string "overall_progress", default: "not_assessed", null: false
+    t.string "public_id", null: false
+    t.datetime "reopened_at"
+    t.bigint "reopened_by_id"
+    t.string "reopening_reason"
+    t.string "report_language", default: "ar", null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.bigint "scheduled_lesson_id", null: false
+    t.string "status", default: "draft", null: false
+    t.datetime "submitted_at"
+    t.bigint "submitted_by_id"
+    t.bigint "teacher_profile_id", null: false
+    t.text "topics_covered"
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["created_by_id"], name: "index_lesson_reports_on_created_by_id"
+    t.index ["locked_at"], name: "index_lesson_reports_on_locked_at"
+    t.index ["locked_by_id"], name: "index_lesson_reports_on_locked_by_id"
+    t.index ["public_id"], name: "index_lesson_reports_on_public_id", unique: true
+    t.index ["reopened_by_id"], name: "index_lesson_reports_on_reopened_by_id"
+    t.index ["reviewed_at"], name: "index_lesson_reports_on_reviewed_at"
+    t.index ["reviewed_by_id"], name: "index_lesson_reports_on_reviewed_by_id"
+    t.index ["scheduled_lesson_id"], name: "index_lesson_reports_on_scheduled_lesson_id", unique: true
+    t.index ["status", "created_at"], name: "index_lesson_reports_on_status_and_created_at"
+    t.index ["submitted_at"], name: "index_lesson_reports_on_submitted_at"
+    t.index ["submitted_by_id"], name: "index_lesson_reports_on_submitted_by_id"
+    t.index ["teacher_profile_id"], name: "index_lesson_reports_on_teacher_profile_id"
+    t.index ["updated_by_id"], name: "index_lesson_reports_on_updated_by_id"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying, 'reviewed'::character varying, 'locked'::character varying, 'reopened'::character varying, 'archived'::character varying]::text[])", name: "lesson_reports_status"
+  end
+
+  create_table "lesson_student_report_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.bigint "lesson_student_report_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_lesson_student_report_events_on_actor_id"
+    t.index ["event_type"], name: "index_lesson_student_report_events_on_event_type"
+    t.index ["lesson_student_report_id", "created_at"], name: "idx_on_lesson_student_report_id_created_at_91347a16e9"
+    t.index ["lesson_student_report_id"], name: "index_lesson_student_report_events_on_lesson_student_report_id"
+  end
+
+  create_table "lesson_student_reports", force: :cascade do |t|
+    t.text "areas_for_improvement"
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "engagement_level", default: "not_assessed", null: false
+    t.text "guardian_visible_notes"
+    t.text "homework"
+    t.bigint "lesson_report_id", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "memorization_from"
+    t.string "memorization_material"
+    t.text "memorization_notes"
+    t.string "memorization_result", default: "not_assessed", null: false
+    t.string "memorization_to"
+    t.text "mistakes_summary"
+    t.text "next_lesson_target"
+    t.string "performance_level", default: "not_assessed", null: false
+    t.text "private_teacher_notes"
+    t.string "public_id", null: false
+    t.string "reading_from"
+    t.string "reading_material"
+    t.text "reading_notes"
+    t.string "reading_quality", default: "not_assessed", null: false
+    t.string "reading_to"
+    t.string "revision_material"
+    t.text "revision_notes"
+    t.string "revision_result", default: "not_assessed", null: false
+    t.bigint "scheduled_lesson_enrollment_id", null: false
+    t.string "status", default: "pending", null: false
+    t.text "strengths"
+    t.text "student_visible_notes"
+    t.text "tajweed_observations"
+    t.string "tajweed_topics", default: [], null: false, array: true
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["created_by_id"], name: "index_lesson_student_reports_on_created_by_id"
+    t.index ["lesson_report_id", "scheduled_lesson_enrollment_id"], name: "idx_student_report_entry", unique: true
+    t.index ["lesson_report_id"], name: "index_lesson_student_reports_on_lesson_report_id"
+    t.index ["public_id"], name: "index_lesson_student_reports_on_public_id", unique: true
+    t.index ["scheduled_lesson_enrollment_id"], name: "index_lesson_student_reports_on_scheduled_lesson_enrollment_id"
+    t.index ["status", "engagement_level", "performance_level"], name: "idx_student_report_outcomes"
+    t.index ["updated_by_id"], name: "index_lesson_student_reports_on_updated_by_id"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'completed'::character varying, 'not_applicable'::character varying, 'withheld'::character varying]::text[])", name: "lesson_student_reports_status"
   end
 
   create_table "program_events", force: :cascade do |t|
@@ -734,13 +908,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
     t.index ["role"], name: "index_users_on_role"
     t.index ["status", "role", "created_at"], name: "index_users_on_status_and_role_and_created_at"
     t.index ["status"], name: "index_users_on_status"
-    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying::text, 'en'::character varying::text])", name: "users_preferred_locale"
+    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying, 'en'::character varying]::text[])", name: "users_preferred_locale"
     t.check_constraint "session_version >= 0", name: "users_session_version_nonnegative"
   end
 
   add_foreign_key "academy_setting_events", "academy_settings", on_delete: :restrict
   add_foreign_key "academy_setting_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "academy_settings", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "communication_log_events", "communication_logs", on_delete: :restrict
+  add_foreign_key "communication_log_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "communication_logs", "guardians", on_delete: :restrict
+  add_foreign_key "communication_logs", "lesson_reports", on_delete: :restrict
+  add_foreign_key "communication_logs", "lesson_student_reports", on_delete: :restrict
+  add_foreign_key "communication_logs", "scheduled_lessons", on_delete: :restrict
+  add_foreign_key "communication_logs", "student_profiles", on_delete: :restrict
+  add_foreign_key "communication_logs", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "communication_logs", "users", column: "confirmed_by_id", on_delete: :nullify
+  add_foreign_key "communication_logs", "users", column: "recipient_user_id", on_delete: :nullify
   add_foreign_key "course_offering_events", "course_offerings", on_delete: :restrict
   add_foreign_key "course_offering_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "course_offerings", "programs", on_delete: :restrict
@@ -764,6 +948,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
   add_foreign_key "lesson_attendances", "scheduled_lessons", on_delete: :restrict
   add_foreign_key "lesson_attendances", "users", column: "last_adjusted_by_id", on_delete: :nullify
   add_foreign_key "lesson_attendances", "users", column: "recorded_by_id", on_delete: :nullify
+  add_foreign_key "lesson_report_events", "lesson_reports", on_delete: :restrict
+  add_foreign_key "lesson_report_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "lesson_reports", "scheduled_lessons", on_delete: :restrict
+  add_foreign_key "lesson_reports", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "lesson_reports", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "lesson_reports", "users", column: "locked_by_id", on_delete: :nullify
+  add_foreign_key "lesson_reports", "users", column: "reopened_by_id", on_delete: :nullify
+  add_foreign_key "lesson_reports", "users", column: "reviewed_by_id", on_delete: :nullify
+  add_foreign_key "lesson_reports", "users", column: "submitted_by_id", on_delete: :nullify
+  add_foreign_key "lesson_reports", "users", column: "updated_by_id", on_delete: :restrict
+  add_foreign_key "lesson_student_report_events", "lesson_student_reports", on_delete: :restrict
+  add_foreign_key "lesson_student_report_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "lesson_student_reports", "lesson_reports", on_delete: :restrict
+  add_foreign_key "lesson_student_reports", "scheduled_lesson_enrollments", on_delete: :restrict
+  add_foreign_key "lesson_student_reports", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "lesson_student_reports", "users", column: "updated_by_id", on_delete: :restrict
   add_foreign_key "program_events", "programs", on_delete: :restrict
   add_foreign_key "program_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "programs", "users", column: "created_by_id", on_delete: :nullify

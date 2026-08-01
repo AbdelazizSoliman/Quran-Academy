@@ -1,0 +1,21 @@
+<%= render "shared/page_header", title: (I18n.locale == :ar ? @entry.scheduled_lesson.title_ar : @entry.scheduled_lesson.title_en), description: @entry.public_id %>
+<% summary = capture do %>
+  <p><%= @entry.lesson_report.lesson_summary %></p>
+  <p class="mt-3"><%= @entry.lesson_report.topics_covered %></p>
+<% end %>
+<% progress = capture do %>
+  <dl class="space-y-3">
+    <div><dt class="ds-caption"><%= t("lesson_reports.sections.reading") %></dt><dd><%= @entry.reading_material %> · <%= t("lesson_reports.reading_quality.#{@entry.reading_quality}") %></dd></div>
+    <div><dt class="ds-caption"><%= t("lesson_reports.sections.memorization") %></dt><dd><%= @entry.memorization_material %> · <%= t("lesson_reports.memorization.#{@entry.memorization_result}") %></dd></div>
+    <div><dt class="ds-caption"><%= t("lesson_reports.sections.revision") %></dt><dd><%= @entry.revision_material %> · <%= t("lesson_reports.revision.#{@entry.revision_result}") %></dd></div>
+    <div><dt class="ds-caption"><%= t("lesson_reports.sections.tajweed") %></dt><dd><%= @entry.tajweed_observations %></dd></div>
+    <div><dt class="ds-caption"><%= t("lesson_reports.fields.strengths") %></dt><dd><%= @entry.strengths %></dd></div>
+    <div><dt class="ds-caption"><%= t("lesson_reports.fields.areas_for_improvement") %></dt><dd><%= @entry.areas_for_improvement %></dd></div>
+    <div><dt class="ds-caption"><%= t("lesson_reports.fields.homework") %></dt><dd><%= @entry.homework.presence || @entry.lesson_report.general_homework %></dd></div>
+    <div><dt class="ds-caption"><%= t("lesson_reports.fields.next_lesson_target") %></dt><dd><%= @entry.next_lesson_target %></dd></div>
+  </dl>
+<% end %>
+<div class="grid gap-6 lg:grid-cols-2">
+  <%= render "shared/components/card", title: t("lesson_reports.fields.lesson_summary"), body: summary %>
+  <%= render "shared/components/card", title: t("lesson_reports.sections.progress"), body: progress %>
+</div>

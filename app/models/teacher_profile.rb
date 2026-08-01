@@ -25,6 +25,7 @@ class TeacherProfile < ApplicationRecord
   has_many :availabilities, class_name: "TeacherAvailability", dependent: :restrict_with_exception
   has_many :availability_exceptions, class_name: "TeacherAvailabilityException", dependent: :restrict_with_exception
   has_many :scheduled_lessons, inverse_of: :teacher_profile, dependent: :restrict_with_exception
+  has_many :lesson_reports, dependent: :restrict_with_exception
 
   attr_readonly :public_id
 

@@ -119,6 +119,23 @@ Rails.application.routes.draw do
       end
     end
     resources :lesson_attendances, only: :index
+    resources :lesson_reports, only: %i[index show edit update] do
+      member do
+        patch :review
+        patch :lock
+        patch :reopen
+        patch :relock
+      end
+      resources :student_reports, only: %i[edit update], controller: :lesson_student_reports
+      resources :communications, only: :create, controller: :communications
+    end
+    resources :communication_logs, only: %i[index show] do
+      member do
+        patch :mark_opened
+        patch :confirm_sent
+        patch :cancel
+      end
+    end
   end
   namespace :teacher do
     resource :profile, only: %i[show edit update], controller: :profiles
@@ -140,6 +157,18 @@ Rails.application.routes.draw do
           patch :record_departure
         end
       end
+      resource :report, only: %i[show edit update], controller: :lesson_reports do
+        patch :submit
+        resources :students, only: %i[edit update], controller: :lesson_student_reports
+        resources :communications, only: :create, controller: :communications
+      end
+    end
+    resources :communication_logs, only: :show do
+      member do
+        patch :mark_opened
+        patch :confirm_sent
+        patch :cancel
+      end
     end
   end
   namespace :student do
@@ -147,6 +176,7 @@ Rails.application.routes.draw do
     resources :enrollments, only: %i[index show]
     resources :schedule, only: %i[index show]
     resources :attendances, only: %i[index show]
+    resources :reports, only: %i[index show]
   end
   root "dashboard#index"
   constraints LocalEnvironmentConstraint.new do

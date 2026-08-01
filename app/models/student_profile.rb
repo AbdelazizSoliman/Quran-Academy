@@ -30,6 +30,7 @@ class StudentProfile < ApplicationRecord
            through: :scheduled_lesson_enrollments
   has_many :course_offerings, through: :enrollments
   has_many :programs, through: :course_offerings
+  has_many :communication_logs, dependent: :restrict_with_exception
 
   attr_readonly :public_id
   before_validation :normalize_values
