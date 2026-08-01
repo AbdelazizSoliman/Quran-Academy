@@ -18,7 +18,7 @@ module NavigationHelper
     schedule: { icon: :calendar, roles: %i[admin staff], path: :admin_scheduled_lessons_path },
     attendance: { icon: :check_circle, roles: %i[admin staff teacher student] },
     whatsapp: { icon: :message, roles: %i[admin staff] },
-    payroll: { icon: :wallet, roles: %i[admin] },
+    payroll: { icon: :wallet, roles: %i[admin teacher] },
     reports: { icon: :reports, roles: %i[admin staff teacher] },
     settings: { icon: :settings, roles: %i[admin], path: :admin_settings_path }
   }.freeze
@@ -41,6 +41,13 @@ module NavigationHelper
   def navigation_path(key, item)
     return public_send(item[:path]) if item[:path]
     return root_path if key == :dashboard
+
+    role_specific_navigation_path(key)
+  end
+
+  def role_specific_navigation_path(key)
+    return current_user&.teacher? ? teacher_payrolls_path : admin_teacher_payrolls_path if key == :payroll
+    return current_user&.teacher? ? teacher_reports_path : admin_operational_reports_path if key == :reports
 
     "#"
   end

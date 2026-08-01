@@ -1,0 +1,7 @@
+<%= render "shared/page_header", title: t("payroll.admin.edit.title"), description: @payroll.public_id %>
+<div class="ds-card p-5"><%= form_with model: @payroll, url: admin_teacher_payroll_path(@payroll), class: "space-y-4" do |form| %>
+  <% %i[bonus_amount deduction_amount manual_adjustment_amount].each do |field| %><div><%= form.label field, t("payroll.fields.#{field}"), class: "ds-label" %><%= form.number_field field, step: "0.01", min: (field == :manual_adjustment_amount ? nil : 0), class: "ds-control mt-2" %></div><% end %>
+  <div><%= form.label :notes, t("payroll.fields.notes"), class: "ds-label" %><%= form.text_area :notes, rows: 3, class: "ds-control mt-2" %></div>
+  <div><%= label_tag :adjustment_reason, t("payroll.fields.adjustment_reason"), class: "ds-label" %><%= text_field_tag :adjustment_reason, nil, required: true, class: "ds-control mt-2" %></div>
+  <%= render "shared/components/button", label: t("payroll.actions.save_adjustment"), type: :submit %>
+<% end %></div>

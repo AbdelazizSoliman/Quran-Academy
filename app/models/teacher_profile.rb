@@ -26,6 +26,7 @@ class TeacherProfile < ApplicationRecord
   has_many :availability_exceptions, class_name: "TeacherAvailabilityException", dependent: :restrict_with_exception
   has_many :scheduled_lessons, inverse_of: :teacher_profile, dependent: :restrict_with_exception
   has_many :lesson_reports, dependent: :restrict_with_exception
+  has_many :teacher_payrolls, dependent: :restrict_with_exception
 
   attr_readonly :public_id
 
@@ -60,7 +61,6 @@ class TeacherProfile < ApplicationRecord
   validate :validate_active_date
   validate :validate_complete_profile, if: :complete_or_verified?
 
-  scope :recent_first, -> { order(created_at: :desc, id: :desc) }
   scope :available_for_scheduling, -> { where(employment_status: "active").where.not(profile_status: "archived") }
 
   def completion_percentage

@@ -17,8 +17,7 @@
 
   <body class="min-h-screen bg-slate-50 text-slate-900 antialiased"
         data-time-zone="<%= Time.zone.name %>"
-        data-controller="sidebar"
-        data-sidebar-hidden-class-value="<%= I18n.locale == :ar ? "translate-x-full" : "-translate-x-full" %>">
+        data-controller="sidebar">
     <a href="#main-content" class="sr-only z-50 rounded-md bg-white px-4 py-2 text-emerald-800 focus:not-sr-only focus:fixed focus:right-4 focus:top-4">
       <%= t("accessibility.skip_to_content") %>
     </a>

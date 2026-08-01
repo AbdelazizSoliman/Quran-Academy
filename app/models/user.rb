@@ -71,6 +71,8 @@ class User < ApplicationRecord
   has_many :updated_scheduled_lessons, class_name: "ScheduledLesson", foreign_key: :updated_by_id,
                                        inverse_of: :updated_by, dependent: :nullify
   has_many :communication_logs, foreign_key: :actor_id, inverse_of: :actor, dependent: :restrict_with_exception
+  has_many :created_teacher_payrolls, class_name: "TeacherPayroll", foreign_key: :created_by_id,
+                                      inverse_of: :created_by, dependent: :restrict_with_exception
 
   validates :first_name, :last_name, presence: true
   validates :preferred_locale, inclusion: { in: %w[ar en] }
