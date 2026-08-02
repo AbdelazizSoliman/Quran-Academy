@@ -60,8 +60,8 @@ module Notifications
     end
 
     def invitation_template
-      { name: ENV.fetch("WHATSAPP_INVITATION_TEMPLATE_NAME", "account_invitation"),
-        language_code: @notification.recipient_locale == "ar" ? "ar" : "en_US",
+      { name: ENV.fetch("WHATSAPP_INVITATION_TEMPLATE_NAME", "quran_account_setup"),
+        language_code: ENV.fetch("WHATSAPP_INVITATION_LANGUAGE", "ar"),
         parameters: [{ type: "text", text: invitation_url }] }
     end
 
