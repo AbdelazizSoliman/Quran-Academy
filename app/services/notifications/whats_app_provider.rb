@@ -14,8 +14,23 @@ module Notifications
     end
 
     def deliver(recipient:, body:, **)
-      return failure("configuration_missing", "WhatsApp provider is not configured") if configuration_missing?
+      Rails.logger.info("WhatsApp provider called")
+      result = if configuration_missing?
+                 failure("configuration_missing", "WhatsApp provider is not configured")
+               else
+                 perform_delivery(recipient:, body:)
+               end
+      log_response(result)
+      result
+    rescue SocketError, SystemCallError, Timeout::Error, OpenSSL::SSL::SSLError => e
+      result = failure(e.class.name, "WhatsApp delivery failed")
+      log_response(result)
+      result
+    end
 
+    private
+
+    def perform_delivery(recipient:, body:)
       response = request(recipient:, body:)
       parsed = parse_response(response.body)
       return success(parsed, response.code.to_i) if response.is_a?(Net::HTTPSuccess)
@@ -23,11 +38,15 @@ module Notifications
       error = parsed.fetch("error", {})
       failure(error["code"].to_s.presence || "provider_error", error["message"].to_s,
               safe_response(parsed), response.code.to_i)
-    rescue SocketError, SystemCallError, Timeout::Error, OpenSSL::SSL::SSLError => e
-      failure(e.class.name, "WhatsApp delivery failed")
     end
 
-    private
+    def log_response(result)
+      details = { success: result.success?, http_status: result.http_status,
+                  provider_status: result.provider_status, provider_message_id: result.provider_message_id,
+                  error_code: result.error_code, error_message: result.error_message,
+                  response: result.response }.compact
+      Rails.logger.info("WhatsApp provider response #{details.inspect}")
+    end
 
     def request(recipient:, body:)
       uri = URI("https://graph.facebook.com/#{GRAPH_VERSION}/#{@phone_number_id}/messages")
