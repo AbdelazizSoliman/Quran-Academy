@@ -1,0 +1,4 @@
+<% action = current_user.admin? ? render("shared/components/button", label: t("academic.actions.new_assessment"), href: new_admin_student_assessment_path, icon: :plus) : nil %>
+<%= render "shared/page_header", title: t("academic.assessments.index"), description: t("academic.assessments.description"), primary_action: action %>
+<%= render "shared/academic/assessment_list", assessments: @assessments, path: ->(assessment) { admin_student_assessment_path(assessment) } %>
+<% if @pagy.pages > 1 %><p class="mt-5 ds-caption"><%= t("pagination.summary", from: @pagy.from, to: @pagy.to, total: @pagy.count) %></p><% end %>

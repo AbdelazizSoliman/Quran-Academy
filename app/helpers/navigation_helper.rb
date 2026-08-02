@@ -21,6 +21,10 @@ module NavigationHelper
     whatsapp: { icon: :message, roles: %i[admin staff] },
     payroll: { icon: :wallet, roles: %i[admin teacher] },
     reports: { icon: :reports, roles: %i[admin staff teacher] },
+    assessments: { icon: :reports, roles: %i[admin staff teacher student] },
+    exams: { icon: :calendar, roles: %i[admin staff teacher] },
+    certificates: { icon: :check_circle, roles: %i[admin staff student] },
+    academic_progress: { icon: :reports, roles: %i[admin staff teacher student] },
     settings: { icon: :settings, roles: %i[admin], path: :admin_settings_path }
   }.freeze
 
@@ -47,9 +51,31 @@ module NavigationHelper
   end
 
   def role_specific_navigation_path(key)
+    return assessment_navigation_path if key == :assessments
+    return exam_navigation_path if key == :exams
+    return current_user&.student? ? student_certificates_path : admin_certificates_path if key == :certificates
+    return academic_progress_navigation_path if key == :academic_progress
     return current_user&.teacher? ? teacher_payrolls_path : admin_teacher_payrolls_path if key == :payroll
     return current_user&.teacher? ? teacher_reports_path : admin_operational_reports_path if key == :reports
 
     "#"
+  end
+
+  def assessment_navigation_path
+    return teacher_assessments_path if current_user&.teacher?
+    return student_assessments_path if current_user&.student?
+
+    admin_student_assessments_path
+  end
+
+  def exam_navigation_path
+    current_user&.teacher? ? teacher_exams_path : admin_exam_sessions_path
+  end
+
+  def academic_progress_navigation_path
+    return teacher_academic_dashboard_path if current_user&.teacher?
+    return student_progress_path if current_user&.student?
+
+    admin_academic_dashboard_path
   end
 end

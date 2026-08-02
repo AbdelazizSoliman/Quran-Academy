@@ -28,7 +28,8 @@ module Admin
     def setting_params
       params.expect(academy_setting: [
                       *scalar_fields,
-                      { supported_locales: [], teaching_languages: [], working_days: [] }
+                      { supported_locales: [], teaching_languages: [], working_days: [],
+                        assessment_grade_boundaries: {} }
                     ])
     end
 

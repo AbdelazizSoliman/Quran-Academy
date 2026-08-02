@@ -1,0 +1,9 @@
+<% if template.errors.any? %><%= render "shared/components/alert", variant: :error, title: t("academic.errors.title"), message: template.errors.full_messages.to_sentence %><% end %>
+<%= form_with model: [:admin, template], class: "ds-card grid gap-5 p-5 sm:grid-cols-2" do |form| %>
+  <%= form.hidden_field :lock_version if template.persisted? %>
+  <% %i[name_ar name_en].each do |field| %><div><%= form.label field, t("academic.fields.#{field}"), class: "ds-label" %><%= form.text_field field, class: "ds-control mt-2", required: true %></div><% end %>
+  <div><%= form.label :status, t("academic.fields.status"), class: "ds-label" %><%= form.select :status, AssessmentTemplate::STATUSES.map { |value| [t("academic.template_statuses.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+  <div><%= form.label :display_order, t("academic.fields.display_order"), class: "ds-label" %><%= form.number_field :display_order, min: 0, class: "ds-control mt-2" %></div>
+  <div class="sm:col-span-2"><%= form.label :description, t("academic.fields.description"), class: "ds-label" %><%= form.text_area :description, rows: 4, class: "ds-control mt-2" %></div>
+  <div class="sm:col-span-2 flex justify-end"><%= render "shared/components/button", label: t("actions.save"), type: "submit" %></div>
+<% end %>

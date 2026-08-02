@@ -84,6 +84,9 @@
   <% end %>
   <%= render "shared/components/card", title: t("admin.settings.sections.finance"), body: finance_body %>
 
+  <% grades_body = capture do %><div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"><% StudentAssessment::LETTER_GRADES.each do |grade| %><div><%= label_tag "academy_setting_assessment_grade_boundaries_#{grade}", t("academic.grade_minimum", grade:), class: "ds-label" %><%= number_field_tag "academy_setting[assessment_grade_boundaries][#{grade}]", @setting.assessment_grade_boundaries[grade], id: "academy_setting_assessment_grade_boundaries_#{grade}", min: 0, max: 100, step: 0.01, class: "ds-control mt-2" %></div><% end %></div><% end %>
+  <%= render "shared/components/card", title: t("academic.grade_settings"), body: grades_body %>
+
   <div class="sticky bottom-4 flex justify-end rounded-xl border border-app-border bg-app-surface/95 p-4 shadow-lg">
     <%= render "shared/components/button", label: t("actions.save"), type: "submit" %>
   </div>

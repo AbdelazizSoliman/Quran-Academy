@@ -9,6 +9,7 @@ class CourseOffering < ApplicationRecord
   has_many :enrollments, dependent: :restrict_with_exception
   has_many :events, class_name: "CourseOfferingEvent", dependent: :restrict_with_exception
   has_many :scheduled_lessons, dependent: :restrict_with_exception
+  has_many :exam_sessions, dependent: :restrict_with_exception
 
   attr_readonly :public_id
   before_validation :normalize_values

@@ -24,6 +24,8 @@ class Enrollment < ApplicationRecord
   has_many :events, class_name: "EnrollmentEvent", dependent: :restrict_with_exception
   has_many :scheduled_lesson_enrollments, inverse_of: :enrollment, dependent: :restrict_with_exception
   has_many :scheduled_lessons, through: :scheduled_lesson_enrollments
+  has_many :student_assessments, dependent: :restrict_with_exception
+  has_many :certificates, dependent: :restrict_with_exception
 
   attr_readonly :public_id, :student_profile_id, :course_offering_id
   before_validation :generate_public_id, on: :create

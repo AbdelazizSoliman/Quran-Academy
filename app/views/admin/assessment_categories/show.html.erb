@@ -1,0 +1,1 @@
+<%= render "shared/page_header", title: @category.localized_name, description: @category.code, primary_action: render("shared/components/button", label: t("actions.edit"), href: edit_admin_assessment_category_path(@category)) %>

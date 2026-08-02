@@ -1,4 +1,6 @@
 class TeacherProfile < ApplicationRecord
+  has_many :student_assessments, dependent: :restrict_with_exception
+  has_many :exam_sessions, dependent: :restrict_with_exception
   GENDERS = %w[male female unspecified].freeze
   EMPLOYMENT_STATUSES = %w[candidate active on_leave inactive departed].freeze
   ENGAGEMENT_TYPES = %w[contractor part_time full_time volunteer].freeze

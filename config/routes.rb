@@ -7,6 +7,30 @@ Rails.application.routes.draw do
              path_names: { sign_in: "sign-in", sign_out: "sign-out", password: "password" },
              skip: :registrations
   namespace :admin do
+    resources :assessment_templates, except: :destroy do
+      resources :rubric_items, only: %i[create update], controller: :assessment_rubric_items
+    end
+    resources :assessment_categories, except: :destroy
+    resources :student_assessments, except: :destroy do
+      member do
+        patch :submit
+        patch :review
+        patch :publish
+        patch :archive
+      end
+    end
+    resources :exam_sessions, except: :destroy do
+      member do
+        patch :schedule
+        patch :complete
+        patch :review
+        patch :publish
+        patch :archive
+      end
+    end
+    resources :certificates, only: %i[index show new create]
+    resources :student_progresses, only: %i[index show update]
+    get "academic_dashboard", to: "academic_dashboard#show"
     resources :account_invitations, only: %i[index show] do
       member do
         patch :resend
@@ -159,6 +183,13 @@ Rails.application.routes.draw do
     end
   end
   namespace :teacher do
+    resources :assessments, controller: :student_assessments, except: :destroy do
+      patch :submit, on: :member
+    end
+    resources :exams, controller: :exam_sessions, only: %i[index show] do
+      patch :complete, on: :member
+    end
+    resource :academic_dashboard, only: :show
     resource :profile, only: %i[show edit update], controller: :profiles
     resources :availabilities, only: %i[index new create edit update]
     resources :availability_exceptions, only: %i[index new create edit update]
@@ -195,6 +226,10 @@ Rails.application.routes.draw do
     resource :reports, only: :show, controller: :reports
   end
   namespace :student do
+    resources :assessments, only: %i[index show]
+    resources :certificates, only: %i[index show]
+    resource :transcript, only: :show
+    resource :progress, only: :show
     resource :profile, only: %i[show edit update], controller: :profiles
     resources :enrollments, only: %i[index show]
     resources :schedule, only: %i[index show]

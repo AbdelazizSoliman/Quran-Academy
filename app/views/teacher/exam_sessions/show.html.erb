@@ -1,0 +1,1 @@
+<%= render "shared/page_header", title: @exam.title %><div class="ds-card p-5"><p><%= l(@exam.starts_at, format: :long) %></p><p><%= @exam.duration_minutes %> <%= t("academic.minutes") %></p><% if @exam.scheduled? %><%= button_to t("academic.actions.complete"), complete_teacher_exam_path(@exam), method: :patch, class: button_classes %><% end %></div>

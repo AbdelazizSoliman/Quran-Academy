@@ -73,10 +73,19 @@ module Admin
 
     def filter_dates(relation)
       scope = relation
+
       scope = scope.where(status: Enrollment::TERMINAL_STATUSES) if @params[:terminal] == "true"
       scope = scope.where.not(status: Enrollment::TERMINAL_STATUSES) if @params[:terminal] == "false"
-      scope = scope.where(applied_on: Date.iso8601(@params[:applied_on])..) if valid_date?(@params[:applied_on])
-      scope.where(started_on: Date.iso8601(@params[:started_on])..) if valid_date?(@params[:started_on])
+
+      if valid_date?(@params[:applied_on])
+        scope = scope.where(applied_on: Date.iso8601(@params[:applied_on])..)
+      end
+
+      if valid_date?(@params[:started_on])
+        scope = scope.where(started_on: Date.iso8601(@params[:started_on])..)
+      end
+
+      scope
     end
 
     def valid_date?(value)

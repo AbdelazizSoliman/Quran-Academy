@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -34,6 +34,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.boolean "allow_manual_attendance_adjustment", default: true, null: false
     t.boolean "allow_student_self_cancellation", default: true, null: false
     t.boolean "allow_teacher_self_cancellation", default: false, null: false
+    t.jsonb "assessment_grade_boundaries", default: {"A" => 90, "B" => 80, "C" => 70, "D" => 60, "F" => 0, "A+" => 95, "B+" => 85}, null: false
     t.boolean "attendance_notifications_enabled", default: true, null: false
     t.string "billing_currency", default: "EGP", null: false
     t.string "billing_cycle", default: "monthly", null: false
@@ -131,6 +132,116 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["token_digest"], name: "index_account_invitations_on_token_digest", unique: true
     t.index ["user_id"], name: "index_account_invitations_on_user_id", unique: true
     t.check_constraint "resent_count >= 0", name: "invitation_resent_count_nonnegative"
+  end
+
+  create_table "assessment_categories", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.integer "display_order", default: 0, null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "name_ar", null: false
+    t.string "name_en", null: false
+    t.string "public_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["active", "display_order"], name: "index_assessment_categories_on_active_and_display_order"
+    t.index ["code"], name: "index_assessment_categories_on_code", unique: true
+    t.index ["created_by_id"], name: "index_assessment_categories_on_created_by_id"
+    t.index ["public_id"], name: "index_assessment_categories_on_public_id", unique: true
+    t.index ["updated_by_id"], name: "index_assessment_categories_on_updated_by_id"
+  end
+
+  create_table "assessment_rubric_items", force: :cascade do |t|
+    t.bigint "assessment_category_id", null: false
+    t.bigint "assessment_template_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "display_order", default: 0, null: false
+    t.integer "lock_version", default: 0, null: false
+    t.decimal "maximum_score", precision: 7, scale: 2, default: "100.0", null: false
+    t.string "name_ar", null: false
+    t.string "name_en", null: false
+    t.boolean "required", default: true, null: false
+    t.string "scoring_type", default: "numeric", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "weight", precision: 7, scale: 2, default: "1.0", null: false
+    t.index ["assessment_category_id"], name: "index_assessment_rubric_items_on_assessment_category_id"
+    t.index ["assessment_template_id", "display_order"], name: "idx_rubrics_template_order"
+    t.index ["assessment_template_id"], name: "index_assessment_rubric_items_on_assessment_template_id"
+    t.check_constraint "maximum_score > 0::numeric AND weight > 0::numeric", name: "rubric_positive_values"
+    t.check_constraint "scoring_type::text = ANY (ARRAY['numeric'::character varying, 'rating'::character varying]::text[])", name: "rubric_scoring_type"
+  end
+
+  create_table "assessment_scores", force: :cascade do |t|
+    t.bigint "assessment_rubric_item_id", null: false
+    t.text "comments"
+    t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.decimal "numeric_score", precision: 7, scale: 2
+    t.string "rating"
+    t.bigint "student_assessment_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assessment_rubric_item_id"], name: "index_assessment_scores_on_assessment_rubric_item_id"
+    t.index ["student_assessment_id", "assessment_rubric_item_id"], name: "idx_unique_rubric_score", unique: true
+    t.index ["student_assessment_id"], name: "index_assessment_scores_on_student_assessment_id"
+    t.check_constraint "numeric_score IS NULL OR numeric_score >= 0::numeric", name: "assessment_scores_nonnegative"
+  end
+
+  create_table "assessment_templates", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.text "description"
+    t.integer "display_order", default: 0, null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "name_ar", null: false
+    t.string "name_en", null: false
+    t.string "public_id", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["created_by_id"], name: "index_assessment_templates_on_created_by_id"
+    t.index ["public_id"], name: "index_assessment_templates_on_public_id", unique: true
+    t.index ["status", "display_order"], name: "index_assessment_templates_on_status_and_display_order"
+    t.index ["updated_by_id"], name: "index_assessment_templates_on_updated_by_id"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'archived'::character varying]::text[])", name: "assessment_template_status"
+  end
+
+  create_table "certificate_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.bigint "certificate_id", null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.index ["actor_id"], name: "index_certificate_events_on_actor_id"
+    t.index ["certificate_id", "created_at"], name: "idx_certificate_events_history"
+    t.index ["certificate_id"], name: "index_certificate_events_on_certificate_id"
+  end
+
+  create_table "certificates", force: :cascade do |t|
+    t.string "certificate_type", null: false
+    t.datetime "created_at", null: false
+    t.bigint "enrollment_id"
+    t.bigint "exam_session_id"
+    t.date "issued_on", null: false
+    t.bigint "issuer_id", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.text "notes"
+    t.string "public_id", null: false
+    t.string "qr_placeholder"
+    t.bigint "student_profile_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "verification_code", null: false
+    t.index ["enrollment_id"], name: "index_certificates_on_enrollment_id"
+    t.index ["exam_session_id"], name: "index_certificates_on_exam_session_id"
+    t.index ["issuer_id"], name: "index_certificates_on_issuer_id"
+    t.index ["public_id"], name: "index_certificates_on_public_id", unique: true
+    t.index ["student_profile_id", "issued_on"], name: "index_certificates_on_student_profile_id_and_issued_on"
+    t.index ["student_profile_id"], name: "index_certificates_on_student_profile_id"
+    t.index ["verification_code"], name: "index_certificates_on_verification_code", unique: true
+    t.check_constraint "certificate_type::text = ANY (ARRAY['program_completion'::character varying, 'exam_completion'::character varying, 'ijazah'::character varying]::text[])", name: "certificate_type"
   end
 
   create_table "communication_log_events", force: :cascade do |t|
@@ -314,6 +425,46 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.check_constraint "starting_memorized_juz_count IS NULL OR starting_memorized_juz_count >= 0 AND starting_memorized_juz_count <= 30", name: "enrollments_starting_juz_range"
   end
 
+  create_table "exam_session_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.bigint "exam_session_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.index ["actor_id"], name: "index_exam_session_events_on_actor_id"
+    t.index ["exam_session_id", "created_at"], name: "idx_exam_session_events_history"
+    t.index ["exam_session_id"], name: "index_exam_session_events_on_exam_session_id"
+  end
+
+  create_table "exam_sessions", force: :cascade do |t|
+    t.bigint "course_offering_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.integer "duration_minutes", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.text "notes"
+    t.bigint "program_id", null: false
+    t.string "public_id", null: false
+    t.datetime "starts_at", null: false
+    t.string "status", default: "draft", null: false
+    t.bigint "teacher_profile_id", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["course_offering_id"], name: "index_exam_sessions_on_course_offering_id"
+    t.index ["created_by_id"], name: "index_exam_sessions_on_created_by_id"
+    t.index ["program_id"], name: "index_exam_sessions_on_program_id"
+    t.index ["public_id"], name: "index_exam_sessions_on_public_id", unique: true
+    t.index ["status", "starts_at"], name: "index_exam_sessions_on_status_and_starts_at"
+    t.index ["teacher_profile_id", "starts_at"], name: "index_exam_sessions_on_teacher_profile_id_and_starts_at"
+    t.index ["teacher_profile_id"], name: "index_exam_sessions_on_teacher_profile_id"
+    t.index ["updated_by_id"], name: "index_exam_sessions_on_updated_by_id"
+    t.check_constraint "duration_minutes >= 1 AND duration_minutes <= 480", name: "exam_duration_range"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'scheduled'::character varying, 'completed'::character varying, 'reviewed'::character varying, 'published'::character varying, 'archived'::character varying]::text[])", name: "exam_session_status"
+  end
+
   create_table "guardian_events", force: :cascade do |t|
     t.bigint "actor_id", null: false
     t.datetime "created_at", null: false
@@ -395,7 +546,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["status", "arrival_at"], name: "index_lesson_attendances_on_status_and_arrival_at"
     t.check_constraint "departure_at IS NULL OR arrival_at IS NULL OR departure_at >= arrival_at", name: "lesson_attendances_time_order"
     t.check_constraint "minutes_late >= 0", name: "lesson_attendances_nonnegative_lateness"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'present'::character varying, 'late'::character varying, 'absent'::character varying, 'excused_absence'::character varying, 'left_early'::character varying, 'lesson_cancelled'::character varying, 'not_applicable'::character varying]::text[])", name: "lesson_attendances_status"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'present'::character varying::text, 'late'::character varying::text, 'absent'::character varying::text, 'excused_absence'::character varying::text, 'left_early'::character varying::text, 'lesson_cancelled'::character varying::text, 'not_applicable'::character varying::text])", name: "lesson_attendances_status"
   end
 
   create_table "lesson_report_events", force: :cascade do |t|
@@ -647,9 +798,60 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["teacher_profile_id", "starts_at", "ends_at"], name: "idx_on_teacher_profile_id_starts_at_ends_at_69d19f2e3b"
     t.index ["teacher_profile_id"], name: "index_scheduled_lessons_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_scheduled_lessons_on_updated_by_id"
-    t.check_constraint "attendance_status::text = ANY (ARRAY['not_opened'::character varying, 'open'::character varying, 'locked'::character varying, 'reopened'::character varying]::text[])", name: "scheduled_lessons_attendance_status"
+    t.check_constraint "attendance_status::text = ANY (ARRAY['not_opened'::character varying::text, 'open'::character varying::text, 'locked'::character varying::text, 'reopened'::character varying::text])", name: "scheduled_lessons_attendance_status"
     t.check_constraint "ends_at > starts_at", name: "scheduled_lesson_time_order"
-    t.check_constraint "teacher_attendance_status::text = ANY (ARRAY['not_checked_in'::character varying, 'on_time'::character varying, 'late'::character varying, 'absent'::character varying, 'administrator_override'::character varying]::text[])", name: "scheduled_lessons_teacher_attendance_status"
+    t.check_constraint "teacher_attendance_status::text = ANY (ARRAY['not_checked_in'::character varying::text, 'on_time'::character varying::text, 'late'::character varying::text, 'absent'::character varying::text, 'administrator_override'::character varying::text])", name: "scheduled_lessons_teacher_attendance_status"
+  end
+
+  create_table "student_assessment_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "student_assessment_id", null: false
+    t.index ["actor_id"], name: "index_student_assessment_events_on_actor_id"
+    t.index ["student_assessment_id", "created_at"], name: "idx_student_assessment_events_history"
+    t.index ["student_assessment_id"], name: "index_student_assessment_events_on_student_assessment_id"
+  end
+
+  create_table "student_assessments", force: :cascade do |t|
+    t.datetime "archived_at"
+    t.date "assessment_date", null: false
+    t.bigint "assessment_template_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.bigint "enrollment_id", null: false
+    t.string "letter_grade"
+    t.integer "lock_version", default: 0, null: false
+    t.text "notes"
+    t.decimal "overall_score", precision: 7, scale: 2
+    t.string "public_id", null: false
+    t.datetime "published_at"
+    t.datetime "reviewed_at"
+    t.bigint "reviewer_id"
+    t.bigint "scheduled_lesson_id"
+    t.string "status", default: "draft", null: false
+    t.bigint "student_profile_id", null: false
+    t.datetime "submitted_at"
+    t.bigint "teacher_profile_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["assessment_template_id"], name: "index_student_assessments_on_assessment_template_id"
+    t.index ["created_by_id"], name: "index_student_assessments_on_created_by_id"
+    t.index ["enrollment_id", "assessment_template_id", "assessment_date"], name: "idx_assessments_enrollment_template_date"
+    t.index ["enrollment_id"], name: "index_student_assessments_on_enrollment_id"
+    t.index ["public_id"], name: "index_student_assessments_on_public_id", unique: true
+    t.index ["reviewer_id"], name: "index_student_assessments_on_reviewer_id"
+    t.index ["scheduled_lesson_id"], name: "index_student_assessments_on_scheduled_lesson_id"
+    t.index ["student_profile_id", "assessment_date"], name: "idx_on_student_profile_id_assessment_date_45182c2b2a"
+    t.index ["student_profile_id"], name: "index_student_assessments_on_student_profile_id"
+    t.index ["teacher_profile_id", "status", "assessment_date"], name: "idx_assessments_teacher_status_date"
+    t.index ["teacher_profile_id"], name: "index_student_assessments_on_teacher_profile_id"
+    t.index ["updated_by_id"], name: "index_student_assessments_on_updated_by_id"
+    t.check_constraint "overall_score IS NULL OR overall_score >= 0::numeric AND overall_score <= 100::numeric", name: "assessment_score_range"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying, 'reviewed'::character varying, 'published'::character varying, 'archived'::character varying]::text[])", name: "student_assessment_status"
   end
 
   create_table "student_guardianship_events", force: :cascade do |t|
@@ -759,6 +961,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["user_id"], name: "index_student_profiles_on_user_id", unique: true
     t.check_constraint "left_on IS NULL OR joined_on IS NULL OR left_on >= joined_on", name: "student_profiles_date_order"
     t.check_constraint "memorized_juz_count IS NULL OR memorized_juz_count >= 0 AND memorized_juz_count <= 30", name: "student_profiles_juz_range"
+  end
+
+  create_table "student_progresses", force: :cascade do |t|
+    t.decimal "average_score", precision: 7, scale: 2
+    t.decimal "completion_percentage", precision: 7, scale: 2, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.integer "current_ayah"
+    t.integer "current_page"
+    t.string "current_surah"
+    t.decimal "highest_score", precision: 7, scale: 2
+    t.boolean "ijazah_ready", default: false, null: false
+    t.date "last_evaluation_date"
+    t.bigint "latest_assessment_id"
+    t.integer "lock_version", default: 0, null: false
+    t.decimal "lowest_score", precision: 7, scale: 2
+    t.decimal "memorization_progress", precision: 7, scale: 2, default: "0.0", null: false
+    t.decimal "revision_progress", precision: 7, scale: 2, default: "0.0", null: false
+    t.bigint "strongest_category_id"
+    t.bigint "student_profile_id", null: false
+    t.string "trend", default: "stable", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.bigint "weakest_category_id"
+    t.index ["latest_assessment_id"], name: "index_student_progresses_on_latest_assessment_id"
+    t.index ["strongest_category_id"], name: "index_student_progresses_on_strongest_category_id"
+    t.index ["student_profile_id"], name: "index_student_progresses_on_student_profile_id", unique: true
+    t.index ["trend", "average_score"], name: "index_student_progresses_on_trend_and_average_score"
+    t.index ["updated_by_id"], name: "index_student_progresses_on_updated_by_id"
+    t.index ["weakest_category_id"], name: "index_student_progresses_on_weakest_category_id"
+    t.check_constraint "current_ayah IS NULL OR current_ayah >= 1", name: "progress_ayah_positive"
+    t.check_constraint "current_page IS NULL OR current_page >= 1 AND current_page <= 604", name: "progress_page_range"
+    t.check_constraint "memorization_progress >= 0::numeric AND memorization_progress <= 100::numeric AND revision_progress >= 0::numeric AND revision_progress <= 100::numeric AND completion_percentage >= 0::numeric AND completion_percentage <= 100::numeric", name: "progress_percentage_ranges"
+    t.check_constraint "trend::text = ANY (ARRAY['improving'::character varying, 'stable'::character varying, 'needs_attention'::character varying]::text[])", name: "student_progress_trend"
   end
 
   create_table "teacher_availabilities", force: :cascade do |t|
@@ -1018,7 +1253,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["role"], name: "index_users_on_role"
     t.index ["status", "role", "created_at"], name: "index_users_on_status_and_role_and_created_at"
     t.index ["status"], name: "index_users_on_status"
-    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying, 'en'::character varying]::text[])", name: "users_preferred_locale"
+    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying::text, 'en'::character varying::text])", name: "users_preferred_locale"
     t.check_constraint "session_version >= 0", name: "users_session_version_nonnegative"
   end
 
@@ -1029,6 +1264,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
   add_foreign_key "account_invitation_events", "users", column: "actor_id", on_delete: :nullify
   add_foreign_key "account_invitations", "users", column: "created_by_id", on_delete: :restrict
   add_foreign_key "account_invitations", "users", on_delete: :restrict
+  add_foreign_key "assessment_categories", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "assessment_categories", "users", column: "updated_by_id", on_delete: :restrict
+  add_foreign_key "assessment_rubric_items", "assessment_categories", on_delete: :restrict
+  add_foreign_key "assessment_rubric_items", "assessment_templates", on_delete: :restrict
+  add_foreign_key "assessment_scores", "assessment_rubric_items", on_delete: :restrict
+  add_foreign_key "assessment_scores", "student_assessments", on_delete: :restrict
+  add_foreign_key "assessment_templates", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "assessment_templates", "users", column: "updated_by_id", on_delete: :restrict
+  add_foreign_key "certificate_events", "certificates", on_delete: :restrict
+  add_foreign_key "certificate_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "certificates", "enrollments", on_delete: :restrict
+  add_foreign_key "certificates", "exam_sessions", on_delete: :restrict
+  add_foreign_key "certificates", "student_profiles", on_delete: :restrict
+  add_foreign_key "certificates", "users", column: "issuer_id", on_delete: :restrict
   add_foreign_key "communication_log_events", "communication_logs", on_delete: :restrict
   add_foreign_key "communication_log_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "communication_logs", "guardians", on_delete: :restrict
@@ -1052,6 +1301,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
   add_foreign_key "enrollments", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "enrollments", "users", column: "ended_by_id", on_delete: :nullify
   add_foreign_key "enrollments", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "exam_session_events", "exam_sessions", on_delete: :restrict
+  add_foreign_key "exam_session_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "exam_sessions", "course_offerings", on_delete: :restrict
+  add_foreign_key "exam_sessions", "programs", on_delete: :restrict
+  add_foreign_key "exam_sessions", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "exam_sessions", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "exam_sessions", "users", column: "updated_by_id", on_delete: :restrict
   add_foreign_key "guardian_events", "guardians", on_delete: :restrict
   add_foreign_key "guardian_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "guardians", "users", column: "created_by_id", on_delete: :nullify
@@ -1094,6 +1350,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
   add_foreign_key "scheduled_lessons", "users", column: "cancelled_by_id", on_delete: :nullify
   add_foreign_key "scheduled_lessons", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "scheduled_lessons", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "student_assessment_events", "student_assessments", on_delete: :restrict
+  add_foreign_key "student_assessment_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "student_assessments", "assessment_templates", on_delete: :restrict
+  add_foreign_key "student_assessments", "enrollments", on_delete: :restrict
+  add_foreign_key "student_assessments", "scheduled_lessons", on_delete: :restrict
+  add_foreign_key "student_assessments", "student_profiles", on_delete: :restrict
+  add_foreign_key "student_assessments", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "student_assessments", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "student_assessments", "users", column: "reviewer_id", on_delete: :nullify
+  add_foreign_key "student_assessments", "users", column: "updated_by_id", on_delete: :restrict
   add_foreign_key "student_guardianship_events", "student_guardianships", on_delete: :restrict
   add_foreign_key "student_guardianship_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "student_guardianships", "guardians", on_delete: :restrict
@@ -1105,6 +1371,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
   add_foreign_key "student_profiles", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "student_profiles", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "student_profiles", "users", on_delete: :restrict
+  add_foreign_key "student_progresses", "assessment_categories", column: "strongest_category_id", on_delete: :nullify
+  add_foreign_key "student_progresses", "assessment_categories", column: "weakest_category_id", on_delete: :nullify
+  add_foreign_key "student_progresses", "student_assessments", column: "latest_assessment_id", on_delete: :nullify
+  add_foreign_key "student_progresses", "student_profiles", on_delete: :restrict
+  add_foreign_key "student_progresses", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "teacher_availabilities", "teacher_profiles", on_delete: :restrict
   add_foreign_key "teacher_availabilities", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "teacher_availabilities", "users", column: "updated_by_id", on_delete: :nullify

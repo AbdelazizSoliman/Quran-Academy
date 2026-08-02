@@ -1,0 +1,93 @@
+ar:
+  academic:
+    not_available: "غير متاح"
+    empty: "لا توجد سجلات أكاديمية"
+    audit: "سجل التدقيق"
+    active: "نشط"
+    inactive: "غير نشط"
+    minutes: "دقيقة"
+    qr: "رمز QR"
+    qr_placeholder: "موضع رمز التحقق من الشهادة"
+    average: "المتوسط: %{value}"
+    weight: "الوزن: %{value}"
+    rubric_count: "%{count} بنود تقييم"
+    grade_settings: "حدود الدرجات"
+    grade_minimum: "الحد الأدنى لدرجة %{grade}"
+    highest_performers: "الأعلى أداءً"
+    needs_attention: "طلاب يحتاجون متابعة"
+    categories_title: "فئات التقييم"
+    fields:
+      name_ar: "الاسم بالعربية"
+      name_en: "الاسم بالإنجليزية"
+      description: "الوصف"
+      display_order: "ترتيب العرض"
+      active: "نشط"
+      code: "الرمز"
+      status: "الحالة"
+      title: "العنوان"
+      student: "الطالب"
+      teacher: "المعلم"
+      enrollment: "التسجيل"
+      template: "نموذج التقييم"
+      lesson: "الحلقة"
+      date: "تاريخ التقييم"
+      score: "النتيجة الكلية"
+      grade: "التقدير"
+      notes: "ملاحظات"
+      comments: "ملاحظات النتيجة"
+      program: "البرنامج"
+      offering: "المجموعة التعليمية"
+      starts_at: "التاريخ والوقت"
+      duration: "المدة بالدقائق"
+      certificate_type: "نوع الشهادة"
+      issue_date: "تاريخ الإصدار"
+      exam: "الاختبار"
+      current_surah: "السورة الحالية"
+      current_page: "الصفحة الحالية"
+      current_ayah: "الآية الحالية"
+      memorization_progress: "تقدم الحفظ (%)"
+      revision_progress: "تقدم المراجعة (%)"
+      completion_percentage: "نسبة الإكمال"
+      ijazah_ready: "جاهز للإجازة"
+      average_score: "متوسط الدرجات"
+      highest_score: "أعلى درجة"
+      lowest_score: "أقل درجة"
+      trend: "الاتجاه"
+    statuses: { draft: "مسودة", submitted: "مُرسل", reviewed: "مُراجع", published: "منشور", archived: "مؤرشف" }
+    template_statuses: { active: "نشط", inactive: "غير نشط", archived: "مؤرشف" }
+    exam_statuses: { draft: "مسودة", scheduled: "مجدول", completed: "مكتمل", reviewed: "مُراجع", published: "منشور", archived: "مؤرشف" }
+    scoring_types: { numeric: "درجة رقمية", rating: "مقياس تقدير" }
+    ratings: { excellent: "ممتاز", very_good: "جيد جدًا", good: "جيد", fair: "مقبول", poor: "ضعيف" }
+    trends: { improving: "يتحسن", stable: "مستقر", needs_attention: "يحتاج متابعة" }
+    categories: { memorization: "الحفظ", revision: "المراجعة", tajweed: "التجويد", fluency: "الطلاقة", attendance: "الحضور", homework: "الواجب", participation: "المشاركة", discipline: "الانضباط", behavior: "السلوك" }
+    certificate_types: { program_completion: "إكمال برنامج", exam_completion: "إكمال اختبار", ijazah: "إجازة" }
+    events: { created: "أُنشئ", updated: "حُدث", submitted: "أُرسل", reviewed: "رُوجع", published: "نُشر", archived: "أُرشف", scheduled: "جُدول", completed: "اكتمل" }
+    messages: { saved: "تم حفظ السجل الأكاديمي بنجاح." }
+    errors: { title: "يرجى تصحيح الأخطاء الموضحة" }
+    actions:
+      new_assessment: "تقييم جديد"
+      edit_assessment: "تعديل التقييم"
+      new_template: "نموذج جديد"
+      edit_template: "تعديل النموذج"
+      new_category: "فئة جديدة"
+      edit_category: "تعديل الفئة"
+      new_exam: "اختبار جديد"
+      edit_exam: "تعديل الاختبار"
+      issue_certificate: "إصدار شهادة"
+      lifecycle: "إجراءات دورة الحياة"
+      submit: "إرسال"
+      review: "مراجعة"
+      publish: "نشر"
+      archive: "أرشفة"
+      schedule: "جدولة"
+      complete: "إكمال"
+    assessments: { index: "تقييمات الطلاب", teacher: "تقييماتي", student: "نتائج تقييماتي", description: "مراجعة الدرجات والتقديرات وحالة دورة الحياة." }
+    templates: { index: "نماذج التقييم", description: "معايير ثنائية اللغة قابلة لإعادة الاستخدام." }
+    rubrics: { title: "بنود التقييم", add: "إضافة بند تقييم" }
+    scores: { title: "درجات الفئات والبنود" }
+    exams: { index: "جلسات الاختبار", teacher: "اختباراتي" }
+    certificates: { index: "الشهادات", student: "شهاداتي" }
+    progress: { index: "تقدم الطلاب", title: "التقدم القرآني والأكاديمي" }
+    dashboard: { admin: "لوحة الأكاديمية التعليمية", teacher: "لوحة تقييمات المعلم" }
+    transcript: { title: "السجل الأكاديمي", programs: "البرامج والتسجيلات" }
+    metrics: { assessments: "التقييمات", published: "التقييمات المنشورة", average_score: "متوسط الدرجات", pass_rate: "نسبة النجاح (%)", exams: "جلسات الاختبار", certificates: "الشهادات", needs_attention: "يحتاج متابعة", assigned: "التقييمات المسندة", drafts: "المسودات", submitted: "المرسلة", upcoming_exams: "الاختبارات القادمة" }

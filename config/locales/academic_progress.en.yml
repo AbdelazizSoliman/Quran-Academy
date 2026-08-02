@@ -1,0 +1,93 @@
+en:
+  academic:
+    not_available: "Not available"
+    empty: "No academic records found"
+    audit: "Audit history"
+    active: "Active"
+    inactive: "Inactive"
+    minutes: "minutes"
+    qr: "QR"
+    qr_placeholder: "Certificate verification QR placeholder"
+    average: "Average: %{value}"
+    weight: "Weight: %{value}"
+    rubric_count: "%{count} rubric items"
+    grade_settings: "Assessment grade boundaries"
+    grade_minimum: "%{grade} minimum percentage"
+    highest_performers: "Highest performers"
+    needs_attention: "Students needing attention"
+    categories_title: "Assessment categories"
+    fields:
+      name_ar: "Arabic name"
+      name_en: "English name"
+      description: "Description"
+      display_order: "Display order"
+      active: "Active"
+      code: "Code"
+      status: "Status"
+      title: "Title"
+      student: "Student"
+      teacher: "Teacher"
+      enrollment: "Enrollment"
+      template: "Assessment template"
+      lesson: "Lesson"
+      date: "Assessment date"
+      score: "Overall score"
+      grade: "Letter grade"
+      notes: "Notes"
+      comments: "Score comments"
+      program: "Program"
+      offering: "Course offering"
+      starts_at: "Date and time"
+      duration: "Duration (minutes)"
+      certificate_type: "Certificate type"
+      issue_date: "Issue date"
+      exam: "Exam"
+      current_surah: "Current Surah"
+      current_page: "Current page"
+      current_ayah: "Current Ayah"
+      memorization_progress: "Memorization progress (%)"
+      revision_progress: "Revision progress (%)"
+      completion_percentage: "Completion percentage"
+      ijazah_ready: "Ijazah ready"
+      average_score: "Average score"
+      highest_score: "Highest score"
+      lowest_score: "Lowest score"
+      trend: "Trend"
+    statuses: { draft: "Draft", submitted: "Submitted", reviewed: "Reviewed", published: "Published", archived: "Archived" }
+    template_statuses: { active: "Active", inactive: "Inactive", archived: "Archived" }
+    exam_statuses: { draft: "Draft", scheduled: "Scheduled", completed: "Completed", reviewed: "Reviewed", published: "Published", archived: "Archived" }
+    scoring_types: { numeric: "Numeric score", rating: "Rating scale" }
+    ratings: { excellent: "Excellent", very_good: "Very good", good: "Good", fair: "Fair", poor: "Poor" }
+    trends: { improving: "Improving", stable: "Stable", needs_attention: "Needs attention" }
+    categories: { memorization: "Memorization", revision: "Revision", tajweed: "Tajweed", fluency: "Fluency", attendance: "Attendance", homework: "Homework", participation: "Participation", discipline: "Discipline", behavior: "Behavior" }
+    certificate_types: { program_completion: "Program completion", exam_completion: "Exam completion", ijazah: "Ijazah" }
+    events: { created: "Created", updated: "Updated", submitted: "Submitted", reviewed: "Reviewed", published: "Published", archived: "Archived", scheduled: "Scheduled", completed: "Completed" }
+    messages: { saved: "Academic record saved successfully." }
+    errors: { title: "Please correct the highlighted errors" }
+    actions:
+      new_assessment: "New assessment"
+      edit_assessment: "Edit assessment"
+      new_template: "New template"
+      edit_template: "Edit template"
+      new_category: "New category"
+      edit_category: "Edit category"
+      new_exam: "New exam"
+      edit_exam: "Edit exam"
+      issue_certificate: "Issue certificate"
+      lifecycle: "Lifecycle actions"
+      submit: "Submit"
+      review: "Review"
+      publish: "Publish"
+      archive: "Archive"
+      schedule: "Schedule"
+      complete: "Complete"
+    assessments: { index: "Student assessments", teacher: "My assessments", student: "My assessment results", description: "Review scores, grades, and lifecycle status." }
+    templates: { index: "Assessment templates", description: "Reusable bilingual rubrics for academic evaluation." }
+    rubrics: { title: "Rubric items", add: "Add rubric item" }
+    scores: { title: "Category and rubric scores" }
+    exams: { index: "Exam sessions", teacher: "My exam sessions" }
+    certificates: { index: "Certificates", student: "My certificates" }
+    progress: { index: "Student progress", title: "Quran and academic progress" }
+    dashboard: { admin: "Academic dashboard", teacher: "Teaching assessment dashboard" }
+    transcript: { title: "Student transcript", programs: "Programs and enrollments" }
+    metrics: { assessments: "Assessments", published: "Published assessments", average_score: "Average score", pass_rate: "Pass rate (%)", exams: "Exam sessions", certificates: "Certificates", needs_attention: "Needs attention", assigned: "Assigned assessments", drafts: "Drafts", submitted: "Submitted", upcoming_exams: "Upcoming exams" }

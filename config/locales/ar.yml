@@ -59,6 +59,10 @@ ar:
     settings: "الإعدادات"
     users: "إدارة المستخدمين"
     invitations: "دعوات الحسابات"
+    assessments: "التقييمات"
+    exams: "الاختبارات"
+    certificates: "الشهادات"
+    academic_progress: "التقدم الأكاديمي"
     my_profile: "ملفي الشخصي"
     coming_soon: "قريباً"
   actions:

@@ -1,0 +1,19 @@
+<div class="grid gap-4">
+  <% assessments.each do |assessment| %>
+    <article class="ds-card p-5">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 class="font-bold"><%= link_to assessment.public_id, path.call(assessment), class: "text-app-primary hover:underline" %></h2>
+          <p class="mt-1 ds-caption"><%= assessment.assessment_template.localized_name %> · <%= assessment.student_profile.user.full_name %></p>
+        </div>
+        <span class="ds-badge"><%= t("academic.statuses.#{assessment.status}") %></span>
+      </div>
+      <dl class="mt-4 grid gap-3 sm:grid-cols-3">
+        <div><dt class="ds-caption"><%= t("academic.fields.date") %></dt><dd><%= l(assessment.assessment_date) %></dd></div>
+        <div><dt class="ds-caption"><%= t("academic.fields.score") %></dt><dd><%= assessment.overall_score || t("academic.not_available") %></dd></div>
+        <div><dt class="ds-caption"><%= t("academic.fields.grade") %></dt><dd><%= assessment.letter_grade || t("academic.not_available") %></dd></div>
+      </dl>
+    </article>
+  <% end %>
+  <% if assessments.empty? %><%= render "shared/components/empty_state", icon: :reports, title: t("academic.empty"), description: "" %><% end %>
+</div>

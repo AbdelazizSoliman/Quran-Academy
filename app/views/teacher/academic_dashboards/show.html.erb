@@ -1,0 +1,1 @@
+<%= render "shared/page_header", title: t("academic.dashboard.teacher") %><div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><% @metrics.each do |key, value| %><div class="ds-card p-5"><p class="ds-caption"><%= t("academic.metrics.#{key}") %></p><p class="text-2xl font-bold"><%= value %></p></div><% end %></div>

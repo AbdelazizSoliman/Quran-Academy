@@ -1,4 +1,7 @@
 class StudentProfile < ApplicationRecord
+  has_many :student_assessments, dependent: :restrict_with_exception
+  has_one :student_progress, dependent: :restrict_with_exception
+  has_many :certificates, dependent: :restrict_with_exception
   GENDERS = %w[male female unspecified].freeze
   STUDENT_TYPES = %w[minor adult].freeze
   PROFILE_STATUSES = %w[draft complete verified archived].freeze

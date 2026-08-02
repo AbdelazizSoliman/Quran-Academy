@@ -1,0 +1,1 @@
+<%= render "shared/page_header", title: t("academic.assessments.student") %><%= render "shared/academic/assessment_list", assessments: @assessments, path: ->(assessment) { student_assessment_path(assessment) } %>

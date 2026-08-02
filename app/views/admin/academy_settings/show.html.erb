@@ -66,6 +66,8 @@
   <% end %>
 </div>
 
+<div class="mt-6"><% grades = capture do %><dl class="grid gap-4 sm:grid-cols-4"><% @setting.assessment_grade_boundaries.each do |grade, minimum| %><div><dt class="ds-caption"><%= grade %></dt><dd class="font-semibold"><%= minimum %>%</dd></div><% end %></dl><% end %><%= render "shared/components/card", title: t("academic.grade_settings"), body: grades %></div>
+
 <div class="mt-6">
   <% audit_body = capture do %>
     <p class="mb-4 ds-supporting"><%= t("admin.settings.show.updated", time: l(@setting.updated_at, format: :long), actor: @setting.updated_by&.full_name || t("admin.settings.not_configured")) %></p>

@@ -49,6 +49,7 @@ class AcademySetting < ApplicationRecord
   validate :validate_lesson_durations
   validate :validate_cancellation_rules
   validate :validate_attendance_rules
+  validate :validate_assessment_grade_boundaries
 
   before_validation :normalize_values
 
@@ -143,5 +144,20 @@ class AcademySetting < ApplicationRecord
   def validate_attendance_rules
     threshold = [student_late_after_minutes, teacher_late_after_minutes].compact.max
     errors.add(:absence_after_minutes, :too_small) if threshold && absence_after_minutes.to_i < threshold
+  end
+
+  def validate_assessment_grade_boundaries
+    boundaries = assessment_grade_boundaries.to_h
+    expected = StudentAssessment::LETTER_GRADES
+    errors.add(:assessment_grade_boundaries, :invalid) unless boundaries.keys.sort == expected.sort
+    values = expected.filter_map { |grade| decimal_boundary(boundaries[grade]) }
+    invalid_values = values.size != expected.size || values.any? { |value| !value.in?(0..100) }
+    errors.add(:assessment_grade_boundaries, :invalid) if invalid_values || values != values.sort.reverse
+  end
+
+  def decimal_boundary(value)
+    BigDecimal(value.to_s)
+  rescue ArgumentError
+    nil
   end
 end

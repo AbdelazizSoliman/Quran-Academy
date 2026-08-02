@@ -12,6 +12,7 @@ class Program < ApplicationRecord
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_programs
   has_many :course_offerings, dependent: :restrict_with_exception
   has_many :events, class_name: "ProgramEvent", dependent: :restrict_with_exception
+  has_many :exam_sessions, dependent: :restrict_with_exception
 
   attr_readonly :public_id
   before_validation :normalize_values

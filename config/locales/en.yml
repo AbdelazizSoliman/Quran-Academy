@@ -59,6 +59,10 @@ en:
     settings: "Settings"
     users: "User administration"
     invitations: "Account invitations"
+    assessments: "Assessments"
+    exams: "Exams"
+    certificates: "Certificates"
+    academic_progress: "Academic progress"
     my_profile: "My Profile"
     coming_soon: "Coming Soon"
   actions:
