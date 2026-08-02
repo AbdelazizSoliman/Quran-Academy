@@ -14,12 +14,15 @@ module Admin
 
     def new
       @user = User.new(status: :pending, time_zone: "Cairo")
+      @contact_fields = { phone_number: nil, whatsapp_number: nil }
     end
 
     def edit; end
 
     def create
-      @user = Users::Create.new(actor: current_user, attributes: create_params).call
+      attributes = create_params
+      @contact_fields = attributes.slice(:phone_number, :whatsapp_number).to_h.symbolize_keys
+      @user = Users::Create.new(actor: current_user, attributes:).call
       if @user.persisted?
         redirect_to admin_user_path(@user), notice: t("admin.users.messages.created")
       else

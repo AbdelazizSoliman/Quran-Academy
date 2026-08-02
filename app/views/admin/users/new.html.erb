@@ -5,4 +5,5 @@
              { label: t("admin.users.index.title"), href: admin_users_path },
              { label: t("admin.users.new.title") }
            ] %>
-<%= render "shared/components/card", body: capture { render "form", user: @user } %>
+<%= render "shared/components/card",
+           body: capture { render "form", user: @user, contact_fields: @contact_fields } %>
