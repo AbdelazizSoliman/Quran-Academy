@@ -19,7 +19,7 @@ module Notifications
 
       attempt = mark_attempting!(address)
       result = provider.deliver(recipient: address, subject: @notification.subject,
-                                body: delivery_body, **@provider_options)
+                                body: delivery_body, **provider_options)
       result.success? ? mark_sent!(attempt, result) : mark_failed!(attempt, result)
       @notification
     rescue ActiveRecord::StaleObjectError
@@ -47,6 +47,26 @@ module Notifications
       SecurePayload.decrypt(@notification.delivery_payload_ciphertext)
     rescue ActiveSupport::MessageEncryptor::InvalidMessage
       nil
+    end
+
+    def provider_options
+      return @provider_options unless invitation_whatsapp?
+
+      @provider_options.merge(template: invitation_template)
+    end
+
+    def invitation_whatsapp?
+      @notification.whatsapp? && @notification.notification_type == "account_invitation"
+    end
+
+    def invitation_template
+      { name: ENV.fetch("WHATSAPP_INVITATION_TEMPLATE_NAME", "account_invitation"),
+        language_code: @notification.recipient_locale == "ar" ? "ar" : "en_US",
+        parameters: [{ type: "text", text: invitation_url }] }
+    end
+
+    def invitation_url
+      URI.extract(delivery_body.to_s, %w[http https]).first
     end
 
     def mark_attempting!(address)
