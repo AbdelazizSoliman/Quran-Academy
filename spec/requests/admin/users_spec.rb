@@ -51,18 +51,22 @@ RSpec.describe "Admin user administration" do
     sign_in admin
     attributes = attributes_for(:user, :teacher).merge(
       password: "SecurePass123!", password_confirmation: "SecurePass123!",
-      sign_in_count: 999, encrypted_password: "unsafe"
+      phone_number: "+20 100-123-4567", whatsapp_number: "", sign_in_count: 999,
+      encrypted_password: "unsafe"
     )
 
     expect { post admin_users_path, params: { user: attributes } }.to change(User, :count).by(1)
     expect(UserAccountEvent.where(event_type: "created").count).to eq(1)
-    expect(User.order(:created_at).last.sign_in_count).to eq(0)
+    user = User.order(:created_at).last
+    expect(user.sign_in_count).to eq(0)
+    expect(user.teacher_profile.whatsapp_number).to eq("+201001234567")
   end
 
   it "rejects duplicate email and weak passwords without an audit" do
     sign_in admin
     existing = create(:user)
-    attributes = attributes_for(:user, email: existing.email, password: "weak", password_confirmation: "weak")
+    attributes = attributes_for(:user, email: existing.email, password: "weak", password_confirmation: "weak",
+                                       phone_number: "+201001234567")
 
     expect do
       post admin_users_path, params: { user: attributes }

@@ -63,7 +63,7 @@ module Admin
 
     def create_params
       params.expect(user: %i[
-                      first_name last_name email role preferred_locale time_zone
+                      first_name last_name email role preferred_locale time_zone phone_number whatsapp_number
                     ])
     end
 

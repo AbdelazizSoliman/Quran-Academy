@@ -26,6 +26,7 @@ class User < ApplicationRecord
   has_many :teacher_profile_events, foreign_key: :actor_id, inverse_of: :actor,
                                     dependent: :restrict_with_exception
   has_one :student_profile, inverse_of: :user, dependent: :restrict_with_exception
+  has_one :staff_profile, inverse_of: :user, dependent: :restrict_with_exception
   has_many :created_student_profiles, class_name: "StudentProfile", foreign_key: :created_by_id,
                                       inverse_of: :created_by, dependent: :nullify
   has_many :updated_student_profiles, class_name: "StudentProfile", foreign_key: :updated_by_id,

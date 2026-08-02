@@ -28,6 +28,12 @@ en:
       schedule_conflict: "conflicts with another scheduled lesson"
       cancellation_reason_required: "is required when cancelling a lesson"
       stale_record: "was changed by another administrator; reload and try again"
+      invalid_role: "must belong to an administrator or staff account"
+  activerecord:
+    attributes:
+      user:
+        phone_number: "Phone number"
+        whatsapp_number: "WhatsApp number"
   time:
     formats:
       long: "%B %d, %Y at %H:%M"
@@ -318,7 +324,7 @@ en:
         caption: "Academy user accounts"
       new:
         title: "Create user"
-        description: "Create a controlled account without sending an invitation."
+        description: "Create an account, contact profile, and secure invitation."
       edit:
         title: "Edit %{name}"
         description: "Update identity, role, language, and time-zone settings."
@@ -337,6 +343,8 @@ en:
         last_name: "Last name"
         name: "Name"
         email: "Email"
+        phone_number: "Phone number"
+        whatsapp_number: "WhatsApp number"
         role: "Role"
         status: "Status"
         preferred_locale: "Language"
@@ -362,6 +370,7 @@ en:
         errors_title: "Please review the account details"
         status_hint: "Use explicit account actions to change status safely."
         locale_automatic: "Automatic default for role"
+        whatsapp_fallback_hint: "Leave blank to use the phone number for WhatsApp."
       actions:
         new: "Create user"
         back: "Back to users"

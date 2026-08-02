@@ -47,7 +47,7 @@ module Notifications
     end
 
     def profile_phone
-      profile = @user.teacher_profile || @user.student_profile
+      profile = @user.teacher_profile || @user.student_profile || @user.staff_profile
       profile&.whatsapp_number.presence || profile&.phone_number
     end
 

@@ -7,7 +7,8 @@ RSpec.describe "Admin user operations" do
     user = Admin::Users::Create.new(
       actor:,
       attributes: attributes_for(:user, :student).merge(preferred_locale: "", password: "SecurePass123!",
-                                                        password_confirmation: "SecurePass123!")
+                                                        password_confirmation: "SecurePass123!",
+                                                        phone_number: "+20 100-123-4567", whatsapp_number: "")
     ).call
 
     expect(user).to be_persisted
@@ -15,6 +16,47 @@ RSpec.describe "Admin user operations" do
     expect(user.time_zone).to eq("Cairo")
     expect(user.account_events.last.event_type).to eq("created")
     expect(user.account_events.last.metadata.to_s).not_to include("password")
+    expect(user.student_profile.phone_number).to eq("+201001234567")
+    expect(user.student_profile.whatsapp_number).to eq("+201001234567")
+  end
+
+  it "creates a contact profile for every account role before invitation delivery" do
+    %i[teacher staff admin].each do |role|
+      user = Admin::Users::Create.new(
+        actor:, attributes: attributes_for(:user, role).merge(phone_number: "+201001234567")
+      ).call
+
+      expect(user).to be_persisted
+      expect(user.teacher? ? user.teacher_profile : user.staff_profile).to be_present
+    end
+  end
+
+  it "rejects missing or invalid phone numbers before creating an account" do
+    missing = Admin::Users::Create.new(actor:, attributes: attributes_for(:user, :student)).call
+    invalid = Admin::Users::Create.new(
+      actor:, attributes: attributes_for(:user, :teacher).merge(phone_number: "123")
+    ).call
+
+    expect(missing).not_to be_persisted
+    expect(missing.errors[:phone_number]).to be_present
+    expect(invalid).not_to be_persisted
+    expect(invalid.errors[:phone_number]).to be_present
+  end
+
+  it "makes the new profile phone available to immediate WhatsApp invitation delivery" do
+    AcademySetting.current.update!(invitation_delivery_mode: "whatsapp_only",
+                                   whatsapp_notifications_enabled: true)
+    provider = instance_double(Notifications::WhatsAppProvider)
+    delivery = Notifications::ProviderResult.new(true, "wamid.new-user", {}, 200, "accepted", nil, nil)
+    allow(Notifications::WhatsAppProvider).to receive(:new).and_return(provider)
+    allow(provider).to receive(:deliver).and_return(delivery)
+
+    user = Admin::Users::Create.new(
+      actor:, attributes: attributes_for(:user, :teacher).merge(phone_number: "+20 100-123-4567")
+    ).call
+
+    expect(user).to be_persisted
+    expect(provider).to have_received(:deliver).with(hash_including(recipient: "201001234567"))
   end
 
   it "audits meaningful updates and role changes but not no-op updates" do

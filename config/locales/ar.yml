@@ -28,6 +28,12 @@ ar:
       schedule_conflict: "يتعارض مع درس مجدول آخر"
       cancellation_reason_required: "مطلوب عند إلغاء الدرس"
       stale_record: "تم تغييره بواسطة مسؤول آخر؛ أعد التحميل وحاول مجدداً"
+      invalid_role: "يجب أن يكون مرتبطاً بحساب مدير أو موظف"
+  activerecord:
+    attributes:
+      user:
+        phone_number: "رقم الهاتف"
+        whatsapp_number: "رقم واتساب"
   time:
     formats:
       long: "%d/%m/%Y، %H:%M"
@@ -318,7 +324,7 @@ ar:
         caption: "حسابات مستخدمي الأكاديمية"
       new:
         title: "إنشاء مستخدم"
-        description: "إنشاء حساب مُدار دون إرسال دعوة."
+        description: "إنشاء الحساب وملف التواصل والدعوة الآمنة."
       edit:
         title: "تعديل %{name}"
         description: "تحديث الهوية والدور واللغة والمنطقة الزمنية."
@@ -337,6 +343,8 @@ ar:
         last_name: "اسم العائلة"
         name: "الاسم"
         email: "البريد الإلكتروني"
+        phone_number: "رقم الهاتف"
+        whatsapp_number: "رقم واتساب"
         role: "الدور"
         status: "الحالة"
         preferred_locale: "اللغة"
@@ -362,6 +370,7 @@ ar:
         errors_title: "يرجى مراجعة بيانات الحساب"
         status_hint: "استخدم إجراءات الحساب الصريحة لتغيير الحالة بأمان."
         locale_automatic: "الافتراضي التلقائي حسب الدور"
+        whatsapp_fallback_hint: "اتركه فارغاً لاستخدام رقم الهاتف لواتساب."
       actions:
         new: "إنشاء مستخدم"
         back: "العودة إلى المستخدمين"
