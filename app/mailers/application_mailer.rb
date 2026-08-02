@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: ENV.fetch("MAILER_SENDER", "no-reply@quran-academy.example")
+  default from: ENV.fetch("MAILER_SENDER", "onboarding@resend.dev")
   layout "mailer"
 end

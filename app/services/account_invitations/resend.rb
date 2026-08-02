@@ -10,7 +10,7 @@ module AccountInvitations
     def call
       raw_token = Token.generate
       rotate_token(raw_token)
-      AccountInvitationMailer.with(invitation: @invitation, token: raw_token).invitation_email.deliver_now
+      mark_sent if deliver(raw_token)
       Result.new(invitation: @invitation, token: raw_token)
     rescue ActiveRecord::RecordInvalid => e
       @invitation.errors.merge!(e.record.errors)
@@ -24,12 +24,26 @@ module AccountInvitations
         raise ActiveRecord::RecordInvalid, @invitation if @invitation.accepted? || @invitation.cancelled?
 
         previous = @invitation.status
-        now = Time.current
-        @invitation.update!(token_digest: Token.digest(raw_token), status: "sent",
+        @invitation.update!(token_digest: Token.digest(raw_token), status: "pending",
                             expires_at: AcademySetting.current.invitation_expires_after_hours.hours.from_now,
-                            sent_at: now, last_sent_at: now, resent_count: @invitation.resent_count + 1)
+                            resent_count: @invitation.resent_count + 1)
         @invitation.events.create!(actor: @actor, event_type: "resent",
-                                   before_data: { "status" => previous }, after_data: { "status" => "sent" })
+                                   before_data: { "status" => previous }, after_data: { "status" => "pending" })
+      end
+    end
+
+    def deliver(raw_token)
+      AccountInvitationMailer.with(invitation: @invitation, token: raw_token).invitation_email.deliver_now
+      true
+    rescue StandardError => e
+      Rails.logger.error("Invitation email delivery failed (#{e.class})")
+      false
+    end
+
+    def mark_sent
+      @invitation.with_lock do
+        now = Time.current
+        @invitation.update!(status: "sent", sent_at: now, last_sent_at: now)
       end
     end
   end

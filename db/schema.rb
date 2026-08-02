@@ -185,8 +185,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["recipient_user_id"], name: "index_communication_logs_on_recipient_user_id"
     t.index ["scheduled_lesson_id"], name: "index_communication_logs_on_scheduled_lesson_id"
     t.index ["student_profile_id"], name: "index_communication_logs_on_student_profile_id"
-    t.check_constraint "channel::text = ANY (ARRAY['whatsapp'::character varying::text, 'email'::character varying::text])", name: "communication_logs_channel"
-    t.check_constraint "status::text = ANY (ARRAY['prepared'::character varying::text, 'opened'::character varying::text, 'confirmed_sent'::character varying::text, 'cancelled'::character varying::text, 'failed'::character varying::text])", name: "communication_logs_status"
+    t.check_constraint "channel::text = ANY (ARRAY['whatsapp'::character varying, 'email'::character varying]::text[])", name: "communication_logs_channel"
+    t.check_constraint "status::text = ANY (ARRAY['prepared'::character varying, 'opened'::character varying, 'confirmed_sent'::character varying, 'cancelled'::character varying, 'failed'::character varying]::text[])", name: "communication_logs_status"
   end
 
   create_table "course_offering_events", force: :cascade do |t|
@@ -395,7 +395,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["status", "arrival_at"], name: "index_lesson_attendances_on_status_and_arrival_at"
     t.check_constraint "departure_at IS NULL OR arrival_at IS NULL OR departure_at >= arrival_at", name: "lesson_attendances_time_order"
     t.check_constraint "minutes_late >= 0", name: "lesson_attendances_nonnegative_lateness"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'present'::character varying::text, 'late'::character varying::text, 'absent'::character varying::text, 'excused_absence'::character varying::text, 'left_early'::character varying::text, 'lesson_cancelled'::character varying::text, 'not_applicable'::character varying::text])", name: "lesson_attendances_status"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'present'::character varying, 'late'::character varying, 'absent'::character varying, 'excused_absence'::character varying, 'left_early'::character varying, 'lesson_cancelled'::character varying, 'not_applicable'::character varying]::text[])", name: "lesson_attendances_status"
   end
 
   create_table "lesson_report_events", force: :cascade do |t|
@@ -453,7 +453,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["submitted_by_id"], name: "index_lesson_reports_on_submitted_by_id"
     t.index ["teacher_profile_id"], name: "index_lesson_reports_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_lesson_reports_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'submitted'::character varying::text, 'reviewed'::character varying::text, 'locked'::character varying::text, 'reopened'::character varying::text, 'archived'::character varying::text])", name: "lesson_reports_status"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying, 'reviewed'::character varying, 'locked'::character varying, 'reopened'::character varying, 'archived'::character varying]::text[])", name: "lesson_reports_status"
   end
 
   create_table "lesson_student_report_events", force: :cascade do |t|
@@ -513,7 +513,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["scheduled_lesson_enrollment_id"], name: "index_lesson_student_reports_on_scheduled_lesson_enrollment_id"
     t.index ["status", "engagement_level", "performance_level"], name: "idx_student_report_outcomes"
     t.index ["updated_by_id"], name: "index_lesson_student_reports_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'completed'::character varying::text, 'not_applicable'::character varying::text, 'withheld'::character varying::text])", name: "lesson_student_reports_status"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'completed'::character varying, 'not_applicable'::character varying, 'withheld'::character varying]::text[])", name: "lesson_student_reports_status"
   end
 
   create_table "program_events", force: :cascade do |t|
@@ -647,9 +647,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["teacher_profile_id", "starts_at", "ends_at"], name: "idx_on_teacher_profile_id_starts_at_ends_at_69d19f2e3b"
     t.index ["teacher_profile_id"], name: "index_scheduled_lessons_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_scheduled_lessons_on_updated_by_id"
-    t.check_constraint "attendance_status::text = ANY (ARRAY['not_opened'::character varying::text, 'open'::character varying::text, 'locked'::character varying::text, 'reopened'::character varying::text])", name: "scheduled_lessons_attendance_status"
+    t.check_constraint "attendance_status::text = ANY (ARRAY['not_opened'::character varying, 'open'::character varying, 'locked'::character varying, 'reopened'::character varying]::text[])", name: "scheduled_lessons_attendance_status"
     t.check_constraint "ends_at > starts_at", name: "scheduled_lesson_time_order"
-    t.check_constraint "teacher_attendance_status::text = ANY (ARRAY['not_checked_in'::character varying::text, 'on_time'::character varying::text, 'late'::character varying::text, 'absent'::character varying::text, 'administrator_override'::character varying::text])", name: "scheduled_lessons_teacher_attendance_status"
+    t.check_constraint "teacher_attendance_status::text = ANY (ARRAY['not_checked_in'::character varying, 'on_time'::character varying, 'late'::character varying, 'absent'::character varying, 'administrator_override'::character varying]::text[])", name: "scheduled_lessons_teacher_attendance_status"
   end
 
   create_table "student_guardianship_events", force: :cascade do |t|
@@ -1018,7 +1018,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_180000) do
     t.index ["role"], name: "index_users_on_role"
     t.index ["status", "role", "created_at"], name: "index_users_on_status_and_role_and_created_at"
     t.index ["status"], name: "index_users_on_status"
-    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying::text, 'en'::character varying::text])", name: "users_preferred_locale"
+    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying, 'en'::character varying]::text[])", name: "users_preferred_locale"
     t.check_constraint "session_version >= 0", name: "users_session_version_nonnegative"
   end
 

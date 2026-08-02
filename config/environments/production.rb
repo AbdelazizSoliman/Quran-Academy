@@ -53,14 +53,13 @@ Rails.application.configure do
   # Replace the default in-process and non-durable queuing backend for Active Job.
   # config.active_job.queue_adapter = :resque
 
-  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.delivery_method = :resend
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
 
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = ProductionMailerConfiguration.default_url_options
   config.action_mailer.default_options = { from: ProductionMailerConfiguration.sender }
-  config.action_mailer.smtp_settings = ProductionMailerConfiguration.smtp_settings
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

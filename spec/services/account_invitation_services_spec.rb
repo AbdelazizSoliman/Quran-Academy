@@ -24,6 +24,19 @@ RSpec.describe "Account invitation services" do
     expect(result.token).to be_present
   end
 
+  it "keeps a created invitation pending when delivery fails" do
+    delivery = instance_double(ActionMailer::MessageDelivery)
+    mailer = instance_double(AccountInvitationMailer, invitation_email: delivery)
+    allow(AccountInvitationMailer).to receive(:with).and_return(mailer)
+    allow(delivery).to receive(:deliver_now).and_raise(Resend::Error.new("delivery failed", 500))
+
+    user = create(:user, :pending)
+    expect do
+      result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
+      expect(result.invitation).to be_pending
+    end.to change(AccountInvitation, :count).by(1).and change(AccountInvitationEvent, :count).by(1)
+  end
+
   it "accepts once, activates the user, and records request context" do
     invitation = create(:account_invitation, created_by: admin)
     AccountInvitations::Accept.new(invitation:, password: "NewSecure123!",

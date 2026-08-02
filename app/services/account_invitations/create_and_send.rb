@@ -10,8 +10,7 @@ module AccountInvitations
     def call
       raw_token = Token.generate
       invitation = create_invitation(raw_token)
-      AccountInvitationMailer.with(invitation:, token: raw_token).invitation_email.deliver_now
-      mark_sent(invitation)
+      mark_sent(invitation) if deliver(invitation, raw_token)
       Result.new(invitation:, token: raw_token)
     end
 
@@ -34,6 +33,14 @@ module AccountInvitations
         invitation.update!(status: "sent", sent_at: now, last_sent_at: now)
         event!(invitation, "sent", before_data: { "status" => "pending" }, after_data: { "status" => "sent" })
       end
+    end
+
+    def deliver(invitation, raw_token)
+      AccountInvitationMailer.with(invitation:, token: raw_token).invitation_email.deliver_now
+      true
+    rescue StandardError => e
+      Rails.logger.error("Invitation email delivery failed (#{e.class})")
+      false
     end
 
     def event!(invitation, event_type, before_data: {}, after_data: {})

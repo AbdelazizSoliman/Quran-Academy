@@ -68,28 +68,24 @@ The task creates an active Arabic administrator in the Cairo time zone, refuses 
 
 Password-reset delivery is provider-neutral. Reset URLs use `APP_HOST`, optional `APP_PORT`, and `DEFAULT_URL_OPTIONS_PROTOCOL`; production must supply the correct public host and protocol before email delivery is enabled. `MAILER_SENDER` controls the sender address.
 
-### Production email on Render
+### Production email with Resend on Render
 
-Production email uses Gmail SMTP through environment variables only. Add these variables to the
-Render web service; do not put their real values in `.env.example` or source control:
+Production invitation email uses the official Resend Ruby SDK over its HTTPS REST API. ActionMailer
+continues to render the existing localized HTML and text templates; Resend supplies only the
+transport. Add these variables to the Render web service and never commit their real values:
 
 ```text
 APP_HOST=quran-academy-igl2.onrender.com
 DEFAULT_URL_OPTIONS_PROTOCOL=https
 MAILER_SENDER=your-verified-sender@example.com
-SMTP_ADDRESS=smtp.gmail.com
-SMTP_PORT=587
-SMTP_DOMAIN=gmail.com
-SMTP_USERNAME=your-google-account@example.com
-SMTP_PASSWORD=your-google-app-password
-SMTP_AUTHENTICATION=plain
-SMTP_ENABLE_STARTTLS_AUTO=true
+RESEND_API_KEY=your-resend-api-key
 ```
 
-`APP_HOST` is a hostname only: do not include `https://` or a path. Gmail requires two-step
-verification and a generated **App Password** for `SMTP_PASSWORD`. Never use the account's normal
-Gmail password. `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAILER_SENDER`, and `APP_HOST` are required at
-production boot; the remaining SMTP values have secure Gmail defaults.
+`APP_HOST` is a hostname only: do not include `https://` or a path. `RESEND_API_KEY`,
+`MAILER_SENDER`, and `APP_HOST` are required at production boot. During development and tests,
+the sender defaults to `onboarding@resend.dev` when `MAILER_SENDER` is absent. For production,
+use `onboarding@resend.dev` only while operating within Resend's testing restrictions; use an
+address on a verified domain for normal recipient delivery.
 
 After Render restarts successfully with those variables, open Render Shell and send a real
 invitation-template delivery test to an address you control:
@@ -99,15 +95,14 @@ EMAIL=test@example.com bin/rails mailers:test_invitation
 ```
 
 Optionally set `LOCALE=ar` for an Arabic message. The task creates no permanent user or invitation,
-does not print credentials, and reports only that SMTP accepted the message. Replace the example
+does not print the API key, and reports only that Resend accepted the message. Replace the example
 recipient on the command line; never store it in source control.
 
-For Gmail `535` authentication errors, confirm that two-step verification is enabled, generate a
-new App Password, verify `SMTP_USERNAME`, and ensure the normal Gmail password was not used. For
-connection or timeout errors, verify `smtp.gmail.com`, port `587`, STARTTLS `true`, and that the
-Render service can make outbound SMTP connections. Delivery errors intentionally fail loudly in
-production so the Render logs show the underlying SMTP response without printing the configured
-password.
+For authentication errors, verify that `RESEND_API_KEY` is current and belongs to the intended
+Resend account. For sender or validation errors, verify `MAILER_SENDER` against Resend's domain and
+testing-mode rules. For timeouts, confirm that the Render service can make outbound HTTPS requests
+to Resend. Invitation creation remains committed if delivery fails; the invitation stays pending
+and can be resent after configuration is corrected.
 
 Academy business modules remain intentionally out of scope.
 
