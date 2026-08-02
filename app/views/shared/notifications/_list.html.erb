@@ -7,6 +7,8 @@
         <div><dt class="ds-caption"><%= t("notifications.fields.provider") %></dt><dd><%= t("notifications.providers.#{notification.provider}", default: notification.provider) %></dd></div>
         <div><dt class="ds-caption"><%= t("notifications.fields.attempts") %></dt><dd><%= notification.attempt_count %></dd></div>
         <div><dt class="ds-caption"><%= t("notifications.fields.sent_at") %></dt><dd><%= notification.sent_at ? l(notification.sent_at, format: :short) : t("notifications.not_available") %></dd></div>
+        <div><dt class="ds-caption"><%= t("notifications.fields.scheduled_at") %></dt><dd><%= notification.scheduled_at ? l(notification.scheduled_at, format: :short) : t("notifications.not_available") %></dd></div>
+        <div><dt class="ds-caption"><%= t("notifications.fields.queued_at") %></dt><dd><%= notification.queued_at ? l(notification.queued_at, format: :short) : t("notifications.not_available") %></dd></div>
         <div><dt class="ds-caption"><%= t("notifications.fields.provider_id") %></dt><dd class="break-all"><%= notification.provider_message_id.presence || t("notifications.not_available") %></dd></div>
         <div><dt class="ds-caption"><%= t("notifications.fields.response") %></dt><dd><%= notification.provider_status.presence || t("notifications.not_available") %></dd></div>
       </dl>

@@ -42,6 +42,9 @@ class AcademySetting < ApplicationRecord
             :second_lesson_reminder_minutes_before, :teacher_check_in_opens_minutes_before,
             :teacher_check_in_closes_minutes_after, :left_early_threshold_minutes,
             numericality: { only_integer: true, in: 0..1_440 }
+  validates :lesson_reminder_minutes_before, :first_late_reminder_minutes, :second_late_reminder_minutes,
+            numericality: { only_integer: true, in: 0..1_440 }
+  validate :validate_notification_reminders
 
   validate :validate_collections
   validate :validate_locale_relationship
@@ -144,6 +147,12 @@ class AcademySetting < ApplicationRecord
   def validate_attendance_rules
     threshold = [student_late_after_minutes, teacher_late_after_minutes].compact.max
     errors.add(:absence_after_minutes, :too_small) if threshold && absence_after_minutes.to_i < threshold
+  end
+
+  def validate_notification_reminders
+    return if first_late_reminder_minutes.to_i < second_late_reminder_minutes.to_i
+
+    errors.add(:second_late_reminder_minutes, :after_first_reminder)
   end
 
   def validate_assessment_grade_boundaries

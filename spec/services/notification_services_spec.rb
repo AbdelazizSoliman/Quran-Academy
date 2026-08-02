@@ -58,4 +58,48 @@ RSpec.describe "Notification services" do
     expect(result.guardian).to eq(guardian)
     expect(result.provider_address).to eq("966501234567")
   end
+
+  it "creates due lesson reminders once for the teacher and enrolled students" do
+    now = Time.current
+    lesson = create(:scheduled_lesson, :scheduled, starts_at: now + 20.minutes, ends_at: now + 50.minutes)
+    participation = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+    participation.enrollment.student_profile.update!(phone_number: "+201001234568")
+    configure_reminders
+    stub_whatsapp_success
+
+    expect do
+      Notifications::LessonReminderScheduler.new(actor: admin, now:).call
+    end.to change(Notification, :count).by(2)
+    expect do
+      Notifications::LessonReminderScheduler.new(actor: admin, now:).call
+    end.not_to change(Notification, :count)
+  end
+
+  it "creates both due late stages only for pending attendance" do
+    now = Time.current
+    lesson = create(:scheduled_lesson, :in_progress, starts_at: now - 25.minutes, ends_at: now + 20.minutes)
+    participation = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+    participation.enrollment.student_profile.update!(phone_number: "+201001234569")
+    create(:lesson_attendance, scheduled_lesson_enrollment: participation, scheduled_lesson: lesson)
+    configure_reminders
+    stub_whatsapp_success
+
+    expect do
+      Notifications::LateAttendanceReminderScheduler.new(actor: admin, now:).call
+    end.to change(Notification, :count).by(4)
+  end
+
+  def configure_reminders
+    AcademySetting.current.update!(lesson_reminders_enabled: true, whatsapp_notifications_enabled: true,
+                                   lesson_reminder_minutes_before: 30, first_late_reminder_minutes: 10,
+                                   second_late_reminder_minutes: 20)
+  end
+
+  def stub_whatsapp_success
+    provider = instance_double(Notifications::WhatsAppProvider)
+    result = Notifications::ProviderResult.new(true, "wamid.test", { "messages" => [{ "id" => "wamid.test" }] },
+                                               200, "accepted", nil, nil)
+    allow(Notifications::WhatsAppProvider).to receive(:new).and_return(provider)
+    allow(provider).to receive(:deliver).and_return(result)
+  end
 end

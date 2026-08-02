@@ -5,6 +5,7 @@ en:
       guardian_not_available: "does not have an eligible primary guardian with a valid WhatsApp number"
       channel_disabled: "notification channel is disabled in academy settings"
       notification_type_disabled: "notification type is disabled in academy settings"
+      after_first_reminder: "must be later than the first late reminder"
   notifications:
     not_available: "Not available"
     audit: "Delivery audit history"
@@ -31,6 +32,8 @@ en:
       provider: "Provider"
       attempts: "Attempts"
       sent_at: "Sent at"
+      scheduled_at: "Scheduled at"
+      queued_at: "Queued at"
       http_status: "HTTP status"
       response: "Provider response"
       primary_guardian: "Send WhatsApp to the minor student's primary guardian"
@@ -42,6 +45,9 @@ en:
     types:
       account_invitation: "Account invitation"
       lesson_reminder: "Lesson reminder"
+      late_reminder: "Late attendance reminder"
+      lesson_cancelled: "Lesson cancelled"
+      lesson_rescheduled: "Lesson rescheduled"
       lesson_report: "Lesson report"
       certificate: "Certificate notification"
     events: { created: "Created", attempted: "Attempted", sent: "Sent", delivered: "Delivered", failed: "Failed", retried: "Retried" }
@@ -49,15 +55,25 @@ en:
     errors: { title: "Notification could not be sent" }
     messages:
       saved: "The delivery attempt was recorded."
+      students: "Enrolled students"
       account_invitation:
         subject: "%{academy} account invitation"
         body: "Hello %{recipient},\n\nYou have been invited to %{academy}. Create your password securely using this single-use link:\n%{url}"
       lesson_reminder:
         subject: "%{academy} lesson reminder"
-        body: "Hello %{recipient},\n\nThis is a reminder for %{title} on %{date}."
+        body: "Academy: %{academy}\nTeacher: %{teacher}\nStudent: %{student}\nLesson: %{title}\nDate: %{date}\nTime: %{time}\nProgram: %{program}\nCourse: %{course}"
+      late_reminder:
+        subject: "%{academy} attendance reminder"
+        body: "Academy: %{academy}\nTeacher: %{teacher}\nStudent: %{student}\nAttendance is still pending for %{title}.\nDate: %{date}\nTime: %{time}\nProgram: %{program}\nCourse: %{course}"
+      lesson_cancelled:
+        subject: "%{academy} lesson cancelled"
+        body: "Academy: %{academy}\nTeacher: %{teacher}\nStudent: %{student}\nLesson cancelled: %{title}\nDate: %{date}\nTime: %{time}\nProgram: %{program}\nCourse: %{course}"
+      lesson_rescheduled:
+        subject: "%{academy} lesson rescheduled"
+        body: "Academy: %{academy}\nTeacher: %{teacher}\nStudent: %{student}\nLesson rescheduled: %{title}\nNew date: %{date}\nNew time: %{time}\nProgram: %{program}\nCourse: %{course}"
       lesson_report:
         subject: "%{academy} lesson report"
-        body: "Hello %{recipient},\n\nYour report for %{title} is available:\n%{url}"
+        body: "Academy: %{academy}\nTeacher: %{teacher}\nStudent: %{student}\nLesson report published: %{title}\nDate: %{date}\nTime: %{time}\nProgram: %{program}\nCourse: %{course}\n%{url}"
       certificate:
         subject: "%{academy} certificate"
-        body: "Hello %{recipient},\n\nCertificate %{title} was issued on %{date}. View it here:\n%{url}"
+        body: "Academy: %{academy}\nTeacher: %{teacher}\nStudent: %{student}\nCertificate: %{title}\nDate: %{date}\nTime: %{time}\nProgram: %{program}\nCourse: %{course}\n%{url}"

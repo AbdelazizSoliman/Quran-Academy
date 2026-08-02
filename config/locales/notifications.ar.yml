@@ -5,6 +5,7 @@ ar:
       guardian_not_available: "لا يوجد ولي أمر أساسي مؤهل برقم واتساب صالح"
       channel_disabled: "قناة الإشعارات معطلة في إعدادات الأكاديمية"
       notification_type_disabled: "نوع الإشعار معطل في إعدادات الأكاديمية"
+      after_first_reminder: "يجب أن يكون بعد تذكير التأخر الأول"
   notifications:
     not_available: "غير متاح"
     audit: "سجل تدقيق الإرسال"
@@ -31,6 +32,8 @@ ar:
       provider: "المزود"
       attempts: "المحاولات"
       sent_at: "وقت الإرسال"
+      scheduled_at: "وقت الجدولة"
+      queued_at: "وقت الإدراج"
       http_status: "حالة HTTP"
       response: "استجابة المزود"
       primary_guardian: "إرسال واتساب إلى ولي الأمر الأساسي للطالب القاصر"
@@ -42,6 +45,9 @@ ar:
     types:
       account_invitation: "دعوة حساب"
       lesson_reminder: "تذكير بالحلقة"
+      late_reminder: "تذكير تأخر الحضور"
+      lesson_cancelled: "إلغاء الحلقة"
+      lesson_rescheduled: "إعادة جدولة الحلقة"
       lesson_report: "تقرير الحلقة"
       certificate: "إشعار شهادة"
     events: { created: "أُنشئ", attempted: "جرت المحاولة", sent: "أُرسل", delivered: "تم التسليم", failed: "فشل", retried: "أُعيدت المحاولة" }
@@ -49,15 +55,25 @@ ar:
     errors: { title: "تعذر إرسال الإشعار" }
     messages:
       saved: "تم تسجيل محاولة الإرسال."
+      students: "الطلاب المسجلون"
       account_invitation:
         subject: "دعوة حساب %{academy}"
         body: "مرحبًا %{recipient}،\n\nتمت دعوتك إلى %{academy}. أنشئ كلمة مرورك بأمان عبر الرابط الصالح للاستخدام مرة واحدة:\n%{url}"
       lesson_reminder:
         subject: "تذكير بحلقة %{academy}"
-        body: "مرحبًا %{recipient}،\n\nنذكرك بحلقة %{title} بتاريخ %{date}."
+        body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nالحلقة: %{title}\nالتاريخ: %{date}\nالوقت: %{time}\nالبرنامج: %{program}\nالدورة: %{course}"
+      late_reminder:
+        subject: "تذكير حضور من %{academy}"
+        body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nلا يزال حضور حلقة %{title} معلقًا.\nالتاريخ: %{date}\nالوقت: %{time}\nالبرنامج: %{program}\nالدورة: %{course}"
+      lesson_cancelled:
+        subject: "إلغاء حلقة في %{academy}"
+        body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nتم إلغاء الحلقة: %{title}\nالتاريخ: %{date}\nالوقت: %{time}\nالبرنامج: %{program}\nالدورة: %{course}"
+      lesson_rescheduled:
+        subject: "إعادة جدولة حلقة في %{academy}"
+        body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nتمت إعادة جدولة الحلقة: %{title}\nالتاريخ الجديد: %{date}\nالوقت الجديد: %{time}\nالبرنامج: %{program}\nالدورة: %{course}"
       lesson_report:
         subject: "تقرير حلقة %{academy}"
-        body: "مرحبًا %{recipient}،\n\nأصبح تقرير حلقة %{title} متاحًا:\n%{url}"
+        body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nتم نشر تقرير الحلقة: %{title}\nالتاريخ: %{date}\nالوقت: %{time}\nالبرنامج: %{program}\nالدورة: %{course}\n%{url}"
       certificate:
         subject: "شهادة من %{academy}"
-        body: "مرحبًا %{recipient}،\n\nتم إصدار الشهادة %{title} بتاريخ %{date}. يمكنك عرضها هنا:\n%{url}"
+        body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nالشهادة: %{title}\nالتاريخ: %{date}\nالوقت: %{time}\nالبرنامج: %{program}\nالدورة: %{course}\n%{url}"

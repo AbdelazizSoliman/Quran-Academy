@@ -7,9 +7,22 @@ Quran Academy (أكاديمية القرآن) is a production-oriented managemen
 Provider-backed notifications use Resend for email and the official Meta WhatsApp Cloud API over HTTPS. Configure
 `RESEND_API_KEY`, `MAILER_SENDER`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, and
 `WHATSAPP_BUSINESS_ACCOUNT_ID` in the deployment environment and never commit their values. The academy Email and
-WhatsApp notification switches must also be enabled. Delivery is manual and synchronous in this release; no
-background jobs or automatic schedules are created. Meta may require an approved WhatsApp template when a
+WhatsApp notification switches must also be enabled. No job is enqueued and no external schedule is installed
+automatically. Meta may require an approved WhatsApp template when a
 business-initiated message is outside the customer-service conversation window.
+
+### Future reminder scheduling
+
+The application exposes thin ActiveJob adapters and does not install or execute an external scheduler. Configure cron,
+a Render Cron Job, or a future Solid Queue recurring schedule to enqueue both sweep jobs once per minute. Set
+`NOTIFICATION_ACTOR_ID` to an active administrator used as the audit actor, then invoke:
+
+```bash
+bin/rails runner 'actor = User.find(ENV.fetch("NOTIFICATION_ACTOR_ID")); ReminderSweepJob.perform_later(actor:); LateReminderSweepJob.perform_later(actor:)'
+```
+
+The jobs contain no reminder business logic. They call the idempotent reminder services, so overlapping scheduler
+invocations cannot create duplicate notifications for the same lesson, recipient, and reminder stage.
 
 ## Planned capabilities
 

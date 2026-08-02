@@ -1,20 +1,26 @@
 module Notifications
   class Dispatch
-    def initialize(actor:, recipient:, source:, type:, channel:, primary_guardian: false)
+    def initialize(actor:, recipient:, source:, type:, channel:, primary_guardian: false,
+                   idempotency_key: nil, scheduled_at: nil, queued_at: nil)
       @actor = actor
       @recipient = recipient
       @source = source
       @type = type.to_s
       @channel = channel.to_s
       @primary_guardian = primary_guardian
+      @idempotency_key = idempotency_key
+      @scheduled_at = scheduled_at
+      @queued_at = queued_at
     end
 
     def call
       notification = build_notification
       return invalid(notification, :forbidden) unless authorized?
+      return invalid(notification, :invalid_source) unless source_valid?
+      existing = Notification.find_by(idempotency_key: @idempotency_key) if @idempotency_key.present?
+      return existing if existing
       return invalid(notification, :channel_disabled) unless channel_enabled?
       return invalid(notification, :notification_type_disabled) unless notification_type_enabled?
-      return invalid(notification, :invalid_source) unless source_valid?
 
       resolved = RecipientResolver.new(user: @recipient, channel: @channel,
                                        primary_guardian: @primary_guardian).call
@@ -35,6 +41,8 @@ module Notifications
                   delivery_body: message.body).call
     rescue ActiveRecord::RecordInvalid
       notification
+    rescue ActiveRecord::RecordNotUnique
+      Notification.find_by!(idempotency_key: @idempotency_key)
     end
 
     private
@@ -42,7 +50,8 @@ module Notifications
     def build_notification
       Notification.new(recipient_user: @recipient, actor: @actor, source: @source, channel: @channel,
                        notification_type: @type, recipient_locale: locale,
-                       recipient_address_masked: "unavailable", message_snapshot: "unavailable")
+                       recipient_address_masked: "unavailable", message_snapshot: "unavailable",
+                       idempotency_key: @idempotency_key, scheduled_at: @scheduled_at, queued_at: @queued_at)
     end
 
     def authorized?
@@ -61,14 +70,17 @@ module Notifications
     def source_valid?
       Notification::TYPES.include?(@type) && Notification::CHANNELS.include?(@channel) &&
         { "account_invitation" => AccountInvitation, "lesson_reminder" => ScheduledLesson,
-          "lesson_report" => LessonReport, "certificate" => Certificate }[@type] === @source &&
+          "late_reminder" => ScheduledLesson, "lesson_cancelled" => ScheduledLesson,
+          "lesson_rescheduled" => ScheduledLesson, "lesson_report" => LessonReport,
+          "certificate" => Certificate }[@type] === @source &&
         source_deliverable? && recipient_belongs_to_source?
     end
 
     def source_deliverable?
       case @source
       when AccountInvitation then @source.usable?
-      when ScheduledLesson then @source.status.in?(%w[scheduled in_progress])
+      when ScheduledLesson
+        @type == "lesson_cancelled" ? @source.cancelled? : @source.status.in?(%w[scheduled in_progress])
       when LessonReport then @source.status.in?(%w[reviewed locked])
       when Certificate then true
       else false
@@ -78,24 +90,40 @@ module Notifications
     def recipient_belongs_to_source?
       case @source
       when AccountInvitation then @source.user_id == @recipient.id
-      when ScheduledLesson then @source.enrollments.joins(student_profile: :user).exists?(users: { id: @recipient.id })
+      when ScheduledLesson
+        @source.teacher_profile.user_id == @recipient.id ||
+          @source.enrollments.joins(student_profile: :user).exists?(users: { id: @recipient.id })
       when LessonReport then @source.lesson_student_reports.joins(student_profile: :user).exists?(users: { id: @recipient.id })
       when Certificate then @source.student_profile.user_id == @recipient.id
       else false
       end
     end
 
-    def channel_enabled?
-      setting = AcademySetting.current
-      @channel == "email" ? setting.email_notifications_enabled? : setting.whatsapp_notifications_enabled?
-    end
-
     def notification_type_enabled?
       setting = AcademySetting.current
       { "account_invitation" => setting.invitation_notifications_enabled?,
         "lesson_reminder" => setting.lesson_reminders_enabled?,
-        "lesson_report" => setting.lesson_report_notifications_enabled?,
+        "late_reminder" => setting.lesson_reminders_enabled?,
+        "lesson_cancelled" => setting.lesson_reminders_enabled?,
+        "lesson_rescheduled" => setting.lesson_reminders_enabled?,
+        "lesson_report" => setting.lesson_report_notifications_enabled? && setting.lesson_report_whatsapp_enabled?,
         "certificate" => setting.certificate_notifications_enabled? }.fetch(@type, false)
+    end
+
+    def channel_enabled?
+      setting = AcademySetting.current
+      return false unless channel_allowed_for_type?(setting)
+
+      @channel == "email" ? setting.email_notifications_enabled? : setting.whatsapp_notifications_enabled?
+    end
+
+    def channel_allowed_for_type?(setting)
+      return @channel == "email" if @type == "account_invitation"
+      return @channel == "whatsapp" if @type.in?(%w[lesson_reminder late_reminder lesson_cancelled
+                                                     lesson_rescheduled lesson_report])
+      return @channel == "email" || (@channel == "whatsapp" && setting.certificate_whatsapp_enabled?) if @type == "certificate"
+
+      false
     end
 
     def rotate_invitation_token

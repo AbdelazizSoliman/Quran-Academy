@@ -1,7 +1,9 @@
 module Admin
   class NotificationsController < SchedulingBaseController
     SOURCE_TYPES = { "account_invitation" => AccountInvitation, "lesson_reminder" => ScheduledLesson,
-                     "lesson_report" => LessonReport, "certificate" => Certificate }.freeze
+                     "late_reminder" => ScheduledLesson, "lesson_cancelled" => ScheduledLesson,
+                     "lesson_rescheduled" => ScheduledLesson, "lesson_report" => LessonReport,
+                     "certificate" => Certificate }.freeze
 
     before_action :require_admin!, except: %i[index show]
     before_action :set_notification, only: %i[show retry_delivery]

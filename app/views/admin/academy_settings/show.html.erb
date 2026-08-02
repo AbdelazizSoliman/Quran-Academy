@@ -48,7 +48,7 @@
       attendance: %i[student_late_after_minutes teacher_late_after_minutes absence_after_minutes
                      teacher_check_in_opens_minutes_before teacher_check_in_closes_minutes_after
                      left_early_threshold_minutes allow_manual_attendance_adjustment],
-      communication: %i[email_notifications_enabled whatsapp_notifications_enabled invitation_notifications_enabled lesson_reminders_enabled lesson_report_notifications_enabled certificate_notifications_enabled sms_notifications_enabled attendance_notifications_enabled payment_notifications_enabled lesson_reminder_hours_before second_lesson_reminder_minutes_before invitation_expires_after_hours],
+      communication: %i[email_notifications_enabled whatsapp_notifications_enabled invitation_notifications_enabled lesson_reminders_enabled lesson_reminder_minutes_before first_late_reminder_minutes second_late_reminder_minutes lesson_report_notifications_enabled lesson_report_whatsapp_enabled certificate_notifications_enabled certificate_whatsapp_enabled sms_notifications_enabled attendance_notifications_enabled payment_notifications_enabled invitation_expires_after_hours],
       finance: %i[default_teacher_compensation_type default_teacher_rate payroll_currency payroll_period billing_currency default_lesson_price billing_cycle]
     }.fetch(section) %>
     <% body = capture do %>
