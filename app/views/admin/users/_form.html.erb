@@ -22,15 +22,13 @@
         <%= label_tag "user_phone_number", t("admin.users.fields.phone_number"), class: "ds-label" %>
         <%= tag.input type: "tel", name: "user[phone_number]", id: "user_phone_number",
                       value: contact_fields[:phone_number], class: "ds-control mt-2", required: true,
-                      autocomplete: "tel", aria: { invalid: user.errors[:phone_number].any? } %>
-        <% if user.errors[:phone_number].any? %><p class="mt-1 text-sm text-app-danger"><%= user.errors[:phone_number].to_sentence %></p><% end %>
+                      autocomplete: "tel" %>
       </div>
       <div>
         <%= label_tag "user_whatsapp_number", t("admin.users.fields.whatsapp_number"), class: "ds-label" %>
         <%= tag.input type: "tel", name: "user[whatsapp_number]", id: "user_whatsapp_number",
                       value: contact_fields[:whatsapp_number], class: "ds-control mt-2", autocomplete: "tel" %>
         <p class="mt-1 ds-caption"><%= t("admin.users.form.whatsapp_fallback_hint") %></p>
-        <% if user.errors[:whatsapp_number].any? %><p class="mt-1 text-sm text-app-danger"><%= user.errors[:whatsapp_number].to_sentence %></p><% end %>
       </div>
     <% end %>
 

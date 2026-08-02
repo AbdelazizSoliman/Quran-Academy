@@ -58,6 +58,11 @@ module Admin
       end
     end
 
+    def destroy
+      Users::ForceDelete.new(actor: current_user, user: @user).call
+      redirect_to admin_users_path, notice: t("admin.users.messages.deleted")
+    end
+
     private
 
     def set_user

@@ -18,7 +18,7 @@ module Admin
         end
         user
       rescue ActiveRecord::RecordInvalid => e
-        user.errors.merge!(e.record.errors) unless e.record == user
+        merge_profile_errors(user, e.record) unless e.record == user
         user
       end
 
@@ -47,12 +47,12 @@ module Admin
 
       def normalize_phone(user, attribute, value)
         if value.blank?
-          user.errors.add(attribute, :blank)
+          user.errors.add(:base, I18n.t("admin.users.errors.#{attribute}_blank"))
           return
         end
 
         result = Notifications::E164Normalizer.call(value)
-        user.errors.add(attribute, result.error) unless result.valid?
+        user.errors.add(:base, I18n.t("admin.users.errors.#{attribute}_invalid")) unless result.valid?
         result if result.valid?
       end
 
@@ -83,6 +83,10 @@ module Admin
       def create_staff_profile(user)
         user.create_staff_profile!(@contact.merge(display_name: user.full_name,
                                                   created_by: @actor, updated_by: @actor))
+      end
+
+      def merge_profile_errors(user, profile)
+        profile.errors.full_messages.each { |message| user.errors.add(:base, message) }
       end
     end
   end

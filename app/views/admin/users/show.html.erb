@@ -51,6 +51,13 @@
                    primary_action: primary %>
       <% end %>
       <%= render "shared/components/button", label: t("admin.users.actions.reset_password"), href: reset_password_admin_user_path(@user), variant: :outline %>
+      <% if current_user.email.to_s.casecmp?(Admin::Users::ForceDelete::PRIVILEGED_EMAIL) && current_user != @user %>
+        <% delete_action = button_to t("admin.users.actions.force_delete"), admin_user_path(@user), method: :delete, class: button_classes(variant: :danger) %>
+        <%= render "shared/components/modal", open_label: t("admin.users.actions.force_delete"), open_variant: :danger,
+                   open_icon: :warning, title: t("admin.users.confirmations.force_delete_title"),
+                   description: t("admin.users.confirmations.force_delete", name: @user.full_name),
+                   body: tag.p(t("admin.users.confirmations.force_delete_warning")), primary_action: delete_action %>
+      <% end %>
     </div>
   <% end %>
   <%= render "shared/components/card", title: t("admin.users.show.actions"), body: actions_body %>

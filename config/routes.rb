@@ -110,7 +110,7 @@ Rails.application.routes.draw do
         patch :restore
       end
     end
-    resources :users, except: :destroy do
+    resources :users do
       member do
         patch :approve
         patch :suspend

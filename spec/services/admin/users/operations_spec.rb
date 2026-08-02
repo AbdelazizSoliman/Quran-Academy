@@ -38,9 +38,9 @@ RSpec.describe "Admin user operations" do
     ).call
 
     expect(missing).not_to be_persisted
-    expect(missing.errors[:phone_number]).to be_present
+    expect(missing.errors[:base]).to include(I18n.t("admin.users.errors.phone_number_blank"))
     expect(invalid).not_to be_persisted
-    expect(invalid.errors[:phone_number]).to be_present
+    expect(invalid.errors[:base]).to include(I18n.t("admin.users.errors.phone_number_invalid"))
   end
 
   it "makes the new profile phone available to immediate WhatsApp invitation delivery" do

@@ -74,6 +74,17 @@ RSpec.describe "Admin user administration" do
     expect(response).to have_http_status(:unprocessable_content)
   end
 
+  it "renders localized contact errors without treating profile fields as User attributes" do
+    sign_in admin
+
+    post admin_users_path, params: {
+      user: attributes_for(:user, :teacher).merge(phone_number: "invalid", whatsapp_number: "")
+    }
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.body).to include(I18n.t("admin.users.errors.phone_number_invalid"))
+  end
+
   it "updates safe fields but cannot mass assign security internals or status" do
     sign_in admin
     user = create(:user)
@@ -89,6 +100,23 @@ RSpec.describe "Admin user administration" do
     expect(user.time_zone).to eq("London")
     expect(user).to be_active
     expect(user.sign_in_count).to eq(0)
+  end
+
+  it "allows only the designated administrator to force-delete another user" do
+    privileged = create(:user, :admin, email: Admin::Users::ForceDelete::PRIVILEGED_EMAIL)
+    target = create(:user, :pending)
+    sign_in privileged
+
+    expect { delete admin_user_path(target) }.to change(User, :count).by(-1)
+    expect(response).to redirect_to(admin_users_path)
+  end
+
+  it "rejects force deletion by every other administrator" do
+    sign_in admin
+    target = create(:user, :pending)
+
+    expect { delete admin_user_path(target) }.not_to change(User, :count)
+    expect(response).to redirect_to(admin_user_path(target))
   end
 
   it "approves a pending user and shows audit history" do
