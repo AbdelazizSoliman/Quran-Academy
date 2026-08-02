@@ -45,7 +45,8 @@ module Admin
         teacher_late_after_minutes absence_after_minutes allow_manual_attendance_adjustment
         teacher_check_in_opens_minutes_before teacher_check_in_closes_minutes_after left_early_threshold_minutes
         email_notifications_enabled whatsapp_notifications_enabled sms_notifications_enabled
-        lesson_reminders_enabled attendance_notifications_enabled payment_notifications_enabled
+        invitation_notifications_enabled lesson_reminders_enabled lesson_report_notifications_enabled
+        certificate_notifications_enabled attendance_notifications_enabled payment_notifications_enabled
         lesson_reminder_hours_before second_lesson_reminder_minutes_before default_teacher_compensation_type
         default_teacher_rate payroll_currency payroll_period billing_currency default_lesson_price billing_cycle
         invitation_expires_after_hours

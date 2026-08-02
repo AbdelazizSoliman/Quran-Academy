@@ -1,0 +1,1 @@
+<%= render "shared/page_header", title: t("notifications.history.title"), description: t("notifications.history.student") %><%= render "shared/notifications/list", notifications: @notifications, path: ->(notification) { student_notification_path(notification) } %>

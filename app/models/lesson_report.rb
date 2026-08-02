@@ -1,4 +1,5 @@
 class LessonReport < ApplicationRecord
+  has_many :notifications, as: :source, dependent: :restrict_with_exception
   STATUSES = %w[draft submitted reviewed locked reopened archived].freeze
   ENGAGEMENT_LEVELS = %w[not_assessed low inconsistent engaged highly_engaged].freeze
   PROGRESS_LEVELS = %w[not_assessed needs_support developing meeting_expectations above_expectations excellent].freeze

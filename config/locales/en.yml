@@ -63,6 +63,7 @@ en:
     exams: "Exams"
     certificates: "Certificates"
     academic_progress: "Academic progress"
+    notifications: "Notifications"
     my_profile: "My Profile"
     coming_soon: "Coming Soon"
   actions:
@@ -233,6 +234,9 @@ en:
         allow_manual_attendance_adjustment: "Allow manual attendance adjustment"
         email_notifications_enabled: "Email channel preference"
         whatsapp_notifications_enabled: "WhatsApp channel preference"
+        invitation_notifications_enabled: "Account invitation notifications"
+        lesson_report_notifications_enabled: "Lesson report notifications"
+        certificate_notifications_enabled: "Certificate notifications"
         sms_notifications_enabled: "SMS channel preference"
         lesson_reminders_enabled: "Lesson reminder preference"
         attendance_notifications_enabled: "Attendance notification preference"
@@ -265,8 +269,8 @@ en:
         enabled: "Enabled"
         disabled: "Disabled"
       provider:
-        title: "Provider not configured"
-        description: "These flags express future preferences only. No email, WhatsApp, or SMS provider is connected and no messages will be sent."
+        title: "Notification channels"
+        description: "Email uses Resend and WhatsApp uses the official Meta Cloud API. Disabling a channel prevents new provider deliveries. SMS and automatic scheduling remain unavailable."
       hints:
         operational_default: "A future operational default; no workflow is executed yet."
         readiness_only: "Readiness preference only; no provider or automation is configured."

@@ -7,6 +7,15 @@ Rails.application.routes.draw do
              path_names: { sign_in: "sign-in", sign_out: "sign-out", password: "password" },
              skip: :registrations
   namespace :admin do
+    resources :notifications, only: %i[index show new create] do
+      member { patch :retry_delivery }
+      collection do
+        post :send_account_invitation
+        post :send_lesson_reminder
+        post :send_lesson_report
+        post :send_certificate
+      end
+    end
     resources :assessment_templates, except: :destroy do
       resources :rubric_items, only: %i[create update], controller: :assessment_rubric_items
     end
@@ -183,6 +192,7 @@ Rails.application.routes.draw do
     end
   end
   namespace :teacher do
+    resources :notifications, only: %i[index show create]
     resources :assessments, controller: :student_assessments, except: :destroy do
       patch :submit, on: :member
     end
@@ -226,6 +236,7 @@ Rails.application.routes.draw do
     resource :reports, only: :show, controller: :reports
   end
   namespace :student do
+    resources :notifications, only: %i[index show]
     resources :assessments, only: %i[index show]
     resources :certificates, only: %i[index show]
     resource :transcript, only: :show

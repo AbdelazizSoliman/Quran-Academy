@@ -63,6 +63,7 @@ ar:
     exams: "الاختبارات"
     certificates: "الشهادات"
     academic_progress: "التقدم الأكاديمي"
+    notifications: "الإشعارات"
     my_profile: "ملفي الشخصي"
     coming_soon: "قريباً"
   actions:
@@ -233,6 +234,9 @@ ar:
         allow_manual_attendance_adjustment: "السماح بتعديل الحضور يدوياً"
         email_notifications_enabled: "تفضيل قناة البريد"
         whatsapp_notifications_enabled: "تفضيل قناة واتساب"
+        invitation_notifications_enabled: "إشعارات دعوات الحسابات"
+        lesson_report_notifications_enabled: "إشعارات تقارير الحلقات"
+        certificate_notifications_enabled: "إشعارات الشهادات"
         sms_notifications_enabled: "تفضيل قناة الرسائل النصية"
         lesson_reminders_enabled: "تفضيل تذكيرات الحلقات"
         attendance_notifications_enabled: "تفضيل إشعارات الحضور"
@@ -265,8 +269,8 @@ ar:
         enabled: "مفعّل"
         disabled: "غير مفعّل"
       provider:
-        title: "مزود الخدمة غير مهيأ"
-        description: "هذه الأعلام تفضيلات مستقبلية فقط. لا يوجد مزود بريد أو واتساب أو رسائل نصية ولن تُرسل رسائل."
+        title: "قنوات الإشعارات"
+        description: "يستخدم البريد Resend ويستخدم واتساب واجهة Meta Cloud الرسمية. تعطيل القناة يمنع عمليات الإرسال الجديدة. الرسائل النصية والجدولة التلقائية غير متاحتين."
       hints:
         operational_default: "قيمة تشغيلية مستقبلية؛ لا يتم تنفيذ أي إجراء حالياً."
         readiness_only: "تفضيل جاهزية فقط؛ لا يوجد مزود أو تشغيل آلي."

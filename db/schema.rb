@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_02_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -170,7 +170,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.index ["assessment_template_id", "display_order"], name: "idx_rubrics_template_order"
     t.index ["assessment_template_id"], name: "index_assessment_rubric_items_on_assessment_template_id"
     t.check_constraint "maximum_score > 0::numeric AND weight > 0::numeric", name: "rubric_positive_values"
-    t.check_constraint "scoring_type::text = ANY (ARRAY['numeric'::character varying, 'rating'::character varying]::text[])", name: "rubric_scoring_type"
+    t.check_constraint "scoring_type::text = ANY (ARRAY['numeric'::character varying::text, 'rating'::character varying::text])", name: "rubric_scoring_type"
   end
 
   create_table "assessment_scores", force: :cascade do |t|
@@ -204,7 +204,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.index ["public_id"], name: "index_assessment_templates_on_public_id", unique: true
     t.index ["status", "display_order"], name: "index_assessment_templates_on_status_and_display_order"
     t.index ["updated_by_id"], name: "index_assessment_templates_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'archived'::character varying]::text[])", name: "assessment_template_status"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying::text, 'inactive'::character varying::text, 'archived'::character varying::text])", name: "assessment_template_status"
   end
 
   create_table "certificate_events", force: :cascade do |t|
@@ -241,7 +241,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.index ["student_profile_id", "issued_on"], name: "index_certificates_on_student_profile_id_and_issued_on"
     t.index ["student_profile_id"], name: "index_certificates_on_student_profile_id"
     t.index ["verification_code"], name: "index_certificates_on_verification_code", unique: true
-    t.check_constraint "certificate_type::text = ANY (ARRAY['program_completion'::character varying, 'exam_completion'::character varying, 'ijazah'::character varying]::text[])", name: "certificate_type"
+    t.check_constraint "certificate_type::text = ANY (ARRAY['program_completion'::character varying::text, 'exam_completion'::character varying::text, 'ijazah'::character varying::text])", name: "certificate_type"
   end
 
   create_table "communication_log_events", force: :cascade do |t|
@@ -296,8 +296,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.index ["recipient_user_id"], name: "index_communication_logs_on_recipient_user_id"
     t.index ["scheduled_lesson_id"], name: "index_communication_logs_on_scheduled_lesson_id"
     t.index ["student_profile_id"], name: "index_communication_logs_on_student_profile_id"
-    t.check_constraint "channel::text = ANY (ARRAY['whatsapp'::character varying, 'email'::character varying]::text[])", name: "communication_logs_channel"
-    t.check_constraint "status::text = ANY (ARRAY['prepared'::character varying, 'opened'::character varying, 'confirmed_sent'::character varying, 'cancelled'::character varying, 'failed'::character varying]::text[])", name: "communication_logs_status"
+    t.check_constraint "channel::text = ANY (ARRAY['whatsapp'::character varying::text, 'email'::character varying::text])", name: "communication_logs_channel"
+    t.check_constraint "status::text = ANY (ARRAY['prepared'::character varying::text, 'opened'::character varying::text, 'confirmed_sent'::character varying::text, 'cancelled'::character varying::text, 'failed'::character varying::text])", name: "communication_logs_status"
   end
 
   create_table "course_offering_events", force: :cascade do |t|
@@ -462,7 +462,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.index ["teacher_profile_id"], name: "index_exam_sessions_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_exam_sessions_on_updated_by_id"
     t.check_constraint "duration_minutes >= 1 AND duration_minutes <= 480", name: "exam_duration_range"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'scheduled'::character varying, 'completed'::character varying, 'reviewed'::character varying, 'published'::character varying, 'archived'::character varying]::text[])", name: "exam_session_status"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'scheduled'::character varying::text, 'completed'::character varying::text, 'reviewed'::character varying::text, 'published'::character varying::text, 'archived'::character varying::text])", name: "exam_session_status"
   end
 
   create_table "guardian_events", force: :cascade do |t|
@@ -604,7 +604,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.index ["submitted_by_id"], name: "index_lesson_reports_on_submitted_by_id"
     t.index ["teacher_profile_id"], name: "index_lesson_reports_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_lesson_reports_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying, 'reviewed'::character varying, 'locked'::character varying, 'reopened'::character varying, 'archived'::character varying]::text[])", name: "lesson_reports_status"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'submitted'::character varying::text, 'reviewed'::character varying::text, 'locked'::character varying::text, 'reopened'::character varying::text, 'archived'::character varying::text])", name: "lesson_reports_status"
   end
 
   create_table "lesson_student_report_events", force: :cascade do |t|
@@ -664,7 +664,59 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.index ["scheduled_lesson_enrollment_id"], name: "index_lesson_student_reports_on_scheduled_lesson_enrollment_id"
     t.index ["status", "engagement_level", "performance_level"], name: "idx_student_report_outcomes"
     t.index ["updated_by_id"], name: "index_lesson_student_reports_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'completed'::character varying, 'not_applicable'::character varying, 'withheld'::character varying]::text[])", name: "lesson_student_reports_status"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'completed'::character varying::text, 'not_applicable'::character varying::text, 'withheld'::character varying::text])", name: "lesson_student_reports_status"
+  end
+
+  create_table "notification_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.jsonb "after_data", default: {}, null: false
+    t.jsonb "before_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "notification_id", null: false
+    t.index ["actor_id"], name: "index_notification_events_on_actor_id"
+    t.index ["notification_id", "created_at"], name: "idx_notification_event_history"
+    t.index ["notification_id"], name: "index_notification_events_on_notification_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.integer "attempt_count", default: 0, null: false
+    t.string "channel", null: false
+    t.datetime "created_at", null: false
+    t.datetime "failed_at"
+    t.string "failure_code"
+    t.text "failure_reason"
+    t.datetime "first_attempted_at"
+    t.datetime "last_attempted_at"
+    t.integer "lock_version", default: 0, null: false
+    t.text "message_snapshot", null: false
+    t.string "notification_type", null: false
+    t.string "provider_message_id"
+    t.jsonb "provider_response", default: {}, null: false
+    t.string "public_id", null: false
+    t.string "recipient_address_masked", null: false
+    t.string "recipient_locale", null: false
+    t.bigint "recipient_user_id", null: false
+    t.integer "retry_count", default: 0, null: false
+    t.datetime "sent_at"
+    t.bigint "source_id"
+    t.string "source_type"
+    t.string "status", default: "pending", null: false
+    t.string "subject"
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_notifications_on_actor_id"
+    t.index ["channel", "status", "created_at"], name: "index_notifications_on_channel_and_status_and_created_at"
+    t.index ["provider_message_id"], name: "index_notifications_on_provider_message_id"
+    t.index ["public_id"], name: "index_notifications_on_public_id", unique: true
+    t.index ["recipient_user_id", "created_at"], name: "index_notifications_on_recipient_user_id_and_created_at"
+    t.index ["recipient_user_id"], name: "index_notifications_on_recipient_user_id"
+    t.index ["source_type", "source_id"], name: "index_notifications_on_source_type_and_source_id"
+    t.check_constraint "attempt_count >= 0", name: "notification_attempt_count"
+    t.check_constraint "channel::text = ANY (ARRAY['email'::character varying, 'whatsapp'::character varying]::text[])", name: "notification_channel"
+    t.check_constraint "retry_count >= 0", name: "notification_retry_count"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'sending'::character varying, 'sent'::character varying, 'failed'::character varying]::text[])", name: "notification_status"
   end
 
   create_table "program_events", force: :cascade do |t|
@@ -851,7 +903,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.index ["teacher_profile_id"], name: "index_student_assessments_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_student_assessments_on_updated_by_id"
     t.check_constraint "overall_score IS NULL OR overall_score >= 0::numeric AND overall_score <= 100::numeric", name: "assessment_score_range"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying, 'reviewed'::character varying, 'published'::character varying, 'archived'::character varying]::text[])", name: "student_assessment_status"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'submitted'::character varying::text, 'reviewed'::character varying::text, 'published'::character varying::text, 'archived'::character varying::text])", name: "student_assessment_status"
   end
 
   create_table "student_guardianship_events", force: :cascade do |t|
@@ -993,7 +1045,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.check_constraint "current_ayah IS NULL OR current_ayah >= 1", name: "progress_ayah_positive"
     t.check_constraint "current_page IS NULL OR current_page >= 1 AND current_page <= 604", name: "progress_page_range"
     t.check_constraint "memorization_progress >= 0::numeric AND memorization_progress <= 100::numeric AND revision_progress >= 0::numeric AND revision_progress <= 100::numeric AND completion_percentage >= 0::numeric AND completion_percentage <= 100::numeric", name: "progress_percentage_ranges"
-    t.check_constraint "trend::text = ANY (ARRAY['improving'::character varying, 'stable'::character varying, 'needs_attention'::character varying]::text[])", name: "student_progress_trend"
+    t.check_constraint "trend::text = ANY (ARRAY['improving'::character varying::text, 'stable'::character varying::text, 'needs_attention'::character varying::text])", name: "student_progress_trend"
   end
 
   create_table "teacher_availabilities", force: :cascade do |t|
@@ -1334,6 +1386,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
   add_foreign_key "lesson_student_reports", "scheduled_lesson_enrollments", on_delete: :restrict
   add_foreign_key "lesson_student_reports", "users", column: "created_by_id", on_delete: :restrict
   add_foreign_key "lesson_student_reports", "users", column: "updated_by_id", on_delete: :restrict
+  add_foreign_key "notification_events", "notifications", on_delete: :restrict
+  add_foreign_key "notification_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "notifications", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "notifications", "users", column: "recipient_user_id", on_delete: :restrict
   add_foreign_key "program_events", "programs", on_delete: :restrict
   add_foreign_key "program_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "programs", "users", column: "created_by_id", on_delete: :nullify

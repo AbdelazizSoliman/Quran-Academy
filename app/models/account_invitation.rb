@@ -4,6 +4,7 @@ class AccountInvitation < ApplicationRecord
   belongs_to :user
   belongs_to :created_by, class_name: "User"
   has_many :events, class_name: "AccountInvitationEvent", dependent: :restrict_with_exception
+  has_many :notifications, as: :source, dependent: :restrict_with_exception
 
   attr_readonly :public_id, :user_id, :created_by_id
   before_validation :generate_public_id, on: :create

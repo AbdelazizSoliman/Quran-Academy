@@ -76,6 +76,10 @@ class User < ApplicationRecord
   has_one :account_invitation, dependent: :restrict_with_exception
   has_many :created_account_invitations, class_name: "AccountInvitation", foreign_key: :created_by_id,
                                          inverse_of: :created_by, dependent: :restrict_with_exception
+  has_many :received_notifications, class_name: "Notification", foreign_key: :recipient_user_id,
+                                    inverse_of: :recipient_user, dependent: :restrict_with_exception
+  has_many :sent_notifications, class_name: "Notification", foreign_key: :actor_id,
+                                inverse_of: :actor, dependent: :restrict_with_exception
 
   validates :first_name, :last_name, presence: true
   validates :preferred_locale, inclusion: { in: %w[ar en] }

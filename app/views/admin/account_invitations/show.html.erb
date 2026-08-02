@@ -10,6 +10,7 @@
   <% actions = capture do %><div class="flex flex-wrap gap-3">
     <% unless @invitation.accepted? || @invitation.cancelled? %>
       <%= button_to t("invitations.admin.resend"), resend_admin_account_invitation_path(@invitation), method: :patch, class: button_classes %>
+      <%= render "shared/components/button", label: t("notifications.actions.send"), href: new_admin_notification_path(notification_type: "account_invitation", source_id: @invitation.id, recipient_user_id: @invitation.user_id), variant: :secondary %>
       <%= button_to t("invitations.admin.cancel"), cancel_admin_account_invitation_path(@invitation), method: :patch, class: button_classes(variant: :danger) %>
     <% end %>
   </div><% end %>

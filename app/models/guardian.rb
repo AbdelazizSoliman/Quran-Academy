@@ -10,6 +10,8 @@ class Guardian < ApplicationRecord
   has_many :student_profiles, through: :student_guardianships
   has_many :events, class_name: "GuardianEvent", dependent: :restrict_with_exception
   has_many :communication_logs, dependent: :restrict_with_exception
+  has_many :received_notifications, class_name: "Notification", foreign_key: :recipient_guardian_id,
+                                    dependent: :restrict_with_exception
 
   attr_readonly :public_id
   before_validation :normalize_values

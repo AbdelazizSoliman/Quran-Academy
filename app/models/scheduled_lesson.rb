@@ -1,4 +1,5 @@
 class ScheduledLesson < ApplicationRecord
+  has_many :notifications, as: :source, dependent: :restrict_with_exception
   STATUSES = %w[draft scheduled in_progress completed cancelled archived].freeze
   DELIVERY_MODES = %w[online onsite hybrid].freeze
   SCHEDULING_SOURCES = %w[manual rescheduled imported].freeze

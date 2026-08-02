@@ -1,0 +1,63 @@
+ar:
+  errors:
+    messages:
+      invalid_phone: "لا يحتوي على رقم واتساب دولي صالح"
+      guardian_not_available: "لا يوجد ولي أمر أساسي مؤهل برقم واتساب صالح"
+      channel_disabled: "قناة الإشعارات معطلة في إعدادات الأكاديمية"
+      notification_type_disabled: "نوع الإشعار معطل في إعدادات الأكاديمية"
+  notifications:
+    not_available: "غير متاح"
+    audit: "سجل تدقيق الإرسال"
+    secure_link_omitted: "تم حجب رابط الدعوة الآمن من نسخة الإشعار المحفوظة."
+    admin:
+      title: "مركز الإشعارات"
+      description: "مراجعة محاولات إرسال البريد وواتساب عبر المزود."
+      manual_description: "إرسال إشعار واحد فورًا باستخدام سجل مصدر معتمد."
+      manual_only: "إرسال يدوي"
+      no_jobs: "يتم الإرسال فورًا دون إنشاء مهمة خلفية أو جدولة تلقائية."
+    history:
+      title: "سجل الإشعارات"
+      teacher: "الرسائل التي أرسلتها أو وصلت إلى حسابك."
+      student: "الرسائل التي وصلت إلى حسابك."
+    fields:
+      type: "نوع الإشعار"
+      channel: "القناة"
+      recipient: "المستلم"
+      source_id: "معرف سجل المصدر"
+      status: "الحالة"
+      address: "عنوان المستلم"
+      retries: "المحاولات"
+      provider_id: "معرف رسالة المزود"
+      provider: "المزود"
+      attempts: "المحاولات"
+      sent_at: "وقت الإرسال"
+      http_status: "حالة HTTP"
+      response: "استجابة المزود"
+      primary_guardian: "إرسال واتساب إلى ولي الأمر الأساسي للطالب القاصر"
+      message: "الرسالة"
+    channels: { email: "البريد الإلكتروني", whatsapp: "واتساب" }
+    statuses: { pending: "قيد الانتظار", sending: "جارٍ الإرسال", sent: "تم الإرسال", delivered: "تم التسليم", failed: "فشل" }
+    providers: { meta_whatsapp: "واجهة Meta WhatsApp Cloud", resend: "Resend" }
+    details: { summary: "ملخص الإرسال", attempts: "محاولات الإرسال" }
+    types:
+      account_invitation: "دعوة حساب"
+      lesson_reminder: "تذكير بالحلقة"
+      lesson_report: "تقرير الحلقة"
+      certificate: "إشعار شهادة"
+    events: { created: "أُنشئ", attempted: "جرت المحاولة", sent: "أُرسل", delivered: "تم التسليم", failed: "فشل", retried: "أُعيدت المحاولة" }
+    actions: { new: "إرسال إشعار", send: "إرسال الآن", retry: "إعادة محاولة الإرسال" }
+    errors: { title: "تعذر إرسال الإشعار" }
+    messages:
+      saved: "تم تسجيل محاولة الإرسال."
+      account_invitation:
+        subject: "دعوة حساب %{academy}"
+        body: "مرحبًا %{recipient}،\n\nتمت دعوتك إلى %{academy}. أنشئ كلمة مرورك بأمان عبر الرابط الصالح للاستخدام مرة واحدة:\n%{url}"
+      lesson_reminder:
+        subject: "تذكير بحلقة %{academy}"
+        body: "مرحبًا %{recipient}،\n\nنذكرك بحلقة %{title} بتاريخ %{date}."
+      lesson_report:
+        subject: "تقرير حلقة %{academy}"
+        body: "مرحبًا %{recipient}،\n\nأصبح تقرير حلقة %{title} متاحًا:\n%{url}"
+      certificate:
+        subject: "شهادة من %{academy}"
+        body: "مرحبًا %{recipient}،\n\nتم إصدار الشهادة %{title} بتاريخ %{date}. يمكنك عرضها هنا:\n%{url}"

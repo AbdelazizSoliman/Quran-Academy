@@ -18,13 +18,14 @@ module NavigationHelper
     student_schedule: { icon: :calendar, roles: %i[student], path: :student_schedule_index_path },
     schedule: { icon: :calendar, roles: %i[admin staff], path: :admin_scheduled_lessons_path },
     attendance: { icon: :check_circle, roles: %i[admin staff teacher student] },
-    whatsapp: { icon: :message, roles: %i[admin staff] },
+    whatsapp: { icon: :message, roles: %i[admin staff teacher student] },
     payroll: { icon: :wallet, roles: %i[admin teacher] },
     reports: { icon: :reports, roles: %i[admin staff teacher] },
     assessments: { icon: :reports, roles: %i[admin staff teacher student] },
     exams: { icon: :calendar, roles: %i[admin staff teacher] },
     certificates: { icon: :check_circle, roles: %i[admin staff student] },
     academic_progress: { icon: :reports, roles: %i[admin staff teacher student] },
+    notifications: { icon: :message, roles: %i[admin staff teacher student] },
     settings: { icon: :settings, roles: %i[admin], path: :admin_settings_path }
   }.freeze
 
@@ -55,10 +56,27 @@ module NavigationHelper
     return exam_navigation_path if key == :exams
     return current_user&.student? ? student_certificates_path : admin_certificates_path if key == :certificates
     return academic_progress_navigation_path if key == :academic_progress
+    return attendance_navigation_path if key == :attendance
+    return whatsapp_navigation_path if key == :whatsapp
+    return notification_navigation_path if key == :notifications
     return current_user&.teacher? ? teacher_payrolls_path : admin_teacher_payrolls_path if key == :payroll
     return current_user&.teacher? ? teacher_reports_path : admin_operational_reports_path if key == :reports
 
-    "#"
+    raise KeyError, "No navigation path configured for #{key.inspect}"
+  end
+
+  def attendance_navigation_path
+    return student_attendances_path if current_user&.student?
+    return teacher_schedule_index_path if current_user&.teacher?
+
+    admin_lesson_attendances_path
+  end
+
+  def whatsapp_navigation_path
+    return student_notifications_path if current_user&.student?
+    return teacher_notifications_path if current_user&.teacher?
+
+    admin_notifications_path
   end
 
   def assessment_navigation_path
@@ -77,5 +95,12 @@ module NavigationHelper
     return student_progress_path if current_user&.student?
 
     admin_academic_dashboard_path
+  end
+
+  def notification_navigation_path
+    return teacher_notifications_path if current_user&.teacher?
+    return student_notifications_path if current_user&.student?
+
+    admin_notifications_path
   end
 end

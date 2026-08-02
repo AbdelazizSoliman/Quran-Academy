@@ -2,6 +2,15 @@
 
 Quran Academy (أكاديمية القرآن) is a production-oriented management platform for Quran academies. The application is Arabic-first, right-to-left, responsive, and designed to give academy teams a clear operational workspace.
 
+## Notification providers
+
+Provider-backed notifications use Resend for email and the official Meta WhatsApp Cloud API over HTTPS. Configure
+`RESEND_API_KEY`, `MAILER_SENDER`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, and
+`WHATSAPP_BUSINESS_ACCOUNT_ID` in the deployment environment and never commit their values. The academy Email and
+WhatsApp notification switches must also be enabled. Delivery is manual and synchronous in this release; no
+background jobs or automatic schedules are created. Meta may require an approved WhatsApp template when a
+business-initiated message is outside the customer-service conversation window.
+
 ## Planned capabilities
 
 - Student self-registration and guardian records

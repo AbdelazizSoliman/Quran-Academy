@@ -1,4 +1,5 @@
 class Certificate < ApplicationRecord
+  has_many :notifications, as: :source, dependent: :restrict_with_exception
   TYPES = %w[program_completion exam_completion ijazah].freeze
 
   belongs_to :student_profile

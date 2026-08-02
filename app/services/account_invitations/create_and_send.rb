@@ -36,11 +36,7 @@ module AccountInvitations
     end
 
     def deliver(invitation, raw_token)
-      AccountInvitationMailer.with(invitation:, token: raw_token).invitation_email.deliver_now
-      true
-    rescue StandardError => e
-      Rails.logger.error("Invitation email delivery failed (#{e.class})")
-      false
+      Notifications::InvitationEmailDelivery.new(invitation:, token: raw_token, actor: @actor).call
     end
 
     def event!(invitation, event_type, before_data: {}, after_data: {})

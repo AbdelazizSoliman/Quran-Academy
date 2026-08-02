@@ -1,0 +1,63 @@
+en:
+  errors:
+    messages:
+      invalid_phone: "does not have a valid international WhatsApp number"
+      guardian_not_available: "does not have an eligible primary guardian with a valid WhatsApp number"
+      channel_disabled: "notification channel is disabled in academy settings"
+      notification_type_disabled: "notification type is disabled in academy settings"
+  notifications:
+    not_available: "Not available"
+    audit: "Delivery audit history"
+    secure_link_omitted: "Secure invitation link omitted from the stored notification snapshot."
+    admin:
+      title: "Notification Center"
+      description: "Review provider-backed email and WhatsApp delivery attempts."
+      manual_description: "Send one notification immediately using an approved source record."
+      manual_only: "Manual delivery"
+      no_jobs: "This sends immediately. No background job or automatic schedule is created."
+    history:
+      title: "Notification history"
+      teacher: "Messages sent by you or delivered to your account."
+      student: "Messages delivered to your account."
+    fields:
+      type: "Notification type"
+      channel: "Channel"
+      recipient: "Recipient"
+      source_id: "Source record ID"
+      status: "Status"
+      address: "Recipient address"
+      retries: "Attempts"
+      provider_id: "Provider message ID"
+      provider: "Provider"
+      attempts: "Attempts"
+      sent_at: "Sent at"
+      http_status: "HTTP status"
+      response: "Provider response"
+      primary_guardian: "Send WhatsApp to the minor student's primary guardian"
+      message: "Message"
+    channels: { email: "Email", whatsapp: "WhatsApp" }
+    statuses: { pending: "Pending", sending: "Sending", sent: "Sent", delivered: "Delivered", failed: "Failed" }
+    providers: { meta_whatsapp: "Meta WhatsApp Cloud API", resend: "Resend" }
+    details: { summary: "Delivery summary", attempts: "Delivery attempts" }
+    types:
+      account_invitation: "Account invitation"
+      lesson_reminder: "Lesson reminder"
+      lesson_report: "Lesson report"
+      certificate: "Certificate notification"
+    events: { created: "Created", attempted: "Attempted", sent: "Sent", delivered: "Delivered", failed: "Failed", retried: "Retried" }
+    actions: { new: "Send notification", send: "Send now", retry: "Retry delivery" }
+    errors: { title: "Notification could not be sent" }
+    messages:
+      saved: "The delivery attempt was recorded."
+      account_invitation:
+        subject: "%{academy} account invitation"
+        body: "Hello %{recipient},\n\nYou have been invited to %{academy}. Create your password securely using this single-use link:\n%{url}"
+      lesson_reminder:
+        subject: "%{academy} lesson reminder"
+        body: "Hello %{recipient},\n\nThis is a reminder for %{title} on %{date}."
+      lesson_report:
+        subject: "%{academy} lesson report"
+        body: "Hello %{recipient},\n\nYour report for %{title} is available:\n%{url}"
+      certificate:
+        subject: "%{academy} certificate"
+        body: "Hello %{recipient},\n\nCertificate %{title} was issued on %{date}. View it here:\n%{url}"

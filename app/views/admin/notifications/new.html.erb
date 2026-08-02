@@ -1,0 +1,11 @@
+<%= render "shared/page_header", title: t("notifications.actions.new"), description: t("notifications.admin.manual_description") %>
+<% if flash[:alert] %><%= render "shared/components/alert", variant: :error, title: t("notifications.errors.title"), message: flash[:alert] %><% end %>
+<%= form_with scope: :notification, url: admin_notifications_path, class: "ds-card grid gap-5 p-5 sm:grid-cols-2" do |form| %>
+  <div><%= form.label :notification_type, t("notifications.fields.type"), class: "ds-label" %><%= form.select :notification_type, Notification::TYPES.map { |value| [t("notifications.types.#{value}"), value] }, { selected: @notification.notification_type }, class: "ds-control mt-2" %></div>
+  <div><%= form.label :channel, t("notifications.fields.channel"), class: "ds-label" %><%= form.select :channel, Notification::CHANNELS.map { |value| [t("notifications.channels.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+  <div><%= form.label :recipient_user_id, t("notifications.fields.recipient"), class: "ds-label" %><%= form.collection_select :recipient_user_id, User.order(:first_name, :last_name), :id, :full_name, { selected: @notification.recipient_user_id }, class: "ds-control mt-2" %></div>
+  <div><%= form.label :source_id, t("notifications.fields.source_id"), class: "ds-label" %><%= form.number_field :source_id, value: @notification.source_id, min: 1, required: true, class: "ds-control mt-2" %></div>
+  <label class="flex items-center gap-2 sm:col-span-2"><%= form.check_box :primary_guardian, class: "ds-checkbox" %><span><%= t("notifications.fields.primary_guardian") %></span></label>
+  <div class="sm:col-span-2"><%= render "shared/components/alert", variant: :information, title: t("notifications.admin.manual_only"), message: t("notifications.admin.no_jobs") %></div>
+  <div class="sm:col-span-2"><%= render "shared/components/button", label: t("notifications.actions.send"), type: "submit" %></div>
+<% end %>

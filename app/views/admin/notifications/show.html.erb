@@ -1,0 +1,27 @@
+<%= render "shared/page_header", title: @notification.public_id, description: t("notifications.types.#{@notification.notification_type}") %>
+<div class="grid gap-6 lg:grid-cols-2">
+  <section class="ds-card p-5" aria-labelledby="delivery-summary">
+    <h2 id="delivery-summary" class="font-bold"><%= t("notifications.details.summary") %></h2>
+    <dl class="mt-4 grid gap-4 sm:grid-cols-2">
+      <% { status: t("notifications.statuses.#{@notification.status}"), channel: t("notifications.channels.#{@notification.channel}"), provider: t("notifications.providers.#{@notification.provider}", default: @notification.provider), recipient: @notification.recipient_guardian&.full_name || @notification.recipient_user.full_name, address: @notification.recipient_address_masked, attempts: @notification.attempt_count, sent_at: (@notification.sent_at && l(@notification.sent_at, format: :short)), provider_id: @notification.provider_message_id, http_status: @notification.http_status, response: @notification.provider_status }.each do |key, value| %>
+        <div><dt class="ds-caption"><%= t("notifications.fields.#{key}") %></dt><dd class="break-all font-semibold"><%= value.presence || t("notifications.not_available") %></dd></div>
+      <% end %>
+    </dl>
+    <% if current_user.admin? && @notification.failed? && @notification.notification_type != "account_invitation" %><div class="mt-5"><%= button_to t("notifications.actions.retry"), retry_delivery_admin_notification_path(@notification), method: :patch, class: button_classes %></div><% end %>
+  </section>
+  <section class="ds-card p-5" aria-labelledby="message-snapshot"><h2 id="message-snapshot" class="font-bold"><%= t("notifications.fields.message") %></h2><p class="mt-3 whitespace-pre-line"><%= @notification.message_snapshot %></p></section>
+</div>
+<section class="mt-6 ds-card p-5" aria-labelledby="attempt-history">
+  <h2 id="attempt-history" class="font-bold"><%= t("notifications.details.attempts") %></h2>
+  <ol class="mt-3 space-y-4">
+    <% @attempts.each do |attempt| %>
+      <li class="rounded-lg border border-app-border p-4">
+        <div class="grid gap-3 sm:grid-cols-3"><p><strong>#<%= attempt.attempt_number %></strong> · <%= t("notifications.statuses.#{attempt.status}") %></p><p><%= attempt.provider %> · HTTP <%= attempt.http_status || "—" %></p><p><%= l(attempt.attempted_at, format: :short) %></p></div>
+        <p class="mt-2 break-all"><%= attempt.provider_message_id %></p>
+        <% if attempt.error_message.present? %><p class="mt-2 text-app-danger"><%= attempt.error_code %>: <%= attempt.error_message %></p><% end %>
+        <details class="mt-3"><summary class="cursor-pointer font-medium"><%= t("notifications.fields.response") %></summary><pre class="mt-2 overflow-x-auto whitespace-pre-wrap break-words text-xs"><%= JSON.pretty_generate(attempt.provider_response) %></pre></details>
+      </li>
+    <% end %>
+  </ol>
+</section>
+<section class="mt-6 ds-card p-5" aria-labelledby="audit-history"><h2 id="audit-history" class="font-bold"><%= t("notifications.audit") %></h2><ol class="mt-3 divide-y divide-app-border"><% @events.each do |event| %><li class="py-2"><%= t("notifications.events.#{event.event_type}") %> · <%= event.actor.full_name %> · <%= l(event.created_at, format: :short) %></li><% end %></ol></section>

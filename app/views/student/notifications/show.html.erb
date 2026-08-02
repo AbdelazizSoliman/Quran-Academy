@@ -1,0 +1,1 @@
+<%= render "shared/page_header", title: @notification.public_id, description: t("notifications.types.#{@notification.notification_type}") %><div class="ds-card p-5"><p><%= t("notifications.statuses.#{@notification.status}") %> · <%= t("notifications.channels.#{@notification.channel}") %></p><p class="mt-4 whitespace-pre-line"><%= @notification.message_snapshot %></p></div>
