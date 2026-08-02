@@ -37,6 +37,39 @@ RSpec.describe "Account invitation services" do
     end.to change(AccountInvitation, :count).by(1).and change(AccountInvitationEvent, :count).by(1)
   end
 
+  it "sends one invitation token through email and WhatsApp with an identical URL" do
+    setting = AcademySetting.current
+    setting.update!(invitation_delivery_mode: "email_and_whatsapp", whatsapp_notifications_enabled: true)
+    user = create(:user, :teacher, :pending, preferred_locale: "en")
+    create(:teacher_profile, user:, whatsapp_number: "+201001234567")
+    provider = instance_double(Notifications::WhatsAppProvider)
+    result = Notifications::ProviderResult.new(true, "wamid.invitation", {}, 200, "accepted", nil, nil)
+    allow(Notifications::WhatsAppProvider).to receive(:new).and_return(provider)
+    allow(provider).to receive(:deliver).and_return(result)
+
+    service_result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
+    invitation_url = AccountInvitations::UrlBuilder.call(token: service_result.token, locale: "en")
+
+    digest = AccountInvitations::Token.digest(service_result.token)
+    expect(service_result.invitation.token_digest).to eq(digest)
+    expect(ActionMailer::Base.deliveries.last.text_part.body.decoded).to include(invitation_url)
+    expect(provider).to have_received(:deliver).with(hash_including(body: include(invitation_url)))
+  end
+
+  it "retains a failed WhatsApp invitation for an administrator retry" do
+    AcademySetting.current.update!(invitation_delivery_mode: "whatsapp_only",
+                                   whatsapp_notifications_enabled: true)
+    user = create(:user, :teacher, :pending)
+
+    result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
+    notification = result.invitation.notifications.last
+
+    expect(result.invitation).to be_pending
+    expect(notification).to be_failed
+    expect(notification.delivery_payload_ciphertext).to be_present
+    expect(notification.message_snapshot).to eq(I18n.t("notifications.secure_link_omitted"))
+  end
+
   it "accepts once, activates the user, and records request context" do
     invitation = create(:account_invitation, created_by: admin)
     AccountInvitations::Accept.new(invitation:, password: "NewSecure123!",

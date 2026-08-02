@@ -1,7 +1,8 @@
 module Notifications
   class Dispatch
     def initialize(actor:, recipient:, source:, type:, channel:, primary_guardian: false,
-                   idempotency_key: nil, scheduled_at: nil, queued_at: nil)
+                   idempotency_key: nil, scheduled_at: nil, queued_at: nil,
+                   invitation_token: nil, persist_recipient_failure: false)
       @actor = actor
       @recipient = recipient
       @source = source
@@ -11,6 +12,8 @@ module Notifications
       @idempotency_key = idempotency_key
       @scheduled_at = scheduled_at
       @queued_at = queued_at
+      @invitation_token = invitation_token
+      @persist_recipient_failure = persist_recipient_failure
     end
 
     def call
@@ -19,20 +22,21 @@ module Notifications
       return invalid(notification, :invalid_source) unless source_valid?
       existing = Notification.find_by(idempotency_key: @idempotency_key) if @idempotency_key.present?
       return existing if existing
-      return invalid(notification, :channel_disabled) unless channel_enabled?
+      return recipient_failure(notification, :channel_disabled) unless channel_enabled?
       return invalid(notification, :notification_type_disabled) unless notification_type_enabled?
 
       resolved = RecipientResolver.new(user: @recipient, channel: @channel,
                                        primary_guardian: @primary_guardian).call
-      return invalid(notification, resolved.error) unless resolved.valid?
+      return recipient_failure(notification, resolved.error) unless resolved.valid?
 
-      token = rotate_invitation_token if @type == "account_invitation"
+      token = invitation_token
       message = MessageBuilder.new(type: @type, source: @source, recipient: @recipient,
                                    locale: resolved.locale, invitation_token: token).call
       notification.assign_attributes(recipient_guardian: resolved.guardian, provider: provider_name,
                                      recipient_address_masked: resolved.masked_address,
                                      recipient_locale: resolved.locale, subject: message.subject,
-                                     message_snapshot: stored_message(message.body))
+                                     message_snapshot: stored_message(message.body),
+                                     delivery_payload_ciphertext: secure_payload(message.body))
       Notification.transaction do
         notification.save!
         event!(notification, "created", after_data: { "status" => "pending" })
@@ -118,12 +122,25 @@ module Notifications
     end
 
     def channel_allowed_for_type?(setting)
-      return @channel == "email" if @type == "account_invitation"
+      return invitation_channel_allowed?(setting) if @type == "account_invitation"
       return @channel == "whatsapp" if @type.in?(%w[lesson_reminder late_reminder lesson_cancelled
                                                      lesson_rescheduled lesson_report])
       return @channel == "email" || (@channel == "whatsapp" && setting.certificate_whatsapp_enabled?) if @type == "certificate"
 
       false
+    end
+
+    def invitation_channel_allowed?(setting)
+      mode = setting.invitation_delivery_mode
+      return mode.in?(%w[email_only email_and_whatsapp]) if @channel == "email"
+
+      mode.in?(%w[whatsapp_only email_and_whatsapp])
+    end
+
+    def invitation_token
+      return unless @type == "account_invitation"
+
+      @invitation_token.presence || rotate_invitation_token
     end
 
     def rotate_invitation_token
@@ -138,6 +155,7 @@ module Notifications
 
     def invitation_expiry = AcademySetting.current.invitation_expires_after_hours.hours.from_now
     def stored_message(body) = @type == "account_invitation" ? I18n.t("notifications.secure_link_omitted") : body
+    def secure_payload(body) = SecurePayload.encrypt(body) if @type == "account_invitation"
     def locale = @recipient.preferred_locale.to_s.presence_in(%w[ar en]) || AcademySetting.current.default_locale
     def provider_name = @channel == "whatsapp" ? "meta_whatsapp" : "resend"
 
@@ -147,6 +165,25 @@ module Notifications
 
     def invalid(notification, key)
       notification.errors.add(:base, key)
+      notification
+    end
+
+    def recipient_failure(notification, key)
+      return invalid(notification, key) unless @persist_recipient_failure
+
+      message = MessageBuilder.new(type: @type, source: @source, recipient: @recipient,
+                                   locale:, invitation_token:).call
+      notification.assign_attributes(provider: provider_name, subject: message.subject,
+                                     message_snapshot: stored_message(message.body),
+                                     delivery_payload_ciphertext: secure_payload(message.body),
+                                     failure_code: key.to_s, failure_reason: I18n.t("errors.messages.#{key}"),
+                                     failed_at: Time.current)
+      Notification.transaction do
+        notification.save!
+        event!(notification, "created", after_data: { "status" => "pending" })
+        notification.update!(status: "failed")
+        event!(notification, "failed", after_data: { "status" => "failed", "failure_code" => key.to_s })
+      end
       notification
     end
   end

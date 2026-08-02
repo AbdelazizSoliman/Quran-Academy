@@ -207,6 +207,7 @@ en:
         country_code: "Country code"
         default_locale: "Default interface language"
         invitation_expires_after_hours: "Invitation validity (hours)"
+        invitation_delivery_mode: "Invitation delivery mode"
         supported_locales: "Supported interface languages"
         default_time_zone: "Default time zone"
         teaching_languages: "Teaching languages"
@@ -284,6 +285,10 @@ en:
         maximum_booking_window_days: "Furthest future booking horizon."
         reschedule_notice_hours: "Required notice for future rescheduling workflows."
       options:
+        invitation_delivery_mode:
+          email_only: "Email only"
+          whatsapp_only: "WhatsApp only"
+          email_and_whatsapp: "Email + WhatsApp"
         default_teacher_compensation_type:
           per_lesson: "Per lesson"
           hourly: "Hourly"

@@ -7,7 +7,8 @@
         <div><dt class="ds-caption"><%= t("notifications.fields.#{key}") %></dt><dd class="break-all font-semibold"><%= value.presence || t("notifications.not_available") %></dd></div>
       <% end %>
     </dl>
-    <% if current_user.admin? && @notification.failed? && @notification.notification_type != "account_invitation" %><div class="mt-5"><%= button_to t("notifications.actions.retry"), retry_delivery_admin_notification_path(@notification), method: :patch, class: button_classes %></div><% end %>
+    <% retryable = @notification.notification_type != "account_invitation" || @notification.delivery_payload_ciphertext.present? %>
+    <% if current_user.admin? && @notification.failed? && retryable %><div class="mt-5"><%= button_to t("notifications.actions.retry"), retry_delivery_admin_notification_path(@notification), method: :patch, class: button_classes %></div><% end %>
   </section>
   <section class="ds-card p-5" aria-labelledby="message-snapshot"><h2 id="message-snapshot" class="font-bold"><%= t("notifications.fields.message") %></h2><p class="mt-3 whitespace-pre-line"><%= @notification.message_snapshot %></p></section>
 </div>

@@ -207,6 +207,7 @@ ar:
         country_code: "رمز الدولة"
         default_locale: "لغة الواجهة الافتراضية"
         invitation_expires_after_hours: "صلاحية الدعوة (بالساعات)"
+        invitation_delivery_mode: "طريقة إرسال الدعوة"
         supported_locales: "لغات الواجهة المدعومة"
         default_time_zone: "المنطقة الزمنية الافتراضية"
         teaching_languages: "لغات التدريس"
@@ -284,6 +285,10 @@ ar:
         maximum_booking_window_days: "أبعد نطاق زمني للحجز المستقبلي."
         reschedule_notice_hours: "المهلة المطلوبة لإعادة الجدولة مستقبلاً."
       options:
+        invitation_delivery_mode:
+          email_only: "البريد الإلكتروني فقط"
+          whatsapp_only: "واتساب فقط"
+          email_and_whatsapp: "البريد الإلكتروني + واتساب"
         default_teacher_compensation_type:
           per_lesson: "لكل حلقة"
           hourly: "بالساعة"

@@ -33,7 +33,7 @@ module AccountInvitations
     end
 
     def deliver(raw_token)
-      Notifications::InvitationEmailDelivery.new(invitation: @invitation, token: raw_token, actor: @actor).call
+      Notifications::InvitationDelivery.new(invitation: @invitation, token: raw_token, actor: @actor).call
     end
 
     def mark_sent

@@ -58,7 +58,7 @@ en:
       students: "Enrolled students"
       account_invitation:
         subject: "%{academy} account invitation"
-        body: "Hello %{recipient},\n\nYou have been invited to %{academy}. Create your password securely using this single-use link:\n%{url}"
+        body: "Welcome to %{academy}.\n\nYour account has been created successfully.\n\nPlease use the following link to create your password and activate your account:\n\n%{url}\n\nIf you need any help, please contact the academy administration."
       lesson_reminder:
         subject: "%{academy} lesson reminder"
         body: "Academy: %{academy}\nTeacher: %{teacher}\nStudent: %{student}\nLesson: %{title}\nDate: %{date}\nTime: %{time}\nProgram: %{program}\nCourse: %{course}"

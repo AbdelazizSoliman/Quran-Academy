@@ -58,7 +58,7 @@ ar:
       students: "الطلاب المسجلون"
       account_invitation:
         subject: "دعوة حساب %{academy}"
-        body: "مرحبًا %{recipient}،\n\nتمت دعوتك إلى %{academy}. أنشئ كلمة مرورك بأمان عبر الرابط الصالح للاستخدام مرة واحدة:\n%{url}"
+        body: "السلام عليكم ورحمة الله وبركاته\n\nتم إنشاء حسابك في %{academy}.\n\nلإكمال إنشاء كلمة المرور وتفعيل حسابك، اضغط على الرابط التالي:\n\n%{url}\n\nإذا احتجت أي مساعدة يرجى التواصل مع إدارة الأكاديمية."
       lesson_reminder:
         subject: "تذكير بحلقة %{academy}"
         body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nالحلقة: %{title}\nالتاريخ: %{date}\nالوقت: %{time}\nالبرنامج: %{program}\nالدورة: %{course}"

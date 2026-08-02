@@ -54,7 +54,7 @@ module Notifications
       options = Rails.application.config.action_mailer.default_url_options
       case @source
       when AccountInvitation
-        helpers.edit_account_invitation_url(token: @invitation_token, locale: @locale, **options)
+        AccountInvitations::UrlBuilder.call(token: @invitation_token, locale: @locale)
       when LessonReport
         entry = @source.lesson_student_reports.find_by(student_profile: @recipient.student_profile)
         entry ? helpers.student_report_url(entry, **options) : ""

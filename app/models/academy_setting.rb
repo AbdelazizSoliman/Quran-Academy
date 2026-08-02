@@ -5,6 +5,7 @@ class AcademySetting < ApplicationRecord
   WEEKDAYS = %w[sunday monday tuesday wednesday thursday friday saturday].freeze
   COMPENSATION_TYPES = %w[per_lesson hourly monthly].freeze
   PAYROLL_PERIODS = %w[weekly biweekly monthly].freeze
+  INVITATION_DELIVERY_MODES = %w[email_only whatsapp_only email_and_whatsapp].freeze
   BILLING_CYCLES = %w[per_lesson weekly monthly package].freeze
   CURRENCY_PATTERN = /\A[A-Z]{3}\z/
   COUNTRY_PATTERN = /\A[A-Z]{2}\z/
@@ -25,6 +26,7 @@ class AcademySetting < ApplicationRecord
   validates :payroll_currency, :billing_currency, format: { with: CURRENCY_PATTERN }
   validates :default_teacher_compensation_type, inclusion: { in: COMPENSATION_TYPES }
   validates :payroll_period, inclusion: { in: PAYROLL_PERIODS }
+  validates :invitation_delivery_mode, inclusion: { in: INVITATION_DELIVERY_MODES }
   validates :billing_cycle, inclusion: { in: BILLING_CYCLES }
   validates :default_teacher_rate, :default_lesson_price,
             numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 1_000_000 }

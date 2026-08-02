@@ -19,7 +19,7 @@ module Notifications
 
       attempt = mark_attempting!(address)
       result = provider.deliver(recipient: address, subject: @notification.subject,
-                                body: @delivery_body || @notification.message_snapshot, **@provider_options)
+                                body: delivery_body, **@provider_options)
       result.success? ? mark_sent!(attempt, result) : mark_failed!(attempt, result)
       @notification
     rescue ActiveRecord::StaleObjectError
@@ -34,8 +34,19 @@ module Notifications
 
       @actor.admin? || @notification.actor_id == @actor.id
     end
+
     def invitation_retry_without_token?
-      @notification.notification_type == "account_invitation" && @delivery_body.blank?
+      @notification.notification_type == "account_invitation" && delivery_body.blank?
+    end
+
+    def delivery_body
+      return @delivery_body if @delivery_body.present?
+      return @notification.message_snapshot unless @notification.notification_type == "account_invitation"
+      return if @notification.delivery_payload_ciphertext.blank?
+
+      SecurePayload.decrypt(@notification.delivery_payload_ciphertext)
+    rescue ActiveSupport::MessageEncryptor::InvalidMessage
+      nil
     end
 
     def mark_attempting!(address)
@@ -95,7 +106,7 @@ module Notifications
     end
 
     def provider_name = @notification.whatsapp? ? "meta_whatsapp" : "resend"
-    def request_fingerprint(address) = Digest::SHA256.hexdigest("#{address}:#{@delivery_body || @notification.message_snapshot}")
+    def request_fingerprint(address) = Digest::SHA256.hexdigest("#{address}:#{delivery_body}")
 
     def mask(address)
       return "#{address.first}***@#{address.split('@', 2).last}" if @notification.email?

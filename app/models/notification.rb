@@ -15,7 +15,7 @@ class Notification < ApplicationRecord
 
   attr_readonly :public_id, :recipient_user_id, :recipient_guardian_id, :actor_id, :source_type, :source_id, :channel,
                 :notification_type, :provider, :recipient_address_masked, :recipient_locale, :subject,
-                :message_snapshot, :idempotency_key, :scheduled_at, :queued_at
+                :message_snapshot, :delivery_payload_ciphertext, :idempotency_key, :scheduled_at, :queued_at
   before_validation :generate_public_id, on: :create
 
   validates :public_id, presence: true, uniqueness: true, format: { with: /\ANOT-[A-Z0-9]{10}\z/ }

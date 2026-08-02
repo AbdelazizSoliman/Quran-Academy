@@ -36,7 +36,7 @@ module AccountInvitations
     end
 
     def deliver(invitation, raw_token)
-      Notifications::InvitationEmailDelivery.new(invitation:, token: raw_token, actor: @actor).call
+      Notifications::InvitationDelivery.new(invitation:, token: raw_token, actor: @actor).call
     end
 
     def event!(invitation, event_type, before_data: {}, after_data: {})

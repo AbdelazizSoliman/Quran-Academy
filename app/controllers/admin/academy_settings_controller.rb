@@ -51,7 +51,7 @@ module Admin
         first_late_reminder_minutes second_late_reminder_minutes lesson_reminder_hours_before
         second_lesson_reminder_minutes_before default_teacher_compensation_type
         default_teacher_rate payroll_currency payroll_period billing_currency default_lesson_price billing_cycle
-        invitation_expires_after_hours
+        invitation_expires_after_hours invitation_delivery_mode
       ]
     end
   end
