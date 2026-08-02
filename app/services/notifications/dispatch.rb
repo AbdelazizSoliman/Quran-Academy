@@ -36,7 +36,7 @@ module Notifications
                                      recipient_address_masked: resolved.masked_address,
                                      recipient_locale: resolved.locale, subject: message.subject,
                                      message_snapshot: stored_message(message.body),
-                                     delivery_payload_ciphertext: secure_payload(message.body))
+                                     delivery_payload_ciphertext: invitation_payload(message.body))
       Notification.transaction do
         notification.save!
         event!(notification, "created", after_data: { "status" => "pending" })
@@ -155,7 +155,11 @@ module Notifications
 
     def invitation_expiry = AcademySetting.current.invitation_expires_after_hours.hours.from_now
     def stored_message(body) = @type == "account_invitation" ? I18n.t("notifications.secure_link_omitted") : body
-    def secure_payload(body) = SecurePayload.encrypt(body) if @type == "account_invitation"
+    def invitation_payload(body)
+      return unless @type == "account_invitation"
+
+      Notifications::SecurePayload.encrypt(body)
+    end
     def locale = @recipient.preferred_locale.to_s.presence_in(%w[ar en]) || AcademySetting.current.default_locale
     def provider_name = @channel == "whatsapp" ? "meta_whatsapp" : "resend"
 
@@ -175,7 +179,7 @@ module Notifications
                                    locale:, invitation_token:).call
       notification.assign_attributes(provider: provider_name, subject: message.subject,
                                      message_snapshot: stored_message(message.body),
-                                     delivery_payload_ciphertext: secure_payload(message.body),
+                                     delivery_payload_ciphertext: invitation_payload(message.body),
                                      failure_code: key.to_s, failure_reason: I18n.t("errors.messages.#{key}"),
                                      failed_at: Time.current)
       Notification.transaction do
