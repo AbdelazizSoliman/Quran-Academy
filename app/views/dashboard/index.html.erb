@@ -1,8 +1,5 @@
 <% content_for :title, "#{t("dashboard.title")} | #{t("app.name")}" %>
-<%= render "shared/page_header",
-           title: t("dashboard.title"),
-           description: t("dashboard.subtitle"),
-           badge: render("shared/components/badge", label: t("dashboard.placeholder_badge"), variant: :neutral) %>
+<%= render "shared/page_header", title: t("dashboard.title"), description: t("dashboard.subtitle") %>
 
 <section class="ds-card relative mb-6 overflow-hidden border-app-primary bg-app-primary p-6 text-white sm:p-8" aria-labelledby="welcome-title">
   <div class="relative z-10 max-w-2xl">
@@ -10,77 +7,70 @@
     <h2 id="welcome-title" class="text-2xl font-bold sm:text-3xl"><%= t("dashboard.welcome") %></h2>
     <p class="mt-3 max-w-xl text-sm leading-7 text-emerald-50"><%= t("dashboard.welcome_message") %></p>
     <div class="mt-5 flex flex-wrap gap-3">
-      <%= render "shared/components/button", label: t("dashboard.view_schedule"), variant: :secondary, icon: :calendar %>
-      <%= render "shared/components/button", label: t("dashboard.attendance_report"), variant: :outline, icon: :check, class: "border-white text-white hover:bg-white/10 focus-visible:outline-white" %>
+      <%= render "shared/components/button", label: t("dashboard.view_schedule"), href: dashboard_schedule_path, variant: :secondary, icon: :calendar %>
+      <%= render "shared/components/button", label: t("dashboard.attendance_report"), href: dashboard_attendance_path, variant: :outline, icon: :check, class: "border-white text-white hover:bg-white/10 focus-visible:outline-white" %>
     </div>
   </div>
 </section>
 
 <section aria-labelledby="statistics-title">
-  <h2 id="statistics-title" class="sr-only"><%= t("dashboard.placeholder_badge") %></h2>
+  <h2 id="statistics-title" class="sr-only"><%= t("dashboard.statistics.title") %></h2>
   <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    <% %i[students teachers lessons attendance].each do |stat| %>
-      <%= render "shared/components/stat_card",
-                 label: t("dashboard.statistics.#{stat}"),
-                 value: t("dashboard.statistics.#{stat}_value"),
-                 note: t("dashboard.statistics.#{stat}_note"),
-                 icon: (stat == :lessons ? :calendar : :information) %>
-    <% end %>
+    <%= render "shared/components/stat_card", label: t("dashboard.statistics.students"), value: @dashboard[:statistics][:students], note: t("dashboard.statistics.students_note", count: @dashboard[:statistics][:active_students]), icon: :users %>
+    <%= render "shared/components/stat_card", label: t("dashboard.statistics.teachers"), value: @dashboard[:statistics][:teachers], note: t("dashboard.statistics.teachers_note", count: @dashboard[:statistics][:active_teachers]), icon: :users %>
+    <%= render "shared/components/stat_card", label: t("dashboard.statistics.lessons"), value: @dashboard[:statistics][:lessons], note: t("dashboard.statistics.lessons_note", count: @dashboard[:statistics][:remaining_lessons]), icon: :calendar %>
+    <%= render "shared/components/stat_card", label: t("dashboard.statistics.attendance"), value: number_to_percentage(@dashboard[:statistics][:attendance][:rate], precision: 0), note: t("dashboard.statistics.attendance_note", attended: @dashboard[:statistics][:attendance][:attended], total: @dashboard[:statistics][:attendance][:total]), icon: :check_circle %>
   </div>
 </section>
 
 <div class="mt-6 grid gap-6 xl:grid-cols-3">
-  <% lessons = capture do %>
-    <div class="divide-y divide-app-border">
-      <% [
-        [t("dashboard.lesson_one"), t("dashboard.teacher_one"), "10:00", t("dashboard.room_one"), t("dashboard.soon")],
-        [t("dashboard.lesson_two"), t("dashboard.teacher_two"), "11:30", t("dashboard.room_two"), t("dashboard.upcoming")],
-        [t("dashboard.lesson_three"), t("dashboard.teacher_three"), "13:00", t("dashboard.remote"), t("dashboard.upcoming")]
-      ].each do |lesson, teacher, time, room, status| %>
-        <article class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center">
-          <time class="w-20 text-sm font-bold text-app-primary"><%= time %></time>
-          <div class="min-w-0 flex-1">
-            <h3 class="truncate text-sm font-semibold text-app-text"><%= lesson %></h3>
-            <p class="mt-1 ds-caption"><%= teacher %> · <%= room %></p>
-          </div>
-          <%= render "shared/components/badge", label: status, variant: :success %>
-        </article>
-      <% end %>
-    </div>
-  <% end %>
   <div class="xl:col-span-2">
-    <%= render "shared/components/card",
-               title: t("dashboard.today_lessons"),
-               subtitle: t("dashboard.upcoming_lessons"),
-               header_action: render("shared/components/button", label: t("actions.view_all"), variant: :ghost, size: :small),
-               body: lessons,
-               body_class: "p-0" %>
+    <% lessons = capture do %>
+      <% if @dashboard[:lessons].empty? %>
+        <%= render "shared/components/empty_state", title: t("dashboard.no_lessons_title"), description: t("dashboard.no_lessons_description"), icon: :calendar %>
+      <% else %>
+        <div class="divide-y divide-app-border">
+          <% @dashboard[:lessons].each do |lesson| %>
+            <article class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center">
+              <time class="w-28 text-sm font-bold text-app-primary" datetime="<%= lesson.starts_at.iso8601 %>"><%= l(lesson.starts_at.in_time_zone(lesson.academy_time_zone), format: :short) %></time>
+              <div class="min-w-0 flex-1">
+                <h3 class="truncate text-sm font-semibold text-app-text"><%= dashboard_lesson_title(lesson) %></h3>
+                <p class="mt-1 ds-caption"><%= lesson.teacher_profile.display_name %> · <%= dashboard_lesson_location(lesson) %></p>
+              </div>
+              <%= scheduling_status_badge(lesson) %>
+            </article>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+    <%= render "shared/components/card", title: t("dashboard.today_lessons"), subtitle: t("dashboard.upcoming_lessons"), header_action: render("shared/components/button", label: t("actions.view_all"), href: dashboard_schedule_path, variant: :ghost, size: :small), body: lessons, body_class: "p-0" %>
   </div>
 
-  <%= render "shared/components/card",
-             title: t("dashboard.late_title"),
-             subtitle: t("dashboard.late_subtitle"),
-             body: render("shared/components/empty_state",
-                          title: t("dashboard.late_empty_title"),
-                          description: t("dashboard.late_empty_description"),
-                          icon: :check_circle) %>
+  <% late_attendances = @dashboard[:late_attendances] %>
+  <% late_content = capture do %>
+    <% if late_attendances.empty? %>
+      <%= render "shared/components/empty_state", title: t("dashboard.late_empty_title"), description: t("dashboard.late_empty_description"), icon: :check_circle %>
+    <% else %>
+      <div class="divide-y divide-app-border">
+        <% late_attendances.each do |attendance| %>
+          <article class="px-5 py-4">
+            <h3 class="text-sm font-semibold text-app-text"><%= attendance.student_profile.display_name %></h3>
+            <p class="mt-1 ds-caption"><%= dashboard_lesson_title(attendance.scheduled_lesson) %> · <%= t("dashboard.late_minutes", count: attendance.minutes_late) %></p>
+          </article>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+  <%= render "shared/components/card", title: t("dashboard.late_title"), subtitle: t("dashboard.late_subtitle"), body: late_content, body_class: "p-0" %>
 </div>
 
 <% quick_actions = capture do %>
   <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-    <% [
-      [t("dashboard.record_attendance"), :check],
-      [t("dashboard.add_lesson"), :plus],
-      [t("dashboard.send_reminder"), :information],
-      [t("dashboard.view_reports"), :arrow]
-    ].each do |label, action_icon| %>
-      <%= render "shared/components/button", label:, icon: action_icon, variant: :secondary, disabled: true, class: "justify-start" %>
-    <% end %>
+    <%= render "shared/components/button", label: t("dashboard.view_schedule"), href: dashboard_schedule_path, icon: :calendar, variant: :secondary, class: "justify-start" %>
+    <%= render "shared/components/button", label: t("dashboard.record_attendance"), href: dashboard_attendance_path, icon: :check, variant: :secondary, class: "justify-start" %>
+    <%= render "shared/components/button", label: t("dashboard.view_reports"), href: dashboard_reports_path, icon: :reports, variant: :secondary, class: "justify-start" %>
   </div>
 <% end %>
 <div class="mt-6">
-  <%= render "shared/components/card",
-             title: t("dashboard.quick_actions"),
-             subtitle: t("dashboard.quick_actions_description"),
-             body: quick_actions %>
+  <%= render "shared/components/card", title: t("dashboard.quick_actions"), subtitle: t("dashboard.quick_actions_description"), body: quick_actions %>
 </div>

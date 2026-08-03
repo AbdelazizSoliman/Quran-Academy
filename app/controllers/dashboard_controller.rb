@@ -1,3 +1,5 @@
 class DashboardController < ApplicationController
-  def index; end
+  def index
+    @dashboard = Dashboard::Overview.new(user: current_user).call
+  end
 end
