@@ -23,6 +23,17 @@ RSpec.describe "Academic catalog requests" do
     expect(response.body).to include('dir="ltr"', "Course Offerings")
   end
 
+  it "shows only valid program lifecycle actions" do
+    program = create(:program, :active)
+    sign_in admin
+
+    get admin_program_path(program)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).not_to include(activate_admin_program_path(program))
+    expect(response.body).to include(deactivate_admin_program_path(program))
+  end
+
   it "creates a program without permitting lifecycle status" do
     sign_in admin
     post admin_programs_path, params: { program: attributes_for(:program).merge(status: "active") }
