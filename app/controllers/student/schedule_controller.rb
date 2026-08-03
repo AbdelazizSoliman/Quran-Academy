@@ -8,17 +8,32 @@ module Student
 
     def show
       @lesson = current_user.student_profile.scheduled_lessons.operational
-                            .includes(:teacher_profile, :course_offering).find(params.expect(:id))
+                            .includes(:teacher_profile, :course_offering,
+                                      scheduled_lesson_enrollments: { enrollment: :student_profile })
+                            .find(params.expect(:id))
+      @participant = expected_participant
     rescue ActiveRecord::RecordNotFound
       head :not_found
     end
 
     private
 
+    def expected_participant
+      @lesson.scheduled_lesson_enrollments.find do |item|
+        item.enrollment.student_profile.user_id == current_user.id && item.expected?
+      end
+    end
+
     def upcoming_lessons(profile)
       return ScheduledLesson.none unless profile
 
-      profile.scheduled_lessons.operational.chronological.where(starts_at: Time.current..30.days.from_now)
+      profile.scheduled_lessons.operational.chronological.where(starts_at: schedule_window)
+    end
+
+    def schedule_window
+      zone_name = AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+      academy_now = Time.current.in_time_zone(zone_name)
+      academy_now.beginning_of_day..(academy_now + 30.days).end_of_day
     end
 
     def require_student!

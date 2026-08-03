@@ -15,15 +15,15 @@ module Teacher
     def edit; end
 
     def create
-      @availability = TeacherAvailabilities::Create.new(
+      @availability = ::Admin::TeacherAvailabilities::Create.new(
         actor: current_user, teacher_profile: current_user.teacher_profile, attributes: teacher_params
       ).call
       respond_to_save(:created, :new)
     end
 
     def update
-      @availability = TeacherAvailabilities::Update.new(actor: current_user, availability: @availability,
-                                                        attributes: teacher_params).call
+      @availability = ::Admin::TeacherAvailabilities::Update.new(actor: current_user, availability: @availability,
+                                                                 attributes: teacher_params).call
       respond_to_save(:updated, :edit)
     end
 

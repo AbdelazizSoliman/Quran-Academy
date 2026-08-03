@@ -21,9 +21,10 @@ module Admin
     end
 
     def create
-      teacher = TeacherProfile.find(params.expect(teacher_availability: :teacher_profile_id))
+      attributes = availability_params
+      teacher = TeacherProfile.find(attributes.fetch(:teacher_profile_id))
       @availability = TeacherAvailabilities::Create.new(actor: current_user, teacher_profile: teacher,
-                                                        attributes: availability_params).call
+                                                        attributes:).call
       respond_to_save(:created, :new)
     end
 

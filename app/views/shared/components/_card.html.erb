@@ -18,7 +18,7 @@
       <% if local_assigns[:header_action].present? %><div><%= header_action %></div><% end %>
     </header>
   <% end %>
-  <div class="<%= local_assigns.fetch(:body_class, "p-5") %>"><%= local_assigns[:body] %></div>
+  <div class="<%= local_assigns.fetch(:body_class, "p-5") %>"><%= block_given? ? yield : local_assigns[:body] %></div>
   <% if local_assigns[:footer].present? %>
     <footer class="border-t border-app-border bg-app-muted/50 px-5 py-3"><%= footer %></footer>
   <% end %>

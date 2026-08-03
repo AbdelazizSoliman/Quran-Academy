@@ -29,6 +29,7 @@ en:
       cancellation_reason_required: "is required when cancelling a lesson"
       stale_record: "was changed by another administrator; reload and try again"
       invalid_role: "must belong to an administrator or staff account"
+      invalid_url: "must be one complete HTTP or HTTPS URL without another URL appended"
   activerecord:
     attributes:
       user:

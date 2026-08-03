@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Quran Academy — Role-Based User Guide</title>
+  <style>
+    @page { size: A4; margin: 18mm 16mm 18mm; }
+    * { box-sizing: border-box; }
+    body { color: #18352d; font-family: DejaVu Sans, Arial, sans-serif; font-size: 10.5pt; line-height: 1.55; margin: 0; }
+    h1, h2, h3 { color: #12634f; page-break-after: avoid; }
+    h1 { font-size: 28pt; line-height: 1.15; margin: 0 0 12px; }
+    h2 { border-bottom: 2px solid #c8e4da; font-size: 18pt; margin: 26px 0 12px; padding-bottom: 5px; }
+    h3 { font-size: 13pt; margin: 18px 0 6px; }
+    p { margin: 7px 0; }
+    ul, ol { margin: 7px 0 12px 22px; padding: 0; }
+    li { margin: 4px 0; }
+    table { border-collapse: collapse; margin: 10px 0 16px; page-break-inside: avoid; width: 100%; }
+    th, td { border: 1px solid #b8d5cb; padding: 7px; text-align: left; vertical-align: top; }
+    th { background: #eaf6f1; color: #114c3d; }
+    code { background: #eef5f2; border-radius: 3px; padding: 1px 4px; }
+    .cover { min-height: 245mm; padding-top: 43mm; text-align: center; }
+    .cover .mark { color: #ba8a2d; font-size: 42pt; margin-bottom: 16px; }
+    .cover .subtitle { color: #53736a; font-size: 15pt; }
+    .cover .meta { margin-top: 52mm; }
+    .page-break { page-break-before: always; }
+    .callout { background: #eef8f4; border-left: 5px solid #248268; margin: 12px 0; padding: 10px 13px; }
+    .warning { background: #fff7e8; border-left-color: #c48b23; }
+    .danger { background: #fff0f0; border-left-color: #b64242; }
+    .step { border: 1px solid #cfe3dc; border-radius: 5px; margin: 10px 0; padding: 9px 12px; page-break-inside: avoid; }
+    .step strong { color: #12634f; }
+    .small { color: #5d756e; font-size: 9pt; }
+    .status { font-weight: bold; white-space: nowrap; }
+    footer { color: #758983; font-size: 8pt; margin-top: 24px; text-align: center; }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <div class="mark">☾</div>
+    <h1>Quran Academy</h1>
+    <div class="subtitle">Role-Based Application User Guide</div>
+    <p>Administrator · Staff · Teacher · Student</p>
+    <div class="meta">
+      <p><strong>Application:</strong> https://quran-academy-igl2.onrender.com</p>
+      <p><strong>Edition:</strong> MVP Guide · August 2026</p>
+    </div>
+  </section>
+
+  <section class="page-break">
+    <h2>1. Readiness assessment</h2>
+    <div class="callout warning">
+      <strong>Is the application 100% complete?</strong> No software can honestly be certified as covering 100% of every academy's needs without production acceptance testing. The application is a broad Quran Academy MVP with the primary academic and operational workflows implemented. Production readiness still depends on real-user testing, data review, monitoring, backups, provider configuration, and policy approval.
+    </div>
+    <h3>Implemented scope</h3>
+    <ul>
+      <li>Secure administrator-created accounts and single-use invitations.</li>
+      <li>Teacher, student, staff, guardian, program, offering, and enrollment management.</li>
+      <li>Teacher availability, lesson scheduling, conflict checks, and role schedules.</li>
+      <li>Lesson check-in, start, attendance, completion, locking, and audit history.</li>
+      <li>Academic lesson reports, individual student entries, and manual communications.</li>
+      <li>Assessments, exams, progress summaries, transcripts, and certificate records.</li>
+      <li>Teacher payroll preparation, approval, payment recording, dashboards, reports, and CSV exports.</li>
+      <li>Email/WhatsApp notification records, delivery attempts, failures, and retry workflows.</li>
+      <li>Arabic RTL and English LTR interfaces with role-based authorization.</li>
+    </ul>
+    <h3>Important limitations</h3>
+    <ul>
+      <li>Certificate records do not generate formal certificate PDFs.</li>
+      <li>Payroll is operational tracking, not accounting, banking, taxation, or government payroll.</li>
+      <li>WhatsApp delivery requires approved Meta templates, valid E.164 numbers, and provider configuration.</li>
+      <li>Email delivery requires a configured Resend account and verified sender domain.</li>
+      <li>Reminder jobs require an external scheduler in production.</li>
+      <li>Guardians do not have authenticated portal accounts.</li>
+      <li>Before launch, perform browser, mobile, accessibility, backup/restore, load, and security acceptance testing.</li>
+    </ul>
+
+    <h2>2. Getting started</h2>
+    <div class="step"><strong>Step 1 — Open the application.</strong> Visit the application URL and select Arabic or English where the interface offers a locale control.</div>
+    <div class="step"><strong>Step 2 — Sign in.</strong> Open <code>/account/sign-in</code>, enter the email and password, then choose Sign in.</div>
+    <div class="step"><strong>Step 3 — Use the sidebar.</strong> Available items vary by role. If a page is not visible, the signed-in role is not authorized for that operation.</div>
+    <div class="step"><strong>Step 4 — Confirm the time zone.</strong> Scheduled and actual times should be reviewed in the user's configured time zone and academy time-zone context.</div>
+    <div class="step"><strong>Step 5 — Sign out safely.</strong> Use the account menu and Sign out, especially on shared devices.</div>
+
+    <h3>Local demo accounts</h3>
+    <table>
+      <tr><th>Role</th><th>Email</th><th>Password</th></tr>
+      <tr><td>Administrator</td><td>admin@demo.quran-academy.test</td><td>DemoPass123!</td></tr>
+      <tr><td>Staff</td><td>staff@demo.quran-academy.test</td><td>DemoPass123!</td></tr>
+      <tr><td>Teacher</td><td>teacher1@demo.quran-academy.test</td><td>DemoPass123!</td></tr>
+      <tr><td>Student</td><td>student1@demo.quran-academy.test</td><td>DemoPass123!</td></tr>
+    </table>
+    <p class="small">These accounts are local demo data only. Never use the shared demo password for production users.</p>
+  </section>
+
+  <section class="page-break">
+    <h2>3. Administrator guide</h2>
+    <h3>3.1 Initial academy setup</h3>
+    <ol>
+      <li>Open <strong>Settings</strong> from the administration sidebar.</li>
+      <li>Review academy identity, time zone, lateness rules, teacher check-in windows, payroll defaults, grade boundaries, and notification settings.</li>
+      <li>Choose invitation delivery mode: Email Only, WhatsApp Only, or Email + WhatsApp.</li>
+      <li>Enable only notification channels whose production credentials and sender/template approvals are complete.</li>
+      <li>Save, reopen Settings, and confirm values persisted.</li>
+    </ol>
+
+    <h3>3.2 Create users and send invitations</h3>
+    <ol>
+      <li>Open <strong>Users</strong> and choose <strong>New User</strong>.</li>
+      <li>Enter name, email, role, required phone number, and optional WhatsApp number. If WhatsApp is blank, phone is used.</li>
+      <li>Submit. The user and role profile are created together; the account remains pending.</li>
+      <li>The invitation service creates one secure, expiring, single-use token and dispatches according to academy settings.</li>
+      <li>Open <strong>Invitations</strong> to inspect status. Use Resend to invalidate the old token and issue a new one, or Cancel to block acceptance.</li>
+      <li>For a failed WhatsApp/email attempt, open <strong>Notification Center</strong>, inspect provider details, correct configuration or recipient data, then use Retry.</li>
+    </ol>
+    <div class="callout danger"><strong>Security:</strong> never send a default password. Administrators should not ask users to share their password or invitation token.</div>
+
+    <h3>3.3 Configure teachers and students</h3>
+    <ol>
+      <li>Open <strong>Teachers</strong>; complete the teacher profile, status, qualifications, contact data, salary strategy, and rate where applicable.</li>
+      <li>Open <strong>Students</strong>; complete student type, time zone, contact preferences, and academic profile.</li>
+      <li>For a minor, create or select a guardian and create a guardianship. Mark the correct primary contact.</li>
+      <li>Keep operational records active/inactive or archived through lifecycle controls; avoid deleting historical data.</li>
+    </ol>
+
+    <h3>3.4 Programs, offerings, and enrollment</h3>
+    <ol>
+      <li>Create a reusable <strong>Program</strong>, enter Arabic/English names and defaults, then activate it.</li>
+      <li>Create a <strong>Course Offering</strong> from the program, set capacity and dates, then move it through Open and In Progress when appropriate.</li>
+      <li>Create an <strong>Enrollment</strong> linking a student to an offering.</li>
+      <li>Review placement and guardian readiness where required.</li>
+      <li>Use explicit actions to approve, waitlist, activate, pause, complete, cancel, withdraw, transfer, or archive.</li>
+    </ol>
+  </section>
+
+  <section class="page-break">
+    <h2>4. Administrator scheduling and attendance</h2>
+    <h3>4.1 Teacher availability</h3>
+    <ol>
+      <li>Open <strong>Teacher Availability</strong> and create weekly availability windows.</li>
+      <li>Add date-specific exceptions for leave, closures, or special availability.</li>
+      <li>Review local time and time zone carefully, especially around daylight-saving changes.</li>
+    </ol>
+
+    <h3>4.2 Schedule a lesson</h3>
+    <ol>
+      <li>Open <strong>Scheduled Lessons</strong> and choose New.</li>
+      <li>Select offering, assigned teacher, start/end time, lesson title, and meeting information.</li>
+      <li>Add eligible participants. The application checks availability and scheduling conflicts.</li>
+      <li>Schedule the draft. Use the explicit Reschedule or Cancel action for later changes.</li>
+      <li>Do not edit scheduled timestamps to represent actual operation; actual start/end fields are recorded separately.</li>
+    </ol>
+
+    <h3>4.3 Operate and close a lesson</h3>
+    <ol>
+      <li>Open the lesson and use administrator override check-in only when necessary; record the reason.</li>
+      <li>Start the lesson. This records actual start time and opens attendance.</li>
+      <li>For each expected participant, record arrival/present, absent, excused absence, or departure.</li>
+      <li>Review unresolved students before completion. Confirm explicitly if unresolved students must become absent.</li>
+      <li>Complete the lesson. Actual end time is recorded and attendance is locked.</li>
+      <li>If correction is required, reopen attendance as an administrator with a reason, adjust it, and relock.</li>
+    </ol>
+
+    <h3>4.4 Attendance review</h3>
+    <ol>
+      <li>Open <strong>Attendance</strong> to filter by date, teacher, program, offering, lesson status, student, or attendance status.</li>
+      <li>Use late, absent, and unresolved filters for operational follow-up.</li>
+      <li>Open a lesson to review teacher check-in, actual lesson times, attendance lock state, participant outcomes, and audit history.</li>
+    </ol>
+  </section>
+
+  <section class="page-break">
+    <h2>5. Administrator academic workflows</h2>
+    <h3>5.1 Lesson reports</h3>
+    <ol>
+      <li>After a completed lesson has locked attendance, open <strong>Lesson Reports</strong>.</li>
+      <li>Review the teacher's summary, topics, homework, next lesson plan, and per-student entries.</li>
+      <li>Confirm private teacher notes are not copied into student or guardian communications.</li>
+      <li>Use Review, then Lock to finalize. Use Reopen with a required reason for corrections, followed by Relock.</li>
+    </ol>
+
+    <h3>5.2 Assessments and progress</h3>
+    <ol>
+      <li>Create and activate <strong>Assessment Categories</strong>.</li>
+      <li>Create an <strong>Assessment Template</strong> and add ordered numeric or rating rubric items with weights.</li>
+      <li>Create a student assessment against an enrollment, assigned teacher, date, and optional lesson.</li>
+      <li>Enter rubric results and notes. Use lifecycle actions: Draft → Submitted → Reviewed → Published → Archived.</li>
+      <li>Only published assessments should be considered student-facing.</li>
+      <li>Open <strong>Student Progress</strong> to review averages, highest/lowest scores, category strengths/weaknesses, Quran position, completion, readiness, and trend.</li>
+    </ol>
+
+    <h3>5.3 Exams and certificates</h3>
+    <ol>
+      <li>Create an <strong>Exam Session</strong> for a program/offering and teacher.</li>
+      <li>Move it through Draft, Scheduled, Completed, Reviewed, and Published using explicit actions.</li>
+      <li>Create a <strong>Certificate</strong> for program completion, exam completion, or Ijazah.</li>
+      <li>Verify student, issue date, issuer, type, and verification code before notifying the recipient.</li>
+      <li>Remember that certificate PDF generation is not included; the application stores and displays the certificate record.</li>
+    </ol>
+
+    <h3>5.4 Academic dashboard</h3>
+    <p>Use the Academic Dashboard to review assessment/exam statistics, pass rate, high performers, and students needing attention. Treat these indicators as decision support, not as a substitute for teacher review.</p>
+  </section>
+
+  <section class="page-break">
+    <h2>6. Administrator payroll, reporting, and notifications</h2>
+    <h3>6.1 Teacher payroll</h3>
+    <ol>
+      <li>Confirm teacher salary strategy and rate are correct before generating payroll.</li>
+      <li>Open <strong>Teacher Payrolls</strong>, choose New, select teacher and period, then generate the draft.</li>
+      <li>Review completed lessons included; cancelled and draft lessons must be excluded.</li>
+      <li>Review base amount, bonus, deduction, manual adjustment, and net formula.</li>
+      <li>Use Prepare, then Approve, then Mark Paid. These actions record operational state only; they do not transfer money.</li>
+      <li>If correction is needed before final payment recording, use Reopen where allowed and retain the audit trail.</li>
+    </ol>
+    <div class="callout"><strong>Net amount:</strong> Base + Bonus − Deduction + Manual Adjustment.</div>
+
+    <h3>6.2 Operational reports and CSV</h3>
+    <ol>
+      <li>Open <strong>Operational Reports</strong>.</li>
+      <li>Select teacher workload, teacher attendance, student attendance, lesson completion, lesson reports, payroll, programs, offerings, or enrollments.</li>
+      <li>Apply a finite date range and relevant teacher/program/course/status filters.</li>
+      <li>Review totals, then choose CSV Export. The export is UTF-8 BOM encoded for Arabic-compatible spreadsheet import.</li>
+    </ol>
+
+    <h3>6.3 Notification Center</h3>
+    <ol>
+      <li>Open <strong>Notification Center</strong> to view recipient, channel, provider, status, attempt count, timestamps, provider message ID, and response.</li>
+      <li>Open an item for its timeline, audit events, and immutable delivery attempts.</li>
+      <li>Use manual actions to send eligible invitation, lesson reminder, lesson report, or certificate notifications.</li>
+      <li>Retry only failed notifications after correcting the underlying phone, email, template, credential, or provider issue.</li>
+      <li>A successful API acceptance does not necessarily prove handset delivery; inspect provider status and Meta/Resend dashboards when needed.</li>
+    </ol>
+  </section>
+
+  <section class="page-break">
+    <h2>7. Staff guide</h2>
+    <div class="callout">Staff access is intentionally read-only for sensitive operational areas. The visible interface may resemble administration, but mutation actions are restricted by authorization.</div>
+    <ol>
+      <li>Sign in with the staff account and use the sidebar to open permitted dashboards and lists.</li>
+      <li>Review teachers, students, programs, offerings, enrollments, schedules, attendance, lesson reports, and operational reports where exposed.</li>
+      <li>Use filters and pagination rather than exporting or scanning unrestricted data unnecessarily.</li>
+      <li>Review notification history only where staff policy permits it; do not expect retry, reopen, lifecycle, payroll mutation, or user-administration controls.</li>
+      <li>Escalate corrections to an active administrator instead of attempting workarounds.</li>
+      <li>Never share student, guardian, payroll, invitation, or notification information outside approved academy operations.</li>
+    </ol>
+
+    <h3>Staff verification checklist</h3>
+    <ul>
+      <li>Mutation buttons are absent or denied.</li>
+      <li>Private teacher notes and sensitive audit payloads are not exposed.</li>
+      <li>Reports show only the intended academy data.</li>
+      <li>No payroll approval/payment or invitation management action is available.</li>
+    </ul>
+  </section>
+
+  <section class="page-break">
+    <h2>8. Teacher guide</h2>
+    <h3>8.1 Profile and availability</h3>
+    <ol>
+      <li>Open <strong>Profile</strong> and verify name, phone/WhatsApp, locale, and time zone.</li>
+      <li>Open <strong>Availability</strong> and maintain recurring weekly windows.</li>
+      <li>Add availability exceptions for specific unavailable or specially available dates.</li>
+    </ol>
+
+    <h3>8.2 Conduct a lesson</h3>
+    <ol>
+      <li>Open <strong>Schedule</strong>. Only lessons assigned to the signed-in teacher should appear.</li>
+      <li>Open the lesson and choose Check In within the configured check-in window.</li>
+      <li>Choose Start Lesson. Attendance opens and actual start time is recorded.</li>
+      <li>For each student, record live arrival or the appropriate attendance outcome. Lateness is calculated from scheduled start, not actual start.</li>
+      <li>Record departure for present/late students where needed.</li>
+      <li>Resolve every expected participant. On completion, review the unresolved warning and explicitly confirm absent defaults if appropriate.</li>
+      <li>Choose Complete Lesson. Attendance locks; teachers cannot reopen it.</li>
+    </ol>
+
+    <h3>8.3 Complete the lesson report</h3>
+    <ol>
+      <li>From the completed lesson, open or initialize its report.</li>
+      <li>Enter a meaningful lesson summary, topics, general homework, and next lesson plan.</li>
+      <li>Open each expected student's entry and record reading, memorization, revision, Tajweed, engagement, performance, homework, and next target.</li>
+      <li>Keep private notes private; use student-visible and guardian-visible fields deliberately.</li>
+      <li>Complete all required entries and Submit. A submitted report becomes non-editable to the teacher unless an administrator reopens it.</li>
+    </ol>
+
+    <h3>8.4 Assessments, exams, notifications, and payroll</h3>
+    <ol>
+      <li>Open <strong>Assessments</strong> to create or edit only assessments assigned to you, then submit them for review.</li>
+      <li>Open <strong>Exams</strong> to view assigned sessions and participants; administrative lifecycle controls remain unavailable.</li>
+      <li>Open <strong>Notifications</strong> to review your notification history and permitted manual communication records.</li>
+      <li>Open <strong>Payroll</strong> to view only your own periods, calculations, lesson details, and status. Teachers cannot prepare, approve, reopen, cancel, or mark payroll paid.</li>
+      <li>Use the teacher dashboard/reports for your own workload and student follow-up only.</li>
+    </ol>
+  </section>
+
+  <section class="page-break">
+    <h2>9. Student guide</h2>
+    <h3>9.1 Account activation</h3>
+    <ol>
+      <li>Open the secure invitation link received by email or WhatsApp.</li>
+      <li>Check the displayed academy and account information; the invitation does not allow email or role editing.</li>
+      <li>Enter and confirm a strong password, then activate the account.</li>
+      <li>The invitation becomes unusable after acceptance or expiration. Contact the academy if it has expired.</li>
+      <li>Sign in normally after activation.</li>
+    </ol>
+
+    <h3>9.2 Daily use</h3>
+    <ol>
+      <li>Open <strong>Profile</strong> to review or update permitted personal preferences.</li>
+      <li>Open <strong>Enrollments</strong> to see your programs, offerings, enrollment status, and placement information.</li>
+      <li>Open <strong>Schedule</strong> for your linked lessons. Meeting details follow lesson lifecycle and visibility rules.</li>
+      <li>Open <strong>Attendance</strong> to see only your own outcome, arrival, lateness, and excuse state.</li>
+      <li>Open <strong>Lesson Reports</strong> to see reviewed/locked reports and your own completed, non-withheld entry.</li>
+      <li>Open <strong>Assessments</strong> for your published grades and feedback.</li>
+      <li>Open <strong>Progress</strong> for academic averages, category indicators, Quran progress, and trend.</li>
+      <li>Open <strong>Transcript</strong> for programs, enrollments, assessments, grades, certificates, and overall progress.</li>
+      <li>Open <strong>Certificates</strong> to view issued certificate records and verification codes.</li>
+      <li>Open <strong>Notifications</strong> for your own notification history.</li>
+    </ol>
+    <div class="callout">Students cannot edit attendance, reports, assessments, certificates, notifications, or another student's information. Draft, unreviewed, private, withheld, and administrative content is intentionally hidden.</div>
+  </section>
+
+  <section class="page-break">
+    <h2>10. Recommended end-to-end operating sequence</h2>
+    <table>
+      <tr><th>Stage</th><th>Owner</th><th>Required sequence</th></tr>
+      <tr><td>Foundation</td><td>Admin</td><td>Settings → users/profiles → programs → offerings</td></tr>
+      <tr><td>Onboarding</td><td>Admin/User</td><td>Create user/profile → invitation → password setup → active account</td></tr>
+      <tr><td>Enrollment</td><td>Admin</td><td>Create → readiness/placement review → approve → activate</td></tr>
+      <tr><td>Scheduling</td><td>Admin</td><td>Availability → create lesson → participants → conflict check → schedule</td></tr>
+      <tr><td>Lesson</td><td>Teacher</td><td>Check in → start → attendance → resolve participants → complete/lock</td></tr>
+      <tr><td>Reporting</td><td>Teacher/Admin</td><td>Draft report → student entries → submit → review → lock</td></tr>
+      <tr><td>Assessment</td><td>Teacher/Admin</td><td>Draft → score → submit → review → publish</td></tr>
+      <tr><td>Payroll</td><td>Admin</td><td>Generate draft → verify lessons/amounts → prepare → approve → paid</td></tr>
+      <tr><td>Communication</td><td>Admin/Teacher</td><td>Prepare/send → provider attempt → inspect result → retry failure if corrected</td></tr>
+    </table>
+
+    <h2>11. Production launch checklist</h2>
+    <ul>
+      <li>Verify Render environment variables without printing secrets.</li>
+      <li>Verify database backups and perform a restore rehearsal.</li>
+      <li>Test invitation acceptance, expiry, resend, and cancellation.</li>
+      <li>Test approved Meta templates in both configured languages and validate real delivery.</li>
+      <li>Test Resend sender verification, bounce/failure behavior, and links using HTTPS.</li>
+      <li>Configure an external scheduler for reminder sweep jobs if reminders are required.</li>
+      <li>Run full automated verification and resolve every failure/security warning.</li>
+      <li>Perform role-isolation tests for admin, staff, teacher, and multiple students.</li>
+      <li>Verify Arabic RTL, English LTR, keyboard operation, and 390px mobile layout.</li>
+      <li>Confirm academy policies for attendance corrections, report publication, payroll approval, retention, and privacy.</li>
+      <li>Train administrators with non-production data before entering real student information.</li>
+    </ul>
+
+    <h2>12. Support and troubleshooting</h2>
+    <table>
+      <tr><th>Problem</th><th>Recommended action</th></tr>
+      <tr><td>Invitation not received</td><td>Check invitation mode, recipient profile contact, notification record, provider response, sender/template approval, then resend or retry.</td></tr>
+      <tr><td>WhatsApp API says accepted but no handset delivery</td><td>Confirm E.164 number, approved template name/language, parameter position, Meta conversation rules, and Meta delivery status.</td></tr>
+      <tr><td>Teacher cannot start lesson</td><td>Confirm assignment, active teacher status, lesson lifecycle, check-in, time window, and lock version.</td></tr>
+      <tr><td>Cannot complete lesson</td><td>Resolve pending attendance or explicitly confirm unresolved absences where permitted.</td></tr>
+      <tr><td>Student cannot see report/assessment</td><td>Confirm lesson completion and that report/assessment is reviewed/published, student entry is completed, and it is not withheld.</td></tr>
+      <tr><td>Payroll amount unexpected</td><td>Check teacher strategy/rate, period, included completed lessons, duration, bonus, deduction, and adjustment audit.</td></tr>
+      <tr><td>Stale record warning</td><td>Reload the page, review the newer saved version, and reapply the intended change; do not bypass optimistic locking.</td></tr>
+    </table>
+
+    <footer>Quran Academy Role-Based User Guide · Generated from the implemented application routes and workflows · August 2026</footer>
+  </section>
+</body>
+</html>

@@ -1,1 +1,22 @@
-<%= render "shared/page_header", title: I18n.locale == :ar ? @lesson.title_ar : @lesson.title_en, description: @lesson.public_id, badge: scheduling_status_badge(@lesson) %><%= render "shared/components/card", title: t("scheduling.sections.lesson") do %><p><%= @lesson.teacher_profile.display_name %></p><p class="mt-2" dir="ltr"><%= scheduling_time(@lesson.starts_at, zone: ActiveSupport::TimeZone[current_user.time_zone]) %></p><p class="mt-2"><%= @lesson.course_offering.title_en %></p><% if @lesson.scheduled? || @lesson.in_progress? %><% participant = @lesson.scheduled_lesson_enrollments.find { |item| item.enrollment.student_profile.user_id == current_user.id && item.expected? } %><% if participant && @lesson.online_meeting_url.present? %><%= link_to t("scheduling.actions.join_online"), @lesson.online_meeting_url, target: "_blank", rel: "noopener", class: "mt-4 inline-flex text-app-primary" %><% end %><% end %><% attendance = @lesson.lesson_attendances.find { |item| item.student_profile.user_id == current_user.id } %><% if attendance %><p class="mt-4"><%= t("attendance.student.outcome") %>: <%= t("attendance.statuses.#{attendance.status}") %></p><% end %><% end %>
+<%= render "shared/page_header",
+           title: I18n.locale == :ar ? @lesson.title_ar : @lesson.title_en,
+           description: @lesson.public_id,
+           badge: scheduling_status_badge(@lesson) %>
+
+<%= render "shared/components/card", title: t("scheduling.sections.lesson") do %>
+  <p><%= @lesson.teacher_profile.display_name %></p>
+  <p class="mt-2" dir="ltr"><%= scheduling_time(@lesson.starts_at, zone: ActiveSupport::TimeZone[current_user.time_zone]) %></p>
+  <p class="mt-2"><%= @lesson.course_offering.title_en %></p>
+
+  <% if @participant && @lesson.online_meeting_join_url.present? %>
+    <%= link_to t("scheduling.actions.join_online"), @lesson.online_meeting_join_url,
+                target: "_blank", rel: "noopener", class: "mt-4 inline-flex text-app-primary" %>
+  <% elsif @lesson.delivery_mode.in?(%w[online hybrid]) %>
+    <p class="mt-4 ds-caption"><%= t("scheduling.student.meeting_unavailable") %></p>
+  <% end %>
+
+  <% attendance = @lesson.lesson_attendances.find { |item| item.student_profile.user_id == current_user.id } %>
+  <% if attendance %>
+    <p class="mt-4"><%= t("attendance.student.outcome") %>: <%= t("attendance.statuses.#{attendance.status}") %></p>
+  <% end %>
+<% end %>

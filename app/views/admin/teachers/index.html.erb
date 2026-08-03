@@ -61,7 +61,7 @@
   <nav class="mt-5 flex flex-wrap justify-between gap-3" aria-label="<%= t("accessibility.pagination") %>">
     <p class="ds-caption"><%= t("pagination.summary", from: @pagy.from, to: @pagy.to, total: @pagy.count) %></p>
     <div class="flex gap-2">
-      <% if @pagy.prev %><%= link_to t("pagination.previous"), admin_teachers_path(request.query_parameters.merge(page: @pagy.prev)), class: button_classes(variant: :secondary, size: :small) %><% end %>
+      <% if @pagy.previous %><%= link_to t("pagination.previous"), admin_teachers_path(request.query_parameters.merge(page: @pagy.previous)), class: button_classes(variant: :secondary, size: :small) %><% end %>
       <% if @pagy.next %><%= link_to t("pagination.next"), admin_teachers_path(request.query_parameters.merge(page: @pagy.next)), class: button_classes(variant: :secondary, size: :small) %><% end %>
     </div>
   </nav>

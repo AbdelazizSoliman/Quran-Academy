@@ -15,15 +15,15 @@ module Teacher
     def edit; end
 
     def create
-      @exception = TeacherAvailabilityExceptions::Create.new(
+      @exception = ::Admin::TeacherAvailabilityExceptions::Create.new(
         actor: current_user, teacher_profile: current_user.teacher_profile, attributes: exception_params
       ).call
       respond_to_save(:created, :new)
     end
 
     def update
-      @exception = TeacherAvailabilityExceptions::Update.new(actor: current_user, exception: @exception,
-                                                             attributes: exception_params).call
+      @exception = ::Admin::TeacherAvailabilityExceptions::Update.new(actor: current_user, exception: @exception,
+                                                                      attributes: exception_params).call
       respond_to_save(:updated, :edit)
     end
 

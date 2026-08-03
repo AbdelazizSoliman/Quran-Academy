@@ -27,10 +27,15 @@ module Admin
 
       def normalize_attributes
         attributes = @attributes.to_h.symbolize_keys
-        zone = attributes[:academy_time_zone].presence || AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+        zone = persisted_academy_zone || attributes[:academy_time_zone].presence ||
+               AcademySetting.current_or_nil&.default_time_zone || "Cairo"
         attributes.merge(academy_time_zone: zone,
                          starts_at: parse_datetime(attributes[:starts_at], zone),
                          ends_at: parse_datetime(attributes[:ends_at], zone))
+      end
+
+      def persisted_academy_zone
+        @lesson.academy_time_zone if defined?(@lesson) && @lesson&.persisted?
       end
 
       def parse_datetime(value, zone)

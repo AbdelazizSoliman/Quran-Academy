@@ -29,6 +29,7 @@ ar:
       cancellation_reason_required: "مطلوب عند إلغاء الدرس"
       stale_record: "تم تغييره بواسطة مسؤول آخر؛ أعد التحميل وحاول مجدداً"
       invalid_role: "يجب أن يكون مرتبطاً بحساب مدير أو موظف"
+      invalid_url: "يجب أن يكون رابط HTTP أو HTTPS كاملاً واحداً دون إلحاق رابط آخر به"
   activerecord:
     attributes:
       user:

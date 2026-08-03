@@ -21,13 +21,16 @@ en:
       schedule: "My schedule"
     student:
       schedule: "My schedule"
+      meeting_unavailable: "The online meeting link is not available for this participation. Contact the academy if you believe you should have access."
     empty:
       title: "No availability records"
       description: "Create a recurring teaching window to make scheduling possible."
       lessons_title: "No scheduled lessons"
       lessons_description: "There are no lessons in the selected period."
     sections: { availability: "Recurring availability", exception: "Availability exception", lesson: "Lesson details", participants: "Participants", add_participant: "Add participant", audit: "Audit history" }
-    actions: { new_availability: "New availability", edit_availability: "Edit availability", new_exception: "New exception", edit_exception: "Edit exception", cancel_exception: "Cancel exception", new_lesson: "New lesson", edit_lesson: "Edit lesson", schedule: "Schedule", start: "Start", complete: "Complete", cancel: "Cancel lesson", archive: "Archive", reschedule: "Reschedule", join_online: "Join online", add_participant: "Add participant" }
+    actions: { new_availability: "New availability", edit_availability: "Edit availability", new_exception: "New exception", edit_exception: "Edit exception", cancel_exception: "Cancel exception", new_lesson: "New lesson", edit_lesson: "Edit lesson", schedule: "Schedule", start: "Start", complete: "Complete", cancel: "Cancel lesson", archive: "Archive", reschedule: "Reschedule", join_online: "Join online", add_participant: "Add participant", save_and_add_participants: "Save and add participants" }
+    participants_creation_hint: "First save the lesson and its course offering. You will then choose participating students from approved, active, or paused enrollments in that offering."
+    no_eligible_participants: "No eligible students remain for this lesson. Confirm that students are enrolled in this course offering with an approved, active, or paused enrollment."
     fields:
       teacher: "Teacher"
       offering: "Course offering"

@@ -25,6 +25,7 @@ class ScheduledLesson < ApplicationRecord
 
   attr_readonly :public_id, :academy_time_zone
   before_validation :normalize_values
+  before_validation :normalize_online_meeting_url
   before_validation :generate_public_id, on: :create
   before_validation :snapshot_academy_zone, on: :create
 
@@ -37,7 +38,7 @@ class ScheduledLesson < ApplicationRecord
   validates :teacher_attendance_status, inclusion: { in: TEACHER_ATTENDANCE_STATUSES }
   validates :completion_notes, :operation_notes, length: { maximum: 2_000 }, allow_blank: true
   validates :academy_time_zone, inclusion: { in: ->(_) { ActiveSupport::TimeZone.all.map(&:name) } }
-  validates :online_meeting_url, format: { with: %r{\Ahttps?://\S+\z} }, allow_blank: true
+  validate :online_meeting_url_format
   validates :cancellation_reason, presence: true, if: :cancelled?
   validate :time_order
   validate :delivery_requirements, if: :scheduled_or_later?
@@ -49,12 +50,20 @@ class ScheduledLesson < ApplicationRecord
   def attendance_locked? = attendance_status == "locked"
   def unresolved_attendance_count = lesson_attendances.unresolved.count
 
+  def online_meeting_join_url
+    canonical_meeting_url(online_meeting_url)
+  end
+
   STATUSES.each { |value| define_method(:"#{value}?") { status == value } }
 
   private
 
   def normalize_values
     self.academy_time_zone = "Cairo" if academy_time_zone.blank?
+  end
+
+  def normalize_online_meeting_url
+    self.online_meeting_url = online_meeting_join_url if online_meeting_url.present?
   end
 
   def generate_public_id
@@ -76,5 +85,34 @@ class ScheduledLesson < ApplicationRecord
   def delivery_requirements
     errors.add(:online_meeting_url, :required) if delivery_mode.in?(%w[online hybrid]) && online_meeting_url.blank?
     errors.add(:location_name, :required) if delivery_mode.in?(%w[onsite hybrid]) && location_name.blank?
+  end
+
+  def online_meeting_url_format
+    return if online_meeting_url.blank?
+
+    uri = URI.parse(online_meeting_url)
+    errors.add(:online_meeting_url, :invalid_url) unless valid_meeting_uri?(uri)
+  rescue URI::InvalidURIError
+    errors.add(:online_meeting_url, :invalid_url)
+  end
+
+  def valid_meeting_uri?(uri)
+    http_uri?(uri) && !embedded_or_concatenated_url?(uri)
+  end
+
+  def http_uri?(uri)
+    uri.is_a?(URI::HTTP) && uri.host.present? && uri.userinfo.nil?
+  end
+
+  def embedded_or_concatenated_url?(uri)
+    online_meeting_url.match?(%r{https?//}i) || uri.path.to_s.start_with?("//")
+  end
+
+  def canonical_meeting_url(value)
+    normalized = value.to_s.strip.gsub(%r{(https?)//}i, '\\1://')
+    scheme_positions = normalized.enum_for(:scan, %r{https?://}i).map { Regexp.last_match.begin(0) }
+    return normalized if scheme_positions.empty?
+
+    normalized[scheme_positions.last..]
   end
 end

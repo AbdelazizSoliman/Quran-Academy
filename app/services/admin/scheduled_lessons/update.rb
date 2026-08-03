@@ -23,6 +23,10 @@ module Admin
 
       private
 
+      def normalize_attributes
+        super.except(:academy_time_zone)
+      end
+
       def assign_valid_attributes?
         @lesson.assign_attributes(normalize_attributes)
         @lesson.valid?

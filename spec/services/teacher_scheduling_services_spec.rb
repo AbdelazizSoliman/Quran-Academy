@@ -29,4 +29,20 @@ RSpec.describe "Teacher scheduling services" do
     expect(result).to be_cancelled
     expect(result.events.last.event_type).to eq("cancelled")
   end
+
+  it "reschedules times without reassigning the immutable academy time zone" do
+    lesson = create(:scheduled_lesson, :scheduled, academy_time_zone: "Cairo")
+    new_start = 3.days.from_now.change(hour: 12)
+    new_end = new_start + 1.hour
+
+    result = Admin::ScheduledLessons::Reschedule.new(
+      actor: admin, lesson:, starts_at: new_start.strftime("%Y-%m-%dT%H:%M"),
+      ends_at: new_end.strftime("%Y-%m-%dT%H:%M")
+    ).call
+
+    expect(result.errors).to be_empty
+    expect(result.reload.academy_time_zone).to eq("Cairo")
+    expect(result.starts_at).to eq(new_start)
+    expect(result.events.where(event_type: "rescheduled")).to exist
+  end
 end

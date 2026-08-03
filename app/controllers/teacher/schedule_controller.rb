@@ -60,7 +60,13 @@ module Teacher
     def upcoming_lessons(profile)
       return ScheduledLesson.none unless profile
 
-      profile.scheduled_lessons.operational.chronological.where(starts_at: Time.current..30.days.from_now)
+      profile.scheduled_lessons.operational.chronological.where(starts_at: schedule_window)
+    end
+
+    def schedule_window
+      zone_name = AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+      academy_now = Time.current.in_time_zone(zone_name)
+      academy_now.beginning_of_day..(academy_now + 30.days).end_of_day
     end
 
     def require_teacher!

@@ -8,11 +8,7 @@ module Admin
     end
 
     def show
-      @events = @lesson.events.includes(:actor).recent_first.limit(30)
-      @participants = @lesson.scheduled_lesson_enrollments.includes(enrollment: { student_profile: :user })
-      participant_ids = @participants.map(&:enrollment_id)
-      @available_enrollments = @lesson.course_offering.enrollments.where(status: %w[approved active paused])
-                                      .where.not(id: participant_ids).includes(:student_profile).order(:id)
+      load_show_data
     end
 
     def new
@@ -95,6 +91,14 @@ module Admin
 
     private
 
+    def load_show_data
+      @events = @lesson.events.includes(:actor).recent_first.limit(30)
+      @participants = @lesson.scheduled_lesson_enrollments.includes(enrollment: { student_profile: :user })
+      participant_ids = @participants.map(&:enrollment_id)
+      @available_enrollments = @lesson.course_offering.enrollments.where(status: %w[approved active paused])
+                                      .where.not(id: participant_ids).includes(:student_profile).order(:id)
+    end
+
     def set_lesson
       @lesson = ScheduledLesson.includes(:course_offering, :teacher_profile).find(params.expect(:id))
     end
@@ -115,7 +119,7 @@ module Admin
         redirect_to admin_scheduled_lesson_path(@lesson), notice: t("scheduling.messages.#{message}"),
                                                           status: :see_other
       else
-        load_options
+        template == :show ? load_show_data : load_options
         render template, status: :unprocessable_content
       end
     end

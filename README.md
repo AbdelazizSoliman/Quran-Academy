@@ -298,6 +298,28 @@ bin/dev
 
 Open <http://localhost:3000>. The default locale is Arabic and the application time zone is Cairo; database timestamps remain UTC.
 
+## Local demo data
+
+Load a complete, fictional development dataset with:
+
+```bash
+DEMO_DATA=true bin/rails db:prepare
+DEMO_DATA=true bin/rails db:seed
+```
+
+The dataset includes administrator, staff, teacher, and student accounts plus profiles,
+guardians, programs, offerings, enrollments, schedules, attendance, lesson reports,
+assessments, progress, an exam, a certificate, payrolls, invitations, and notification
+history. Running the seed again is safe and does not duplicate the dataset. External email
+and WhatsApp delivery is disabled while it loads, and the seed refuses to run in production.
+
+All demo accounts use the password `DemoPass123!`. Useful accounts are:
+
+- `admin@demo.quran-academy.test`
+- `staff@demo.quran-academy.test`
+- `teacher1@demo.quran-academy.test` through `teacher3@demo.quran-academy.test`
+- `student1@demo.quran-academy.test` through `student10@demo.quran-academy.test`
+
 ## Running tests
 
 ```bash
