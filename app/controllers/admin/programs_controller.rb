@@ -54,9 +54,10 @@ module Admin
     def respond_to_save(message, template)
       if @program.persisted? && @program.errors.empty?
         redirect_to admin_program_path(@program), notice: t("programs.messages.#{message}"), status: :see_other
+      elsif template == :show
+        redirect_to admin_program_path(@program), alert: @program.errors.full_messages.to_sentence,
+                                                  status: :see_other
       else
-        @events = @program.events.includes(:actor).recent_first.limit(20) if template == :show
-        @offerings = @program.course_offerings.recent_first.limit(10) if template == :show
         render template, status: :unprocessable_content
       end
     end

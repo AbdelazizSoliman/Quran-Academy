@@ -84,9 +84,10 @@ module Admin
       if @offering.persisted? && @offering.errors.empty?
         redirect_to admin_course_offering_path(@offering),
                     notice: t("course_offerings.messages.#{message}"), status: :see_other
+      elsif template == :show
+        redirect_to admin_course_offering_path(@offering), alert: @offering.errors.full_messages.to_sentence,
+                                                           status: :see_other
       else
-        @events = @offering.events.includes(:actor).recent_first.limit(20) if template == :show
-        @status_counts = @offering.enrollments.group(:status).count if template == :show
         render template, status: :unprocessable_content
       end
     end

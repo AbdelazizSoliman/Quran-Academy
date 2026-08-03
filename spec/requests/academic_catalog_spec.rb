@@ -30,6 +30,31 @@ RSpec.describe "Academic catalog requests" do
     expect(Program.last).to be_draft
   end
 
+  it "activates a valid program and then opens its offering" do
+    program = create(:program)
+    offering = create(:course_offering, program:)
+    sign_in admin
+
+    patch activate_admin_program_path(program)
+    expect(response).to have_http_status(:see_other)
+    expect(program.reload).to be_active
+
+    patch open_admin_course_offering_path(offering)
+    expect(response).to have_http_status(:see_other)
+    expect(offering.reload).to be_open
+  end
+
+  it "redirects with the validation reason when opening an offering for an inactive program" do
+    offering = create(:course_offering, program: create(:program))
+    sign_in admin
+
+    patch open_admin_course_offering_path(offering)
+
+    expect(response).to redirect_to(admin_course_offering_path(offering))
+    expect(flash[:alert]).to be_present
+    expect(offering.reload).to be_draft
+  end
+
   it "keeps student enrollment pages ownership scoped and hides internal notes" do
     student = create(:student_profile, :complete)
     own = create(:enrollment, student_profile: student, administrator_notes: "secret")
