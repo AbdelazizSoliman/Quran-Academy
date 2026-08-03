@@ -34,6 +34,33 @@ RSpec.describe "Academic catalog requests" do
     expect(response.body).to include(deactivate_admin_program_path(program))
   end
 
+  it "shows only offering transitions valid for each current status" do
+    sign_in admin
+
+    {
+      draft: { open: true }, open: { open: false }, in_progress: { open: false }, completed: { open: false }
+    }.each do |status, expectations|
+      offering = create(:course_offering, status:, accepts_new_enrollments: status == :open)
+      get admin_course_offering_path(offering)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body.include?(open_admin_course_offering_path(offering))).to eq(expectations[:open])
+    end
+  end
+
+  it "hides enrollment approval when the offering is no longer accepting enrollments" do
+    offering = create(:course_offering, :open)
+    offering.update!(status: "in_progress", accepts_new_enrollments: false)
+    enrollment = create(:enrollment, course_offering: offering, status: "waitlisted")
+    sign_in admin
+
+    get admin_enrollment_path(enrollment)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).not_to include(approve_admin_enrollment_path(enrollment))
+    expect(response.body).to include(I18n.t("enrollments.approval_unavailable.title", locale: :ar))
+  end
+
   it "creates a program without permitting lifecycle status" do
     sign_in admin
     post admin_programs_path, params: { program: attributes_for(:program).merge(status: "active") }

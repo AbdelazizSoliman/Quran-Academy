@@ -7,6 +7,7 @@
   <%= render "shared/components/card", title: t("enrollments.sections.lifecycle") do %>
     <div class="flex flex-wrap gap-2">
       <% enrollment_actions(@enrollment).each do |action| %><%= button_to t("enrollments.actions.#{action}"), public_send("#{action}_admin_enrollment_path", @enrollment), method: :patch, class: button_classes(variant: :outline, size: :small) %><% end %>
+      <% if @enrollment.status.in?(%w[pending waitlisted]) && !enrollment_approval_available?(@enrollment) %><%= render "shared/components/alert", variant: :information, title: t("enrollments.approval_unavailable.title"), message: t("enrollments.approval_unavailable.message") %><% end %>
       <% if @enrollment.placement_status.in?(%w[pending in_review]) %><%= button_to t("enrollments.actions.complete_placement"), complete_placement_admin_enrollment_path(@enrollment), method: :patch, params: { placement_method: "administrator_override" }, class: button_classes(size: :small) %><%= form_with url: waive_placement_admin_enrollment_path(@enrollment), method: :patch, class: "flex gap-2" do |form| %><%= form.hidden_field :placement_method, value: "administrator_override" %><%= form.text_field :placement_notes, required: true, placeholder: t("enrollments.fields.waiver_reason"), class: "ds-control" %><%= form.submit t("enrollments.actions.waive_placement"), class: button_classes(variant: :outline, size: :small) %><% end %><% end %>
     </div>
   <% end %>

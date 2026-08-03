@@ -35,12 +35,26 @@ module AcademicCatalogHelper
   end
 
   def enrollment_actions(enrollment)
-    {
+    actions = {
       "pending" => %i[approve waitlist reject cancel],
       "waitlisted" => %i[approve withdraw cancel],
       "approved" => %i[activate withdraw cancel transfer],
       "active" => %i[pause complete withdraw cancel transfer],
       "paused" => %i[resume complete withdraw cancel transfer]
     }.fetch(enrollment.status, [])
+    return actions unless actions.include?(:approve)
+
+    enrollment_approval_available?(enrollment) ? actions : actions - [:approve]
+  end
+
+  def course_offering_actions(offering)
+    Admin::CourseOfferings::Transition::RULES.filter_map do |action, rule|
+      action if offering.status.in?(rule[:from])
+    end
+  end
+
+  def enrollment_approval_available?(enrollment)
+    offering = enrollment.course_offering
+    offering.status == "open" && offering.accepts_new_enrollments?
   end
 end

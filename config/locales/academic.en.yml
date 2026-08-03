@@ -144,6 +144,7 @@ en:
       waiver_reason: "Waiver reason"
       administrator_notes: "Administrator notes"
     messages: { created: "Enrollment created.", updated: "Enrollment updated.", approve: "Enrollment approved.", waitlist: "Enrollment waitlisted.", reject: "Enrollment rejected.", activate: "Enrollment activated.", pause: "Enrollment paused.", resume: "Enrollment resumed.", complete: "Enrollment completed.", withdraw: "Enrollment withdrawn.", cancel: "Enrollment cancelled.", transfer: "Enrollment marked transferred.", complete_placement: "Placement completed.", waive_placement: "Placement waived." }
+    approval_unavailable: { title: "Approval unavailable", message: "This course offering is not open or is no longer accepting enrollments." }
   student_enrollments:
     index: { title: "My enrollments", description: "Your current and historical academy enrollments." }
     empty: { title: "No enrollments", description: "You do not have enrollment records yet." }
