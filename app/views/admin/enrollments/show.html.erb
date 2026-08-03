@@ -1,3 +1,4 @@
+<%= render "shared/academic/errors", record: @enrollment %>
 <%= render "shared/page_header", title: @enrollment.public_id, description: localized_program_name(@enrollment.course_offering.program), badge: enrollment_status_badge(@enrollment) %>
 <div class="grid gap-6 lg:grid-cols-2">
   <%= render "shared/components/card", title: t("enrollments.sections.membership") do %>

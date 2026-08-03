@@ -42,6 +42,19 @@ RSpec.describe "Academic catalog requests" do
     expect(response).to have_http_status(:not_found)
   end
 
+  it "shows approval validation errors instead of appearing unchanged" do
+    offering = create(:course_offering, :open, capacity: 1)
+    create(:enrollment, :approved, course_offering: offering)
+    enrollment = create(:enrollment, course_offering: offering)
+    sign_in admin
+
+    patch approve_admin_enrollment_path(enrollment)
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.body).to include(I18n.t("forms.errors_title", locale: :ar))
+    expect(response.body).to include(I18n.t("errors.messages.capacity_full", locale: :ar))
+  end
+
   it "does not expose destructive or public enrollment routes" do
     delete admin_program_path(create(:program))
     expect(response).to have_http_status(:not_found)

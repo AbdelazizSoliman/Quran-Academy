@@ -30,6 +30,16 @@ en:
       stale_record: "was changed by another administrator; reload and try again"
       invalid_role: "must belong to an administrator or staff account"
       invalid_url: "must be one complete HTTP or HTTPS URL without another URL appended"
+      profile_not_ready: "requires a complete or verified student profile"
+      account_not_active: "requires an active student account"
+      guardian_not_ready: "requires complete primary guardian information for a minor student"
+      offering_not_open: "requires an open course offering that accepts enrollments"
+      program_not_active: "requires an active program"
+      capacity_full: "cannot be approved because the course offering is full"
+      student_type_not_allowed: "does not match the student types allowed by this program and offering"
+      language_not_supported: "does not match the offering's supported learning language"
+      profile_not_verified: "requires a verified student profile before activation"
+      placement_incomplete: "requires completed or waived placement before activation"
   activerecord:
     attributes:
       user:
