@@ -47,7 +47,7 @@
           <%= link_to path, class: nav_item_classes(active: active), aria: (active ? { current: "page" } : {}) do %>
             <span class="grid size-8 place-items-center rounded-lg bg-app-muted text-app-secondary group-hover:bg-white"><%= icon item[:icon], size: 4 %></span>
             <span><%= t("navigation.#{key}") %></span>
-            <% unless active || item[:path] %>
+            <% if item.fetch(:coming_soon, false) && !active %>
               <span class="ms-auto text-[10px] font-normal text-app-subtle"><%= t("navigation.coming_soon") %></span>
             <% end %>
           <% end %>

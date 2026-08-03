@@ -22,7 +22,7 @@ RSpec.describe "Dashboard" do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('<html lang="en" dir="ltr">')
-      expect(response.body).to include(I18n.t("navigation.coming_soon"))
+      expect(response.body).not_to include(I18n.t("navigation.coming_soon"))
       expect(response.body).not_to include("translation missing")
     end
   end
