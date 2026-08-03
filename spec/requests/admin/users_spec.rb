@@ -47,6 +47,14 @@ RSpec.describe "Admin user administration" do
     expect(response.body).to include('dir="rtl"', I18n.t("admin.users.empty.title", locale: :ar))
   end
 
+  it "renders the new-user form inside its card" do
+    sign_in admin
+    get new_admin_user_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('name="user[first_name]"', 'name="user[phone_number]"')
+  end
+
   it "creates a user and audit event with strong parameters" do
     sign_in admin
     attributes = attributes_for(:user, :teacher).merge(
