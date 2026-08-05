@@ -20,9 +20,9 @@ module Dashboard
 
     def statistics
       {
-        students: StudentProfile.count,
+        students: ::StudentProfile.count,
         active_students: active_students_count,
-        teachers: TeacherProfile.count,
+        teachers: ::TeacherProfile.count,
         active_teachers: active_teachers_count,
         lessons: todays_lessons.count,
         remaining_lessons: todays_lessons.where("starts_at > ?", @now).count,
@@ -31,11 +31,11 @@ module Dashboard
     end
 
     def active_students_count
-      StudentProfile.where(learning_status: "active").count
+      ::StudentProfile.where(learning_status: "active").count
     end
 
     def active_teachers_count
-      TeacherProfile.where(employment_status: "active").count
+      ::TeacherProfile.where(employment_status: "active").count
     end
 
     def todays_lessons
@@ -46,27 +46,27 @@ module Dashboard
     end
 
     def accessible_lessons
-      return ScheduledLesson.all if @user.admin? || @user.staff?
+      return ::ScheduledLesson.all if @user.admin? || @user.staff?
       return teacher_lessons if @user.teacher?
 
       student_lessons
     end
 
     def teacher_lessons
-      ScheduledLesson.where(teacher_profile_id: @user.teacher_profile&.id)
+      ::ScheduledLesson.where(teacher_profile_id: @user.teacher_profile&.id)
     end
 
     def student_lessons
       student_enrollment_ids = @user.student_profile&.enrollments&.select(:id)
-      return ScheduledLesson.none unless student_enrollment_ids
+      return ::ScheduledLesson.none unless student_enrollment_ids
 
-      ScheduledLesson.joins(:scheduled_lesson_enrollments)
+      ::ScheduledLesson.joins(:scheduled_lesson_enrollments)
                      .where(scheduled_lesson_enrollments: { enrollment_id: student_enrollment_ids })
                      .distinct
     end
 
     def attendance_scope
-      scope = LessonAttendance.joins(:scheduled_lesson_enrollment)
+      scope = ::LessonAttendance.joins(:scheduled_lesson_enrollment)
                               .where(scheduled_lesson_id: todays_lessons.select(:id))
       return scope unless @user.student?
 
@@ -74,7 +74,7 @@ module Dashboard
     end
 
     def attendance_statistics
-      total = attendance_scope.where(status: LessonAttendance::FINAL_STATUSES).count
+      total = attendance_scope.where(status: ::LessonAttendance::FINAL_STATUSES).count
       attended = attendance_scope.where(status: ATTENDED_STATUSES).count
 
       { total:, attended:, rate: total.zero? ? 0 : ((attended.to_f / total) * 100).round }

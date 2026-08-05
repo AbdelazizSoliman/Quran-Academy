@@ -1,3 +1,2 @@
-<%= render "shared/page_header", title: t("teachers.new.title"), description: t("teachers.new.description") %>
-<%= render "shared/teacher_profiles/form", profile: @profile, user: @user,
-           eligible_users: @eligible_teacher_users, admin_mode: true %>
+<%= render "shared/page_header", title: "معلم جديد", description: "أنشئ حساب المعلم وبيانات التواصل والعمل والأجر وأيام التوفر في خطوة واحدة." %>
+<%= render "shared/teacher_profiles/onboarding_form", profile: @profile %>

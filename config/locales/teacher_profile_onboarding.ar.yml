@@ -1,0 +1,14 @@
+ar:
+  activerecord:
+    attributes:
+      teacher_profile:
+        work_days: "أيام العمل"
+        work_end_time: "نهاية الدوام"
+    errors:
+      models:
+        teacher_profile:
+          attributes:
+            work_days:
+              invalid: "تحتوي على يوم عمل غير صالح"
+            work_end_time:
+              after_start: "يجب أن تكون بعد بداية الدوام"

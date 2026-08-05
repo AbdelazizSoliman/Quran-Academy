@@ -1,0 +1,14 @@
+en:
+  activerecord:
+    attributes:
+      teacher_profile:
+        work_days: "Work days"
+        work_end_time: "Work end time"
+    errors:
+      models:
+        teacher_profile:
+          attributes:
+            work_days:
+              invalid: "contain an invalid work day"
+            work_end_time:
+              after_start: "must be after the work start time"

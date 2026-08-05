@@ -1,0 +1,40 @@
+<%= render "shared/teacher_profiles/errors", profile: %>
+<%= form_with model: profile, url: admin_teachers_path, class: "space-y-6" do |f| %>
+  <%= f.hidden_field :create_account, value: "1" %>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title">البيانات الأساسية</legend><p class="mt-1 ds-caption">معلومات المعلم ووجهة التواصل.</p>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <div><%= f.label :first_name, "الاسم الأول *", class: "ds-label" %><%= f.text_field :first_name, value: params.dig(:teacher_profile, :first_name), required: true, class: "ds-control mt-2" %></div>
+      <div><%= f.label :last_name, "اسم العائلة *", class: "ds-label" %><%= f.text_field :last_name, value: params.dig(:teacher_profile, :last_name), required: true, class: "ds-control mt-2" %></div>
+      <div><%= f.label :display_name, "اسم المعلم داخل الأكاديمية", class: "ds-label" %><%= f.text_field :display_name, class: "ds-control mt-2" %></div>
+      <div><%= f.label :email, "البريد الإلكتروني *", class: "ds-label" %><%= f.email_field :email, value: params.dig(:teacher_profile, :email), required: true, class: "ds-control mt-2", dir: "ltr" %></div>
+      <div><%= f.label :phone_number, "رقم الهاتف *", class: "ds-label" %><%= f.telephone_field :phone_number, required: true, class: "ds-control mt-2", dir: "ltr" %></div>
+      <div><%= f.label :whatsapp_number, "رقم واتساب", class: "ds-label" %><%= f.telephone_field :whatsapp_number, class: "ds-control mt-2", dir: "ltr" %></div>
+      <div><%= f.label :notification_method, "طريقة الإشعار", class: "ds-label" %><%= f.select :notification_method, [["واتساب (الأساسي)", "whatsapp"], ["البريد", "email"], ["كلاهما", "both"]], {}, class: "ds-control mt-2" %></div>
+      <div><%= f.label :message_language, "لغة الرسائل", class: "ds-label" %><%= f.select :message_language, [["العربية", "ar"], ["English", "en"]], {}, class: "ds-control mt-2" %></div>
+    </div>
+  </fieldset>
+
+  <fieldset class="ds-card p-5"><legend class="ds-section-title">الحالة والاستغلال</legend>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <div><%= f.label :employment_status, "الحالة", class: "ds-label" %><%= f.select :employment_status, TeacherProfile::EMPLOYMENT_STATUSES.map { |v| [v.humanize, v] }, { selected: "active" }, class: "ds-control mt-2" %></div>
+      <div><%= f.label :workload_percentage, "نسبة الاستغلال %", class: "ds-label" %><%= f.number_field :workload_percentage, min: 0, max: 100, class: "ds-control mt-2" %></div>
+      <label class="flex items-center gap-2"><%= f.check_box :on_leave %><span>حاصل على إجازة</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset class="ds-card p-5"><legend class="ds-section-title">أيام وساعات العمل</legend><p class="mt-1 ds-caption">تُنشأ سجلات التوفر تلقائياً لكل يوم محدد.</p>
+    <div class="mt-4 flex flex-wrap gap-3"><%= f.collection_check_boxes :work_days, TeacherProfile::WORK_DAYS, :to_s, :humanize do |b| %><label class="rounded-full border border-app-border px-3 py-2"><%= b.check_box %> <%= b.text %></label><% end %></div>
+    <div class="mt-4 grid gap-4 md:grid-cols-2"><div><%= f.label :work_start_time, "بداية الدوام", class: "ds-label" %><%= f.time_field :work_start_time, class: "ds-control mt-2" %></div><div><%= f.label :work_end_time, "نهاية الدوام", class: "ds-label" %><%= f.time_field :work_end_time, class: "ds-control mt-2" %></div></div>
+  </fieldset>
+
+  <fieldset class="ds-card p-5"><legend class="ds-section-title">الأجر</legend><p class="mt-1 ds-caption">طريقة احتساب مستحقات المعلم.</p>
+    <div class="mt-4 grid gap-4 md:grid-cols-4">
+      <div><%= f.label :compensation_unit, "طريقة احتساب الأجر", class: "ds-label" %><%= f.select :compensation_unit, TeacherProfile::COMPENSATION_UNITS.map { |v| [v.humanize, v] }, {}, class: "ds-control mt-2" %></div>
+      <div><%= f.label :default_lesson_rate, "قيمة الحصة", class: "ds-label" %><%= f.number_field :default_lesson_rate, min: 0, step: 0.01, class: "ds-control mt-2" %></div>
+      <div><%= f.label :monthly_salary, "الراتب الشهري", class: "ds-label" %><%= f.number_field :monthly_salary, min: 0, step: 0.01, class: "ds-control mt-2" %></div>
+      <div><%= f.label :compensation_currency, "العملة", class: "ds-label" %><%= f.select :compensation_currency, %w[EGP USD EUR GBP SAR AED].map { |c| [c, c] }, {}, class: "ds-control mt-2" %></div>
+      <label class="md:col-span-4 flex items-center gap-2 rounded-lg bg-app-muted p-4"><%= f.check_box :mid_period_previous_dues %><span>معلم قديم — انضم في منتصف الفترة وله مستحقات سابقة</span></label>
+    </div>
+  </fieldset>
+  <div class="flex gap-3"><%= render "shared/components/button", label: "إرسال الدعوة", type: "submit" %><%= render "shared/components/button", label: "إلغاء", href: admin_teachers_path, variant: :secondary %></div>
+<% end %>

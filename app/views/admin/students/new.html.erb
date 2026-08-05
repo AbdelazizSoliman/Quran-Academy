@@ -1,2 +1,2 @@
-<%= render "shared/page_header", title: t("students.new.title"), description: t("students.new.description") %>
-<%= render "shared/student_profiles/form", profile: @profile, admin_mode: true, eligible_users: @eligible_student_users %>
+<%= render "shared/page_header", title: "طالب جديد", description: "أنشئ الطالب وملفه وولي أمره ودراسته وحساب دخوله في خطوة واحدة، مع بقاء جميع بيانات الملف المتقدمة متاحة بعد الحفظ." %>
+<%= render "shared/student_profiles/onboarding_form", profile: @profile, teachers: @teacher_profiles, offerings: @course_offerings, guardians: @guardians, students: @student_profiles %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_05_111500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -151,7 +151,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.datetime "created_at", null: false
     t.bigint "created_by_id", null: false
     t.integer "display_order", default: 0, null: false
-    t.integer "lock_version", default: 0, null: false
     t.string "name_ar", null: false
     t.string "name_en", null: false
     t.string "public_id", null: false
@@ -169,7 +168,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.bigint "assessment_template_id", null: false
     t.datetime "created_at", null: false
     t.integer "display_order", default: 0, null: false
-    t.integer "lock_version", default: 0, null: false
     t.decimal "maximum_score", precision: 7, scale: 2, default: "100.0", null: false
     t.string "name_ar", null: false
     t.string "name_en", null: false
@@ -181,14 +179,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["assessment_template_id", "display_order"], name: "idx_rubrics_template_order"
     t.index ["assessment_template_id"], name: "index_assessment_rubric_items_on_assessment_template_id"
     t.check_constraint "maximum_score > 0::numeric AND weight > 0::numeric", name: "rubric_positive_values"
-    t.check_constraint "scoring_type::text = ANY (ARRAY['numeric'::character varying::text, 'rating'::character varying::text])", name: "rubric_scoring_type"
+    t.check_constraint "scoring_type::text = ANY (ARRAY['numeric'::character varying, 'rating'::character varying]::text[])", name: "rubric_scoring_type"
   end
 
   create_table "assessment_scores", force: :cascade do |t|
     t.bigint "assessment_rubric_item_id", null: false
     t.text "comments"
     t.datetime "created_at", null: false
-    t.integer "lock_version", default: 0, null: false
     t.decimal "numeric_score", precision: 7, scale: 2
     t.string "rating"
     t.bigint "student_assessment_id", null: false
@@ -215,7 +212,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["public_id"], name: "index_assessment_templates_on_public_id", unique: true
     t.index ["status", "display_order"], name: "index_assessment_templates_on_status_and_display_order"
     t.index ["updated_by_id"], name: "index_assessment_templates_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['active'::character varying::text, 'inactive'::character varying::text, 'archived'::character varying::text])", name: "assessment_template_status"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'archived'::character varying]::text[])", name: "assessment_template_status"
   end
 
   create_table "certificate_events", force: :cascade do |t|
@@ -252,7 +249,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["student_profile_id", "issued_on"], name: "index_certificates_on_student_profile_id_and_issued_on"
     t.index ["student_profile_id"], name: "index_certificates_on_student_profile_id"
     t.index ["verification_code"], name: "index_certificates_on_verification_code", unique: true
-    t.check_constraint "certificate_type::text = ANY (ARRAY['program_completion'::character varying::text, 'exam_completion'::character varying::text, 'ijazah'::character varying::text])", name: "certificate_type"
+    t.check_constraint "certificate_type::text = ANY (ARRAY['program_completion'::character varying, 'exam_completion'::character varying, 'ijazah'::character varying]::text[])", name: "certificate_type"
   end
 
   create_table "communication_log_events", force: :cascade do |t|
@@ -307,8 +304,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["recipient_user_id"], name: "index_communication_logs_on_recipient_user_id"
     t.index ["scheduled_lesson_id"], name: "index_communication_logs_on_scheduled_lesson_id"
     t.index ["student_profile_id"], name: "index_communication_logs_on_student_profile_id"
-    t.check_constraint "channel::text = ANY (ARRAY['whatsapp'::character varying::text, 'email'::character varying::text])", name: "communication_logs_channel"
-    t.check_constraint "status::text = ANY (ARRAY['prepared'::character varying::text, 'opened'::character varying::text, 'confirmed_sent'::character varying::text, 'cancelled'::character varying::text, 'failed'::character varying::text])", name: "communication_logs_status"
+    t.check_constraint "channel::text = ANY (ARRAY['whatsapp'::character varying, 'email'::character varying]::text[])", name: "communication_logs_channel"
+    t.check_constraint "status::text = ANY (ARRAY['prepared'::character varying, 'opened'::character varying, 'confirmed_sent'::character varying, 'cancelled'::character varying, 'failed'::character varying]::text[])", name: "communication_logs_status"
   end
 
   create_table "course_offering_events", force: :cascade do |t|
@@ -473,7 +470,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["teacher_profile_id"], name: "index_exam_sessions_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_exam_sessions_on_updated_by_id"
     t.check_constraint "duration_minutes >= 1 AND duration_minutes <= 480", name: "exam_duration_range"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'scheduled'::character varying::text, 'completed'::character varying::text, 'reviewed'::character varying::text, 'published'::character varying::text, 'archived'::character varying::text])", name: "exam_session_status"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'scheduled'::character varying, 'completed'::character varying, 'reviewed'::character varying, 'published'::character varying, 'archived'::character varying]::text[])", name: "exam_session_status"
   end
 
   create_table "guardian_events", force: :cascade do |t|
@@ -557,7 +554,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["status", "arrival_at"], name: "index_lesson_attendances_on_status_and_arrival_at"
     t.check_constraint "departure_at IS NULL OR arrival_at IS NULL OR departure_at >= arrival_at", name: "lesson_attendances_time_order"
     t.check_constraint "minutes_late >= 0", name: "lesson_attendances_nonnegative_lateness"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'present'::character varying::text, 'late'::character varying::text, 'absent'::character varying::text, 'excused_absence'::character varying::text, 'left_early'::character varying::text, 'lesson_cancelled'::character varying::text, 'not_applicable'::character varying::text])", name: "lesson_attendances_status"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'present'::character varying, 'late'::character varying, 'absent'::character varying, 'excused_absence'::character varying, 'left_early'::character varying, 'lesson_cancelled'::character varying, 'not_applicable'::character varying]::text[])", name: "lesson_attendances_status"
   end
 
   create_table "lesson_report_events", force: :cascade do |t|
@@ -615,7 +612,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["submitted_by_id"], name: "index_lesson_reports_on_submitted_by_id"
     t.index ["teacher_profile_id"], name: "index_lesson_reports_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_lesson_reports_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'submitted'::character varying::text, 'reviewed'::character varying::text, 'locked'::character varying::text, 'reopened'::character varying::text, 'archived'::character varying::text])", name: "lesson_reports_status"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying, 'reviewed'::character varying, 'locked'::character varying, 'reopened'::character varying, 'archived'::character varying]::text[])", name: "lesson_reports_status"
   end
 
   create_table "lesson_student_report_events", force: :cascade do |t|
@@ -675,7 +672,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["scheduled_lesson_enrollment_id"], name: "index_lesson_student_reports_on_scheduled_lesson_enrollment_id"
     t.index ["status", "engagement_level", "performance_level"], name: "idx_student_report_outcomes"
     t.index ["updated_by_id"], name: "index_lesson_student_reports_on_updated_by_id"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'completed'::character varying::text, 'not_applicable'::character varying::text, 'withheld'::character varying::text])", name: "lesson_student_reports_status"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'completed'::character varying, 'not_applicable'::character varying, 'withheld'::character varying]::text[])", name: "lesson_student_reports_status"
   end
 
   create_table "notification_attempts", force: :cascade do |t|
@@ -763,7 +760,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["scheduled_at", "status"], name: "index_notifications_on_scheduled_at_and_status"
     t.index ["source_type", "source_id"], name: "index_notifications_on_source_type_and_source_id"
     t.check_constraint "attempt_count >= 0", name: "notification_attempt_count"
-    t.check_constraint "channel::text = ANY (ARRAY['email'::character varying::text, 'whatsapp'::character varying::text])", name: "notification_channel"
+    t.check_constraint "channel::text = ANY (ARRAY['email'::character varying, 'whatsapp'::character varying]::text[])", name: "notification_channel"
     t.check_constraint "provider::text = ANY (ARRAY['resend'::character varying, 'meta_whatsapp'::character varying]::text[])", name: "notification_provider"
     t.check_constraint "retry_count >= 0", name: "notification_retry_count"
     t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'sending'::character varying, 'sent'::character varying, 'delivered'::character varying, 'failed'::character varying]::text[])", name: "notification_status"
@@ -900,9 +897,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["teacher_profile_id", "starts_at", "ends_at"], name: "idx_on_teacher_profile_id_starts_at_ends_at_69d19f2e3b"
     t.index ["teacher_profile_id"], name: "index_scheduled_lessons_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_scheduled_lessons_on_updated_by_id"
-    t.check_constraint "attendance_status::text = ANY (ARRAY['not_opened'::character varying::text, 'open'::character varying::text, 'locked'::character varying::text, 'reopened'::character varying::text])", name: "scheduled_lessons_attendance_status"
+    t.check_constraint "attendance_status::text = ANY (ARRAY['not_opened'::character varying, 'open'::character varying, 'locked'::character varying, 'reopened'::character varying]::text[])", name: "scheduled_lessons_attendance_status"
     t.check_constraint "ends_at > starts_at", name: "scheduled_lesson_time_order"
-    t.check_constraint "teacher_attendance_status::text = ANY (ARRAY['not_checked_in'::character varying::text, 'on_time'::character varying::text, 'late'::character varying::text, 'absent'::character varying::text, 'administrator_override'::character varying::text])", name: "scheduled_lessons_teacher_attendance_status"
+    t.check_constraint "teacher_attendance_status::text = ANY (ARRAY['not_checked_in'::character varying, 'on_time'::character varying, 'late'::character varying, 'absent'::character varying, 'administrator_override'::character varying]::text[])", name: "scheduled_lessons_teacher_attendance_status"
   end
 
   create_table "staff_profiles", force: :cascade do |t|
@@ -970,7 +967,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["teacher_profile_id"], name: "index_student_assessments_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_student_assessments_on_updated_by_id"
     t.check_constraint "overall_score IS NULL OR overall_score >= 0::numeric AND overall_score <= 100::numeric", name: "assessment_score_range"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'submitted'::character varying::text, 'reviewed'::character varying::text, 'published'::character varying::text, 'archived'::character varying::text])", name: "student_assessment_status"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'submitted'::character varying, 'reviewed'::character varying, 'published'::character varying, 'archived'::character varying]::text[])", name: "student_assessment_status"
   end
 
   create_table "student_guardianship_events", force: :cascade do |t|
@@ -1031,28 +1028,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
   end
 
   create_table "student_profiles", force: :cascade do |t|
+    t.string "account_delivery_method", default: "whatsapp", null: false
+    t.bigint "assigned_teacher_profile_id"
+    t.string "billing_currency", default: "EGP", null: false
     t.string "city"
     t.string "country_of_residence"
     t.datetime "created_at", null: false
     t.bigint "created_by_id"
     t.string "current_quran_level", default: "beginner", null: false
     t.date "date_of_birth"
+    t.decimal "discount_percentage", precision: 5, scale: 2, default: "0.0", null: false
     t.string "display_name"
     t.string "emergency_contact_name"
     t.string "emergency_contact_phone"
     t.string "gender", default: "unspecified", null: false
+    t.string "guardian_email"
+    t.string "guardian_name"
+    t.string "guardian_phone"
     t.text "internal_notes"
     t.date "joined_on"
     t.text "learning_goals"
     t.text "learning_notes"
     t.string "learning_status", default: "prospective", null: false
     t.date "left_on"
+    t.integer "lesson_duration_minutes"
     t.text "medical_notes"
     t.string "memorization_level", default: "none", null: false
     t.integer "memorized_juz_count"
     t.text "memorized_surahs"
     t.string "nationality"
     t.string "native_language"
+    t.string "package_name"
     t.string "phone_number"
     t.string "preferred_contact_method", default: "email", null: false
     t.string "preferred_interface_locale", default: "en", null: false
@@ -1061,13 +1067,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.string "public_id", null: false
     t.string "reading_level", default: "not_started", null: false
     t.text "safeguarding_notes"
+    t.jsonb "schedule_slots", default: [], null: false
+    t.time "schedule_time"
+    t.string "schedule_weekday"
+    t.string "session_type", default: "individual", null: false
+    t.integer "sessions_per_month"
+    t.bigint "sibling_student_profile_id"
     t.text "special_learning_needs"
     t.string "student_type", default: "adult", null: false
     t.string "tajweed_level", default: "none", null: false
+    t.datetime "trial_lesson_at"
     t.datetime "updated_at", null: false
     t.bigint "updated_by_id"
     t.bigint "user_id", null: false
+    t.decimal "wallet_balance", precision: 12, scale: 2, default: "0.0", null: false
+    t.integer "weekly_lesson_count"
+    t.decimal "weekly_price", precision: 12, scale: 2, default: "0.0", null: false
     t.string "whatsapp_number"
+    t.index ["assigned_teacher_profile_id"], name: "index_student_profiles_on_assigned_teacher_profile_id"
     t.index ["created_by_id"], name: "index_student_profiles_on_created_by_id"
     t.index ["date_of_birth"], name: "index_student_profiles_on_date_of_birth"
     t.index ["joined_on"], name: "index_student_profiles_on_joined_on"
@@ -1075,11 +1092,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["preferred_learning_language"], name: "index_student_profiles_on_preferred_learning_language"
     t.index ["profile_status"], name: "index_student_profiles_on_profile_status"
     t.index ["public_id"], name: "index_student_profiles_on_public_id", unique: true
+    t.index ["sibling_student_profile_id"], name: "index_student_profiles_on_sibling_student_profile_id"
     t.index ["student_type"], name: "index_student_profiles_on_student_type"
     t.index ["updated_by_id"], name: "index_student_profiles_on_updated_by_id"
     t.index ["user_id"], name: "index_student_profiles_on_user_id", unique: true
+    t.check_constraint "discount_percentage >= 0::numeric AND discount_percentage <= 100::numeric", name: "student_profiles_discount_range"
     t.check_constraint "left_on IS NULL OR joined_on IS NULL OR left_on >= joined_on", name: "student_profiles_date_order"
     t.check_constraint "memorized_juz_count IS NULL OR memorized_juz_count >= 0 AND memorized_juz_count <= 30", name: "student_profiles_juz_range"
+    t.check_constraint "wallet_balance >= 0::numeric", name: "student_profiles_wallet_nonnegative"
+    t.check_constraint "weekly_price >= 0::numeric", name: "student_profiles_weekly_price_nonnegative"
   end
 
   create_table "student_progresses", force: :cascade do |t|
@@ -1112,7 +1133,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.check_constraint "current_ayah IS NULL OR current_ayah >= 1", name: "progress_ayah_positive"
     t.check_constraint "current_page IS NULL OR current_page >= 1 AND current_page <= 604", name: "progress_page_range"
     t.check_constraint "memorization_progress >= 0::numeric AND memorization_progress <= 100::numeric AND revision_progress >= 0::numeric AND revision_progress <= 100::numeric AND completion_percentage >= 0::numeric AND completion_percentage <= 100::numeric", name: "progress_percentage_ranges"
-    t.check_constraint "trend::text = ANY (ARRAY['improving'::character varying::text, 'stable'::character varying::text, 'needs_attention'::character varying::text])", name: "student_progress_trend"
+    t.check_constraint "trend::text = ANY (ARRAY['improving'::character varying, 'stable'::character varying, 'needs_attention'::character varying]::text[])", name: "student_progress_trend"
   end
 
   create_table "teacher_availabilities", force: :cascade do |t|
@@ -1298,7 +1319,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.text "internal_notes"
     t.date "joined_on"
     t.date "left_on"
+    t.string "message_language", default: "ar", null: false
+    t.boolean "mid_period_previous_dues", default: false, null: false
+    t.decimal "monthly_salary", precision: 12, scale: 2, default: "0.0", null: false
     t.string "nationality"
+    t.string "notification_method", default: "whatsapp", null: false
+    t.boolean "on_leave", default: false, null: false
     t.string "phone_number"
     t.string "profile_status", default: "draft", null: false
     t.string "public_id", null: false
@@ -1312,6 +1338,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.bigint "updated_by_id"
     t.bigint "user_id", null: false
     t.string "whatsapp_number"
+    t.string "work_days", default: [], null: false, array: true
+    t.time "work_end_time"
+    t.time "work_start_time"
+    t.integer "workload_percentage", default: 0, null: false
     t.integer "years_of_teaching_experience", default: 0, null: false
     t.index ["created_by_id"], name: "index_teacher_profiles_on_created_by_id"
     t.index ["employment_status"], name: "index_teacher_profiles_on_employment_status"
@@ -1326,7 +1356,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["user_id"], name: "index_teacher_profiles_on_user_id", unique: true
     t.check_constraint "default_lesson_rate >= 0::numeric", name: "teacher_profiles_rate_nonnegative"
     t.check_constraint "left_on IS NULL OR joined_on IS NULL OR left_on >= joined_on", name: "teacher_profiles_date_order"
+    t.check_constraint "monthly_salary >= 0::numeric", name: "teacher_profiles_monthly_salary_nonnegative"
     t.check_constraint "quran_teaching_experience_years >= 0", name: "teacher_profiles_quran_experience_nonnegative"
+    t.check_constraint "workload_percentage >= 0 AND workload_percentage <= 100", name: "teacher_profiles_workload_range"
     t.check_constraint "years_of_teaching_experience >= 0", name: "teacher_profiles_experience_nonnegative"
   end
 
@@ -1372,7 +1404,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
     t.index ["role"], name: "index_users_on_role"
     t.index ["status", "role", "created_at"], name: "index_users_on_status_and_role_and_created_at"
     t.index ["status"], name: "index_users_on_status"
-    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying::text, 'en'::character varying::text])", name: "users_preferred_locale"
+    t.check_constraint "preferred_locale::text = ANY (ARRAY['ar'::character varying, 'en'::character varying]::text[])", name: "users_preferred_locale"
     t.check_constraint "session_version >= 0", name: "users_session_version_nonnegative"
   end
 
@@ -1497,6 +1529,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_151000) do
   add_foreign_key "student_guardianships", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "student_profile_events", "student_profiles", on_delete: :restrict
   add_foreign_key "student_profile_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "student_profiles", "student_profiles", column: "sibling_student_profile_id"
+  add_foreign_key "student_profiles", "teacher_profiles", column: "assigned_teacher_profile_id"
   add_foreign_key "student_profiles", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "student_profiles", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "student_profiles", "users", on_delete: :restrict
