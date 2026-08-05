@@ -11,6 +11,33 @@ WhatsApp notification switches must also be enabled. No job is enqueued and no e
 automatically. Meta may require an approved WhatsApp template when a
 business-initiated message is outside the customer-service conversation window.
 
+Account-setup WhatsApp delivery is additive: the existing invitation email is always attempted independently. It uses
+the active Meta utility template `quran_account_setup` in `en_US`. Configure all of the following values; the URL prefix
+must exactly match the fixed prefix approved in Meta and must not contain the dynamic `{{1}}` placeholder:
+
+```text
+WHATSAPP_ENABLED=false
+WHATSAPP_ACCESS_TOKEN=
+WHATSAPP_PHONE_NUMBER_ID=
+WHATSAPP_BUSINESS_ACCOUNT_ID=
+WHATSAPP_GRAPH_API_VERSION=v23.0
+WHATSAPP_ACCOUNT_SETUP_TEMPLATE=quran_account_setup
+WHATSAPP_ACCOUNT_SETUP_LANGUAGE=en_US
+WHATSAPP_ACCOUNT_SETUP_URL_PREFIX=https://your-app.example/account/invitation/
+```
+
+Each newly generated invitation token has a digest-based idempotency key. A job retry reuses the same delivery record;
+an explicit invitation resend rotates the token and creates one new WhatsApp delivery event. No raw token or URL suffix
+is stored in notification metadata or logged.
+
+To perform a deliberate live smoke test, select an existing usable invitation and supply its current token without
+printing it. There is no default recipient, and all three explicit values are required:
+
+```bash
+WHATSAPP_ENABLED=true CONFIRM_SEND_ACCOUNT_SETUP=yes INVITATION_ID=123 \
+RAW_INVITATION_TOKEN='paste-current-test-token' bin/rails whatsapp:smoke_account_setup
+```
+
 ### Future reminder scheduling
 
 The application exposes thin ActiveJob adapters and does not install or execute an external scheduler. Configure cron,

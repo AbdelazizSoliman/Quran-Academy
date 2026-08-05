@@ -43,20 +43,16 @@ RSpec.describe "Admin user operations" do
     expect(invalid.errors[:base]).to include(I18n.t("admin.users.errors.phone_number_invalid"))
   end
 
-  it "makes the new profile phone available to immediate WhatsApp invitation delivery" do
+  it "makes the new profile phone available without coupling account creation to WhatsApp" do
     AcademySetting.current.update!(invitation_delivery_mode: "whatsapp_only",
                                    whatsapp_notifications_enabled: true)
-    provider = instance_double(Notifications::WhatsAppProvider)
-    delivery = Notifications::ProviderResult.new(true, "wamid.new-user", {}, 200, "accepted", nil, nil)
-    allow(Notifications::WhatsAppProvider).to receive(:new).and_return(provider)
-    allow(provider).to receive(:deliver).and_return(delivery)
-
     user = Admin::Users::Create.new(
       actor:, attributes: attributes_for(:user, :teacher).merge(phone_number: "+20 100-123-4567")
     ).call
 
     expect(user).to be_persisted
-    expect(provider).to have_received(:deliver).with(hash_including(recipient: "201001234567"))
+    expect(user.teacher_profile.whatsapp_number).to eq("+201001234567")
+    expect(ActionMailer::Base.deliveries).not_to be_empty
   end
 
   it "audits meaningful updates and role changes but not no-op updates" do

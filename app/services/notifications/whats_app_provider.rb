@@ -3,23 +3,19 @@ require "json"
 
 module Notifications
   class WhatsAppProvider
-    GRAPH_VERSION = "v23.0".freeze
-
-    def initialize(access_token: ENV["WHATSAPP_ACCESS_TOKEN"],
-                   phone_number_id: ENV["WHATSAPP_PHONE_NUMBER_ID"],
-                   business_account_id: ENV["WHATSAPP_BUSINESS_ACCOUNT_ID"])
+    def initialize(access_token: ENV.fetch("WHATSAPP_ACCESS_TOKEN", nil),
+                   phone_number_id: ENV.fetch("WHATSAPP_PHONE_NUMBER_ID", nil),
+                   business_account_id: ENV.fetch("WHATSAPP_BUSINESS_ACCOUNT_ID", nil),
+                   graph_api_version: ENV.fetch("WHATSAPP_GRAPH_API_VERSION", nil))
       @access_token = access_token
       @phone_number_id = phone_number_id
       @business_account_id = business_account_id
+      @graph_api_version = graph_api_version
     end
 
     def deliver(recipient:, body:, template: nil, **)
       Rails.logger.info("WhatsApp provider called")
-      result = if configuration_missing?
-                 failure("configuration_missing", "WhatsApp provider is not configured")
-               else
-                 perform_delivery(recipient:, body:, template:)
-               end
+      result = delivery_result(recipient:, body:, template:)
       log_response(result)
       result
     rescue SocketError, SystemCallError, Timeout::Error, OpenSSL::SSL::SSLError => e
@@ -30,32 +26,35 @@ module Notifications
 
     private
 
+    def delivery_result(recipient:, body:, template:)
+      return failure("configuration_missing", "WhatsApp provider is not configured") if configuration_missing?
+
+      perform_delivery(recipient:, body:, template:)
+    end
+
     def perform_delivery(recipient:, body:, template:)
       response = request(recipient:, body:, template:)
       parsed = parse_response(response.body)
       return success(parsed, response.code.to_i) if response.is_a?(Net::HTTPSuccess)
 
       error = parsed.fetch("error", {})
-      failure(error["code"].to_s.presence || "provider_error", error["message"].to_s,
+      failure(error["code"].to_s.presence || "provider_error", "WhatsApp provider rejected the request",
               safe_response(parsed), response.code.to_i)
     end
 
     def log_response(result)
       details = { success: result.success?, http_status: result.http_status,
                   provider_status: result.provider_status, provider_message_id: result.provider_message_id,
-                  error_code: result.error_code, error_message: result.error_message,
-                  response: result.response }.compact
+                  error_code: result.error_code }.compact
       Rails.logger.info("WhatsApp provider response #{details.inspect}")
     end
 
     def request(recipient:, body:, template:)
-      uri = URI("https://graph.facebook.com/#{GRAPH_VERSION}/#{@phone_number_id}/messages")
+      uri = URI("https://graph.facebook.com/#{@graph_api_version}/#{@phone_number_id}/messages")
       request = Net::HTTP::Post.new(uri)
       request["Authorization"] = "Bearer #{@access_token}"
       request["Content-Type"] = "application/json"
-      payload = outbound_payload(recipient:, body:, template:)
-      request.body = payload.to_json
-      log_outbound_payload(payload)
+      request.body = outbound_payload(recipient:, body:, template:).to_json
       Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 10, read_timeout: 20) do |http|
         http.request(request)
       end
@@ -73,44 +72,13 @@ module Notifications
         type: "template",
         template: {
           name: template.fetch(:name), language: { code: template.fetch(:language_code) },
-          components: [{ type: "body", parameters: template.fetch(:parameters) }]
+          components: template.fetch(:components)
         } }
     end
 
-    def log_outbound_payload(payload)
-      safe_payload = payload.deep_dup
-      safe_payload[:to] = mask_phone(payload[:to])
-      redact_urls!(safe_payload)
-      diagnostic = {
-        endpoint: "/<PHONE_NUMBER_ID>/messages", payload: safe_payload,
-        template_name: payload.dig(:template, :name), language_code: payload.dig(:template, :language, :code),
-        message_type: payload[:type], invitation_url_included: payload.to_s.match?(%r{https?://\S+}),
-        invitation_url_as_template_parameter: template_url_parameter?(payload)
-      }
-      Rails.logger.info("WhatsApp outbound payload #{diagnostic.inspect}")
+    def configuration_missing?
+      @access_token.blank? || @phone_number_id.blank? || @business_account_id.blank? || @graph_api_version.blank?
     end
-
-    def redact_urls!(payload)
-      payload[:text][:body] = redact(payload.dig(:text, :body)) if payload[:text]
-      payload.dig(:template, :components)&.each do |component|
-        component[:parameters].each { |parameter| parameter[:text] = redact(parameter[:text]) }
-      end
-    end
-
-    def redact(value) = value.to_s.gsub(%r{https?://\S+}, "[INVITATION_URL_REDACTED]")
-
-    def template_url_parameter?(payload)
-      payload.dig(:template, :components)&.any? do |component|
-        component[:parameters].any? { |parameter| parameter[:text].to_s.match?(%r{https?://\S+}) }
-      end || false
-    end
-
-    def mask_phone(value)
-      digits = value.to_s
-      "#{'*' * [digits.length - 4, 0].max}#{digits.last(4)}"
-    end
-
-    def configuration_missing? = @access_token.blank? || @phone_number_id.blank? || @business_account_id.blank?
 
     def parse_response(body)
       JSON.parse(body)
@@ -130,8 +98,7 @@ module Notifications
 
     def safe_response(parsed)
       { "messaging_product" => parsed["messaging_product"], "messages" => parsed["messages"],
-        "error" => parsed["error"]&.slice("message", "type", "code", "fbtrace_id"),
-        "raw_body" => parsed["raw_body"] }
+        "error" => parsed["error"]&.slice("type", "code", "fbtrace_id") }
         .compact
     end
   end

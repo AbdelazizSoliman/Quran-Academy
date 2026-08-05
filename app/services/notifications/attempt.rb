@@ -16,6 +16,7 @@ module Notifications
 
       address = @recipient_address || resolve_address
       return invalid(:missing_recipient) if address.blank?
+      return invalid(:invalid_template) if invitation_whatsapp? && provider_options[:template].blank?
 
       attempt = mark_attempting!(address)
       result = provider.deliver(recipient: address, subject: @notification.subject,
@@ -50,6 +51,7 @@ module Notifications
     end
 
     def provider_options
+      return @provider_options if @provider_options[:template].present?
       return @provider_options unless invitation_whatsapp?
 
       @provider_options.merge(template: invitation_template)
@@ -60,9 +62,11 @@ module Notifications
     end
 
     def invitation_template
-      { name: ENV.fetch("WHATSAPP_INVITATION_TEMPLATE_NAME", "quran_account_setup"),
-        language_code: ENV.fetch("WHATSAPP_INVITATION_LANGUAGE", "ar"),
-        parameters: [{ type: "text", text: invitation_url }] }
+      suffix = AccountSetupUrlSuffix.call(invitation_url: invitation_url)
+      return if suffix.blank?
+
+      AccountSetupTemplate.call(display_name: @notification.recipient_user.full_name,
+                                email: @notification.recipient_user.email, url_suffix: suffix)
     end
 
     def invitation_url
