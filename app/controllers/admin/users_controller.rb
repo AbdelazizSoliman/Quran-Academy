@@ -72,11 +72,12 @@ module Admin
     def create_params
       params.expect(user: %i[
                       first_name last_name email role preferred_locale time_zone phone_number whatsapp_number
+                      account_delivery_method
                     ])
     end
 
     def update_params
-      params.expect(user: %i[first_name last_name email role preferred_locale time_zone])
+      params.expect(user: %i[first_name last_name email role preferred_locale time_zone account_delivery_method])
     end
 
     def password_params

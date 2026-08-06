@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  ACCOUNT_DELIVERY_METHODS = %w[email whatsapp both].freeze
+
   devise :database_authenticatable, :recoverable, :rememberable, :validatable,
          :trackable, :timeoutable
 
@@ -84,6 +86,7 @@ class User < ApplicationRecord
 
   validates :first_name, :last_name, presence: true
   validates :preferred_locale, inclusion: { in: %w[ar en] }
+  validates :account_delivery_method, inclusion: { in: ACCOUNT_DELIVERY_METHODS }
   validates :time_zone, inclusion: { in: ->(_user) { ActiveSupport::TimeZone.all.map(&:name) } }
   validate :teacher_profile_role_integrity, if: :will_save_change_to_role?
   validate :student_profile_role_integrity, if: :will_save_change_to_role?

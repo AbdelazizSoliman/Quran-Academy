@@ -65,14 +65,15 @@ module Admin
         raise ActiveRecord::RecordInvalid, profile if profile.errors.any?
       end
 
-      # This quick-add flow has no notification-method field of its own (unlike the full
-      # onboarding forms), so it explicitly opts into the safe default rather than silently
-      # inheriting the profile column's own "whatsapp" database default.
+      # The quick-add form's single delivery-method choice maps onto whichever field is
+      # authoritative for the created user's role. It defaults to the safe "email" choice
+      # (rather than silently inheriting the profile column's own "whatsapp" database default)
+      # unless the admin explicitly picked something else.
       def create_teacher_profile(user)
         Admin::TeacherProfiles::Create.new(
           actor: @actor, user:,
           attributes: @contact.merge(display_name: user.full_name, joined_on: Date.current,
-                                     notification_method: "email")
+                                     notification_method: delivery_method)
         ).call
       end
 
@@ -80,7 +81,8 @@ module Admin
         Admin::StudentProfiles::Create.new(
           actor: @actor, user:,
           attributes: @contact.merge(display_name: user.full_name, joined_on: Date.current,
-                                     preferred_contact_method: "whatsapp", account_delivery_method: "email")
+                                     preferred_contact_method: "whatsapp",
+                                     account_delivery_method: delivery_method)
         ).call
       end
 
@@ -88,6 +90,8 @@ module Admin
         user.create_staff_profile!(@contact.merge(display_name: user.full_name,
                                                   created_by: @actor, updated_by: @actor))
       end
+
+      def delivery_method = @attributes[:account_delivery_method].presence || "email"
 
       def merge_profile_errors(user, profile)
         profile.errors.full_messages.each { |message| user.errors.add(:base, message) }

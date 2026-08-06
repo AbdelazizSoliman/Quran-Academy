@@ -10,7 +10,8 @@ module Admin
         end
       end
 
-      SAFE_FIELDS = %w[first_name last_name email role status preferred_locale time_zone].freeze
+      SAFE_FIELDS = %w[first_name last_name email role status preferred_locale time_zone
+                       account_delivery_method].freeze
 
       def initialize(actor:)
         @actor = actor
