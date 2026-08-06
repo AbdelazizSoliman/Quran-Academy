@@ -5,7 +5,9 @@ RSpec.describe "WhatsApp account setup" do
   let(:user) do
     create(:user, :teacher, :pending, first_name: "Amina", last_name: "Hassan", email: "amina@example.test")
   end
-  let!(:profile) { create(:teacher_profile, user:, whatsapp_number: "+20 100-123-4567") }
+  let!(:profile) do
+    create(:teacher_profile, user:, whatsapp_number: "+20 100-123-4567", notification_method: "both")
+  end
   let(:raw_token) { "sensitive-invitation-token" }
   let(:invitation) do
     create(:account_invitation, user:, created_by: admin,

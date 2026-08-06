@@ -20,7 +20,7 @@ module Admin
           user.save!
           profile = Admin::TeacherProfiles::Create.new(actor: @actor, user:, attributes: profile_attributes(user)).call
           raise ActiveRecord::RecordInvalid, profile unless profile.persisted?
-          create_availabilities(profile)
+          create_availabilities(profile) if profile.employment_status == "active"
           AccountInvitations::CreateAndSend.new(user:, actor: @actor).call
         end
         profile
@@ -53,7 +53,7 @@ module Admin
             actor: @actor, teacher_profile: profile,
             attributes: { weekday: day, starts_at_local: @attributes[:work_start_time],
                           ends_at_local: @attributes[:work_end_time], availability_type: "general",
-                          status: "active", effective_from: Date.current, time_zone: "Africa/Cairo" }
+                          status: "active", effective_from: Date.current, time_zone: "Cairo" }
           ).call
           raise ActiveRecord::RecordInvalid, availability unless availability.persisted?
         end

@@ -593,13 +593,12 @@ en:
       employment_statuses:
         candidate: "Candidate"
         active: "Active"
-        on_leave: "On leave"
         inactive: "Inactive"
+        suspended: "Suspended"
         departed: "Departed"
       engagement_types:
+        employee: "Employee"
         contractor: "Contractor"
-        part_time: "Part time"
-        full_time: "Full time"
         volunteer: "Volunteer"
       profile_statuses:
         draft: "Draft"
@@ -608,7 +607,7 @@ en:
         archived: "Archived"
       compensation_units:
         per_lesson: "Per lesson"
-        per_hour: "Per hour"
+        hourly: "Hourly"
         monthly: "Monthly"
       ijazah_statuses:
         none: "None"
@@ -630,14 +629,10 @@ en:
         seniors: "Seniors"
       specializations:
         quran_reading: "Quran reading"
-        quran_memorization: "Quran memorization"
         tajweed: "Tajweed"
-        arabic_language: "Arabic language"
+        memorization: "Memorization"
+        arabic: "Arabic"
         islamic_studies: "Islamic studies"
-        qaida_noorania: "Qaida Noorania"
-        revision: "Revision"
-        recitation_correction: "Recitation correction"
-        new_muslim_foundations: "New Muslim foundations"
       user_statuses:
         pending: "Pending"
         active: "Active"

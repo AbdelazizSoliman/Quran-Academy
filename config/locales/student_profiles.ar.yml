@@ -86,14 +86,14 @@ ar:
     completeness: { missing: "النواقص: %{fields}", age_mismatch: "نوع الطالب المخزن لا يطابق العمر المحسوب ويجب مراجعته قبل التوثيق." }
     catalogs:
       genders: { male: "ذكر", female: "أنثى", unspecified: "غير محدد" }
-      student_types: { minor: "قاصر", adult: "بالغ" }
+      student_types: { adult: "بالغ", minor: "قاصر", child: "طفل" }
       profile_statuses: { draft: "مسودة", complete: "مكتمل", verified: "موثق", archived: "مؤرشف" }
-      learning_statuses: { prospective: "محتمل", active: "نشط", paused: "متوقف مؤقتاً", inactive: "غير نشط", departed: "غادر" }
+      learning_statuses: { prospective: "محتمل", trial: "تجريبي", active: "نشط", paused: "متوقف مؤقتاً", completed: "مكتمل", departed: "غادر" }
       contact_methods: { email: "البريد", phone: "الهاتف", whatsapp: "واتساب", guardian: "ولي الأمر" }
-      quran_levels: { beginner: "مبتدئ", foundation: "تأسيس", reading: "قراءة", intermediate: "متوسط", advanced: "متقدم", memorization: "حفظ", revision: "مراجعة" }
-      reading_levels: { not_started: "لم يبدأ", letters: "حروف", words: "كلمات", sentences: "جمل", fluent: "طليق", advanced: "متقدم" }
-      tajweed_levels: { none: "لا يوجد", basic: "أساسي", intermediate: "متوسط", advanced: "متقدم", qualified: "مؤهل" }
-      memorization_levels: { none: "لا يوجد", short_surahs: "سور قصيرة", partial_juz: "جزء جزئي", multiple_juz: "عدة أجزاء", half_quran: "نصف القرآن", most_quran: "معظم القرآن", complete_quran: "القرآن كاملاً", revision: "مراجعة" }
+      quran_levels: { beginner: "مبتدئ", elementary: "ابتدائي", intermediate: "متوسط", advanced: "متقدم" }
+      reading_levels: { not_started: "لم يبدأ", letters: "حروف", words: "كلمات", sentences: "جمل", fluent: "طليق" }
+      tajweed_levels: { none: "لا يوجد", basic: "أساسي", intermediate: "متوسط", advanced: "متقدم" }
+      memorization_levels: { none: "لا يوجد", short_surahs: "سور قصيرة", juz_amma: "جزء عم", multiple_ajzaa: "أجزاء متعددة", advanced: "متقدم" }
     audit:
       created: "أنشأ %{actor} هذا الملف"
       updated: "حدّث %{actor} هذا الملف"

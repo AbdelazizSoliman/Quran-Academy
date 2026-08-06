@@ -1,6 +1,6 @@
 module AccountInvitations
   class CreateAndSend
-    Result = Data.define(:invitation, :token)
+    Result = Data.define(:invitation, :token, :delivery)
 
     def initialize(user:, actor:)
       @user = user
@@ -10,8 +10,9 @@ module AccountInvitations
     def call
       raw_token = Token.generate
       invitation = create_invitation(raw_token)
-      mark_sent(invitation) if deliver(invitation, raw_token)
-      Result.new(invitation:, token: raw_token)
+      delivery = deliver(invitation, raw_token)
+      MarkSent.call(invitation:, actor: @actor) if delivery.succeeded.include?("email")
+      Result.new(invitation:, token: raw_token, delivery:)
     end
 
     private
@@ -24,14 +25,6 @@ module AccountInvitations
         )
         event!(invitation, "created", after_data: { "status" => invitation.status })
         invitation
-      end
-    end
-
-    def mark_sent(invitation)
-      invitation.with_lock do
-        now = Time.current
-        invitation.update!(status: "sent", sent_at: now, last_sent_at: now)
-        event!(invitation, "sent", before_data: { "status" => "pending" }, after_data: { "status" => "sent" })
       end
     end
 

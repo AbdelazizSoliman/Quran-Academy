@@ -593,13 +593,12 @@ ar:
       employment_statuses:
         candidate: "مرشح"
         active: "نشط"
-        on_leave: "في إجازة"
         inactive: "غير نشط"
+        suspended: "موقوف"
         departed: "غادر"
       engagement_types:
+        employee: "موظف"
         contractor: "متعاقد"
-        part_time: "دوام جزئي"
-        full_time: "دوام كامل"
         volunteer: "متطوع"
       profile_statuses:
         draft: "مسودة"
@@ -608,7 +607,7 @@ ar:
         archived: "مؤرشف"
       compensation_units:
         per_lesson: "لكل حصة"
-        per_hour: "لكل ساعة"
+        hourly: "بالساعة"
         monthly: "شهري"
       ijazah_statuses:
         none: "لا توجد"
@@ -630,14 +629,10 @@ ar:
         seniors: "كبار السن"
       specializations:
         quran_reading: "قراءة القرآن"
-        quran_memorization: "حفظ القرآن"
         tajweed: "التجويد"
-        arabic_language: "اللغة العربية"
+        memorization: "حفظ القرآن"
+        arabic: "اللغة العربية"
         islamic_studies: "الدراسات الإسلامية"
-        qaida_noorania: "القاعدة النورانية"
-        revision: "المراجعة"
-        recitation_correction: "تصحيح التلاوة"
-        new_muslim_foundations: "أساسيات المسلم الجديد"
       user_statuses:
         pending: "قيد الانتظار"
         active: "نشط"

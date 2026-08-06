@@ -37,7 +37,7 @@ RSpec.describe "Teacher profile operations" do
     Admin::TeacherProfiles::Update.new(actor: admin, profile:,
                                        attributes: { default_lesson_rate: 150 }).call
     Admin::TeacherProfiles::Update.new(actor: admin, profile:,
-                                       attributes: { employment_status: "on_leave" }).call
+                                       attributes: { employment_status: "suspended" }).call
 
     expect(profile.events.pluck(:event_type)).to eq(%w[compensation_changed employment_status_changed])
   end

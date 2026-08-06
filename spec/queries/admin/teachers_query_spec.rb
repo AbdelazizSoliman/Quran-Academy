@@ -11,7 +11,7 @@ RSpec.describe Admin::TeachersQuery do
   end
   let!(:english_teacher) do
     create(:teacher_profile, display_name: "Bilal Mentor", whatsapp_number: "+44222",
-                             teaching_languages: %w[en], teaching_specializations: %w[revision],
+                             teaching_languages: %w[en], teaching_specializations: %w[memorization],
                              student_age_groups: %w[adults], engagement_type: "volunteer",
                              profile_status: "archived",
                              user: create(:user, :teacher, email: "bilal@example.test"))
@@ -28,7 +28,7 @@ RSpec.describe Admin::TeachersQuery do
     expect(result(engagement_type: "volunteer")).to eq([english_teacher])
     expect(result(profile_status: "archived")).to eq([english_teacher])
     expect(result(teaching_language: "ar")).to eq([arabic_teacher])
-    expect(result(specialization: "revision")).to eq([english_teacher])
+    expect(result(specialization: "memorization")).to eq([english_teacher])
     expect(result(age_group: "children")).to eq([arabic_teacher])
   end
 

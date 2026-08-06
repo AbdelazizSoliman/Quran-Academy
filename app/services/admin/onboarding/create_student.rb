@@ -98,7 +98,7 @@ module Admin
 
       def guardianship_attributes
         {
-          relationship_type: "parent", primary_contact: true, legal_guardian: true,
+          relationship_type: "legal_guardian", primary_contact: true, legal_guardian: true,
           emergency_contact: true, receives_academic_updates: true, receives_billing_updates: true,
           status: "active", starts_on: Date.current
         }

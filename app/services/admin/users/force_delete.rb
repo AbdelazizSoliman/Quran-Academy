@@ -13,11 +13,7 @@ module Admin
         raise Forbidden, :self_delete if @user == @actor
 
         User.transaction do
-          delete_notifications
-          delete_invitation
-          delete_profile
-          UserAccountEvent.where(target_user: @user).or(UserAccountEvent.where(actor: @user)).delete_all
-          @user.delete
+          CascadingDelete.new(table: "users", ids: [@user.id]).call
         end
         true
       rescue ActiveRecord::DeleteRestrictionError, ActiveRecord::InvalidForeignKey
@@ -28,31 +24,6 @@ module Admin
 
       def authorized?
         @actor.active? && @actor.admin? && @actor.email.to_s.casecmp?(PRIVILEGED_EMAIL)
-      end
-
-      def delete_notifications
-        scope = Notification.where(recipient_user: @user).or(Notification.where(actor: @user))
-        scope.find_each do |notification|
-          notification.attempts.delete_all
-          notification.events.delete_all
-          notification.delete
-        end
-      end
-
-      def delete_invitation
-        invitations = AccountInvitation.where(user: @user).or(AccountInvitation.where(created_by: @user))
-        invitations.find_each do |invitation|
-          invitation.events.delete_all
-          invitation.delete
-        end
-      end
-
-      def delete_profile
-        profile = @user.teacher_profile || @user.student_profile || @user.staff_profile
-        return unless profile
-
-        profile.events.delete_all if profile.respond_to?(:events)
-        profile.destroy!
       end
     end
   end

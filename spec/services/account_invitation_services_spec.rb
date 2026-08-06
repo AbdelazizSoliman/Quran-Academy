@@ -41,7 +41,7 @@ RSpec.describe "Account invitation services" do
     setting = AcademySetting.current
     setting.update!(invitation_delivery_mode: "email_and_whatsapp", whatsapp_notifications_enabled: true)
     user = create(:user, :teacher, :pending, preferred_locale: "en")
-    create(:teacher_profile, user:, whatsapp_number: "+201001234567")
+    create(:teacher_profile, user:, whatsapp_number: "+201001234567", notification_method: "both")
     service_result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
     invitation_url = AccountInvitations::UrlBuilder.call(token: service_result.token, locale: "en")
 

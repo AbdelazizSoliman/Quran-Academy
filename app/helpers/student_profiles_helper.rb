@@ -9,8 +9,8 @@ module StudentProfilesHelper
   end
 
   def student_learning_status_badge(profile)
-    variants = { "active" => :success, "prospective" => :information, "paused" => :warning,
-                 "inactive" => :neutral, "departed" => :danger }
+    variants = { "prospective" => :information, "trial" => :warning, "active" => :success,
+                 "paused" => :warning, "completed" => :neutral, "departed" => :danger }
     student_catalog_badge(:learning_statuses, profile.learning_status, variant: variants.fetch(profile.learning_status))
   end
 

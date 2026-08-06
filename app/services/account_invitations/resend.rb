@@ -10,7 +10,7 @@ module AccountInvitations
     def call
       raw_token = Token.generate
       rotate_token(raw_token)
-      mark_sent if deliver(raw_token)
+      mark_sent if deliver(raw_token).succeeded.include?("email")
       Result.new(invitation: @invitation, token: raw_token)
     rescue ActiveRecord::RecordInvalid => e
       @invitation.errors.merge!(e.record.errors)

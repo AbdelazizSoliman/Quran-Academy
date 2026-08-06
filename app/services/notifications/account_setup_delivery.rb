@@ -25,10 +25,20 @@ module Notifications
       return if suffix.blank?
 
       key = idempotency_key
-      existing = Notification.find_by(idempotency_key: key)
-      return existing if existing
+      notification = Notification.find_by(idempotency_key: key) ||
+                      create_and_send(recipient:, template: template(suffix), idempotency_key: key)
+      mark_invitation_sent(notification)
+      notification
+    end
 
-      create_and_send(recipient:, template: template(suffix), idempotency_key: key)
+    # WhatsApp delivery runs in a background job, after the invitation-creating transaction has
+    # already committed, so this is the first point at which a real (not merely enqueued) success
+    # is known. Idempotent: a second successful attempt (retry, or the email channel finishing
+    # first) simply no-ops via AccountInvitations::MarkSent's own guard.
+    def mark_invitation_sent(notification)
+      return unless notification.sent? || notification.delivered?
+
+      AccountInvitations::MarkSent.call(invitation: @invitation, actor: @actor)
     end
 
     def deliverable? = enabled? && configured? && current_token?
@@ -52,26 +62,12 @@ module Notifications
     end
 
     def enabled?
-      ActiveModel::Type::Boolean.new.cast(ENV.fetch("WHATSAPP_ENABLED", "false")) &&
+      WhatsappConfiguration.enabled? &&
         AcademySetting.current.whatsapp_notifications_enabled? &&
         AcademySetting.current.invitation_notifications_enabled?
     end
 
-    def configured?
-      required_configuration_present? && approved_template_configuration?
-    end
-
-    def required_configuration_present?
-      %w[WHATSAPP_ACCESS_TOKEN WHATSAPP_PHONE_NUMBER_ID WHATSAPP_BUSINESS_ACCOUNT_ID
-         WHATSAPP_GRAPH_API_VERSION WHATSAPP_ACCOUNT_SETUP_URL_PREFIX].all? do |key|
-        ENV.fetch(key, nil).present?
-      end
-    end
-
-    def approved_template_configuration?
-      ENV.fetch("WHATSAPP_ACCOUNT_SETUP_TEMPLATE", nil) == "quran_account_setup" &&
-        ENV.fetch("WHATSAPP_ACCOUNT_SETUP_LANGUAGE", nil) == "en_US"
-    end
+    def configured? = WhatsappConfiguration.configured?
 
     def current_token?
       @invitation.usable? && ActiveSupport::SecurityUtils.secure_compare(

@@ -1,5 +1,15 @@
 module Notifications
+  # Authoritative entry point for delivering an account invitation. Determines which channels
+  # to attempt from the recipient's own stored preference (Notifications::InvitationChannels),
+  # then attempts each requested channel independently — a failure or skip on one channel never
+  # prevents the other from being attempted. Email is delivered synchronously (unchanged,
+  # existing behavior); WhatsApp is handed off to a background job after commit, so returns a
+  # "succeeded" (successfully enqueued) or "skipped" (with a reason) outcome rather than a true
+  # delivery result, which is only known once the job runs. The authoritative, evolving truth for
+  # both channels always lives on the per-channel Notification/NotificationAttempt records.
   class InvitationDelivery
+    Result = Data.define(:requested, :succeeded, :failed, :skipped)
+
     def initialize(invitation:, token:, actor:)
       @invitation = invitation
       @token = token
@@ -8,12 +18,39 @@ module Notifications
 
     def call
       Rails.logger.info("InvitationDelivery started invitation_id=#{@invitation.public_id}")
-      email_succeeded = deliver_email
-      enqueue_whatsapp
-      email_succeeded
+      channels = InvitationChannels.call(user: @invitation.user)
+      succeeded = []
+      failed = []
+      skipped = []
+
+      attempt_email(channels, succeeded, failed)
+      attempt_whatsapp(channels, succeeded, skipped)
+
+      Result.new(requested: channels, succeeded:, failed:, skipped:)
     end
 
     private
+
+    def attempt_email(channels, succeeded, failed)
+      return unless channels.include?("email")
+
+      deliver_email ? succeeded << "email" : failed << "email"
+    end
+
+    def attempt_whatsapp(channels, succeeded, skipped)
+      return unless channels.include?("whatsapp")
+
+      reason = whatsapp_skip_reason
+      if reason
+        Rails.logger.info(
+          "InvitationDelivery whatsapp dispatch skipped reason=#{reason} invitation_id=#{@invitation.public_id}"
+        )
+        skipped << "whatsapp"
+      else
+        enqueue_whatsapp
+        succeeded << "whatsapp"
+      end
+    end
 
     def deliver_email
       Rails.logger.info("InvitationDelivery email dispatch started invitation_id=#{@invitation.public_id}")
@@ -26,11 +63,40 @@ module Notifications
       false
     end
 
-    def enqueue_whatsapp
-      return unless AcademySetting.current.invitation_delivery_mode.in?(%w[whatsapp_only email_and_whatsapp])
-      return unless ActiveModel::Type::Boolean.new.cast(ENV.fetch("WHATSAPP_ENABLED", "false"))
-      return unless whatsapp_configuration_present?
+    # Cheap, local, side-effect-free eligibility check so a skip can be decided and logged
+    # synchronously, without waiting on the background job. AccountSetupDelivery independently
+    # re-validates everything (defense in depth) when the job actually runs, since state (the
+    # token, configuration, the recipient's number) could change between enqueue and execution.
+    def whatsapp_skip_reason
+      return :disabled unless WhatsappConfiguration.enabled?
+      return :not_configured unless WhatsappConfiguration.configured?
+      return :invalid_token unless current_token?
 
+      recipient = RecipientResolver.new(user: @invitation.user, channel: "whatsapp").call
+      return :invalid_number unless recipient.valid?
+      return :url_prefix_mismatch unless url_suffix_available?(recipient.locale)
+
+      nil
+    rescue StandardError => e
+      Rails.logger.error("WhatsApp invitation eligibility check failed (#{e.class})")
+      :check_failed
+    end
+
+    def current_token?
+      @invitation.usable? && ActiveSupport::SecurityUtils.secure_compare(
+        @invitation.token_digest, AccountInvitations::Token.digest(@token)
+      )
+    end
+
+    # Only checks whether a suffix can be derived at all; the suffix itself is discarded
+    # immediately and never logged, stored, or returned (it is derived from the raw token).
+    def url_suffix_available?(locale)
+      url = AccountInvitations::UrlBuilder.call(token: @token, locale:)
+      AccountSetupUrlSuffix.call(invitation_url: url).present?
+    end
+
+    def enqueue_whatsapp
+      Rails.logger.info("InvitationDelivery whatsapp dispatch started invitation_id=#{@invitation.public_id}")
       encrypted_token = SecurePayload.encrypt(@token)
       ActiveRecord.after_all_transactions_commit { enqueue_job(encrypted_token) }
     rescue StandardError => e
@@ -39,14 +105,14 @@ module Notifications
 
     def enqueue_job(encrypted_token)
       AccountSetupWhatsAppJob.perform_later(invitation: @invitation, actor: @actor, encrypted_token:)
+      Rails.logger.info(
+        "InvitationDelivery whatsapp dispatch finished success=true invitation_id=#{@invitation.public_id}"
+      )
     rescue StandardError => e
       Rails.logger.error("WhatsApp invitation enqueue failed (#{e.class})")
-    end
-
-    def whatsapp_configuration_present?
-      %w[WHATSAPP_ACCESS_TOKEN WHATSAPP_PHONE_NUMBER_ID WHATSAPP_BUSINESS_ACCOUNT_ID
-         WHATSAPP_GRAPH_API_VERSION WHATSAPP_ACCOUNT_SETUP_TEMPLATE
-         WHATSAPP_ACCOUNT_SETUP_LANGUAGE WHATSAPP_ACCOUNT_SETUP_URL_PREFIX].all? { |key| ENV[key].present? }
+      Rails.logger.info(
+        "InvitationDelivery whatsapp dispatch finished success=false invitation_id=#{@invitation.public_id}"
+      )
     end
   end
 end

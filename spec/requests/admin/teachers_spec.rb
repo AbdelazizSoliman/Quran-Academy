@@ -39,26 +39,29 @@ RSpec.describe "Admin teacher profiles" do
     expect(response.body).not_to include("translation missing")
   end
 
-  it "creates a profile for an eligible existing teacher and records audit" do
+  it "creates a teacher account and profile via onboarding and records audit" do
     sign_in admin
-    post admin_teachers_path, params: {
-      teacher_profile: valid_attributes.merge(user_id: teacher_user.id)
-    }
+    expect do
+      post admin_teachers_path, params: {
+        teacher_profile: { first_name: "New", last_name: "Teacher", email: "new.teacher@example.test",
+                           display_name: "New Teacher", employment_status: "active" }
+      }
+    end.to change(TeacherProfile, :count).by(1)
 
-    profile = teacher_user.reload.teacher_profile
+    profile = TeacherProfile.find_by!(display_name: "New Teacher")
     expect(response).to redirect_to(admin_teacher_path(profile))
     expect(profile.public_id).to start_with("TCH-")
     expect(profile.events.pluck(:event_type)).to eq(%w[created])
   end
 
-  it "rejects non-teacher and duplicate profile creation" do
-    staff = create(:user, :staff)
+  it "rejects onboarding with a duplicate email without creating a profile" do
+    existing = create(:user, :teacher, email: "taken.teacher@example.test")
     sign_in admin
-    post admin_teachers_path, params: { teacher_profile: valid_attributes.merge(user_id: staff.id) }
-    expect(response).to have_http_status(:unprocessable_content)
-
-    create(:teacher_profile, user: teacher_user)
-    post admin_teachers_path, params: { teacher_profile: valid_attributes.merge(user_id: teacher_user.id) }
+    expect do
+      post admin_teachers_path, params: {
+        teacher_profile: { first_name: "Dup", last_name: "Teacher", email: existing.email }
+      }
+    end.not_to change(TeacherProfile, :count)
     expect(response).to have_http_status(:unprocessable_content)
   end
 

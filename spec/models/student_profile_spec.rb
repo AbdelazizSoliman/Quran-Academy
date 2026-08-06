@@ -14,7 +14,7 @@ RSpec.describe StudentProfile do
   end
 
   it "validates catalogs, learning language, juz range, and lifecycle dates" do
-    profile = build(:student_profile, student_type: "child", preferred_learning_language: "xx",
+    profile = build(:student_profile, student_type: "senior", preferred_learning_language: "xx",
                                       memorized_juz_count: 31, joined_on: Date.current, left_on: Date.yesterday)
     expect(profile).not_to be_valid
     expect(profile.errors).to include(:student_type, :preferred_learning_language, :memorized_juz_count, :left_on)

@@ -16,10 +16,14 @@ RSpec.describe "Admin students" do
   end
 
   it "creates, updates, verifies, archives, and restores with audits" do
-    post admin_students_path, params: {
-      student_profile: attributes_for(:student_profile).except(:user).merge(user_id: student_user.id)
-    }
-    profile = student_user.reload.student_profile
+    expect do
+      post admin_students_path, params: {
+        student_profile: { first_name: "New", last_name: "Learner", email: "new.learner@example.test",
+                           display_name: "New Learner", country_of_residence: "EG",
+                           preferred_learning_language: "en", learning_goals: "Read fluently" }
+      }
+    end.to change(StudentProfile, :count).by(1)
+    profile = StudentProfile.find_by!(display_name: "New Learner")
     expect(response).to redirect_to(admin_student_path(profile))
     patch admin_student_path(profile), params: { student_profile: { display_name: "Updated Student" } }
     patch verify_admin_student_path(profile)
@@ -31,16 +35,13 @@ RSpec.describe "Admin students" do
     expect(profile.events.count).to eq(5)
   end
 
-  it "rejects non-student ownership and duplicate profiles" do
-    teacher = create(:user, :teacher)
-    post admin_students_path, params: {
-      student_profile: attributes_for(:student_profile).except(:user).merge(user_id: teacher.id)
-    }
-    expect(response).to have_http_status(:unprocessable_content)
-    create(:student_profile, user: student_user)
-    post admin_students_path, params: {
-      student_profile: attributes_for(:student_profile).except(:user).merge(user_id: student_user.id)
-    }
+  it "rejects onboarding with a duplicate email without creating a profile" do
+    existing = create(:user, :student, email: "taken@example.test")
+    expect do
+      post admin_students_path, params: {
+        student_profile: { first_name: "Dup", last_name: "Learner", email: existing.email }
+      }
+    end.not_to change(StudentProfile, :count)
     expect(response).to have_http_status(:unprocessable_content)
   end
 

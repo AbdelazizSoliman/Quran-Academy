@@ -65,10 +65,14 @@ module Admin
         raise ActiveRecord::RecordInvalid, profile if profile.errors.any?
       end
 
+      # This quick-add flow has no notification-method field of its own (unlike the full
+      # onboarding forms), so it explicitly opts into the safe default rather than silently
+      # inheriting the profile column's own "whatsapp" database default.
       def create_teacher_profile(user)
         Admin::TeacherProfiles::Create.new(
           actor: @actor, user:,
-          attributes: @contact.merge(display_name: user.full_name, joined_on: Date.current)
+          attributes: @contact.merge(display_name: user.full_name, joined_on: Date.current,
+                                     notification_method: "email")
         ).call
       end
 
@@ -76,7 +80,7 @@ module Admin
         Admin::StudentProfiles::Create.new(
           actor: @actor, user:,
           attributes: @contact.merge(display_name: user.full_name, joined_on: Date.current,
-                                     preferred_contact_method: "whatsapp")
+                                     preferred_contact_method: "whatsapp", account_delivery_method: "email")
         ).call
       end
 
