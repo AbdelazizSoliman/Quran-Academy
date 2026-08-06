@@ -356,6 +356,7 @@ en:
         email: "Email"
         phone_number: "Phone number"
         whatsapp_number: "WhatsApp number"
+        account_delivery_method: "Login delivery method"
         role: "Role"
         status: "Status"
         preferred_locale: "Language"
@@ -382,6 +383,10 @@ en:
         status_hint: "Use explicit account actions to change status safely."
         locale_automatic: "Automatic default for role"
         whatsapp_fallback_hint: "Leave blank to use the phone number for WhatsApp."
+        delivery_methods:
+          email: "Email"
+          whatsapp: "WhatsApp"
+          both: "Email + WhatsApp"
       actions:
         new: "Create user"
         back: "Back to users"

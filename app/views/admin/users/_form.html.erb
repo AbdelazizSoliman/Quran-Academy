@@ -37,6 +37,12 @@
       <%= form.select :role, User.roles.keys.map { |role| [t("roles.#{role}"), role] }, {}, class: "ds-control mt-2" %>
     </div>
 
+    <div>
+      <%= form.label :account_delivery_method, t("admin.users.fields.account_delivery_method"), class: "ds-label" %>
+      <% delivery_options = User::ACCOUNT_DELIVERY_METHODS.map { |method| [t("admin.users.form.delivery_methods.#{method}"), method] } %>
+      <%= form.select :account_delivery_method, delivery_options, {}, class: "ds-control mt-2" %>
+    </div>
+
     <% unless user.new_record? %>
       <div>
         <span class="ds-label"><%= t("admin.users.fields.status") %></span>

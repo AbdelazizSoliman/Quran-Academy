@@ -31,7 +31,7 @@ en:
       message: "This invitation is invalid, cancelled, or has already been used. Contact the academy if you need help."
     admin:
       creation_title: "Secure invitation"
-      creation_hint: "The account will remain pending. The user will receive an email and choose their own password; no temporary password is sent."
+      creation_hint: "The account will remain pending. The user receives an invitation via the selected delivery method and chooses their own password; no temporary password is sent."
       index_title: "Account invitations"
       index_description: "Review secure account onboarding and resend or cancel unused invitations."
       search: "Search name, email, or role"
