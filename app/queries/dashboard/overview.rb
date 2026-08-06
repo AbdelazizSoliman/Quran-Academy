@@ -66,11 +66,18 @@ module Dashboard
     end
 
     def attendance_scope
+      lesson_ids = todays_lessons.reorder(nil).select(:id)
+
       scope = ::LessonAttendance.joins(:scheduled_lesson_enrollment)
-                              .where(scheduled_lesson_id: todays_lessons.select(:id))
+                                .where(scheduled_lesson_id: lesson_ids)
+
       return scope unless @user.student?
 
-      scope.where(scheduled_lesson_enrollments: { enrollment_id: @user.student_profile&.enrollments&.select(:id) })
+      scope.where(
+        scheduled_lesson_enrollments: {
+          enrollment_id: @user.student_profile&.enrollments&.select(:id)
+        }
+      )
     end
 
     def attendance_statistics
