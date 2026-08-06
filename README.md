@@ -38,6 +38,48 @@ WHATSAPP_ENABLED=true CONFIRM_SEND_ACCOUNT_SETUP=yes INVITATION_ID=123 \
 RAW_INVITATION_TOKEN='paste-current-test-token' bin/rails whatsapp:smoke_account_setup
 ```
 
+### Production cutover: replacing the Meta test number
+
+The integration reads every WhatsApp credential from environment variables at call time
+(`Notifications::WhatsAppProvider`, `Notifications::WhatsappConfiguration`); no test-number ID,
+sandbox flag, or Meta test-account value is hardcoded anywhere in the application. Moving from
+the Meta test number to the academy's real production Cloud API number is a configuration change
+only — no code, migration, or architectural change is required. This assumes the production
+number has already been added to the same Meta Business Manager / WhatsApp Business Account as a
+standard Cloud API number (registered directly, not through WhatsApp Business App coexistence).
+
+To cut over:
+
+1. In Meta Business Manager, confirm the production phone number is added to the WhatsApp Business
+   Account as a Cloud API number and is verified.
+2. Confirm the existing System User (the one whose permanent token is already used for the test
+   number) has been granted access to that WhatsApp Business Account and phone number under
+   **Business Settings → System Users → Add Assets**. A token that works for the test number does
+   not automatically work for a different WABA/number until the System User is explicitly granted
+   access to it. Reuse the existing token if access is granted; generate a new permanent token for
+   the same System User only if Meta requires it after granting access.
+3. In Render, replace only:
+   ```text
+   WHATSAPP_PHONE_NUMBER_ID=<production phone number ID>
+   WHATSAPP_BUSINESS_ACCOUNT_ID=<production WABA ID>
+   WHATSAPP_ACCESS_TOKEN=<same or re-granted System User token>
+   ```
+   Leave `WHATSAPP_GRAPH_API_VERSION`, `WHATSAPP_ACCOUNT_SETUP_TEMPLATE`, `WHATSAPP_ACCOUNT_SETUP_LANGUAGE`,
+   and `WHATSAPP_ACCOUNT_SETUP_URL_PREFIX` unchanged — the approved template and URL prefix are
+   independent of which number sends it.
+4. Keep `WHATSAPP_ENABLED=false` until steps 1–3 are confirmed. `WhatsappConfiguration.ready?` (used
+   by both `InvitationDelivery` and `AccountSetupDelivery`) already refuses to send unless the flag
+   is `true` and every required key is present, so a partially-updated environment fails closed.
+5. Set `WHATSAPP_ENABLED=true` and run the existing smoke test above against one real, usable
+   invitation to confirm the production number sends successfully before relying on it for live
+   traffic. The smoke task never prints the token and creates no extra invitation.
+6. Only after a successful smoke test should the academy's WhatsApp notification switches be relied
+   upon for real invitations.
+
+No webhook receiver, embedded onboarding UI, or new admin page is needed for this path: the academy
+owner registers the production number directly with Meta as a standard Cloud API number outside this
+application, and the application only needs the resulting IDs and token above.
+
 ### Future reminder scheduling
 
 The application exposes thin ActiveJob adapters and does not install or execute an external scheduler. Configure cron,
