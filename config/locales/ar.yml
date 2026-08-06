@@ -356,6 +356,7 @@ ar:
         email: "البريد الإلكتروني"
         phone_number: "رقم الهاتف"
         whatsapp_number: "رقم واتساب"
+        account_delivery_method: "طريقة إرسال بيانات الدخول"
         role: "الدور"
         status: "الحالة"
         preferred_locale: "اللغة"
