@@ -93,6 +93,14 @@ bin/rails runner 'actor = User.find(ENV.fetch("NOTIFICATION_ACTOR_ID")); Reminde
 The jobs contain no reminder business logic. They call the idempotent reminder services, so overlapping scheduler
 invocations cannot create duplicate notifications for the same lesson, recipient, and reminder stage.
 
+Lesson WhatsApp reminders use the approved Meta Utility template `quran_lesson_reminder` in `en_US`. Configure
+`WHATSAPP_LESSON_REMINDER_TEMPLATE=quran_lesson_reminder`, `WHATSAPP_LESSON_REMINDER_LANGUAGE=en_US`, and
+`WHATSAPP_LESSON_JOIN_URL_PREFIX` to the exact fixed URL prefix approved for the template's **Join lesson** button.
+The application sends only the validated dynamic suffix; a missing, malformed, cross-origin, or prefix-mismatched
+lesson URL is skipped. The minute sweeps send one reminder per opted-in teacher/student 15 minutes before start and,
+at 5 minutes after start, one additional reminder only for a teacher without `teacher_checked_in_at` or a student
+without authoritative present/late/arrival attendance.
+
 ## Planned capabilities
 
 - Student self-registration and guardian records

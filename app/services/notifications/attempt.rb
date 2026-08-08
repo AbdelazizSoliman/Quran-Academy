@@ -16,7 +16,7 @@ module Notifications
 
       address = @recipient_address || resolve_address
       return invalid(:missing_recipient) if address.blank?
-      return invalid(:invalid_template) if invitation_whatsapp? && provider_options[:template].blank?
+      return invalid(:invalid_template) if template_whatsapp? && provider_options[:template].blank?
 
       attempt = mark_attempting!(address)
       result = provider.deliver(recipient: address, subject: @notification.subject,
@@ -52,14 +52,22 @@ module Notifications
 
     def provider_options
       return @provider_options if @provider_options[:template].present?
-      return @provider_options unless invitation_whatsapp?
+      return @provider_options unless template_whatsapp?
 
-      @provider_options.merge(template: invitation_template)
+      template = invitation_whatsapp? ? invitation_template : lesson_reminder_template
+      @provider_options.merge(template:)
     end
 
     def invitation_whatsapp?
       @notification.whatsapp? && @notification.notification_type == "account_invitation"
     end
+
+    def lesson_reminder_whatsapp?
+      @notification.whatsapp? &&
+        @notification.notification_type.in?(%w[lesson_pre_reminder lesson_late_reminder])
+    end
+
+    def template_whatsapp? = invitation_whatsapp? || lesson_reminder_whatsapp?
 
     def invitation_template
       suffix = AccountSetupUrlSuffix.call(invitation_url: invitation_url)
@@ -71,6 +79,14 @@ module Notifications
 
     def invitation_url
       URI.extract(delivery_body.to_s, %w[http https]).first
+    end
+
+    def lesson_reminder_template
+      lesson = @notification.source
+      suffix = LessonJoinUrlSuffix.call(join_url: lesson.online_meeting_join_url)
+      return if suffix.blank?
+
+      LessonReminderTemplate.call(notification: @notification, url_suffix: suffix)
     end
 
     def mark_attempting!(address)

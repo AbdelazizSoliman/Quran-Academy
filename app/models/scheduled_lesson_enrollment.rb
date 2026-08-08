@@ -13,6 +13,7 @@ class ScheduledLessonEnrollment < ApplicationRecord
   validate :operational_enrollment
 
   def expected? = participation_status == "expected"
+  scope :expected, -> { where(participation_status: "expected") }
 
   private
 

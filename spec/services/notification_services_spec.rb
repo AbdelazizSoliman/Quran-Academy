@@ -61,9 +61,10 @@ RSpec.describe "Notification services" do
 
   it "creates due lesson reminders once for the teacher and enrolled students" do
     now = Time.current
-    lesson = create(:scheduled_lesson, :scheduled, starts_at: now + 20.minutes, ends_at: now + 50.minutes)
+    lesson = create(:scheduled_lesson, :scheduled, starts_at: now + 15.minutes, ends_at: now + 50.minutes)
     participation = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
-    participation.enrollment.student_profile.update!(phone_number: "+201001234568")
+    participation.enrollment.student_profile.update!(phone_number: "+201001234568",
+                                                       preferred_contact_method: "whatsapp")
     configure_reminders
     stub_whatsapp_success
 
@@ -75,24 +76,27 @@ RSpec.describe "Notification services" do
     end.not_to change(Notification, :count)
   end
 
-  it "creates both due late stages only for pending attendance" do
+  it "creates one late reminder for each absent teacher and student" do
     now = Time.current
-    lesson = create(:scheduled_lesson, :in_progress, starts_at: now - 25.minutes, ends_at: now + 20.minutes)
+    lesson = create(:scheduled_lesson, :in_progress, starts_at: now - 5.minutes, ends_at: now + 20.minutes)
     participation = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
-    participation.enrollment.student_profile.update!(phone_number: "+201001234569")
+    participation.enrollment.student_profile.update!(phone_number: "+201001234569",
+                                                       preferred_contact_method: "whatsapp")
     create(:lesson_attendance, scheduled_lesson_enrollment: participation, scheduled_lesson: lesson)
     configure_reminders
     stub_whatsapp_success
 
     expect do
       Notifications::LateAttendanceReminderScheduler.new(actor: admin, now:).call
-    end.to change(Notification, :count).by(4)
+    end.to change(Notification, :count).by(2)
   end
 
   def configure_reminders
     AcademySetting.current.update!(lesson_reminders_enabled: true, whatsapp_notifications_enabled: true,
-                                   lesson_reminder_minutes_before: 30, first_late_reminder_minutes: 10,
+                                   lesson_reminder_minutes_before: 15, first_late_reminder_minutes: 5,
                                    second_late_reminder_minutes: 20)
+    allow(Notifications::WhatsappConfiguration).to receive(:lesson_reminders_ready?).and_return(true)
+    allow(Notifications::LessonJoinUrlSuffix).to receive(:call).and_return("lesson")
   end
 
   def stub_whatsapp_success

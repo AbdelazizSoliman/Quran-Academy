@@ -1,6 +1,7 @@
 module Admin
   class NotificationsController < SchedulingBaseController
-    SOURCE_TYPES = { "account_invitation" => AccountInvitation, "lesson_reminder" => ScheduledLesson,
+    SOURCE_TYPES = { "account_invitation" => AccountInvitation, "lesson_pre_reminder" => ScheduledLesson,
+                     "lesson_late_reminder" => ScheduledLesson, "lesson_reminder" => ScheduledLesson,
                      "late_reminder" => ScheduledLesson, "lesson_cancelled" => ScheduledLesson,
                      "lesson_rescheduled" => ScheduledLesson, "lesson_report" => LessonReport,
                      "certificate" => Certificate }.freeze

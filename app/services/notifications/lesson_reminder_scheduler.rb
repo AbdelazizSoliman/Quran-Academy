@@ -1,5 +1,8 @@
 module Notifications
   class LessonReminderScheduler
+    MINUTES_BEFORE = 15
+    SWEEP_WINDOW = 1.minute
+
     def initialize(actor:, now: Time.current, relation: ScheduledLesson.all)
       @actor = actor
       @now = now
@@ -16,23 +19,34 @@ module Notifications
     private
 
     def enabled?
-      @setting.lesson_reminders_enabled? && @setting.whatsapp_notifications_enabled?
+      @setting.lesson_reminders_enabled? && @setting.whatsapp_notifications_enabled? &&
+        WhatsappConfiguration.lesson_reminders_ready?
     end
 
     def due_lessons
-      upper_bound = @now + @setting.lesson_reminder_minutes_before.minutes
-      @relation.where(status: "scheduled", starts_at: @now..upper_bound)
+      lower_bound = @now + MINUTES_BEFORE.minutes - SWEEP_WINDOW
+      upper_bound = @now + MINUTES_BEFORE.minutes
+      @relation.where(status: "scheduled").where("starts_at > ? AND starts_at <= ?", lower_bound, upper_bound)
                .includes(teacher_profile: :user,
                          scheduled_lesson_enrollments: { enrollment: { student_profile: :user } })
     end
 
     def notify_lesson(lesson)
-      scheduled_at = lesson.starts_at - @setting.lesson_reminder_minutes_before.minutes
-      recipients(lesson).map do |recipient|
-        Dispatch.new(actor: @actor, recipient:, source: lesson, type: "lesson_reminder", channel: "whatsapp",
-                     scheduled_at:, queued_at: @now,
-                     idempotency_key: idempotency_key(lesson, recipient)).call
+      scheduled_at = lesson.starts_at - MINUTES_BEFORE.minutes
+      recipients(lesson).filter_map do |recipient|
+        next unless LessonReminderRecipient.whatsapp_selected?(recipient)
+
+        dispatch(lesson, recipient, scheduled_at)
       end
+    end
+
+    def dispatch(lesson, recipient, scheduled_at)
+      Rails.logger.info("LessonReminder whatsapp dispatch started lesson_id=#{lesson.id}")
+      notification = Dispatch.new(actor: @actor, recipient:, source: lesson, type: "lesson_pre_reminder",
+                                  channel: "whatsapp", scheduled_at:, queued_at: @now,
+                                  idempotency_key: idempotency_key(lesson, recipient)).call
+      log_finished(notification)
+      notification
     end
 
     def recipients(lesson)
@@ -43,7 +57,12 @@ module Notifications
     end
 
     def idempotency_key(lesson, recipient)
-      "lesson-reminder:#{lesson.id}:recipient:#{recipient.id}"
+      "lesson-pre-reminder:lesson:#{lesson.id}:recipient:#{recipient.id}"
+    end
+
+    def log_finished(notification)
+      Rails.logger.info("LessonReminder whatsapp dispatch finished " \
+                        "success=#{notification.sent? || notification.delivered?}")
     end
   end
 end

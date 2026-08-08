@@ -46,6 +46,8 @@ en:
       account_invitation: "Account invitation"
       lesson_reminder: "Lesson reminder"
       late_reminder: "Late attendance reminder"
+      lesson_pre_reminder: "15-minute lesson reminder"
+      lesson_late_reminder: "Late lesson reminder"
       lesson_cancelled: "Lesson cancelled"
       lesson_rescheduled: "Lesson rescheduled"
       lesson_report: "Lesson report"
@@ -56,6 +58,8 @@ en:
     messages:
       saved: "The delivery attempt was recorded."
       students: "Enrolled students"
+      counterpart_teacher: "Teacher"
+      counterpart_student: "Student"
       account_invitation:
         subject: "%{academy} account invitation"
         body: "Welcome to %{academy}.\n\nYour account has been created successfully.\n\nPlease use the following link to create your password and activate your account:\n\n%{url}\n\nIf you need any help, please contact the academy administration."
@@ -65,6 +69,12 @@ en:
       late_reminder:
         subject: "%{academy} attendance reminder"
         body: "Academy: %{academy}\nTeacher: %{teacher}\nStudent: %{student}\nAttendance is still pending for %{title}.\nDate: %{date}\nTime: %{time}\nProgram: %{program}\nCourse: %{course}"
+      lesson_pre_reminder:
+        subject: "%{academy} lesson reminder"
+        body: "Your Quran lesson starts in 15 minutes.\nTeacher: %{teacher}\nStudent: %{student}\nDate: %{date}\nTime: %{time}"
+      lesson_late_reminder:
+        subject: "%{academy} late lesson reminder"
+        body: "Your Quran lesson started 5 minutes ago. Please join now.\nTeacher: %{teacher}\nStudent: %{student}\nDate: %{date}\nTime: %{time}"
       lesson_cancelled:
         subject: "%{academy} lesson cancelled"
         body: "Academy: %{academy}\nTeacher: %{teacher}\nStudent: %{student}\nLesson cancelled: %{title}\nDate: %{date}\nTime: %{time}\nProgram: %{program}\nCourse: %{course}"

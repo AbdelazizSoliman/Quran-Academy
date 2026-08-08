@@ -1,6 +1,7 @@
 class Notification < ApplicationRecord
   CHANNELS = %w[email whatsapp].freeze
-  TYPES = %w[account_invitation lesson_reminder late_reminder lesson_cancelled lesson_rescheduled
+  TYPES = %w[account_invitation lesson_pre_reminder lesson_late_reminder lesson_reminder late_reminder
+             lesson_cancelled lesson_rescheduled
              lesson_report certificate].freeze
   STATUSES = %w[pending sending sent delivered failed].freeze
   SOURCES = %w[AccountInvitation ScheduledLesson LessonReport Certificate].freeze

@@ -73,11 +73,12 @@ module Notifications
 
     def source_valid?
       Notification::TYPES.include?(@type) && Notification::CHANNELS.include?(@channel) &&
-        { "account_invitation" => AccountInvitation, "lesson_reminder" => ScheduledLesson,
+        { "account_invitation" => AccountInvitation, "lesson_pre_reminder" => ScheduledLesson,
+          "lesson_late_reminder" => ScheduledLesson, "lesson_reminder" => ScheduledLesson,
           "late_reminder" => ScheduledLesson, "lesson_cancelled" => ScheduledLesson,
           "lesson_rescheduled" => ScheduledLesson, "lesson_report" => LessonReport,
           "certificate" => Certificate }[@type] === @source &&
-        source_deliverable? && recipient_belongs_to_source?
+        source_deliverable? && lesson_join_url_valid? && recipient_belongs_to_source?
     end
 
     def source_deliverable?
@@ -106,6 +107,8 @@ module Notifications
     def notification_type_enabled?
       setting = AcademySetting.current
       { "account_invitation" => setting.invitation_notifications_enabled?,
+        "lesson_pre_reminder" => setting.lesson_reminders_enabled?,
+        "lesson_late_reminder" => setting.lesson_reminders_enabled?,
         "lesson_reminder" => setting.lesson_reminders_enabled?,
         "late_reminder" => setting.lesson_reminders_enabled?,
         "lesson_cancelled" => setting.lesson_reminders_enabled?,
@@ -123,7 +126,8 @@ module Notifications
 
     def channel_allowed_for_type?(setting)
       return invitation_channel_allowed?(setting) if @type == "account_invitation"
-      return @channel == "whatsapp" if @type.in?(%w[lesson_reminder late_reminder lesson_cancelled
+      return @channel == "whatsapp" if @type.in?(%w[lesson_pre_reminder lesson_late_reminder lesson_reminder
+                                                     late_reminder lesson_cancelled
                                                      lesson_rescheduled lesson_report])
       return @channel == "email" || (@channel == "whatsapp" && setting.certificate_whatsapp_enabled?) if @type == "certificate"
 
@@ -135,6 +139,12 @@ module Notifications
       return mode.in?(%w[email_only email_and_whatsapp]) if @channel == "email"
 
       mode.in?(%w[whatsapp_only email_and_whatsapp])
+    end
+
+    def lesson_join_url_valid?
+      return true unless @type.in?(%w[lesson_pre_reminder lesson_late_reminder])
+
+      LessonJoinUrlSuffix.call(join_url: @source.online_meeting_join_url).present?
     end
 
     def invitation_token

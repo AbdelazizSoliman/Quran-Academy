@@ -46,6 +46,8 @@ ar:
       account_invitation: "دعوة حساب"
       lesson_reminder: "تذكير بالحلقة"
       late_reminder: "تذكير تأخر الحضور"
+      lesson_pre_reminder: "تذكير الحلقة قبل 15 دقيقة"
+      lesson_late_reminder: "تذكير التأخر عن الحلقة"
       lesson_cancelled: "إلغاء الحلقة"
       lesson_rescheduled: "إعادة جدولة الحلقة"
       lesson_report: "تقرير الحلقة"
@@ -56,6 +58,8 @@ ar:
     messages:
       saved: "تم تسجيل محاولة الإرسال."
       students: "الطلاب المسجلون"
+      counterpart_teacher: "المعلم"
+      counterpart_student: "الطالب"
       account_invitation:
         subject: "دعوة حساب %{academy}"
         body: "السلام عليكم ورحمة الله وبركاته\n\nتم إنشاء حسابك في %{academy}.\n\nلإكمال إنشاء كلمة المرور وتفعيل حسابك، اضغط على الرابط التالي:\n\n%{url}\n\nإذا احتجت أي مساعدة يرجى التواصل مع إدارة الأكاديمية."
@@ -65,6 +69,12 @@ ar:
       late_reminder:
         subject: "تذكير حضور من %{academy}"
         body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nلا يزال حضور حلقة %{title} معلقًا.\nالتاريخ: %{date}\nالوقت: %{time}\nالبرنامج: %{program}\nالدورة: %{course}"
+      lesson_pre_reminder:
+        subject: "تذكير بحلقة %{academy}"
+        body: "تبدأ حلقة القرآن بعد 15 دقيقة.\nالمعلم: %{teacher}\nالطالب: %{student}\nالتاريخ: %{date}\nالوقت: %{time}"
+      lesson_late_reminder:
+        subject: "تذكير تأخر عن حلقة %{academy}"
+        body: "بدأت حلقة القرآن منذ 5 دقائق. يرجى الانضمام الآن.\nالمعلم: %{teacher}\nالطالب: %{student}\nالتاريخ: %{date}\nالوقت: %{time}"
       lesson_cancelled:
         subject: "إلغاء حلقة في %{academy}"
         body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nتم إلغاء الحلقة: %{title}\nالتاريخ: %{date}\nالوقت: %{time}\nالبرنامج: %{program}\nالدورة: %{course}"

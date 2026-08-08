@@ -28,6 +28,7 @@ module Notifications
 
     def source_date
       value = lesson&.starts_at || @source.try(:issued_on)
+      value = value.in_time_zone(lesson.academy_time_zone) if lesson && value.respond_to?(:in_time_zone)
       value ? I18n.l(value.to_date, format: :long) : ""
     end
 
