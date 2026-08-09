@@ -205,6 +205,7 @@ Rails.application.routes.draw do
     resources :availability_exceptions, only: %i[index new create edit update]
     resources :schedule, only: %i[index show] do
       member do
+        get :join
         patch :check_in
         patch :start
         patch :complete
@@ -243,7 +244,9 @@ Rails.application.routes.draw do
     resource :progress, only: :show
     resource :profile, only: %i[show edit update], controller: :profiles
     resources :enrollments, only: %i[index show]
-    resources :schedule, only: %i[index show]
+    resources :schedule, only: %i[index show] do
+      get :join, on: :member
+    end
     resources :attendances, only: %i[index show]
     resources :reports, only: %i[index show]
   end

@@ -12,6 +12,7 @@ ar:
     lessons: { title: "الجدولة", description: "خطط الدروس بتوقيت الأكاديمية مع حفظ المنطقة الزمنية للمعلم." }
     teacher: { availability: "إتاحتي", schedule: "جدولي" }
     student: { schedule: "جدولي", meeting_unavailable: "رابط اللقاء عن بُعد غير متاح لهذه المشاركة. تواصل مع إدارة الأكاديمية إذا كنت تعتقد أنه يجب أن يكون متاحًا لك." }
+    join: { invalid_url: "رابط اللقاء عن بُعد غير متاح أو غير صالح. يرجى التواصل مع إدارة الأكاديمية." }
     empty: { title: "لا توجد سجلات إتاحة", description: "أضف فترة تدريس متكررة للسماح بالجدولة.", lessons_title: "لا توجد دروس مجدولة", lessons_description: "لا توجد دروس في الفترة المحددة." }
     sections: { availability: "الإتاحة المتكررة", exception: "استثناء الإتاحة", lesson: "تفاصيل الدرس", participants: "المشاركون", add_participant: "إضافة مشارك", audit: "سجل التغييرات" }
     actions: { new_availability: "إتاحة جديدة", edit_availability: "تعديل الإتاحة", new_exception: "استثناء جديد", edit_exception: "تعديل الاستثناء", cancel_exception: "إلغاء الاستثناء", new_lesson: "درس جديد", edit_lesson: "تعديل الدرس", schedule: "جدولة", start: "بدء", complete: "إكمال", cancel: "إلغاء الدرس", archive: "أرشفة", reschedule: "إعادة الجدولة", join_online: "الانضمام عن بُعد", add_participant: "إضافة مشارك", save_and_add_participants: "حفظ وإضافة المشاركين" }

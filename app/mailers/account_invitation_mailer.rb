@@ -3,7 +3,9 @@ class AccountInvitationMailer < ApplicationMailer
     @invitation = params[:invitation]
     @user = @invitation.user
     @academy = AcademySetting.current
-    @invitation_url = AccountInvitations::UrlBuilder.call(token: params[:token], locale: @user.preferred_locale)
+    @invitation_url = AccountInvitations::UrlBuilder.call(
+      token: params[:token], locale: @user.preferred_locale, url_options: self.class.default_url_options
+    )
     I18n.with_locale(@user.preferred_locale) do
       mail(to: @user.email, subject: I18n.t("invitations.mailer.subject", academy: @academy.academy_name))
     end

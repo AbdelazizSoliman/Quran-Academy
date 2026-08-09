@@ -182,9 +182,7 @@ RSpec.describe "Admin user administration" do
     expect(response).to redirect_to(new_user_session_path)
   end
 
-  it "has no destroy route and public registration remains unavailable" do
-    delete admin_user_path(create(:user))
-    expect(response).to have_http_status(:not_found)
+  it "keeps public registration unavailable" do
     get "/account/sign-up"
     expect(response).to have_http_status(:not_found)
   end

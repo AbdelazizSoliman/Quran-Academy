@@ -7,16 +7,43 @@ module Student
     end
 
     def show
-      @lesson = current_user.student_profile.scheduled_lessons.operational
-                            .includes(:teacher_profile, :course_offering,
-                                      scheduled_lesson_enrollments: { enrollment: :student_profile })
-                            .find(params.expect(:id))
+      set_lesson
       @participant = expected_participant
     rescue ActiveRecord::RecordNotFound
       head :not_found
     end
 
+    def join
+      set_lesson
+      @participant = expected_participant
+      return head :not_found unless @participant
+
+      join_student_to_meeting
+    rescue ActiveRecord::RecordNotFound
+      head :not_found
+    end
+
     private
+
+    def join_student_to_meeting
+      destination = @lesson.safe_online_meeting_join_url
+      return redirect_to(student_schedule_path(@lesson), alert: t("scheduling.join.invalid_url")) unless destination
+
+      attendance = LessonAttendances::Join.new(actor: current_user, lesson: @lesson,
+                                               participation: @participant).call
+      if attendance.errors.any?
+        return redirect_to(student_schedule_path(@lesson), alert: attendance.errors.full_messages.to_sentence)
+      end
+
+      redirect_to destination, allow_other_host: true
+    end
+
+    def set_lesson
+      @lesson = current_user.student_profile.scheduled_lessons.operational
+                            .includes(:teacher_profile, :course_offering,
+                                      scheduled_lesson_enrollments: { enrollment: :student_profile })
+                            .find(params.expect(:id))
+    end
 
     def expected_participant
       @lesson.scheduled_lesson_enrollments.find do |item|

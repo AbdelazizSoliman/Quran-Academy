@@ -13,6 +13,17 @@ RSpec.describe "Lesson attendance services" do
       .not_to change(ScheduledLessonEvent, :count)
   end
 
+  it "allows teacher check-in at the inclusive 15-minute opening boundary" do
+    AcademySetting.current.update!(teacher_check_in_opens_minutes_before: 15,
+                                   teacher_check_in_closes_minutes_after: 30)
+
+    result = LessonOperations::CheckIn.new(actor: teacher, lesson:,
+                                           occurred_at: lesson.starts_at - 15.minutes).call
+
+    expect(result.errors).to be_empty
+    expect(result.teacher_checked_in_at).to eq(lesson.starts_at - 15.minutes)
+  end
+
   it "requires a reason for administrator check-in override" do
     result = LessonOperations::CheckIn.new(actor: admin, lesson:, override: true).call
     expect(result.errors).to be_present

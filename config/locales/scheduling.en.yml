@@ -22,6 +22,8 @@ en:
     student:
       schedule: "My schedule"
       meeting_unavailable: "The online meeting link is not available for this participation. Contact the academy if you believe you should have access."
+    join:
+      invalid_url: "The online meeting link is unavailable or invalid. Please contact the academy."
     empty:
       title: "No availability records"
       description: "Create a recurring teaching window to make scheduling possible."

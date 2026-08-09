@@ -54,6 +54,14 @@ class ScheduledLesson < ApplicationRecord
     canonical_meeting_url(online_meeting_url)
   end
 
+  def safe_online_meeting_join_url
+    value = online_meeting_join_url
+    uri = URI.parse(value.to_s)
+    value if valid_meeting_uri?(uri)
+  rescue URI::InvalidURIError
+    nil
+  end
+
   STATUSES.each { |value| define_method(:"#{value}?") { status == value } }
 
   private

@@ -21,6 +21,13 @@ module Teacher
       head :not_found
     end
 
+    def join
+      @lesson = owned_lesson
+      join_teacher_to_meeting
+    rescue ActiveRecord::RecordNotFound
+      head :not_found
+    end
+
     def check_in
       operate LessonOperations::CheckIn.new(actor: current_user, lesson: owned_lesson)
     end
@@ -35,6 +42,18 @@ module Teacher
     end
 
     private
+
+    def join_teacher_to_meeting
+      destination = @lesson.safe_online_meeting_join_url
+      return redirect_to(teacher_schedule_path(@lesson), alert: t("scheduling.join.invalid_url")) unless destination
+
+      @lesson = LessonOperations::CheckIn.new(actor: current_user, lesson: @lesson).call
+      if @lesson.errors.any?
+        return redirect_to(teacher_schedule_path(@lesson), alert: @lesson.errors.full_messages.to_sentence)
+      end
+
+      redirect_to destination, allow_other_host: true
+    end
 
     def set_lesson
       @lesson = owned_lesson

@@ -83,7 +83,8 @@ module Notifications
 
     def lesson_reminder_template
       lesson = @notification.source
-      suffix = LessonJoinUrlSuffix.call(join_url: lesson.online_meeting_join_url)
+      join_url = LessonJoinUrlBuilder.call(lesson:, recipient: @notification.recipient_user)
+      suffix = LessonJoinUrlSuffix.call(join_url:)
       return if suffix.blank?
 
       LessonReminderTemplate.call(notification: @notification, url_suffix: suffix)

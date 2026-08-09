@@ -1,8 +1,8 @@
 module AccountInvitations
   class UrlBuilder
-    def self.call(token:, locale:)
+    def self.call(token:, locale:, url_options: Rails.application.config.action_mailer.default_url_options)
       Rails.application.routes.url_helpers.edit_account_invitation_url(
-        token:, locale:, **Rails.application.config.action_mailer.default_url_options
+        token:, locale:, **url_options
       )
     end
   end

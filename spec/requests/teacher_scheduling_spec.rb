@@ -78,6 +78,18 @@ RSpec.describe "Teacher scheduling requests" do
     expect(response.body).to include(lesson.title_ar)
   end
 
+  it "shows the assigned teacher an internal join link without exposing the external URL" do
+    teacher = create(:teacher_profile, :active, :complete, :verified)
+    lesson = create(:scheduled_lesson, :scheduled, teacher_profile: teacher,
+                                                   online_meeting_url: "https://meet.example.test/private-room")
+    sign_in teacher.user
+
+    get teacher_schedule_path(lesson)
+
+    expect(response.body).to include(join_teacher_schedule_path(lesson))
+    expect(response.body).not_to include("https://meet.example.test/private-room")
+  end
+
   it "allows a teacher to create their own availability" do
     teacher = create(:teacher_profile, :active, :complete, :verified)
     sign_in teacher.user
@@ -117,7 +129,7 @@ RSpec.describe "Teacher scheduling requests" do
     expect(response).to have_http_status(:ok)
   end
 
-  it "shows the online meeting link to an expected student participant" do
+  it "shows the internal join link without exposing the external meeting URL" do
     student = create(:student_profile, :complete)
     lesson = create(:scheduled_lesson, :scheduled, online_meeting_url: "https://meet.example.test/quran")
     enrollment = create(:enrollment, :active, student_profile: student, course_offering: lesson.course_offering)
@@ -127,7 +139,8 @@ RSpec.describe "Teacher scheduling requests" do
     get student_schedule_path(lesson)
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("https://meet.example.test/quran")
+    expect(response.body).to include(join_student_schedule_path(lesson))
+    expect(response.body).not_to include("https://meet.example.test/quran")
   end
 
   it "does not expose destroy routes" do

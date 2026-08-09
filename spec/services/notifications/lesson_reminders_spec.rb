@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Attendance-aware WhatsApp lesson reminders" do
+RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
   include ActiveSupport::Testing::TimeHelpers
 
   let(:admin) { create(:user, :admin) }
@@ -19,7 +19,7 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders" do
       "WHATSAPP_GRAPH_API_VERSION" => "v23.0",
       "WHATSAPP_LESSON_REMINDER_TEMPLATE" => "quran_lesson_reminder",
       "WHATSAPP_LESSON_REMINDER_LANGUAGE" => "en_US",
-      "WHATSAPP_LESSON_JOIN_URL_PREFIX" => "https://meet.example.test/lesson/"
+      "WHATSAPP_LESSON_JOIN_URL_PREFIX" => "http://example.com/"
     }
   end
 
@@ -132,7 +132,10 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders" do
                      "Teacher", lesson.teacher_profile.display_name, "Your lesson starts in 15 minutes."]
     expect(body_texts(student_delivery)).to eq(expected_body)
     expect(body_texts(teacher_delivery).last).to eq("Your lesson starts in 15 minutes.")
-    expect(student_delivery.dig(:template, :components, 1, :parameters, 0, :text)).to eq("abc123")
+    student_suffix = student_delivery.dig(:template, :components, 1, :parameters, 0, :text)
+    teacher_suffix = teacher_delivery.dig(:template, :components, 1, :parameters, 0, :text)
+    expect(student_suffix).to eq("student/schedule/#{lesson.id}/join")
+    expect(teacher_suffix).to eq("teacher/schedule/#{lesson.id}/join")
   end
 
   it "uses the late context in the same template" do
@@ -143,10 +146,26 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders" do
     end)
   end
 
-  it "safely skips a missing or prefix-mismatched join URL" do
-    lesson_with_student(starts_at: now + 15.minutes, join_url: "https://other.example.test/abc123")
+  it "safely skips a missing external meeting URL" do
+    lesson, = lesson_with_student(starts_at: now + 15.minutes)
+    lesson.update_column(:online_meeting_url, nil) # rubocop:disable Rails/SkipsModelValidations -- corrupt data
     expect { pre_sweep }.not_to change(Notification, :count)
     expect(deliveries).to be_empty
+  end
+
+  it "skips a student late reminder after the student uses the internal join route" do
+    lesson, participation = lesson_with_student(starts_at: now - 5.minutes, teacher_joined: true)
+    sign_in participation.enrollment.student_profile.user
+    get join_student_schedule_path(lesson)
+    expect { late_sweep }.not_to change(Notification, :count)
+  end
+
+  it "skips a teacher late reminder after the teacher uses the internal join route" do
+    lesson, participation = lesson_with_student(starts_at: now - 5.minutes)
+    create_attendance(participation, status: "present", arrival_at: now - 1.minute)
+    sign_in lesson.teacher_profile.user
+    get join_teacher_schedule_path(lesson)
+    expect { late_sweep }.not_to change(Notification, :count)
   end
 
   it "safely skips when WhatsApp is disabled at the environment kill switch" do

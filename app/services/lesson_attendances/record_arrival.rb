@@ -1,9 +1,10 @@
 module LessonAttendances
   class RecordArrival < Mutation
-    def initialize(actor:, attendance:, occurred_at: nil, adjustment_reason: nil)
+    def initialize(actor:, attendance:, occurred_at: nil, adjustment_reason: nil, allow_scheduled: false)
       super(actor:, attendance:)
       @occurred_at = occurred_at || Time.current
       @adjustment_reason = adjustment_reason
+      @allow_scheduled = allow_scheduled
     end
 
     def call!
@@ -18,6 +19,12 @@ module LessonAttendances
     end
 
     private
+
+    def ensure_editable!
+      return if @allow_scheduled && @lesson.scheduled?
+
+      super
+    end
 
     def reject_unadjusted_overwrite!
       return unless @attendance.arrival_at? && @adjustment_reason.blank?

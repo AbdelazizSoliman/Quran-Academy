@@ -144,7 +144,10 @@ module Notifications
     def lesson_join_url_valid?
       return true unless @type.in?(%w[lesson_pre_reminder lesson_late_reminder])
 
-      LessonJoinUrlSuffix.call(join_url: @source.online_meeting_join_url).present?
+      return false unless @source.safe_online_meeting_join_url
+
+      join_url = LessonJoinUrlBuilder.call(lesson: @source, recipient: @recipient)
+      LessonJoinUrlSuffix.call(join_url:).present?
     end
 
     def invitation_token
