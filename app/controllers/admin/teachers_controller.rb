@@ -25,6 +25,7 @@ module Admin
 
     def show
       @events = @profile.events.includes(:actor).recent_first.limit(20)
+      @availabilities = @profile.availabilities.visible.chronological
     end
 
     def new
@@ -75,7 +76,10 @@ module Admin
         redirect_to admin_teacher_path(@profile), notice: t("teachers.messages.#{message}"), status: :see_other
       else
         template = action_name == "update" ? :edit : :show
-        @events = @profile.events.includes(:actor).recent_first.limit(20) if template == :show
+        if template == :show
+          @events = @profile.events.includes(:actor).recent_first.limit(20)
+          @availabilities = @profile.availabilities.visible.chronological
+        end
         render template, status: :unprocessable_content
       end
     end

@@ -76,6 +76,21 @@ RSpec.describe "Admin teacher profiles" do
     expect(response.body).not_to include(profile.teaching_languages.inspect, "translation missing")
   end
 
+  it "shows the teacher's recurring availability and a preselected creation link" do
+    profile = create(:teacher_profile, user: teacher_user, employment_status: "active")
+    availability = create(
+      :teacher_availability, teacher_profile: profile, weekday: "monday",
+                             starts_at_local: "09:00", ends_at_local: "12:00"
+    )
+    sign_in admin
+    get admin_teacher_path(profile)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("الإتاحة المتكررة", "الاثنين", "09:00", "12:00", availability.time_zone)
+    expect(response.body).to include(admin_teacher_availability_path(availability))
+    expect(response.body).to include(new_admin_teacher_availability_path(teacher_profile_id: profile.id))
+  end
+
   it "updates profile fields but protects ownership, public ID, status, and audit metadata" do
     profile = create(:teacher_profile, user: teacher_user)
     original_id = profile.public_id

@@ -59,6 +59,39 @@
 </div>
 
 <div class="mt-6">
+  <% availability = capture do %>
+    <% if @availabilities.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead><tr class="border-b border-app-border">
+            <% %i[weekday time time_zone effective_from effective_until availability_type status].each do |field| %>
+              <th class="px-3 py-2 text-start"><%= t("scheduling.fields.#{field}") %></th>
+            <% end %>
+          </tr></thead>
+          <tbody class="divide-y divide-app-border">
+            <% @availabilities.each do |item| %>
+              <tr>
+                <td class="px-3 py-3"><%= link_to t("scheduling.catalogs.weekdays.#{item.weekday}"), admin_teacher_availability_path(item), class: "font-semibold text-app-primary hover:underline" %></td>
+                <td class="px-3 py-3" dir="ltr"><%= item.starts_at_local.strftime("%H:%M") %>–<%= item.ends_at_local.strftime("%H:%M") %></td>
+                <td class="px-3 py-3"><%= item.time_zone %></td>
+                <td class="px-3 py-3"><%= item.effective_from %></td>
+                <td class="px-3 py-3"><%= item.effective_until || t("scheduling.not_configured") %></td>
+                <td class="px-3 py-3"><%= t("scheduling.catalogs.availability_types.#{item.availability_type}") %></td>
+                <td class="px-3 py-3"><%= t("scheduling.catalogs.statuses.#{item.status}") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <%= render "shared/components/empty_state", icon: :calendar, title: t("scheduling.empty.title"), description: t("scheduling.empty.description") %>
+    <% end %>
+  <% end %>
+  <%= render "shared/components/card", title: t("scheduling.sections.availability"), body: availability,
+             header_action: render("shared/components/button", label: t("scheduling.actions.new_availability"), href: new_admin_teacher_availability_path(teacher_profile_id: @profile.id), variant: :secondary) %>
+</div>
+
+<div class="mt-6">
   <% actions = capture do %><div class="flex flex-wrap gap-3">
     <% actions = @profile.archived? ? %i[restore] : %i[verify archive] %>
     <% actions.each do |action| %>
