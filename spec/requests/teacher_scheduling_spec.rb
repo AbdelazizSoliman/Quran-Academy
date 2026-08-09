@@ -37,6 +37,19 @@ RSpec.describe "Teacher scheduling requests" do
     expect(response.body).to include(participant.enrollment.student_profile.display_name)
   end
 
+  it "labels the lesson URL as an optional override and shows the assigned teacher default on edit" do
+    teacher = create(:teacher_profile, :active, :verified,
+                     online_meeting_url: "https://meet.example.test/teacher-default")
+    lesson = create(:scheduled_lesson, teacher_profile: teacher, online_meeting_url: nil)
+    sign_in admin
+
+    get edit_admin_scheduled_lesson_path(lesson)
+
+    expect(response.body).to include(I18n.t("scheduling.fields.online_meeting_url", locale: :ar))
+    expect(response.body).to include(I18n.t("scheduling.online_meeting_url_override_hint", locale: :ar))
+    expect(response.body).to include("https://meet.example.test/teacher-default")
+  end
+
   it "renders participants when scheduling validation fails" do
     lesson = create(:scheduled_lesson)
     participant = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)

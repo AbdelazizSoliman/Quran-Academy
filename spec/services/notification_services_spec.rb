@@ -97,6 +97,8 @@ RSpec.describe "Notification services" do
                                    second_late_reminder_minutes: 20)
     allow(Notifications::WhatsappConfiguration).to receive(:lesson_reminders_ready?).and_return(true)
     allow(Notifications::LessonJoinUrlSuffix).to receive(:call).and_return("lesson")
+    allow(ENV).to receive(:fetch).and_call_original
+    allow(ENV).to receive(:fetch).with("WHATSAPP_LESSON_REMINDER_LANGUAGE").and_return("en")
   end
 
   def stub_whatsapp_success

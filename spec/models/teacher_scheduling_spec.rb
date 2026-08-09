@@ -46,6 +46,49 @@ RSpec.describe TeacherScheduling do
       expect(lesson).not_to be_valid
     end
 
+    it "resolves a lesson override before the teacher default" do
+      teacher = build(:teacher_profile, online_meeting_url: "https://meet.example.test/teacher")
+      lesson = build(:scheduled_lesson, teacher_profile: teacher,
+                                        online_meeting_url: "https://meet.example.test/lesson")
+
+      expect(lesson.effective_online_meeting_url).to eq("https://meet.example.test/lesson")
+    end
+
+    it "falls back to the teacher default and returns nil when both URLs are blank" do
+      teacher = build(:teacher_profile, online_meeting_url: "https://meet.example.test/teacher")
+      lesson = build(:scheduled_lesson, teacher_profile: teacher, online_meeting_url: nil)
+      expect(lesson.effective_online_meeting_url).to eq("https://meet.example.test/teacher")
+
+      teacher.online_meeting_url = nil
+      expect(lesson.effective_online_meeting_url).to be_nil
+    end
+
+    it "allows an online lesson with a teacher default but rejects one with no usable URL" do
+      teacher = build(:teacher_profile, online_meeting_url: "https://meet.example.test/teacher")
+      expect(build(:scheduled_lesson, :scheduled, teacher_profile: teacher, online_meeting_url: nil)).to be_valid
+
+      teacher.online_meeting_url = nil
+      expect(build(:scheduled_lesson, :scheduled, teacher_profile: teacher, online_meeting_url: nil)).not_to be_valid
+    end
+
+    it "leaves onsite lesson URL validation requirements unchanged" do
+      lesson = build(:scheduled_lesson, :scheduled, delivery_mode: "onsite", location_name: "Room 1",
+                                                online_meeting_url: nil)
+      expect(lesson).to be_valid
+    end
+
+    it "dynamically follows teacher changes only when there is no lesson override" do
+      teacher = create(:teacher_profile, online_meeting_url: "https://meet.example.test/original")
+      inherited = create(:scheduled_lesson, teacher_profile: teacher, online_meeting_url: nil)
+      overridden = create(:scheduled_lesson, teacher_profile: teacher,
+                                             online_meeting_url: "https://meet.example.test/lesson")
+
+      teacher.update!(online_meeting_url: "https://meet.example.test/replacement")
+
+      expect(inherited.reload.effective_online_meeting_url).to eq("https://meet.example.test/replacement")
+      expect(overridden.reload.effective_online_meeting_url).to eq("https://meet.example.test/lesson")
+    end
+
     it "requires participants to belong to the same offering" do
       lesson = create(:scheduled_lesson)
       participant = build(:scheduled_lesson_enrollment, scheduled_lesson: lesson)

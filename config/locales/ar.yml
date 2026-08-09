@@ -528,6 +528,7 @@ ar:
       emergency: "جهة اتصال الطوارئ"
       employment: "العمل"
       compensation: "إعدادات التعويض الافتراضية"
+      meeting: "الاجتماع عبر الإنترنت"
       administration: "المعلومات الإدارية"
       completeness: "اكتمال الملف"
       audit: "سجل التغييرات"
@@ -545,6 +546,7 @@ ar:
       city: "المدينة"
       phone_number: "رقم الهاتف"
       whatsapp_number: "رقم واتساب"
+      online_meeting_url: "رابط الاجتماع الافتراضي عبر الإنترنت"
       emergency_contact_name: "اسم جهة اتصال الطوارئ"
       emergency_contact_phone: "هاتف جهة اتصال الطوارئ"
       highest_qualification: "أعلى مؤهل"
@@ -575,6 +577,7 @@ ar:
       errors_title: "يرجى تصحيح أخطاء الملف"
       select_teacher: "اختر حساب معلّم مؤهلاً"
       compensation_hint: "قيم افتراضية فقط؛ لا يتم احتساب رواتب أو تنفيذ مدفوعات."
+      online_meeting_url_hint: "سيُستخدم هذا الرابط تلقائيًا لدروس هذا المعلّم عبر الإنترنت ما لم يُحدد رابط خاص للدرس."
     completeness:
       value: "مكتمل بنسبة %{value}%"
       missing: "المطلوب استكماله: %{fields}"

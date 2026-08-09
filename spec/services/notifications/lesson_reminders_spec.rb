@@ -158,6 +158,22 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     end)
   end
 
+  it "keeps the internal join route in WhatsApp when the teacher supplies the meeting URL" do
+    lesson, = lesson_with_student(starts_at: now + 15.minutes)
+    external_url = "https://meet.example.test/teacher-private"
+    lesson.teacher_profile.update!(online_meeting_url: external_url)
+    lesson.update_column(:online_meeting_url, nil) # rubocop:disable Rails/SkipsModelValidations -- inherited URL
+
+    pre_sweep
+
+    expect(deliveries).not_to be_empty
+    deliveries.each do |delivery|
+      suffix = delivery.dig(:template, :components, 1, :parameters, 0, :text)
+      expect(suffix).to match(%r{\A(?:student|teacher)/schedule/#{lesson.id}/join\z})
+      expect(delivery.to_s).not_to include(external_url)
+    end
+  end
+
   it "safely skips a missing external meeting URL" do
     lesson, = lesson_with_student(starts_at: now + 15.minutes)
     lesson.update_column(:online_meeting_url, nil) # rubocop:disable Rails/SkipsModelValidations -- corrupt data

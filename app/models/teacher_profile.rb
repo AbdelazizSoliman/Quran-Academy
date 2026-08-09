@@ -31,6 +31,7 @@ class TeacherProfile < ApplicationRecord
 
   before_validation :apply_academy_defaults, on: :create
   before_validation :normalize_values
+  before_validation :normalize_online_meeting_url
   before_validation :generate_public_id, on: :create
 
   validates :public_id, presence: true, uniqueness: true, format: { with: /\ATCH-[A-Z0-9]{10}\z/ }
@@ -50,6 +51,7 @@ class TeacherProfile < ApplicationRecord
   validates :default_lesson_rate, :monthly_salary, numericality: { greater_than_or_equal_to: 0 }
   validates :phone_number, :whatsapp_number, :emergency_contact_phone,
             length: { maximum: 30 }, allow_blank: true
+  validate :online_meeting_url_format
   validate :user_must_be_teacher
   validate :controlled_arrays
   validate :quran_experience_not_above_total
@@ -59,6 +61,7 @@ class TeacherProfile < ApplicationRecord
   validate :complete_profile_readiness
 
   scope :recent_first, -> { order(created_at: :desc, id: :desc) }
+  scope :available_for_scheduling, -> { where(employment_status: "active").where.not(profile_status: "archived") }
 
   PROFILE_STATUSES.each { |value| define_method(:"#{value}?") { profile_status == value } }
   EMPLOYMENT_STATUSES.each { |value| define_method(:"#{value}?") { employment_status == value } }
@@ -78,7 +81,19 @@ class TeacherProfile < ApplicationRecord
     missing_required_fields.empty?
   end
 
+  def safe_online_meeting_url = OnlineMeetingUrl.safe(online_meeting_url)
+
   private
+
+  def normalize_online_meeting_url
+    self.online_meeting_url = OnlineMeetingUrl.normalize(online_meeting_url) if online_meeting_url.present?
+  end
+
+  def online_meeting_url_format
+    return if online_meeting_url.blank? || OnlineMeetingUrl.valid?(online_meeting_url)
+
+    errors.add(:online_meeting_url, :invalid_url)
+  end
 
   def apply_academy_defaults
     settings = AcademySetting.current

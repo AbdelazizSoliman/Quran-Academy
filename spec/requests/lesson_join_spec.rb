@@ -31,6 +31,17 @@ RSpec.describe "Role-aware lesson join" do
       expect(attendance.reload.arrival_at).to be_within(1.second).of(lesson.starts_at)
     end
 
+    it "falls back to the teacher default and records arrival before redirecting" do
+      lesson, participation = student_lesson(online_meeting_url: nil,
+                                             teacher_url: "https://meet.example.test/teacher-default")
+      sign_in participation.enrollment.student_profile.user
+
+      travel_to(lesson.starts_at) { get join_student_schedule_path(lesson) }
+
+      expect(response).to redirect_to("https://meet.example.test/teacher-default")
+      expect(participation.reload.lesson_attendance.arrival_at).to be_within(1.second).of(lesson.starts_at)
+    end
+
     it "does not allow another student to join or record presence" do
       lesson, participation = student_lesson
       sign_in create(:student_profile, :complete).user
@@ -51,6 +62,18 @@ RSpec.describe "Role-aware lesson join" do
         expect(response).to redirect_to(student_schedule_path(lesson))
         expect(flash[:alert]).to eq(I18n.t("scheduling.join.invalid_url", locale: student_user.preferred_locale))
       end
+    end
+
+    it "fails safely without recording arrival when only an unsafe teacher default exists" do
+      lesson, participation = student_lesson
+      lesson.update_column(:online_meeting_url, nil) # rubocop:disable Rails/SkipsModelValidations -- invalid state
+      lesson.teacher_profile.update_column( # rubocop:disable Rails/SkipsModelValidations -- invalid state
+        :online_meeting_url, "javascript:alert(1)"
+      )
+      sign_in participation.enrollment.student_profile.user
+
+      expect { get join_student_schedule_path(lesson) }.not_to change(LessonAttendance, :count)
+      expect(response).to redirect_to(student_schedule_path(lesson))
     end
   end
 
@@ -78,6 +101,17 @@ RSpec.describe "Role-aware lesson join" do
       expect(lesson.reload.teacher_checked_in_at).to be_within(1.second).of(lesson.starts_at)
     end
 
+    it "falls back to the assigned teacher's default and checks in before redirecting" do
+      lesson = teacher_lesson(online_meeting_url: nil,
+                              teacher_url: "https://meet.example.test/teacher-default")
+      sign_in lesson.teacher_profile.user
+
+      travel_to(lesson.starts_at) { get join_teacher_schedule_path(lesson) }
+
+      expect(response).to redirect_to("https://meet.example.test/teacher-default")
+      expect(lesson.reload.teacher_checked_in_at).to be_within(1.second).of(lesson.starts_at)
+    end
+
     it "denies a teacher who is not assigned to the lesson" do
       lesson = teacher_lesson
       other_teacher = create(:teacher_profile, :active, :verified)
@@ -102,19 +136,34 @@ RSpec.describe "Role-aware lesson join" do
         expect(lesson.reload.teacher_checked_in_at).to be_nil
       end
     end
+
+    it "fails safely without checking in when both lesson and teacher URLs are missing" do
+      lesson = teacher_lesson
+      lesson.update_column(:online_meeting_url, nil) # rubocop:disable Rails/SkipsModelValidations -- invalid state
+      sign_in lesson.teacher_profile.user
+
+      get join_teacher_schedule_path(lesson)
+
+      expect(response).to redirect_to(teacher_schedule_path(lesson))
+      expect(lesson.reload.teacher_checked_in_at).to be_nil
+    end
   end
 
   private
 
-  def student_lesson(online_meeting_url: "https://meet.example.test/room")
+  def student_lesson(online_meeting_url: "https://meet.example.test/room", teacher_url: nil)
+    teacher = create(:teacher_profile, :active, :verified, online_meeting_url: teacher_url)
     lesson = create(:scheduled_lesson, :scheduled, starts_at: 5.minutes.from_now,
-                                                   ends_at: 50.minutes.from_now, online_meeting_url:)
+                                                   ends_at: 50.minutes.from_now, online_meeting_url:,
+                                                   teacher_profile: teacher)
     enrollment = create(:enrollment, :active, course_offering: lesson.course_offering)
     participation = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson, enrollment:)
     [lesson, participation]
   end
 
-  def teacher_lesson
-    create(:scheduled_lesson, :scheduled, starts_at: 5.minutes.from_now, ends_at: 50.minutes.from_now)
+  def teacher_lesson(online_meeting_url: "https://example.test/lesson", teacher_url: nil)
+    teacher = create(:teacher_profile, :active, :verified, online_meeting_url: teacher_url)
+    create(:scheduled_lesson, :scheduled, starts_at: 5.minutes.from_now, ends_at: 50.minutes.from_now,
+                                          online_meeting_url:, teacher_profile: teacher)
   end
 end

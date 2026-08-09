@@ -9,6 +9,7 @@
       <div><%= f.label :email, "البريد الإلكتروني *", class: "ds-label" %><%= f.email_field :email, value: params.dig(:teacher_profile, :email), required: true, class: "ds-control mt-2", dir: "ltr" %></div>
       <div><%= f.label :phone_number, "رقم الهاتف *", class: "ds-label" %><%= f.telephone_field :phone_number, required: true, class: "ds-control mt-2", dir: "ltr" %></div>
       <div><%= f.label :whatsapp_number, "رقم واتساب", class: "ds-label" %><%= f.telephone_field :whatsapp_number, class: "ds-control mt-2", dir: "ltr" %></div>
+      <div class="md:col-span-2"><%= f.label :online_meeting_url, t("teacher_profiles.fields.online_meeting_url"), class: "ds-label" %><%= f.url_field :online_meeting_url, class: "ds-control mt-2", dir: "ltr" %><p class="mt-2 ds-caption"><%= t("teacher_profiles.form.online_meeting_url_hint") %></p></div>
       <div><%= f.label :notification_method, "طريقة الإشعار", class: "ds-label" %><%= f.select :notification_method, [["واتساب (الأساسي)", "whatsapp"], ["البريد", "email"], ["كلاهما", "both"]], {}, class: "ds-control mt-2" %></div>
       <div><%= f.label :message_language, "لغة الرسائل", class: "ds-label" %><%= f.select :message_language, [["العربية", "ar"], ["English", "en"]], {}, class: "ds-control mt-2" %></div>
     </div>

@@ -92,6 +92,15 @@
 
   <% if admin_mode %>
     <fieldset class="ds-card p-5">
+      <legend class="ds-section-title"><%= t("teacher_profiles.sections.meeting") %></legend>
+      <div class="mt-4">
+        <%= form.label :online_meeting_url, t("teacher_profiles.fields.online_meeting_url"), class: "ds-label" %>
+        <%= form.url_field :online_meeting_url, class: "ds-control mt-2", dir: "ltr", aria: { invalid: profile.errors[:online_meeting_url].any? } %>
+        <p class="mt-2 ds-caption"><%= t("teacher_profiles.form.online_meeting_url_hint") %></p>
+      </div>
+    </fieldset>
+
+    <fieldset class="ds-card p-5">
       <legend class="ds-section-title"><%= t("teacher_profiles.sections.employment") %></legend>
       <div class="mt-4 grid gap-5 sm:grid-cols-2">
         <% { employment_status: TeacherProfile::EMPLOYMENT_STATUSES, engagement_type: TeacherProfile::ENGAGEMENT_TYPES }.each do |field, values| %>

@@ -3,7 +3,7 @@ module Admin
     before_action :set_profile, except: %i[index new create]
 
     ONBOARDING_KEYS = [
-      :first_name, :last_name, :email, :display_name, :phone_number, :whatsapp_number,
+      :first_name, :last_name, :email, :display_name, :phone_number, :whatsapp_number, :online_meeting_url,
       :notification_method, :message_language, :employment_status, :workload_percentage, :on_leave,
       :work_start_time, :work_end_time, :compensation_unit, :default_lesson_rate, :monthly_salary,
       :compensation_currency, :mid_period_previous_dues, { work_days: [] }
@@ -11,7 +11,7 @@ module Admin
 
     UPDATE_KEYS = [
       :display_name, :bio, :gender, :date_of_birth, :nationality, :country_of_residence, :city,
-      :phone_number, :whatsapp_number, :emergency_contact_name, :emergency_contact_phone,
+      :phone_number, :whatsapp_number, :online_meeting_url, :emergency_contact_name, :emergency_contact_phone,
       :highest_qualification, :qualification_details, :years_of_teaching_experience,
       :quran_teaching_experience_years, :tajweed_qualification, :ijazah_status, :ijazah_details,
       :employment_status, :engagement_type, :joined_on, :left_on, :default_lesson_rate,

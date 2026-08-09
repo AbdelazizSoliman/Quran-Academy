@@ -2,7 +2,7 @@ module TeacherProfiles
   class Operation
     ADMIN_FIELDS = %w[
       display_name bio gender date_of_birth nationality country_of_residence city phone_number
-      whatsapp_number emergency_contact_name emergency_contact_phone highest_qualification
+      whatsapp_number online_meeting_url emergency_contact_name emergency_contact_phone highest_qualification
       qualification_details years_of_teaching_experience quran_teaching_experience_years
       tajweed_qualification ijazah_status ijazah_details teaching_languages student_age_groups
       teaching_specializations employment_status engagement_type joined_on left_on
@@ -18,14 +18,18 @@ module TeacherProfiles
       teaching_specializations
     ].freeze
     COMPENSATION_FIELDS = %w[default_lesson_rate compensation_currency compensation_unit].freeze
+    REDACTED_FIELDS = %w[online_meeting_url].freeze
 
     private
 
     def audited_changes(profile, fields)
-      profile.changes.slice(*fields).transform_values do |before, after|
-        { "from" => serialized(before), "to" => serialized(after) }
+      profile.changes.slice(*fields).to_h do |field, (before, after)|
+        values = REDACTED_FIELDS.include?(field) ? [redacted(before), redacted(after)] : [before, after]
+        [field, { "from" => serialized(values.first), "to" => serialized(values.last) }]
       end
     end
+
+    def redacted(value) = value.present? ? "[FILTERED]" : value
 
     def serialized(value)
       value.is_a?(BigDecimal) ? value.to_s("F") : value

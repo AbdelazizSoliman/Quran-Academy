@@ -528,6 +528,7 @@ en:
       emergency: "Emergency contact"
       employment: "Employment"
       compensation: "Compensation defaults"
+      meeting: "Online meeting"
       administration: "Administrative information"
       completeness: "Profile completeness"
       audit: "Audit history"
@@ -545,6 +546,7 @@ en:
       city: "City"
       phone_number: "Phone number"
       whatsapp_number: "WhatsApp number"
+      online_meeting_url: "Default online meeting URL"
       emergency_contact_name: "Emergency contact name"
       emergency_contact_phone: "Emergency contact phone"
       highest_qualification: "Highest qualification"
@@ -575,6 +577,7 @@ en:
       errors_title: "Please correct the profile errors"
       select_teacher: "Select an eligible teacher account"
       compensation_hint: "Defaults only; no payroll calculation or payment is performed."
+      online_meeting_url_hint: "This link will be used automatically for this teacher's online lessons unless a lesson-specific link is provided."
     completeness:
       value: "%{value}% complete"
       missing: "Still needed: %{fields}"

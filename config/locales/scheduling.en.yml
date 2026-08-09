@@ -32,6 +32,8 @@ en:
     sections: { availability: "Recurring availability", exception: "Availability exception", lesson: "Lesson details", participants: "Participants", add_participant: "Add participant", audit: "Audit history" }
     actions: { new_availability: "New availability", edit_availability: "Edit availability", new_exception: "New exception", edit_exception: "Edit exception", cancel_exception: "Cancel exception", new_lesson: "New lesson", edit_lesson: "Edit lesson", schedule: "Schedule", start: "Start", complete: "Complete", cancel: "Cancel lesson", archive: "Archive", reschedule: "Reschedule", join_online: "Join online", add_participant: "Add participant", save_and_add_participants: "Save and add participants" }
     participants_creation_hint: "First save the lesson and its course offering. You will then choose participating students from approved, active, or paused enrollments in that offering."
+    online_meeting_url_override_hint: "Meeting URL override: leave blank to use the assigned teacher's default meeting link."
+    teacher_default_meeting_url: "Teacher default: %{url}"
     no_eligible_participants: "No eligible students remain for this lesson. Confirm that students are enrolled in this course offering with an approved, active, or paused enrollment."
     fields:
       teacher: "Teacher"
@@ -55,7 +57,7 @@ en:
       title_en: "English title"
       delivery_mode: "Delivery mode"
       location_name: "Location"
-      online_meeting_url: "Online meeting URL"
+      online_meeting_url: "Meeting URL override"
       enrollment: "Enrollment"
       from: "From"
       to: "To"

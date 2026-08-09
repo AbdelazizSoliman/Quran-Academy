@@ -89,4 +89,17 @@ RSpec.describe TeacherProfile do
     expect(profile.user.update(role: :staff)).to be(false)
     expect(profile.user.errors[:role]).to be_present
   end
+
+  it "accepts blank and absolute HTTP or HTTPS default meeting URLs" do
+    expect(build(:teacher_profile, online_meeting_url: nil)).to be_valid
+    expect(build(:teacher_profile, online_meeting_url: "https://meet.example.test/teacher")).to be_valid
+    expect(build(:teacher_profile, online_meeting_url: "http://meet.example.test/teacher")).to be_valid
+  end
+
+  it "rejects unsafe default meeting URLs and embedded userinfo" do
+    %w[javascript:alert(1) data:text/plain,meeting file:///tmp/meeting
+       https://user:password@meet.example.test/teacher].each do |url|
+      expect(build(:teacher_profile, online_meeting_url: url)).not_to be_valid
+    end
+  end
 end

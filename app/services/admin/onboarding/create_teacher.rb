@@ -2,7 +2,8 @@ module Admin
   module Onboarding
     class CreateTeacher
       PROFILE_KEYS = %i[
-        display_name phone_number whatsapp_number notification_method message_language employment_status
+        display_name phone_number whatsapp_number online_meeting_url notification_method message_language
+        employment_status
         workload_percentage on_leave work_days work_start_time work_end_time compensation_unit default_lesson_rate
         monthly_salary compensation_currency mid_period_previous_dues engagement_type joined_on teaching_languages
         student_age_groups teaching_specializations

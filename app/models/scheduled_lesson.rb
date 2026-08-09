@@ -51,16 +51,11 @@ class ScheduledLesson < ApplicationRecord
   def unresolved_attendance_count = lesson_attendances.unresolved.count
 
   def online_meeting_join_url
-    canonical_meeting_url(online_meeting_url)
+    OnlineMeetingUrl.normalize(effective_online_meeting_url)
   end
 
-  def safe_online_meeting_join_url
-    value = online_meeting_join_url
-    uri = URI.parse(value.to_s)
-    value if valid_meeting_uri?(uri)
-  rescue URI::InvalidURIError
-    nil
-  end
+  def effective_online_meeting_url = online_meeting_url.presence || teacher_profile&.online_meeting_url
+  def safe_online_meeting_join_url = OnlineMeetingUrl.safe(effective_online_meeting_url)
 
   STATUSES.each { |value| define_method(:"#{value}?") { status == value } }
 
@@ -71,7 +66,7 @@ class ScheduledLesson < ApplicationRecord
   end
 
   def normalize_online_meeting_url
-    self.online_meeting_url = online_meeting_join_url if online_meeting_url.present?
+    self.online_meeting_url = OnlineMeetingUrl.normalize(online_meeting_url) if online_meeting_url.present?
   end
 
   def generate_public_id
@@ -91,36 +86,15 @@ class ScheduledLesson < ApplicationRecord
   end
 
   def delivery_requirements
-    errors.add(:online_meeting_url, :required) if delivery_mode.in?(%w[online hybrid]) && online_meeting_url.blank?
+    if delivery_mode.in?(%w[online hybrid]) && safe_online_meeting_join_url.blank?
+      errors.add(:online_meeting_url, :required)
+    end
     errors.add(:location_name, :required) if delivery_mode.in?(%w[onsite hybrid]) && location_name.blank?
   end
 
   def online_meeting_url_format
     return if online_meeting_url.blank?
 
-    uri = URI.parse(online_meeting_url)
-    errors.add(:online_meeting_url, :invalid_url) unless valid_meeting_uri?(uri)
-  rescue URI::InvalidURIError
-    errors.add(:online_meeting_url, :invalid_url)
-  end
-
-  def valid_meeting_uri?(uri)
-    http_uri?(uri) && !embedded_or_concatenated_url?(uri)
-  end
-
-  def http_uri?(uri)
-    uri.is_a?(URI::HTTP) && uri.host.present? && uri.userinfo.nil?
-  end
-
-  def embedded_or_concatenated_url?(uri)
-    online_meeting_url.match?(%r{https?//}i) || uri.path.to_s.start_with?("//")
-  end
-
-  def canonical_meeting_url(value)
-    normalized = value.to_s.strip.gsub(%r{(https?)//}i, '\\1://')
-    scheme_positions = normalized.enum_for(:scan, %r{https?://}i).map { Regexp.last_match.begin(0) }
-    return normalized if scheme_positions.empty?
-
-    normalized[scheme_positions.last..]
+    errors.add(:online_meeting_url, :invalid_url) unless OnlineMeetingUrl.valid?(online_meeting_url)
   end
 end

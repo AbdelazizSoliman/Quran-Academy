@@ -54,6 +54,37 @@ RSpec.describe "Admin teacher profiles" do
     expect(profile.events.pluck(:event_type)).to eq(%w[created])
   end
 
+  it "stores a default meeting URL during onboarding and exposes the field for editing" do
+    sign_in admin
+    post admin_teachers_path, params: {
+      teacher_profile: {
+        first_name: "Meeting", last_name: "Teacher", email: "meeting.teacher@example.test",
+        display_name: "Meeting Teacher", employment_status: "active",
+        online_meeting_url: "https://meet.example.test/fixed-room"
+      }
+    }
+
+    profile = TeacherProfile.find_by!(display_name: "Meeting Teacher")
+    expect(profile.online_meeting_url).to eq("https://meet.example.test/fixed-room")
+
+    get edit_admin_teacher_path(profile)
+    expect(response.body).to include("teacher_profile_online_meeting_url",
+                                     I18n.t("teacher_profiles.form.online_meeting_url_hint", locale: :ar))
+  end
+
+  it "redacts the complete meeting URL from teacher profile audit metadata" do
+    profile = create(:teacher_profile, user: teacher_user)
+    sign_in admin
+
+    patch admin_teacher_path(profile), params: {
+      teacher_profile: valid_attributes.merge(online_meeting_url: "https://meet.example.test/secret?token=value")
+    }
+
+    expect(profile.reload.online_meeting_url).to eq("https://meet.example.test/secret?token=value")
+    expect(profile.events.last.metadata.to_s).to include("[FILTERED]")
+    expect(profile.events.last.metadata.to_s).not_to include("meet.example.test", "token=value")
+  end
+
   it "rejects onboarding with a duplicate email without creating a profile" do
     existing = create(:user, :teacher, email: "taken.teacher@example.test")
     sign_in admin

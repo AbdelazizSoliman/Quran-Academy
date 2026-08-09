@@ -51,7 +51,7 @@
   <%= render "shared/components/card", title: t("teacher_profiles.sections.capabilities"), body: capabilities %>
 
   <% admin_only = capture do %><dl class="grid gap-4 sm:grid-cols-2">
-    <% %i[default_lesson_rate compensation_currency compensation_unit internal_notes emergency_contact_name emergency_contact_phone left_on].each do |field| %>
+    <% %i[default_lesson_rate compensation_currency compensation_unit online_meeting_url internal_notes emergency_contact_name emergency_contact_phone left_on].each do |field| %>
       <div><dt class="ds-caption"><%= t("teacher_profiles.fields.#{field}") %></dt><dd class="mt-1 whitespace-pre-line"><%= field == :compensation_unit ? teacher_catalog_badge(:compensation_units, @profile.compensation_unit) : teacher_value(@profile.public_send(field)) %></dd></div>
     <% end %>
   </dl><% end %>
