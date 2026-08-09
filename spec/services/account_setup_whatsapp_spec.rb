@@ -81,6 +81,19 @@ RSpec.describe "WhatsApp account setup" do
     expect(payload.dig(:template, :components, 1, :parameters, 0, :text)).not_to start_with("http")
   end
 
+  %w[en en_US].each do |language|
+    it "accepts #{language} for the account setup template and passes it to Meta" do
+      ENV["WHATSAPP_ACCOUNT_SETUP_LANGUAGE"] = language
+
+      expect(Notifications::WhatsappConfiguration).to be_configured
+      template = Notifications::AccountSetupTemplate.call(
+        display_name: user.full_name, email: user.email, url_suffix: "abc123"
+      )
+
+      expect(template[:language_code]).to eq(language)
+    end
+  end
+
   it "preserves an encoded locale query while extracting only the dynamic suffix" do
     suffix = Notifications::AccountSetupUrlSuffix.call(
       invitation_url: "http://example.com/account/invitation/abc123?locale=ar%2DEG"
@@ -140,7 +153,7 @@ RSpec.describe "WhatsApp account setup" do
   end
 
   it "skips template configuration that differs from the approved mapping" do
-    ENV["WHATSAPP_ACCOUNT_SETUP_LANGUAGE"] = "ar"
+    ENV["WHATSAPP_ACCOUNT_SETUP_LANGUAGE"] = "not-a-meta-code"
     expect(described_delivery.call).to be_nil
     ENV["WHATSAPP_ACCOUNT_SETUP_LANGUAGE"] = "en_US"
     ENV["WHATSAPP_ACCOUNT_SETUP_TEMPLATE"] = "another_template"

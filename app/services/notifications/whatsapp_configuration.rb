@@ -9,7 +9,7 @@ module Notifications
     ACCOUNT_SETUP_KEYS = %w[WHATSAPP_ACCOUNT_SETUP_URL_PREFIX].freeze
     LESSON_REMINDER_KEYS = %w[WHATSAPP_LESSON_JOIN_URL_PREFIX].freeze
     APPROVED_TEMPLATE = "quran_account_setup".freeze
-    APPROVED_LANGUAGE = "en_US".freeze
+    META_LANGUAGE_CODE = /\A[a-z]{2,3}(?:_[A-Z]{2})?\z/
 
     def self.enabled? = ActiveModel::Type::Boolean.new.cast(ENV.fetch("WHATSAPP_ENABLED", "false"))
 
@@ -19,7 +19,7 @@ module Notifications
 
     def self.approved_template?
       ENV.fetch("WHATSAPP_ACCOUNT_SETUP_TEMPLATE", nil) == APPROVED_TEMPLATE &&
-        ENV.fetch("WHATSAPP_ACCOUNT_SETUP_LANGUAGE", nil) == APPROVED_LANGUAGE
+        valid_language_code?(ENV.fetch("WHATSAPP_ACCOUNT_SETUP_LANGUAGE", nil))
     end
 
     def self.ready? = enabled? && configured?
@@ -27,12 +27,13 @@ module Notifications
     def self.lesson_reminders_configured?
       keys_present?(PROVIDER_KEYS + LESSON_REMINDER_KEYS) &&
         ENV.fetch("WHATSAPP_LESSON_REMINDER_TEMPLATE", nil) == "quran_lesson_reminder" &&
-        ENV.fetch("WHATSAPP_LESSON_REMINDER_LANGUAGE", nil) == "en_US"
+        valid_language_code?(ENV.fetch("WHATSAPP_LESSON_REMINDER_LANGUAGE", nil))
     end
 
     def self.lesson_reminders_ready? = enabled? && lesson_reminders_configured?
 
     def self.keys_present?(keys) = keys.all? { |key| ENV.fetch(key, nil).present? }
-    private_class_method :keys_present?
+    def self.valid_language_code?(code) = code&.match?(META_LANGUAGE_CODE) || false
+    private_class_method :keys_present?, :valid_language_code?
   end
 end

@@ -13,7 +13,7 @@ module Notifications
       button = { type: "button", sub_type: "url", index: "0",
                  parameters: [{ type: "text", text: url_suffix }] }
       { name: ENV.fetch("WHATSAPP_LESSON_REMINDER_TEMPLATE", "quran_lesson_reminder"),
-        language_code: ENV.fetch("WHATSAPP_LESSON_REMINDER_LANGUAGE", "en_US"), components: [body, button] }
+        language_code: ENV.fetch("WHATSAPP_LESSON_REMINDER_LANGUAGE"), components: [body, button] }
     end
 
     def self.body_values(notification, lesson, local_start)

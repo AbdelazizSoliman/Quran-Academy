@@ -12,7 +12,8 @@ automatically. Meta may require an approved WhatsApp template when a
 business-initiated message is outside the customer-service conversation window.
 
 Account-setup WhatsApp delivery is additive: the existing invitation email is always attempted independently. It uses
-the active Meta utility template `quran_account_setup` in `en_US`. Configure all of the following values; the URL prefix
+the active Meta utility template `quran_account_setup`. Configure all of the following values, using the exact
+language code shown for the template in Meta (for example, `en` or `en_US`); the URL prefix
 must exactly match the fixed prefix approved in Meta and must not contain the dynamic `{{1}}` placeholder:
 
 ```text
@@ -22,7 +23,7 @@ WHATSAPP_PHONE_NUMBER_ID=
 WHATSAPP_BUSINESS_ACCOUNT_ID=
 WHATSAPP_GRAPH_API_VERSION=v23.0
 WHATSAPP_ACCOUNT_SETUP_TEMPLATE=quran_account_setup
-WHATSAPP_ACCOUNT_SETUP_LANGUAGE=en_US
+WHATSAPP_ACCOUNT_SETUP_LANGUAGE=en
 WHATSAPP_ACCOUNT_SETUP_URL_PREFIX=https://your-app.example/account/invitation/
 ```
 
@@ -93,8 +94,9 @@ bin/rails runner 'actor = User.find(ENV.fetch("NOTIFICATION_ACTOR_ID")); Reminde
 The jobs contain no reminder business logic. They call the idempotent reminder services, so overlapping scheduler
 invocations cannot create duplicate notifications for the same lesson, recipient, and reminder stage.
 
-Lesson WhatsApp reminders use the approved Meta Utility template `quran_lesson_reminder` in `en_US`. Configure
-`WHATSAPP_LESSON_REMINDER_TEMPLATE=quran_lesson_reminder`, `WHATSAPP_LESSON_REMINDER_LANGUAGE=en_US`, and
+Lesson WhatsApp reminders use the approved Meta Utility template `quran_lesson_reminder`. Configure
+`WHATSAPP_LESSON_REMINDER_TEMPLATE=quran_lesson_reminder`, set `WHATSAPP_LESSON_REMINDER_LANGUAGE` to the exact
+language code shown in Meta (for example, `en` or `en_US`), and configure
 `WHATSAPP_LESSON_JOIN_URL_PREFIX` to the Quran Academy origin/path prefix approved for the template's **Join lesson**
 button. The application sends only a validated student/teacher internal join-path suffix; that authenticated route
 records presence and then redirects to the lesson's external meeting URL. A missing or invalid external URL is skipped.

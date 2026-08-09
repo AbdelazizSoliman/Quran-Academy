@@ -138,6 +138,18 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     expect(teacher_suffix).to eq("teacher/schedule/#{lesson.id}/join")
   end
 
+  %w[en en_US].each do |language|
+    it "accepts #{language} for lesson reminders and passes it to Meta" do
+      ENV["WHATSAPP_LESSON_REMINDER_LANGUAGE"] = language
+      lesson_with_student(starts_at: now + 15.minutes)
+
+      expect(Notifications::WhatsappConfiguration).to be_lesson_reminders_configured
+      pre_sweep
+      expect(deliveries).not_to be_empty
+      expect(deliveries).to all(include(template: hash_including(language_code: language)))
+    end
+  end
+
   it "uses the late context in the same template" do
     lesson_with_student(starts_at: now - 5.minutes)
     late_sweep

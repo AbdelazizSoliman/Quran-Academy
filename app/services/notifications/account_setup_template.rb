@@ -2,7 +2,7 @@ module Notifications
   class AccountSetupTemplate
     def self.call(display_name:, email:, url_suffix:,
                   name: ENV.fetch("WHATSAPP_ACCOUNT_SETUP_TEMPLATE", "quran_account_setup"),
-                  language: ENV.fetch("WHATSAPP_ACCOUNT_SETUP_LANGUAGE", "en_US"))
+                  language: ENV.fetch("WHATSAPP_ACCOUNT_SETUP_LANGUAGE"))
       body = { type: "body", parameters: text_parameters(display_name, email) }
       button = { type: "button", sub_type: "url", index: "0",
                  parameters: [{ type: "text", text: url_suffix }] }
