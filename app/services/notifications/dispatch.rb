@@ -41,8 +41,10 @@ module Notifications
         notification.save!
         event!(notification, "created", after_data: { "status" => "pending" })
       end
-      Attempt.new(notification:, actor: @actor, recipient_address: resolved.provider_address,
-                  delivery_body: message.body).call
+      ActiveRecord.after_all_transactions_commit do
+        NotificationAttemptJob.perform_later(notification:, actor: @actor)
+      end
+      notification
     rescue ActiveRecord::RecordInvalid
       notification
     rescue ActiveRecord::RecordNotUnique

@@ -33,4 +33,15 @@ RSpec.describe "Notification jobs" do
                                         channel: "whatsapp")
     expect(service).to have_received(:call)
   end
+
+  it "resolves a recurring-task audit actor from the environment" do
+    allow(ENV).to receive(:fetch).and_call_original
+    allow(ENV).to receive(:fetch).with("NOTIFICATION_ACTOR_ID").and_return(actor.id.to_s)
+    service = instance_double(Notifications::LessonReminderScheduler, call: [])
+    allow(Notifications::LessonReminderScheduler).to receive(:new)
+      .with(actor:, now: kind_of(Time)).and_return(service)
+
+    ReminderSweepJob.perform_now
+    expect(service).to have_received(:call)
+  end
 end

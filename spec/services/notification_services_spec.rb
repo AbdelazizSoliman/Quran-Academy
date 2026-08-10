@@ -15,6 +15,8 @@ RSpec.describe "Notification services" do
 
     notification = Notifications::Dispatch.new(actor: admin, recipient: student.user, source: certificate,
                                                type: "certificate", channel: "email").call
+    perform_enqueued_jobs
+    notification.reload
     expect(notification).to be_sent
     expect(notification.attempt_count).to eq(1)
     expect(notification.attempts.count).to eq(1)

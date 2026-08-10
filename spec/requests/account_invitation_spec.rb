@@ -6,10 +6,12 @@ RSpec.describe "Account invitations" do
   it "automatically invites a newly created account and ignores submitted status/password" do
     sign_in admin
     expect do
-      post admin_users_path, params: { user: { first_name: "Invited", last_name: "Teacher",
-                                               email: "invitee@example.test", role: "teacher", status: "active",
-                                               password: "KnownPassword123!", preferred_locale: "en",
-                                               time_zone: "Cairo", phone_number: "+201001234567" } }
+      perform_enqueued_jobs do
+        post admin_users_path, params: { user: { first_name: "Invited", last_name: "Teacher",
+                                                 email: "invitee@example.test", role: "teacher", status: "active",
+                                                 password: "KnownPassword123!", preferred_locale: "en",
+                                                 time_zone: "Cairo", phone_number: "+201001234567" } }
+      end
     end.to change(AccountInvitation, :count).by(1).and change(ActionMailer::Base.deliveries, :count).by(1)
 
     expect(User.find_by!(email: "invitee@example.test")).to be_pending

@@ -7,9 +7,9 @@ RSpec.describe "Account invitation services" do
     user = create(:user, :pending)
 
     expect do
-      result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
+      result = perform_enqueued_jobs { AccountInvitations::CreateAndSend.new(user:, actor: admin).call }
       expect(result.invitation.token_digest).to eq(AccountInvitations::Token.digest(result.token))
-      expect(result.invitation).to be_sent
+      expect(result.invitation.reload).to be_sent
     end.to change(ActionMailer::Base.deliveries, :count).by(1)
                                                         .and change(AccountInvitationEvent, :count).by(2)
   end
@@ -32,7 +32,7 @@ RSpec.describe "Account invitation services" do
 
     user = create(:user, :pending)
     expect do
-      result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
+      result = perform_enqueued_jobs { AccountInvitations::CreateAndSend.new(user:, actor: admin).call }
       expect(result.invitation).to be_pending
     end.to change(AccountInvitation, :count).by(1).and change(AccountInvitationEvent, :count).by(1)
   end
@@ -42,13 +42,13 @@ RSpec.describe "Account invitation services" do
     setting.update!(invitation_delivery_mode: "email_and_whatsapp", whatsapp_notifications_enabled: true)
     user = create(:user, :teacher, :pending, preferred_locale: "en")
     create(:teacher_profile, user:, whatsapp_number: "+201001234567", notification_method: "both")
-    service_result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
+    service_result = perform_enqueued_jobs { AccountInvitations::CreateAndSend.new(user:, actor: admin).call }
     invitation_url = AccountInvitations::UrlBuilder.call(token: service_result.token, locale: "en")
 
     digest = AccountInvitations::Token.digest(service_result.token)
     expect(service_result.invitation.token_digest).to eq(digest)
     expect(ActionMailer::Base.deliveries.last.text_part.body.decoded).to include(invitation_url)
-    expect(service_result.invitation).to be_sent
+    expect(service_result.invitation.reload).to be_sent
   end
 
   it "keeps email delivery successful when WhatsApp is not configured" do
@@ -56,8 +56,8 @@ RSpec.describe "Account invitation services" do
                                    whatsapp_notifications_enabled: true)
     user = create(:user, :teacher, :pending)
 
-    result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
-    expect(result.invitation).to be_sent
+    result = perform_enqueued_jobs { AccountInvitations::CreateAndSend.new(user:, actor: admin).call }
+    expect(result.invitation.reload).to be_sent
     expect(result.invitation.notifications.where(channel: "email")).to exist
     expect(result.invitation.notifications.where(channel: "whatsapp")).not_to exist
   end

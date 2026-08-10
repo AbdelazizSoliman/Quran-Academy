@@ -53,10 +53,14 @@ module Notifications
     end
 
     def deliver_email
+      setting = AcademySetting.current
+      return false unless setting.email_notifications_enabled? && setting.invitation_notifications_enabled?
+
       Rails.logger.info("InvitationDelivery email dispatch started invitation_id=#{@invitation.public_id}")
-      success = InvitationEmailDelivery.new(invitation: @invitation, token: @token, actor: @actor).call
-      Rails.logger.info("InvitationDelivery email dispatch finished success=#{success}")
-      success
+      encrypted_token = SecurePayload.encrypt(@token)
+      AccountSetupEmailJob.perform_later(invitation: @invitation, actor: @actor, encrypted_token:)
+      Rails.logger.info("InvitationDelivery email dispatch finished success=true")
+      true
     rescue StandardError => e
       Rails.logger.error("Invitation email delivery failed (#{e.class})")
       Rails.logger.info("InvitationDelivery email dispatch finished success=false")

@@ -81,24 +81,17 @@ No webhook receiver, embedded onboarding UI, or new admin page is needed for thi
 owner registers the production number directly with Meta as a standard Cloud API number outside this
 application, and the application only needs the resulting IDs and token above.
 
-### Future reminder scheduling
+### Render production jobs and schedules
 
-The application exposes thin ActiveJob adapters and does not install or execute an external scheduler. Configure cron,
-a Render Cron Job, or a future Solid Queue recurring schedule to enqueue both sweep jobs once per minute. Set
-`NOTIFICATION_ACTOR_ID` to an active administrator used as the audit actor, then invoke:
+Production uses Solid Queue in the primary PostgreSQL database. Set `SOLID_QUEUE_IN_PUMA=true` on the Render web
+service so its single Puma instance also runs the queue supervisor (`JOB_CONCURRENCY=1` is appropriate at the current
+scale). Run `bin/rails db:migrate` during deployment before accepting traffic.
 
-```bash
-bin/rails runner 'actor = User.find(ENV.fetch("NOTIFICATION_ACTOR_ID")); ReminderSweepJob.perform_later(actor:); LateReminderSweepJob.perform_later(actor:)'
-```
-
-The jobs contain no reminder business logic. They call the idempotent reminder services, so overlapping scheduler
-invocations cannot create duplicate notifications for the same lesson, recipient, and reminder stage.
-
-Run the recurring lesson generation sweep once daily to keep active enrollment schedules generated eight weeks ahead:
-
-```bash
-bin/rails runner 'actor = User.find(ENV.fetch("SCHEDULING_ACTOR_ID")); RecurringLessonGenerationJob.perform_now(actor:)'
-```
+`config/recurring.yml` is the authoritative production schedule: both reminder sweeps run every minute and recurring
+lesson generation runs daily at 00:10 UTC. Set `NOTIFICATION_ACTOR_ID` and `SCHEDULING_ACTOR_ID` to active administrator
+user IDs. The jobs resolve these audit actors at execution time. Solid Queue's scheduler and unique recurring execution
+identity make overlapping scheduler processes duplicate-safe; the reminder and lesson-generation services retain their
+own domain idempotency as a second layer. No Render Cron Jobs are required.
 
 Lesson WhatsApp reminders use the approved Meta Utility template `quran_lesson_reminder`. Configure
 `WHATSAPP_LESSON_REMINDER_TEMPLATE=quran_lesson_reminder`, set `WHATSAPP_LESSON_REMINDER_LANGUAGE` to the exact

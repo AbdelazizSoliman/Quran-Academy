@@ -1,9 +1,8 @@
 class LateReminderSweepJob < ApplicationJob
   queue_as :notifications
 
-  # Invoke once per minute alongside ReminderSweepJob. See README.md for the
-  # scheduler command. This application does not install a scheduler.
-  def perform(actor:, now: Time.current)
+  def perform(actor: nil, now: Time.current)
+    actor ||= User.find(ENV.fetch("NOTIFICATION_ACTOR_ID"))
     Notifications::LateAttendanceReminderScheduler.new(actor:, now:).call
   end
 end

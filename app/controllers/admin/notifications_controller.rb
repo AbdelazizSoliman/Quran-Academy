@@ -33,8 +33,8 @@ module Admin
     def send_certificate = deliver_notification("certificate")
 
     def retry_delivery
-      @notification = Notifications::Attempt.new(notification: @notification, actor: current_user).call
-      respond_to_dispatch
+      NotificationAttemptJob.perform_later(notification: @notification, actor: current_user)
+      redirect_to admin_notification_path(@notification), notice: t("notifications.messages.saved")
     end
 
     private

@@ -11,7 +11,6 @@ module AccountInvitations
       raw_token = Token.generate
       invitation = create_invitation(raw_token)
       delivery = deliver(invitation, raw_token)
-      MarkSent.call(invitation:, actor: @actor) if delivery.succeeded.include?("email")
       Result.new(invitation:, token: raw_token, delivery:)
     end
 

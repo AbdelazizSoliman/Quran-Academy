@@ -45,6 +45,10 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
   config.include FactoryBot::Syntax::Methods
+  config.include ActiveJob::TestHelper
+  config.around do |example|
+    example.example_group_instance.perform_enqueued_jobs { example.run }
+  end
   config.include Devise::Test::IntegrationHelpers, type: :request
 
   # You can uncomment this line to turn off ActiveRecord support entirely.

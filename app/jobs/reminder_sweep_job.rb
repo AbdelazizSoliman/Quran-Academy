@@ -1,10 +1,8 @@
 class ReminderSweepJob < ApplicationJob
   queue_as :notifications
 
-  # Invoke once per minute from cron, a Render Cron Job, or a future recurring-job
-  # configuration. See README.md for the scheduler command. The scheduler only
-  # enqueues this adapter; eligibility and idempotency remain in the service.
-  def perform(actor:, now: Time.current)
+  def perform(actor: nil, now: Time.current)
+    actor ||= User.find(ENV.fetch("NOTIFICATION_ACTOR_ID"))
     Notifications::LessonReminderScheduler.new(actor:, now:).call
   end
 end

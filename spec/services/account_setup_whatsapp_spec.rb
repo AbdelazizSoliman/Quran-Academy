@@ -35,6 +35,7 @@ RSpec.describe "WhatsApp account setup" do
   end
 
   before do
+    allow(AccountSetupEmailJob).to receive(:perform_later) { |**args| AccountSetupEmailJob.perform_now(**args) }
     AcademySetting.current.update!(whatsapp_notifications_enabled: true,
                                    invitation_notifications_enabled: true,
                                    invitation_delivery_mode: "email_and_whatsapp")
@@ -47,7 +48,7 @@ RSpec.describe "WhatsApp account setup" do
 
     result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
 
-    expect(result.invitation).to be_sent
+    expect(result.invitation.reload).to be_sent
     expect(ActionMailer::Base.deliveries).not_to be_empty
     expect(AccountSetupWhatsAppJob).not_to have_received(:perform_later)
     callback.call
