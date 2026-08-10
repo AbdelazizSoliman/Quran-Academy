@@ -1,4 +1,13 @@
 ar:
+  recurring_schedules:
+    title: "جدول الدروس المتكرر"
+    slots_hint: "أدخل يوماً ووقت بدء محلياً في كل سطر. مثال: sunday 18:00"
+    issues: "مشكلات إنشاء الدروس"
+    no_issues: "لا توجد مشكلات إنشاء معلقة"
+    upcoming: "الدروس القادمة المُنشأة"
+    fields: { starts_on: "تاريخ البدء", ends_on: "تاريخ الانتهاء (اختياري)", duration: "مدة الدرس بالدقائق", slots: "المواعيد الأسبوعية", effective_on: "سريان التغيير من" }
+    actions: { new: "جدول متكرر جديد", change: "تغيير الجدول المستقبلي", cancel: "إلغاء الجدول المتكرر" }
+    messages: { created: "تم إنشاء الجدول المتكرر.", changed: "تم تغيير الجدول المتكرر المستقبلي.", cancelled: "تم إلغاء الجدول المتكرر." }
   navigation:
     schedule: "الجدولة"
     teacher_availability: "إتاحة المعلمين"

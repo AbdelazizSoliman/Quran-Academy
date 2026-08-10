@@ -1,0 +1,18 @@
+<%= render "shared/academic/errors", record: schedule %>
+<%= form_with model: schedule, url: form_url, class: "space-y-6" do |form| %>
+  <% if local_assigns[:effective_change] %>
+    <div><%= label_tag :effective_on, t("recurring_schedules.fields.effective_on"), class: "ds-label" %><%= date_field_tag :effective_on, schedule.starts_on, required: true, class: "ds-control mt-2" %></div>
+  <% end %>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("recurring_schedules.title") %></legend>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div><%= form.label :teacher_profile_id, t("scheduling.fields.teacher"), class: "ds-label" %><%= form.collection_select :teacher_profile_id, teachers, :id, :display_name, { include_blank: true }, class: "ds-control mt-2" %></div>
+      <div><%= form.label :lesson_duration_minutes, t("recurring_schedules.fields.duration"), class: "ds-label" %><%= form.number_field :lesson_duration_minutes, min: 1, required: true, class: "ds-control mt-2" %></div>
+      <div><%= form.label :time_zone, t("scheduling.fields.time_zone"), class: "ds-label" %><%= form.select :time_zone, ActiveSupport::TimeZone.all.map { |zone| [zone.name, zone.name] }, {}, class: "ds-control mt-2" %></div>
+      <% unless local_assigns[:effective_change] %><div><%= form.label :starts_on, t("recurring_schedules.fields.starts_on"), class: "ds-label" %><%= form.date_field :starts_on, required: true, class: "ds-control mt-2" %></div><% end %>
+      <div><%= form.label :ends_on, t("recurring_schedules.fields.ends_on"), class: "ds-label" %><%= form.date_field :ends_on, class: "ds-control mt-2" %></div>
+      <%= form.hidden_field :status, value: "active" %>
+      <div class="sm:col-span-2"><%= form.label :slots_text, t("recurring_schedules.fields.slots"), class: "ds-label" %><%= form.text_area :slots_text, value: slots_text, rows: 7, required: true, class: "ds-control mt-2", placeholder: "sunday 18:00\ntuesday 18:00\nthursday 19:30", dir: "ltr" %><p class="mt-2 ds-caption"><%= t("recurring_schedules.slots_hint") %></p></div>
+    </div>
+  </fieldset>
+  <div class="flex gap-3"><%= render "shared/components/button", label: t("actions.save"), type: :submit %><%= render "shared/components/button", label: t("actions.cancel"), href: admin_enrollment_path(enrollment), variant: :secondary %></div>
+<% end %>

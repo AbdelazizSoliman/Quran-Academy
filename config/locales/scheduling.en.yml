@@ -1,4 +1,13 @@
 en:
+  recurring_schedules:
+    title: "Recurring lesson schedule"
+    slots_hint: "Enter one weekday and local start time per line. Example: sunday 18:00"
+    issues: "Generation issues"
+    no_issues: "No unresolved generation issues"
+    upcoming: "Generated upcoming lessons"
+    fields: { starts_on: "Starts on", ends_on: "Ends on (optional)", duration: "Lesson duration (minutes)", slots: "Weekly slots", effective_on: "Change effective on" }
+    actions: { new: "New recurring schedule", change: "Change future schedule", cancel: "Cancel recurring schedule" }
+    messages: { created: "Recurring schedule created.", changed: "Future recurring schedule changed.", cancelled: "Recurring schedule cancelled." }
   navigation:
     schedule: "Scheduling"
     teacher_availability: "Teacher availability"

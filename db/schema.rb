@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_09_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_10_101000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -377,6 +377,65 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_190000) do
     t.index ["enrollment_id", "created_at"], name: "index_enrollment_events_on_enrollment_id_and_created_at"
     t.index ["enrollment_id"], name: "index_enrollment_events_on_enrollment_id"
     t.index ["event_type"], name: "index_enrollment_events_on_event_type"
+  end
+
+  create_table "enrollment_lesson_generation_issues", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "details", default: {}, null: false
+    t.bigint "enrollment_lesson_schedule_slot_id", null: false
+    t.string "reason_code", null: false
+    t.date "recurrence_date", null: false
+    t.datetime "resolved_at"
+    t.datetime "updated_at", null: false
+    t.index ["enrollment_lesson_schedule_slot_id", "recurrence_date"], name: "idx_generation_issues_unique_occurrence", unique: true
+    t.index ["enrollment_lesson_schedule_slot_id"], name: "idx_generation_issues_on_slot"
+  end
+
+  create_table "enrollment_lesson_schedule_events", force: :cascade do |t|
+    t.bigint "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "enrollment_lesson_schedule_id", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_enrollment_lesson_schedule_events_on_actor_id"
+    t.index ["enrollment_lesson_schedule_id", "created_at"], name: "idx_schedule_events_chronological"
+    t.index ["enrollment_lesson_schedule_id"], name: "idx_schedule_events_on_schedule"
+  end
+
+  create_table "enrollment_lesson_schedule_slots", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "enrollment_lesson_schedule_id", null: false
+    t.integer "position", default: 0, null: false
+    t.time "starts_at_local", null: false
+    t.datetime "updated_at", null: false
+    t.string "weekday", null: false
+    t.index ["enrollment_lesson_schedule_id", "weekday", "starts_at_local"], name: "idx_schedule_slots_unique_weekday_time", unique: true
+    t.index ["enrollment_lesson_schedule_id"], name: "idx_schedule_slots_on_schedule"
+  end
+
+  create_table "enrollment_lesson_schedules", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.date "ends_on"
+    t.bigint "enrollment_id", null: false
+    t.integer "lesson_duration_minutes", null: false
+    t.string "public_id", null: false
+    t.date "starts_on", null: false
+    t.string "status", default: "active", null: false
+    t.bigint "teacher_profile_id", null: false
+    t.string "time_zone", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.index ["created_by_id"], name: "index_enrollment_lesson_schedules_on_created_by_id"
+    t.index ["enrollment_id", "status"], name: "index_enrollment_lesson_schedules_on_enrollment_id_and_status"
+    t.index ["enrollment_id"], name: "idx_enrollment_schedules_one_active", unique: true, where: "((status)::text = 'active'::text)"
+    t.index ["enrollment_id"], name: "index_enrollment_lesson_schedules_on_enrollment_id"
+    t.index ["public_id"], name: "index_enrollment_lesson_schedules_on_public_id", unique: true
+    t.index ["teacher_profile_id"], name: "index_enrollment_lesson_schedules_on_teacher_profile_id"
+    t.index ["updated_by_id"], name: "index_enrollment_lesson_schedules_on_updated_by_id"
+    t.check_constraint "ends_on IS NULL OR ends_on >= starts_on", name: "enrollment_schedule_date_order"
+    t.check_constraint "lesson_duration_minutes > 0", name: "enrollment_schedule_duration_positive"
   end
 
   create_table "enrollments", force: :cascade do |t|
@@ -869,11 +928,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_190000) do
     t.string "delivery_mode", default: "online", null: false
     t.datetime "ended_at"
     t.datetime "ends_at", null: false
+    t.bigint "enrollment_lesson_schedule_slot_id"
     t.string "location_name"
     t.integer "lock_version", default: 0, null: false
     t.string "online_meeting_url"
     t.text "operation_notes"
     t.string "public_id", null: false
+    t.date "recurrence_date"
     t.string "scheduling_source", default: "manual", null: false
     t.datetime "started_at"
     t.datetime "starts_at", null: false
@@ -892,6 +953,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_190000) do
     t.index ["course_offering_id", "starts_at"], name: "index_scheduled_lessons_on_course_offering_id_and_starts_at"
     t.index ["course_offering_id"], name: "index_scheduled_lessons_on_course_offering_id"
     t.index ["created_by_id"], name: "index_scheduled_lessons_on_created_by_id"
+    t.index ["enrollment_lesson_schedule_slot_id", "recurrence_date"], name: "idx_scheduled_lessons_unique_recurrence", unique: true
+    t.index ["enrollment_lesson_schedule_slot_id"], name: "idx_lessons_on_recurrence_slot"
     t.index ["public_id"], name: "index_scheduled_lessons_on_public_id", unique: true
     t.index ["status", "starts_at"], name: "index_scheduled_lessons_on_status_and_starts_at"
     t.index ["teacher_profile_id", "starts_at", "ends_at"], name: "idx_on_teacher_profile_id_starts_at_ends_at_69d19f2e3b"
@@ -1448,6 +1511,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_190000) do
   add_foreign_key "course_offerings", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "enrollment_events", "enrollments", on_delete: :restrict
   add_foreign_key "enrollment_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "enrollment_lesson_generation_issues", "enrollment_lesson_schedule_slots", on_delete: :restrict
+  add_foreign_key "enrollment_lesson_schedule_events", "enrollment_lesson_schedules", on_delete: :restrict
+  add_foreign_key "enrollment_lesson_schedule_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "enrollment_lesson_schedule_slots", "enrollment_lesson_schedules", on_delete: :restrict
+  add_foreign_key "enrollment_lesson_schedules", "enrollments", on_delete: :restrict
+  add_foreign_key "enrollment_lesson_schedules", "teacher_profiles", on_delete: :restrict
+  add_foreign_key "enrollment_lesson_schedules", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "enrollment_lesson_schedules", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "enrollments", "course_offerings", on_delete: :restrict
   add_foreign_key "enrollments", "student_profiles", on_delete: :restrict
   add_foreign_key "enrollments", "users", column: "approved_by_id", on_delete: :nullify
@@ -1504,6 +1575,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_190000) do
   add_foreign_key "scheduled_lesson_events", "scheduled_lessons", on_delete: :restrict
   add_foreign_key "scheduled_lesson_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "scheduled_lessons", "course_offerings", on_delete: :restrict
+  add_foreign_key "scheduled_lessons", "enrollment_lesson_schedule_slots", on_delete: :restrict
   add_foreign_key "scheduled_lessons", "teacher_profiles", on_delete: :restrict
   add_foreign_key "scheduled_lessons", "users", column: "attendance_locked_by_id", on_delete: :nullify
   add_foreign_key "scheduled_lessons", "users", column: "attendance_reopened_by_id", on_delete: :nullify

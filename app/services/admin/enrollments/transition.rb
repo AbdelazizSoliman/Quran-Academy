@@ -41,6 +41,7 @@ module Admin
 
           transition!(rule)
         end
+        generate_recurring_lessons if @enrollment.status.in?(%w[approved active])
         @enrollment
       rescue ActiveRecord::RecordInvalid
         @enrollment
@@ -118,6 +119,12 @@ module Admin
 
       def add_error(key)
         @enrollment.errors.add(:base, key)
+      end
+
+      def generate_recurring_lessons
+        @enrollment.lesson_schedules.active.find_each do |schedule|
+          EnrollmentLessonSchedules::GenerateOccurrences.new(schedule:, actor: @actor).call
+        end
       end
 
       def invalid(key)

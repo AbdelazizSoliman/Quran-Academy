@@ -94,6 +94,12 @@ bin/rails runner 'actor = User.find(ENV.fetch("NOTIFICATION_ACTOR_ID")); Reminde
 The jobs contain no reminder business logic. They call the idempotent reminder services, so overlapping scheduler
 invocations cannot create duplicate notifications for the same lesson, recipient, and reminder stage.
 
+Run the recurring lesson generation sweep once daily to keep active enrollment schedules generated eight weeks ahead:
+
+```bash
+bin/rails runner 'actor = User.find(ENV.fetch("SCHEDULING_ACTOR_ID")); RecurringLessonGenerationJob.perform_now(actor:)'
+```
+
 Lesson WhatsApp reminders use the approved Meta Utility template `quran_lesson_reminder`. Configure
 `WHATSAPP_LESSON_REMINDER_TEMPLATE=quran_lesson_reminder`, set `WHATSAPP_LESSON_REMINDER_LANGUAGE` to the exact
 language code shown in Meta (for example, `en` or `en_US`), and configure

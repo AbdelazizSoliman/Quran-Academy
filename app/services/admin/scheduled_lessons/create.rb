@@ -2,7 +2,8 @@ module Admin
   module ScheduledLessons
     class Create < Admin::SchedulingOperation
       FIELDS = %w[course_offering_id teacher_profile_id title_ar title_en starts_at ends_at academy_time_zone
-                  delivery_mode location_name online_meeting_url scheduling_source].freeze
+                  delivery_mode location_name online_meeting_url scheduling_source
+                  enrollment_lesson_schedule_slot_id recurrence_date].freeze
 
       def initialize(actor:, attributes:)
         super()

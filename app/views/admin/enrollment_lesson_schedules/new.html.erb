@@ -1,0 +1,2 @@
+<%= render "shared/page_header", title: t("recurring_schedules.actions.new"), description: @enrollment.public_id %>
+<%= render "form", schedule: @schedule, enrollment: @enrollment, teachers: @teachers, form_url: admin_enrollment_lesson_schedules_path(@enrollment), slots_text: @enrollment.student_profile.schedule_slots.map { |slot| "#{slot['weekday']} #{slot['time']}" }.join("\n") %>

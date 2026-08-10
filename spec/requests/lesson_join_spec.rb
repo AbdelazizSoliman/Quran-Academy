@@ -42,6 +42,16 @@ RSpec.describe "Role-aware lesson join" do
       expect(participation.reload.lesson_attendance.arrival_at).to be_within(1.second).of(lesson.starts_at)
     end
 
+    it "records attendance and redirects for a generated recurring occurrence" do
+      lesson, participation = generated_lesson
+      sign_in participation.enrollment.student_profile.user
+
+      get join_student_schedule_path(lesson)
+
+      expect(response).to redirect_to(lesson.teacher_profile.online_meeting_url)
+      expect(participation.reload.lesson_attendance.arrival_at).to be_present
+    end
+
     it "does not allow another student to join or record presence" do
       lesson, participation = student_lesson
       sign_in create(:student_profile, :complete).user
@@ -112,6 +122,16 @@ RSpec.describe "Role-aware lesson join" do
       expect(lesson.reload.teacher_checked_in_at).to be_within(1.second).of(lesson.starts_at)
     end
 
+    it "checks in and redirects for a generated recurring occurrence" do
+      lesson, = generated_lesson
+      sign_in lesson.teacher_profile.user
+
+      travel_to(lesson.starts_at) { get join_teacher_schedule_path(lesson) }
+
+      expect(response).to redirect_to(lesson.teacher_profile.online_meeting_url)
+      expect(lesson.reload.teacher_checked_in_at).to be_present
+    end
+
     it "denies a teacher who is not assigned to the lesson" do
       lesson = teacher_lesson
       other_teacher = create(:teacher_profile, :active, :verified)
@@ -165,5 +185,24 @@ RSpec.describe "Role-aware lesson join" do
     teacher = create(:teacher_profile, :active, :verified, online_meeting_url: teacher_url)
     create(:scheduled_lesson, :scheduled, starts_at: 5.minutes.from_now, ends_at: 50.minutes.from_now,
                                           online_meeting_url:, teacher_profile: teacher)
+  end
+
+  def generated_lesson
+    admin = create(:user, :admin)
+    teacher = create(:teacher_profile, :active, :verified,
+                     online_meeting_url: "https://meet.example.test/recurring")
+    enrollment = create(:enrollment, :approved)
+    date = Date.current + 1.day
+    weekday = date.strftime("%A").downcase
+    create(:teacher_availability, teacher_profile: teacher, weekday:, starts_at_local: "09:00",
+                                  ends_at_local: "12:00", effective_from: Date.current)
+    schedule = create(:enrollment_lesson_schedule, enrollment:, teacher_profile: teacher, starts_on: date,
+                                                   created_by: admin, updated_by: admin)
+    create(:enrollment_lesson_schedule_slot, enrollment_lesson_schedule: schedule, weekday:,
+                                             starts_at_local: "10:00")
+    lesson = EnrollmentLessonSchedules::GenerateOccurrences.new(
+      schedule:, actor: admin, from_date: date, through_date: date
+    ).call.generated.first
+    [lesson, lesson.scheduled_lesson_enrollments.first]
   end
 end

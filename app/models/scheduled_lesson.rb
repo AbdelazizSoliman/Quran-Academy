@@ -2,7 +2,7 @@ class ScheduledLesson < ApplicationRecord
   has_many :notifications, as: :source, dependent: :restrict_with_exception
   STATUSES = %w[draft scheduled in_progress completed cancelled archived].freeze
   DELIVERY_MODES = %w[online onsite hybrid].freeze
-  SCHEDULING_SOURCES = %w[manual rescheduled imported].freeze
+  SCHEDULING_SOURCES = %w[manual recurring rescheduled imported].freeze
   OPERATIONAL_STATUSES = %w[scheduled in_progress].freeze
   ATTENDANCE_STATUSES = %w[not_opened open locked reopened].freeze
   TEACHER_ATTENDANCE_STATUSES = %w[not_checked_in on_time late absent administrator_override].freeze
@@ -14,6 +14,7 @@ class ScheduledLesson < ApplicationRecord
   belongs_to :cancelled_by, class_name: "User", optional: true
   belongs_to :attendance_locked_by, class_name: "User", optional: true
   belongs_to :attendance_reopened_by, class_name: "User", optional: true
+  belongs_to :enrollment_lesson_schedule_slot, optional: true
   has_many :scheduled_lesson_enrollments, inverse_of: :scheduled_lesson, dependent: :restrict_with_exception
   has_many :enrollments, through: :scheduled_lesson_enrollments
   has_many :lesson_attendances, inverse_of: :scheduled_lesson, dependent: :restrict_with_exception
@@ -38,6 +39,8 @@ class ScheduledLesson < ApplicationRecord
   validates :teacher_attendance_status, inclusion: { in: TEACHER_ATTENDANCE_STATUSES }
   validates :completion_notes, :operation_notes, length: { maximum: 2_000 }, allow_blank: true
   validates :academy_time_zone, inclusion: { in: ->(_) { ActiveSupport::TimeZone.all.map(&:name) } }
+  validates :recurrence_date, presence: true, if: :enrollment_lesson_schedule_slot_id?
+  validates :enrollment_lesson_schedule_slot_id, uniqueness: { scope: :recurrence_date }, allow_nil: true
   validate :online_meeting_url_format
   validates :cancellation_reason, presence: true, if: :cancelled?
   validate :time_order

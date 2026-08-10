@@ -45,6 +45,51 @@ RSpec.describe "Admin students" do
     expect(response).to have_http_status(:unprocessable_content)
   end
 
+  it "creates an authoritative enrollment schedule and slots from onboarding metadata" do
+    teacher = create(:teacher_profile, :active, :verified,
+                     online_meeting_url: "https://meet.example.test/teacher")
+    offering = create(:course_offering, :open, planned_start_on: Date.current)
+
+    expect do
+      post admin_students_path, params: {
+        student_profile: {
+          first_name: "Scheduled", last_name: "Learner", email: "scheduled@example.test",
+          display_name: "Scheduled Learner", assigned_teacher_profile_id: teacher.id,
+          course_offering_id: offering.id, lesson_duration_minutes: 45, weekly_lesson_count: 2,
+          schedule_weekday_1: "sunday", schedule_time_1: "18:00",
+          schedule_weekday_2: "tuesday", schedule_time_2: "19:30"
+        }
+      }
+    end.to change(EnrollmentLessonSchedule, :count).by(1)
+
+    profile = StudentProfile.find_by!(display_name: "Scheduled Learner")
+    schedule = profile.enrollments.first.lesson_schedules.first
+    expect(schedule.teacher_profile).to eq(teacher)
+    expect(schedule.lesson_duration_minutes).to eq(45)
+    expect(schedule.slots.pluck(:weekday)).to contain_exactly("sunday", "tuesday")
+    expect(profile.schedule_slots.size).to eq(2)
+  end
+
+  it "keeps onboarding committed when initial occurrence generation reports a conflict" do
+    teacher = create(:teacher_profile, :active, :verified,
+                     online_meeting_url: "https://meet.example.test/teacher")
+    offering = create(:course_offering, :open, planned_start_on: Date.current)
+
+    post admin_students_path, params: {
+      student_profile: {
+        first_name: "Conflict", last_name: "Learner", email: "conflict@example.test",
+        assigned_teacher_profile_id: teacher.id, course_offering_id: offering.id,
+        lesson_duration_minutes: 45, schedule_weekday_1: Date.current.strftime("%A").downcase,
+        schedule_time_1: "18:00"
+      }
+    }
+
+    expect(response).to have_http_status(:see_other)
+    profile = User.find_by!(email: "conflict@example.test").student_profile
+    expect(profile).to be_persisted
+    expect(profile.enrollments.first.lesson_schedules.first.generation_issues).not_to be_empty
+  end
+
   it "excludes ownership, public IDs, lifecycle status, actors, and metadata from strong parameters" do
     profile = create(:student_profile, user: student_user)
     other = create(:user, :student)

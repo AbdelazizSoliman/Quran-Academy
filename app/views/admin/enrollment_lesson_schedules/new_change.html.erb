@@ -1,0 +1,2 @@
+<%= render "shared/page_header", title: t("recurring_schedules.actions.change"), description: @schedule.public_id %>
+<%= render "form", schedule: @replacement, enrollment: @enrollment, teachers: @teachers, form_url: apply_change_admin_enrollment_lesson_schedule_path(@enrollment, @schedule), slots_text: @schedule.slots.map { |slot| "#{slot.weekday} #{slot.starts_at_local.strftime('%H:%M')}" }.join("\n"), effective_change: true %>

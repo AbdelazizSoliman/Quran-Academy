@@ -174,6 +174,22 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     end
   end
 
+  it "sends normal reminders for a recurring-schedule occurrence" do
+    lesson, participation = lesson_with_student(starts_at: now + 15.minutes)
+    schedule = create(:enrollment_lesson_schedule, enrollment: participation.enrollment,
+                                                   teacher_profile: lesson.teacher_profile,
+                                                   starts_on: lesson.starts_at.to_date)
+    slot = create(:enrollment_lesson_schedule_slot, enrollment_lesson_schedule: schedule,
+                                                    weekday: lesson.starts_at.strftime("%A").downcase,
+                                                    starts_at_local: lesson.starts_at.strftime("%H:%M"))
+    lesson.update!(enrollment_lesson_schedule_slot: slot, recurrence_date: lesson.starts_at.to_date)
+
+    pre_sweep
+
+    expect(deliveries).not_to be_empty
+    expect(Notification.where(source: lesson, notification_type: "lesson_pre_reminder")).to exist
+  end
+
   it "safely skips a missing external meeting URL" do
     lesson, = lesson_with_student(starts_at: now + 15.minutes)
     lesson.update_column(:online_meeting_url, nil) # rubocop:disable Rails/SkipsModelValidations -- corrupt data

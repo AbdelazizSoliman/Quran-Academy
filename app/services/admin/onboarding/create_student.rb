@@ -20,6 +20,7 @@ module Admin
 
       def call
         profile = nil
+        enrollment = nil
         User.transaction do
           user = build_user
           user.save!
@@ -27,7 +28,8 @@ module Admin
           raise ActiveRecord::RecordInvalid, profile unless profile.persisted?
 
           attach_or_create_guardian(profile)
-          create_enrollment(profile)
+          enrollment = create_enrollment(profile)
+          create_lesson_schedule(profile, enrollment)
           AccountInvitations::CreateAndSend.new(user:, actor: @actor).call
         end
         profile
@@ -117,6 +119,34 @@ module Admin
           }
         ).call
         raise ActiveRecord::RecordInvalid, enrollment unless enrollment.persisted?
+
+        enrollment
+      end
+
+      def create_lesson_schedule(profile, enrollment)
+        return unless enrollment&.persisted? && profile.assigned_teacher_profile && complete_schedule_slots.any?
+        return if profile.lesson_duration_minutes.blank?
+
+        schedule = EnrollmentLessonSchedules::Create.new(
+          actor: @actor, enrollment:,
+          attributes: {
+            teacher_profile: profile.assigned_teacher_profile,
+            starts_on: enrollment.course_offering.planned_start_on || Date.current,
+            ends_on: enrollment.course_offering.planned_end_on,
+            lesson_duration_minutes: profile.lesson_duration_minutes,
+            time_zone: profile.user.time_zone, status: "active"
+          },
+          slots: complete_schedule_slots
+        ).call
+        raise ActiveRecord::RecordInvalid, schedule unless schedule.persisted?
+      end
+
+      def complete_schedule_slots
+        schedule_slots.filter_map do |slot|
+          next unless slot.values.all?(&:present?)
+
+          { weekday: slot.fetch("weekday"), starts_at_local: slot.fetch("time") }
+        end
       end
 
       def schedule_note

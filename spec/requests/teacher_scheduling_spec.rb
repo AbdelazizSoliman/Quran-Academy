@@ -9,6 +9,18 @@ RSpec.describe "Teacher scheduling requests" do
     expect(response).to have_http_status(:ok)
   end
 
+  it "renders the new scheduled lesson form with eligible teachers and offerings" do
+    teacher = create(:teacher_profile, :active, :verified)
+    offering = create(:course_offering, :open)
+    sign_in admin
+
+    get new_admin_scheduled_lesson_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(teacher.display_name, offering.title_en)
+    expect(response.body).to include(I18n.t("scheduling.fields.online_meeting_url", locale: :ar))
+  end
+
   it "allows an administrator to create teacher availability" do
     teacher = create(:teacher_profile, :active, :complete, :verified)
     sign_in admin

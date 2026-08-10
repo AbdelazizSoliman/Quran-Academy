@@ -66,6 +66,13 @@ Rails.application.routes.draw do
       end
     end
     resources :enrollments, except: :destroy do
+      resources :lesson_schedules, only: %i[index new create show], controller: :enrollment_lesson_schedules do
+        member do
+          get :new_change
+          post :apply_change
+          patch :cancel
+        end
+      end
       member do
         patch :approve
         patch :waitlist
