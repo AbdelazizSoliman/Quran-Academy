@@ -128,10 +128,20 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     student_delivery = deliveries.find { |item| item[:recipient] == "201112223344" }
     teacher_delivery = deliveries.find { |item| item[:recipient] == "201223334455" }
     expect(student_delivery.dig(:template, :name)).to eq("quran_lesson_reminder")
-    expected_body = [participation.enrollment.student_profile.user.full_name, "August 08, 2026", "12:15",
-                     "Teacher", lesson.teacher_profile.display_name, "Your lesson starts in 15 minutes."]
+    expected_body = ["August 08, 2026 12:15", lesson.teacher_profile.display_name,
+                     "Your lesson starts in 15 minutes."]
     expect(body_texts(student_delivery)).to eq(expected_body)
-    expect(body_texts(teacher_delivery).last).to eq("Your lesson starts in 15 minutes.")
+    expect(body_texts(student_delivery).size).to eq(3)
+    expect(body_texts(teacher_delivery)).to eq(
+      ["08/08/2026 12:15", participation.enrollment.student_profile.display_name,
+       "Your lesson starts in 15 minutes."]
+    )
+    expect(button_parameters(student_delivery)).to contain_exactly(
+      type: "text", text: "student/schedule/#{lesson.id}/join"
+    )
+    expect(button_parameters(teacher_delivery)).to contain_exactly(
+      type: "text", text: "teacher/schedule/#{lesson.id}/join"
+    )
     student_suffix = student_delivery.dig(:template, :components, 1, :parameters, 0, :text)
     teacher_suffix = teacher_delivery.dig(:template, :components, 1, :parameters, 0, :text)
     expect(student_suffix).to eq("student/schedule/#{lesson.id}/join")
@@ -154,8 +164,24 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     lesson_with_student(starts_at: now - 5.minutes)
     late_sweep
     expect(deliveries).to all(satisfy do |delivery|
-      body_texts(delivery).last == "Your lesson started 5 minutes ago. Please join now."
+      delivery.dig(:template, :name) == "quran_lesson_reminder" &&
+        body_texts(delivery).size == 3 &&
+        body_texts(delivery).last == "Your lesson started 5 minutes ago. Please join now." &&
+        button_parameters(delivery).size == 1
     end)
+  end
+
+  it "uses the localized students label for a teacher reminder with multiple students" do
+    lesson, = lesson_with_student(starts_at: now + 15.minutes)
+    create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+
+    pre_sweep
+
+    address = Notifications::RecipientResolver.new(user: lesson.teacher_profile.user, channel: "whatsapp").call
+                                               .provider_address
+    teacher_delivery = deliveries.find { |item| item[:recipient] == address }
+    expected = I18n.t("notifications.messages.students", locale: lesson.teacher_profile.user.preferred_locale)
+    expect(body_texts(teacher_delivery).second).to eq(expected)
   end
 
   it "keeps the internal join route in WhatsApp when the teacher supplies the meeting URL" do
@@ -289,6 +315,10 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
 
   def body_texts(delivery)
     delivery.dig(:template, :components, 0, :parameters).map { |parameter| parameter[:text] }
+  end
+
+  def button_parameters(delivery)
+    delivery.dig(:template, :components, 1, :parameters)
   end
 
   def dispatch_failed_late_reminder(failure)

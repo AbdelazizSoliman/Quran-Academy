@@ -17,21 +17,18 @@ module Notifications
     end
 
     def self.body_values(notification, lesson, local_start)
-      label, counterpart_name = counterpart(notification, lesson)
-      [notification.recipient_user.full_name, localized_date(notification, local_start),
-       local_start.strftime("%H:%M"), label, counterpart_name, CONTEXTS.fetch(notification.notification_type)]
+      [localized_date_and_time(notification, local_start), counterpart(notification, lesson),
+       CONTEXTS.fetch(notification.notification_type)]
     end
 
     def self.counterpart(notification, lesson)
       locale = notification.recipient_locale
       unless notification.recipient_user.teacher?
-        return [I18n.t("notifications.messages.counterpart_teacher", locale:),
-                lesson.teacher_profile.display_name]
+        return lesson.teacher_profile.display_name
       end
 
       students = student_names(lesson)
-      name = students.one? ? students.first : I18n.t("notifications.messages.students", locale:)
-      [I18n.t("notifications.messages.counterpart_student", locale:), name]
+      students.one? ? students.first : I18n.t("notifications.messages.students", locale:)
     end
 
     def self.student_names(lesson)
@@ -39,10 +36,11 @@ module Notifications
             .map { |item| item.enrollment.student_profile.display_name }
     end
 
-    def self.localized_date(notification, local_start)
-      I18n.with_locale(notification.recipient_locale) { I18n.l(local_start.to_date, format: :long) }
+    def self.localized_date_and_time(notification, local_start)
+      date = I18n.with_locale(notification.recipient_locale) { I18n.l(local_start.to_date, format: :long) }
+      "#{date} #{local_start.strftime('%H:%M')}"
     end
 
-    private_class_method :body_values, :counterpart, :student_names, :localized_date
+    private_class_method :body_values, :counterpart, :student_names, :localized_date_and_time
   end
 end
