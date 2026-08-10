@@ -15,6 +15,20 @@ RSpec.describe "Admin students" do
     expect(response.body).to include('dir="ltr"')
   end
 
+  it "renders every onboarding weekday select as a non-shrinking single-line control" do
+    get new_admin_student_path(locale: "ar")
+
+    expect(response).to have_http_status(:ok)
+    document = Nokogiri::HTML(response.body)
+    3.times do |index|
+      field = document.at_css("#student_profile_schedule_weekday_#{index + 1}")
+      expect(field["class"].split).to include("ds-control", "schedule-weekday-select")
+      expect(field.parent["class"].split).to include("schedule-slot-field", "md:col-span-2")
+      expect(field.css("option").map(&:text)).to include("الأحد", "الاثنين", "الثلاثاء")
+      expect(field.css("option").map(&:text)).not_to include(*"Translation missing".chars)
+    end
+  end
+
   it "creates, updates, verifies, archives, and restores with audits" do
     expect do
       post admin_students_path, params: {

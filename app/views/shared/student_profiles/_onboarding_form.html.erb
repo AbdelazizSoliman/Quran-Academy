@@ -34,11 +34,11 @@
       <div><%= f.label :weekly_lesson_count, "تكرار أسبوعي", class: "ds-label" %><%= f.number_field :weekly_lesson_count, min: 1, value: 2, class: "ds-control mt-2" %></div>
       <div><%= f.label :session_type, "نوع الحصة", class: "ds-label" %><%= f.select :session_type, [["فردي (1:1)", "individual"], ["جماعي", "group"]], {}, class: "ds-control mt-2" %></div>
       <div class="md:col-span-2"><%= f.label :trial_lesson_at, "موعد الحصة التجريبية", class: "ds-label" %><%= f.datetime_local_field :trial_lesson_at, class: "ds-control mt-2" %></div>
-      <% weekday_options = StudentProfile::WEEKDAYS.map { |day| [I18n.t("date.day_names")[StudentProfile::WEEKDAYS.index(day)], day] } %>
+      <% weekday_options = StudentProfile::WEEKDAYS.map { |day| [t("scheduling.catalogs.weekdays.#{day}"), day] } %>
       <% 3.times do |index| %>
         <% position = index + 1 %>
-        <div><%= f.label "schedule_weekday_#{position}", "يوم الحصة #{position}", class: "ds-label" %><%= f.select "schedule_weekday_#{position}", weekday_options, { include_blank: position == 1 ? "اختر اليوم" : "موعد إضافي اختياري" }, class: "ds-control mt-2" %></div>
-        <div><%= f.label "schedule_time_#{position}", "وقت الحصة #{position}", class: "ds-label" %><%= f.time_field "schedule_time_#{position}", class: "ds-control mt-2" %></div>
+        <div class="schedule-slot-field md:col-span-2"><%= f.label "schedule_weekday_#{position}", "يوم الحصة #{position}", class: "ds-label" %><%= f.select "schedule_weekday_#{position}", weekday_options, { include_blank: position == 1 ? "اختر اليوم" : "موعد إضافي اختياري" }, class: "ds-control schedule-weekday-select mt-2" %></div>
+        <div class="schedule-slot-field md:col-span-2"><%= f.label "schedule_time_#{position}", "وقت الحصة #{position}", class: "ds-label" %><%= f.time_field "schedule_time_#{position}", class: "ds-control mt-2" %></div>
       <% end %>
       <div><%= f.label :weekly_price, "السعر الأسبوعي", class: "ds-label" %><%= f.number_field :weekly_price, min: 0, step: 0.01, class: "ds-control mt-2" %></div>
       <div><%= f.label :billing_currency, "العملة", class: "ds-label" %><%= f.select :billing_currency, %w[EGP USD EUR GBP SAR AED].map { |c| [c, c] }, {}, class: "ds-control mt-2" %></div>
