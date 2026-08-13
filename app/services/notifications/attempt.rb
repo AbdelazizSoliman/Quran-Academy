@@ -139,11 +139,22 @@ module Notifications
       @notification.whatsapp? ? WhatsAppProvider.new : EmailProvider.new
     end
 
+    # recipient_guardian is also set when RecipientResolver's automatic no-own-number fallback
+    # picked the guardian (Notification#guardian_is_fallback) rather than an explicit
+    # primary_guardian: true request (e.g. a certificate manually sent to a minor's guardian).
+    # Forcing primary_guardian: true here for the fallback case would route through
+    # RecipientResolver#guardian_recipient, whose minor?-only gate would wrongly reject a
+    # fallback recipient for a non-minor student — so only the explicit case re-forces it;
+    # the fallback case re-runs the same automatic resolution that produced it originally.
     def resolve_address
       resolved = RecipientResolver.new(user: @notification.recipient_user, channel: @notification.channel,
-                                       primary_guardian: @notification.recipient_guardian.present?,
+                                       primary_guardian: explicit_guardian_request?,
                                        guardian: @notification.recipient_guardian).call
       resolved.provider_address if resolved.valid?
+    end
+
+    def explicit_guardian_request?
+      @notification.recipient_guardian.present? && !@notification.guardian_is_fallback?
     end
 
     def provider_name = @notification.whatsapp? ? "meta_whatsapp" : "resend"

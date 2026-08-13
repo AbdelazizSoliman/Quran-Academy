@@ -61,6 +61,38 @@ RSpec.describe "Notification services" do
     expect(result.provider_address).to eq("966501234567")
   end
 
+  it "delivers an explicit primary-guardian certificate notification to the minor's guardian, including on retry" do
+    student = create(:student_profile, :minor)
+    guardian = create(:guardian, whatsapp_number: "+201002223333")
+    create(:student_guardianship, student_profile: student, guardian:, primary_contact: true, status: "active")
+    certificate = create(:certificate, student_profile: student,
+                                       enrollment: create(:enrollment, student_profile: student))
+    AcademySetting.current.update!(whatsapp_notifications_enabled: true, certificate_notifications_enabled: true,
+                                   certificate_whatsapp_enabled: true)
+    provider = instance_double(Notifications::WhatsAppProvider)
+    failure = Notifications::ProviderResult.new(false, nil, {}, 503, "failed", "provider_error", "temporary")
+    allow(Notifications::WhatsAppProvider).to receive(:new).and_return(provider)
+    allow(provider).to receive(:deliver).and_return(failure)
+
+    notification = Notifications::Dispatch.new(actor: admin, recipient: student.user, source: certificate,
+                                               type: "certificate", channel: "whatsapp",
+                                               primary_guardian: true).call
+    perform_enqueued_jobs
+    notification.reload
+
+    expect(notification).to be_failed
+    expect(notification.recipient_guardian).to eq(guardian)
+    expect(notification.guardian_is_fallback).to be(false)
+
+    # Retry (e.g. an admin clicking "retry" after a transient failure): resolve_address must
+    # still route to the guardian for this explicit request, not fall through to the student's
+    # own (blank) number.
+    success = Notifications::ProviderResult.new(true, "wamid.retry", {}, 200, "accepted", nil, nil)
+    allow(provider).to receive(:deliver).and_return(success)
+    Notifications::Attempt.new(notification:, actor: admin).call
+    expect(notification.reload).to be_sent
+  end
+
   it "creates due lesson reminders once for the teacher and enrolled students" do
     now = Time.current
     lesson = create(:scheduled_lesson, :scheduled, starts_at: now + 15.minutes, ends_at: now + 50.minutes)
@@ -76,6 +108,27 @@ RSpec.describe "Notification services" do
     expect do
       Notifications::LessonReminderScheduler.new(actor: admin, now:).call
     end.not_to change(Notification, :count)
+  end
+
+  it "delivers a lesson pre-reminder to the primary guardian when an adult student has no number of their own" do
+    now = Time.current
+    lesson = create(:scheduled_lesson, :scheduled, starts_at: now + 15.minutes, ends_at: now + 50.minutes)
+    participation = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+    student = participation.enrollment.student_profile
+    student.update!(student_type: "adult", whatsapp_number: nil, phone_number: nil,
+                    preferred_contact_method: "whatsapp")
+    guardian = create(:guardian, whatsapp_number: "+201001234570")
+    create(:student_guardianship, student_profile: student, guardian:, primary_contact: true, status: "active")
+    configure_reminders
+    stub_whatsapp_success
+
+    Notifications::LessonReminderScheduler.new(actor: admin, now:).call
+    perform_enqueued_jobs
+
+    notification = Notification.find_by(recipient_user: student.user, notification_type: "lesson_pre_reminder")
+    expect(notification).to be_sent
+    expect(notification.recipient_guardian).to eq(guardian)
+    expect(notification.guardian_is_fallback).to be(true)
   end
 
   it "creates one late reminder for each absent teacher and student" do

@@ -8,7 +8,7 @@ module Notifications
       @source = source
       @type = type.to_s
       @channel = channel.to_s
-      @primary_guardian = primary_guardian
+      @primary_guardian = ActiveModel::Type::Boolean.new.cast(primary_guardian)
       @idempotency_key = idempotency_key
       @scheduled_at = scheduled_at
       @queued_at = queued_at
@@ -33,6 +33,7 @@ module Notifications
       message = MessageBuilder.new(type: @type, source: @source, recipient: @recipient,
                                    locale: resolved.locale, invitation_token: token).call
       notification.assign_attributes(recipient_guardian: resolved.guardian, provider: provider_name,
+                                     guardian_is_fallback: resolved.guardian.present? && !@primary_guardian,
                                      recipient_address_masked: resolved.masked_address,
                                      recipient_locale: resolved.locale, subject: message.subject,
                                      message_snapshot: stored_message(message.body),

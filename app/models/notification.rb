@@ -14,9 +14,10 @@ class Notification < ApplicationRecord
   has_many :events, class_name: "NotificationEvent", dependent: :restrict_with_exception
   has_many :attempts, class_name: "NotificationAttempt", dependent: :restrict_with_exception
 
-  attr_readonly :public_id, :recipient_user_id, :recipient_guardian_id, :actor_id, :source_type, :source_id, :channel,
-                :notification_type, :provider, :recipient_address_masked, :recipient_locale, :subject,
-                :message_snapshot, :delivery_payload_ciphertext, :idempotency_key, :scheduled_at, :queued_at
+  attr_readonly :public_id, :recipient_user_id, :recipient_guardian_id, :guardian_is_fallback, :actor_id,
+                :source_type, :source_id, :channel, :notification_type, :provider, :recipient_address_masked,
+                :recipient_locale, :subject, :message_snapshot, :delivery_payload_ciphertext, :idempotency_key,
+                :scheduled_at, :queued_at
   before_validation :generate_public_id, on: :create
 
   validates :public_id, presence: true, uniqueness: true, format: { with: /\ANOT-[A-Z0-9]{10}\z/ }

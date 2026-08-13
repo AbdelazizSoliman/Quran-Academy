@@ -94,6 +94,7 @@ module Notifications
     def build_notification(recipient, idempotency_key)
       Notification.new(recipient_user: @invitation.user, actor: @actor, source: @invitation,
                        channel: "whatsapp", notification_type: "account_invitation", provider: "meta_whatsapp",
+                       recipient_guardian: recipient.guardian, guardian_is_fallback: recipient.guardian.present?,
                        recipient_address_masked: recipient.masked_address, recipient_locale: recipient.locale,
                        subject: nil, message_snapshot: I18n.t("notifications.secure_link_omitted"), idempotency_key:)
     end

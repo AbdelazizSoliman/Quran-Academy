@@ -12,11 +12,37 @@ module Notifications
     def call
       return invalid(:invalid_channel) unless @channel.in?(Notification::CHANNELS)
       return guardian_recipient if @primary_guardian
+      return email_recipient if @channel == "email"
 
-      @channel == "email" ? email_recipient : phone_recipient(profile_phone, @user.preferred_locale)
+      whatsapp_recipient
     end
 
     private
+
+    # A student's own WhatsApp/phone is tried first; if neither is set (Madarak onboarding
+    # allows leaving both blank, treating the guardian as the primary contact — see
+    # Admin::Onboarding::CreateStudent#build_user), this falls back to the primary guardian's
+    # number automatically. Unlike #guardian_recipient below, this applies to every student
+    # regardless of minor?, and doesn't require the caller to opt in with primary_guardian: true.
+    def whatsapp_recipient
+      primary = phone_recipient(profile_phone, @user.preferred_locale)
+      return primary if primary.valid?
+
+      student_guardian_fallback || primary
+    end
+
+    def student_guardian_fallback
+      profile = @user.student_profile
+      return nil unless profile
+
+      guardian = profile.student_guardianships.active.find_by(primary_contact: true)&.guardian
+      return nil unless guardian
+
+      number = guardian.whatsapp_number.presence || guardian.phone_number
+      return nil if number.blank?
+
+      phone_recipient(number, guardian.preferred_language, guardian:)
+    end
 
     def guardian_recipient
       profile = @user.student_profile
