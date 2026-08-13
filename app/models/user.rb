@@ -4,7 +4,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :recoverable, :rememberable, :validatable,
          :trackable, :timeoutable
 
-  enum :role, { admin: 0, staff: 1, teacher: 2, student: 3 }, validate: true
+  enum :role, { admin: 0, staff: 1, teacher: 2, student: 3, guardian: 4 }, validate: true
   enum :status, { pending: 0, active: 1, suspended: 2, disabled: 3 }, validate: true
 
   before_validation :apply_preference_defaults
@@ -28,6 +28,7 @@ class User < ApplicationRecord
   has_many :teacher_profile_events, foreign_key: :actor_id, inverse_of: :actor,
                                     dependent: :restrict_with_exception
   has_one :student_profile, inverse_of: :user, dependent: :restrict_with_exception
+  has_one :guardian_profile, class_name: "Guardian", inverse_of: :user, dependent: :restrict_with_exception
   has_one :staff_profile, inverse_of: :user, dependent: :restrict_with_exception
   has_many :created_student_profiles, class_name: "StudentProfile", foreign_key: :created_by_id,
                                       inverse_of: :created_by, dependent: :nullify
@@ -90,6 +91,7 @@ class User < ApplicationRecord
   validates :time_zone, inclusion: { in: ->(_user) { ActiveSupport::TimeZone.all.map(&:name) } }
   validate :teacher_profile_role_integrity, if: :will_save_change_to_role?
   validate :student_profile_role_integrity, if: :will_save_change_to_role?
+  validate :guardian_profile_role_integrity, if: :will_save_change_to_role?
 
   def full_name
     [first_name, last_name].compact_blank.join(" ").presence || email.to_s.split("@").first.presence || "User"
@@ -113,6 +115,10 @@ class User < ApplicationRecord
     student_profile.present?
   end
 
+  def guardian_profile?
+    guardian_profile.present?
+  end
+
   private
 
   def apply_preference_defaults
@@ -126,5 +132,9 @@ class User < ApplicationRecord
 
   def student_profile_role_integrity
     errors.add(:role, :student_profile_exists) if persisted? && !student? && student_profile?
+  end
+
+  def guardian_profile_role_integrity
+    errors.add(:role, :guardian_profile_exists) if persisted? && !guardian? && guardian_profile?
   end
 end

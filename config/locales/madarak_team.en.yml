@@ -1,0 +1,27 @@
+en:
+  navigation:
+    users: "Team and permissions"
+  madarak_team:
+    title: "Team and permissions — User administration"
+    description: "Invite academy members and manage role-based access and account status."
+    invite: "Invite member"
+    counts:
+      admins: "Owners and managers"
+      staff: "Operations staff"
+      teachers: "Teachers"
+      active: "Active members"
+    fields:
+      member: "Member"
+      role: "Role"
+      status: "Status"
+      access: "Access"
+      last_activity: "Last sign-in"
+      invited_at: "Invited"
+      actions: "Actions"
+    access:
+      admin: "Whole system"
+      staff: "Academy operations"
+      teacher: "Teaching portal"
+      student: "Student portal"
+      guardian: "Guardian portal"
+    role_based_hint: "V1 access is assigned safely by role. Custom module-by-module grants are planned for V2."

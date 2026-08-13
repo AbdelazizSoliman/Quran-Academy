@@ -13,6 +13,35 @@
   <% end %>
   <%= render "shared/components/card", title: t("admin.settings.sections.identity"), body: identity %>
 
+  <% branding = capture do %>
+    <div class="mb-5 flex items-center gap-4">
+      <% if @setting.logo_url.present? %>
+        <%= image_tag @setting.logo_url, alt: @setting.academy_name,
+                                       class: "size-16 rounded-xl border border-app-border object-contain" %>
+      <% else %>
+        <span class="grid size-16 place-items-center rounded-xl bg-app-primary text-2xl font-bold text-white">
+          <%= @setting.academy_name.first %>
+        </span>
+      <% end %>
+      <div>
+        <p class="font-semibold"><%= @setting.academy_name %></p>
+        <p class="mt-1 ds-caption" dir="ltr"><%= @setting.slug %></p>
+      </div>
+    </div>
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <% %i[logo_url primary_color secondary_color slug custom_domain].each do |field| %>
+        <div>
+          <dt class="ds-caption"><%= t("madarak_branding.fields.#{field}") %></dt>
+          <dd class="mt-1 font-semibold" dir="<%= "ltr" if field.in?(%i[logo_url primary_color secondary_color slug custom_domain]) %>">
+            <%= setting_value(@setting.public_send(field)) %>
+          </dd>
+        </div>
+      <% end %>
+    </dl>
+    <p class="mt-5 ds-supporting"><%= t("madarak_branding.hint") %></p>
+  <% end %>
+  <%= render "shared/components/card", title: t("madarak_branding.section"), body: branding %>
+
   <% contact = capture do %>
     <dl class="grid gap-4 sm:grid-cols-2">
       <% %i[contact_email contact_phone whatsapp_number website_url address_line_1 address_line_2 city state_or_region postal_code country_code].each do |field| %>

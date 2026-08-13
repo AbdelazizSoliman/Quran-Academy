@@ -1,0 +1,37 @@
+<% action = render("shared/components/button", label: t("actions.back"), href: admin_students_path, variant: :secondary) %>
+<%= render "shared/page_header", title: t("students.madarak.import"),
+                                 description: t("students.madarak.import_description"),
+                                 primary_action: action %>
+
+<% if @import_error.present? %>
+  <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><%= @import_error %></div>
+<% end %>
+
+<% if @result&.errors&.any? %>
+  <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+    <p class="font-semibold"><%= t("students.madarak.import_errors_title") %></p>
+    <ul class="mt-2 list-disc space-y-1 ps-5">
+      <% @result.errors.first(20).each do |error| %>
+        <li><%= t("students.madarak.import_line_error", line: error[:line], error: error[:messages].to_sentence) %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% body = capture do %>
+  <div class="space-y-5">
+    <p class="text-sm text-app-muted-foreground"><%= t("students.madarak.import_hint") %></p>
+    <p class="rounded-lg bg-app-muted p-3 font-mono text-xs" dir="ltr">
+      first_name,last_name,email,display_name,learning_status,assigned_teacher_profile_id,country_of_residence,gender,current_quran_level,phone_number,guardian_name,guardian_phone
+    </p>
+    <%= form_with url: import_admin_students_path, method: :post, multipart: true, class: "space-y-4" do |form| %>
+      <div>
+        <%= form.label :file, t("students.madarak.import_file"), class: "ds-label" %>
+        <%= form.file_field :file, accept: ".csv,text/csv", class: "ds-control mt-2", required: true %>
+      </div>
+      <%= render "shared/components/button", label: t("students.madarak.import_submit"), type: "submit", icon: :check %>
+    <% end %>
+  </div>
+<% end %>
+
+<%= render "shared/components/card", title: t("students.madarak.import_template"), body: body %>

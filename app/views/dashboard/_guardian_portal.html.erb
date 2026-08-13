@@ -1,0 +1,76 @@
+<%= render "shared/page_header",
+           title: t("portal.guardian.title", name: current_user.first_name),
+           description: t("portal.guardian.subtitle") %>
+
+<% if @portal[:children].many? %>
+  <%= form_with url: root_path, method: :get, class: "mb-5 flex flex-wrap items-end gap-3" do |form| %>
+    <div class="min-w-64"><%= form.label :child_id, t("portal.guardian.choose_child"), class: "ds-label" %>
+      <%= form.select :child_id, @portal[:children].map { |child| [child.display_name, child.id] },
+                      { selected: @portal[:selected_child]&.id }, class: "ds-control mt-2" %></div>
+    <%= render "shared/components/button", label: t("portal.actions.show_child"), type: "submit" %>
+  <% end %>
+<% end %>
+
+<% if @portal[:selected_child] %>
+  <% child = @portal[:selected_child] %>
+  <section class="portal-hero" aria-labelledby="guardian-welcome">
+    <div>
+      <p class="portal-eyebrow"><%= t("portal.guardian.following") %></p>
+      <h2 id="guardian-welcome"><%= child.display_name %></h2>
+      <p><%= t("portal.guardian.welcome_message") %></p>
+    </div>
+    <%= link_to t("portal.actions.child_profile"), guardian_student_path(child), class: "portal-hero-action" %>
+  </section>
+
+  <section class="portal-stat-grid" aria-label="<%= t("portal.shared.summary") %>">
+    <%= render "shared/components/stat_card", label: t("portal.guardian.attendance"),
+               value: number_to_percentage(@portal[:attendance][:rate], precision: 0),
+               note: t("portal.guardian.attendance_note", attended: @portal[:attendance][:attended], total: @portal[:attendance][:total]), icon: :check_circle %>
+    <%= render "shared/components/stat_card", label: t("portal.guardian.progress"),
+               value: number_to_percentage(@portal[:progress]&.completion_percentage || 0, precision: 0),
+               note: t("portal.guardian.progress_note"), icon: :reports %>
+    <%= render "shared/components/stat_card", label: t("portal.guardian.reports"),
+               value: @portal[:reports_count], note: t("portal.guardian.reports_note"), icon: :message %>
+    <%= render "shared/components/stat_card", label: t("portal.guardian.teacher"),
+               value: child.assigned_teacher_profile&.display_name || "-",
+               note: t("portal.guardian.teacher_note"), icon: :users %>
+  </section>
+
+  <div class="mt-6 grid gap-6 xl:grid-cols-3">
+    <section class="ds-card overflow-hidden xl:col-span-2" aria-labelledby="guardian-lessons">
+      <div class="portal-card-header">
+        <div><h2 id="guardian-lessons" class="ds-section-title"><%= t("portal.guardian.upcoming_lessons") %></h2>
+          <p class="ds-caption"><%= t("portal.guardian.upcoming_hint") %></p></div>
+        <%= link_to t("actions.view_all"), guardian_schedule_index_path, class: "portal-text-link" %>
+      </div>
+      <% if @portal[:upcoming_lessons].any? %>
+        <div class="divide-y divide-app-border">
+          <% @portal[:upcoming_lessons].each do |lesson| %>
+            <article class="portal-lesson-row">
+              <time datetime="<%= lesson.starts_at.iso8601 %>"><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :short) %></time>
+              <div><h3><%= dashboard_lesson_title(lesson) %></h3><p><%= lesson.teacher_profile.display_name %></p></div>
+              <%= scheduling_status_badge(lesson) %>
+              <%= link_to t("portal.actions.details"), guardian_schedule_path(lesson), class: "button-secondary" %>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <%= render "shared/components/empty_state", icon: :calendar,
+                   title: t("portal.shared.no_lessons"), description: t("portal.guardian.no_lessons_hint") %>
+      <% end %>
+    </section>
+
+    <aside class="ds-card p-5" aria-labelledby="guardian-actions">
+      <h2 id="guardian-actions" class="ds-section-title"><%= t("portal.shared.quick_actions") %></h2>
+      <div class="mt-4 grid gap-3">
+        <%= link_to guardian_students_path, class: "portal-quick-link" do %><%= icon :users %><span><%= t("portal.actions.children") %></span><% end %>
+        <%= link_to guardian_attendances_path, class: "portal-quick-link" do %><%= icon :check_circle %><span><%= t("portal.actions.attendance") %></span><% end %>
+        <%= link_to guardian_reports_path, class: "portal-quick-link" do %><%= icon :reports %><span><%= t("portal.actions.lesson_reports") %></span><% end %>
+        <%= link_to guardian_notifications_path, class: "portal-quick-link" do %><%= icon :message %><span><%= t("portal.actions.notifications") %></span><% end %>
+      </div>
+    </aside>
+  </div>
+<% else %>
+  <%= render "shared/components/empty_state", icon: :users,
+             title: t("portal.guardian.no_children"), description: t("portal.guardian.no_children_hint") %>
+<% end %>

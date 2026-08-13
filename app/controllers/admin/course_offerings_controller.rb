@@ -15,14 +15,17 @@ module Admin
       @program = Program.find_by(id: params[:program_id])
       @offering = build_offering
       load_programs
+      load_assignment_options
     end
 
     def edit
       load_programs
+      load_assignment_options
     end
 
     def create
       load_programs
+      load_assignment_options
       @program = @programs.find_by(id: params.dig(:course_offering, :program_id))
       @offering = if @program
                     CourseOfferings::Create.new(actor: current_user, program: @program,
@@ -31,13 +34,16 @@ module Admin
                     CourseOffering.new
                   end
       @offering.errors.add(:program, :invalid) unless @program
+      sync_assignments(student_ids: assignment_ids(:student_profile_ids)) if @offering.persisted? && @offering.errors.empty?
       respond_to_save("created", :new)
     end
 
     def update
-      @programs = Program.where.not(status: "archived").order(:name_en)
+      load_programs
+      load_assignment_options
       @offering = CourseOfferings::Update.new(actor: current_user, offering: @offering,
                                               attributes: offering_params).call
+      sync_assignments if @offering.errors.empty?
       respond_to_save("updated", :edit)
     end
 
@@ -51,11 +57,37 @@ module Admin
     private
 
     def set_offering
-      @offering = CourseOffering.includes(:program).find(params.expect(:id))
+      @offering = CourseOffering.includes(:program, :teacher_profiles, :enrollments,
+                                          scheduled_lessons: :teacher_profile).find(params.expect(:id))
     end
 
     def load_programs
       @programs = Program.where.not(status: "archived").order(:name_en)
+    end
+
+    def load_assignment_options
+      @teacher_profiles = TeacherProfile.where(employment_status: "active").where.not(profile_status: "archived")
+                                        .order(:display_name)
+      @student_profiles = StudentProfile.where.not(profile_status: "archived").order(:display_name)
+    end
+
+    def assignment_ids(key)
+      params.dig(:course_offering, key)
+    end
+
+    def sync_assignments(student_ids: nil)
+      @assignment_result = Admin::CourseOfferingAssignments::Sync.new(
+        actor: current_user, offering: @offering,
+        teacher_ids: assignment_ids(:teacher_profile_ids), student_ids:
+      ).call
+      if @assignment_result.errors.any?
+        flash[:alert] = t("course_offerings.madarak.assignment_warning",
+                          errors: @assignment_result.errors.to_sentence)
+      else
+        @assignment_notice = t("course_offerings.madarak.assignment_success",
+                               teachers: @assignment_result.teachers_count,
+                               students: @assignment_result.enrollments_created)
+      end
     end
 
     def build_offering
@@ -76,14 +108,16 @@ module Admin
                       :learning_language, :delivery_mode, :enrollment_opens_on,
                       :enrollment_closes_on, :planned_start_on, :planned_end_on, :capacity,
                       :default_lesson_duration_minutes, :intended_lessons_per_week,
-                      :placement_required, :internal_notes, { target_age_groups: [] }
-                    ])
+                      :placement_required, :internal_notes,
+                      { target_age_groups: [], teacher_profile_ids: [], student_profile_ids: [] }
+                    ]).except(:teacher_profile_ids, :student_profile_ids)
     end
 
     def respond_to_save(message, template)
       if @offering.persisted? && @offering.errors.empty?
         redirect_to admin_course_offering_path(@offering),
-                    notice: t("course_offerings.messages.#{message}"), status: :see_other
+                    notice: [t("course_offerings.messages.#{message}"), @assignment_notice].compact.join(" "),
+                    status: :see_other
       elsif template == :show
         redirect_to admin_course_offering_path(@offering), alert: @offering.errors.full_messages.to_sentence,
                                                            status: :see_other

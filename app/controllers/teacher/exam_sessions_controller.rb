@@ -1,5 +1,6 @@
 module Teacher
   class ExamSessionsController < BaseController
+    before_action -> { require_release_feature!(:exams) }
     def index
       @exam_sessions = scope.includes(:program, :course_offering).chronological
     end

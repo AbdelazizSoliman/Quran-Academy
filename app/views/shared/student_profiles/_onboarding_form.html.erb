@@ -1,69 +1,117 @@
 <%= render "shared/student_profiles/errors", profile: %>
 <%= form_with model: profile, url: admin_students_path, class: "space-y-6" do |f| %>
   <%= f.hidden_field :create_account, value: "1" %>
-  <fieldset class="ds-card p-5"><legend class="ds-section-title">الطالب</legend><p class="mt-1 ds-caption">الاسم والحالة والبيانات الأساسية والمالية.</p>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title">الطالب</legend><p class="mt-1 ds-caption">الاسم والحالة وتقدّم الحفظ.</p>
     <div class="mt-4 grid gap-4 md:grid-cols-3">
-      <div><%= f.label :first_name, "الاسم الأول *", class: "ds-label" %><%= f.text_field :first_name, value: params.dig(:student_profile, :first_name), required: true, class: "ds-control mt-2" %></div>
-      <div><%= f.label :last_name, "اسم العائلة *", class: "ds-label" %><%= f.text_field :last_name, value: params.dig(:student_profile, :last_name), required: true, class: "ds-control mt-2" %></div>
-      <div><%= f.label :display_name, "اسم الطالب داخل الأكاديمية", class: "ds-label" %><%= f.text_field :display_name, class: "ds-control mt-2" %></div>
-      <div><%= f.label :date_of_birth, "تاريخ الميلاد", class: "ds-label" %><%= f.date_field :date_of_birth, class: "ds-control mt-2" %></div>
-      <div><%= f.label :gender, "النوع", class: "ds-label" %><%= f.select :gender, [["غير محدد", "unspecified"], ["ذكر", "male"], ["أنثى", "female"]], {}, class: "ds-control mt-2" %></div>
-      <div><%= f.label :learning_status, "الحالة", class: "ds-label" %><%= f.select :learning_status, StudentProfile::LEARNING_STATUSES.map { |v| [t("student_profiles.catalogs.learning_statuses.#{v}", default: v.humanize), v] }, {}, class: "ds-control mt-2" %></div>
-      <div><%= f.label :country_of_residence, "دولة الطالب", class: "ds-label" %><%= f.text_field :country_of_residence, value: "مصر", class: "ds-control mt-2" %></div>
-      <div><%= f.label :current_quran_level, "المستوى", class: "ds-label" %><%= f.select :current_quran_level, StudentProfile::QURAN_LEVELS.map { |v| [v.humanize, v] }, {}, class: "ds-control mt-2" %></div>
-      <div><%= f.label :student_type, "نوع الطالب", class: "ds-label" %><%= f.select :student_type, StudentProfile::STUDENT_TYPES.map { |v| [v.humanize, v] }, {}, class: "ds-control mt-2" %></div>
-      <div><%= f.label :wallet_balance, "الرصيد في المحفظة", class: "ds-label" %><%= f.number_field :wallet_balance, min: 0, step: 0.01, class: "ds-control mt-2" %></div>
-      <div><%= f.label :discount_percentage, "نسبة الخصم %", class: "ds-label" %><%= f.number_field :discount_percentage, min: 0, max: 100, step: 0.01, class: "ds-control mt-2" %></div>
-      <div><%= f.label :preferred_learning_language, "لغة الدراسة", class: "ds-label" %><%= f.select :preferred_learning_language, (AcademySetting.current_or_nil&.teaching_languages || %w[ar en]).map { |v| [t("academy.languages.#{v}", default: v), v] }, {}, class: "ds-control mt-2" %></div>
+      <div class="md:col-span-3"><label class="ds-label" for="student_profile_full_name">اسم الطالب *</label><%= text_field_tag "student_profile[full_name]", params.dig(:student_profile, :full_name), required: true, class: "ds-control mt-2", id: "student_profile_full_name", placeholder: "اسم الطالب" %></div>
+      <div><%= f.label :public_id, "كود الطالب", class: "ds-label" %><%= f.text_field :public_id, class: "ds-control mt-2", dir: "ltr", placeholder: "اتركه فارغًا للتوليد التلقائي (STD-0001)" %></div>
+      <div><%= f.label :date_of_birth, "تاريخ الميلاد (اختياري)", class: "ds-label" %><%= f.date_field :date_of_birth, class: "ds-control mt-2" %></div>
+      <div><%= f.label :gender, "النوع (اختياري)", class: "ds-label" %><%= f.select :gender, [["— غير محدد —", ""], ["ذكر", "male"], ["أنثى", "female"]], {}, class: "ds-control mt-2" %></div>
+      <div><%= f.label :learning_status, "الحالة", class: "ds-label" %><%= f.select :learning_status, [["نشط", "active"], ["تجريبي", "trial"], ["متعثّر", "at_risk"], ["غير نشط", "inactive"]], {}, class: "ds-control mt-2" %></div>
+      <div><%= f.label :country_of_residence, "دولة الطالب", class: "ds-label" %><%= f.select :country_of_residence, StudentProfile::COUNTRIES.map { |code, name| [name, code] }, {}, class: "ds-control mt-2" %>
+        <p class="mt-1 ds-caption">على أساسها يُحدَّد توقيت الطالب — كل المواعيد والرسائل تظهر له بتوقيت دولته.</p></div>
+      <div><%= f.label :current_quran_level, "المستوى (اختياري)", class: "ds-label" %><%= f.select :current_quran_level, [["مبتدئ", "beginner"], ["متوسط", "intermediate"], ["متقدّم", "advanced"]], { include_blank: "— بدون —" }, class: "ds-control mt-2" %></div>
+      <div><%= f.label :memorized_juz_count, "الأجزاء المحفوظة", class: "ds-label" %><%= f.number_field :memorized_juz_count, min: 0, max: 30, step: 1, value: (profile.memorized_juz_count || 0), class: "ds-control mt-2" %></div>
+      <div><%= f.label :attendance_percentage, "نسبة الحضور %", class: "ds-label" %><%= f.number_field :attendance_percentage, min: 0, max: 100, step: 1, value: (profile.attendance_percentage || 100), class: "ds-control mt-2" %></div>
+      <div><%= f.label :preferred_learning_language, "لغة الدراسة", class: "ds-label" %><%= f.select :preferred_learning_language, (AcademySetting.current_or_nil&.teaching_languages || %w[ar en]).map { |v| [t("admin.settings.languages.#{v}", default: v), v] }, {}, class: "ds-control mt-2" %></div>
     </div>
   </fieldset>
 
-  <fieldset class="ds-card p-5"><legend class="ds-section-title">المعلم والمنهج</legend><p class="mt-1 ds-caption">اختيار المعلم المسؤول والعرض التعليمي أو الباقة.</p>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title">المعلّم والمنهج</legend><p class="mt-1 ds-caption">أسند معلّمًا، وحدّد المناهج التي يدرسها الطالب، وخطة الرسوم.</p>
     <div class="mt-4 grid gap-4 md:grid-cols-2">
-      <div><%= f.label :assigned_teacher_profile_id, "المعلم المسؤول", class: "ds-label" %><%= f.collection_select :assigned_teacher_profile_id, teachers, :id, :display_name, { include_blank: "اختر معلماً" }, class: "ds-control mt-2" %></div>
-      <div><%= f.label :course_offering_id, "العرض التعليمي / الكورس", class: "ds-label" %><%= f.collection_select :course_offering_id, offerings, :id, :title_ar, { include_blank: "بدون — يمكن الإلحاق لاحقاً" }, class: "ds-control mt-2" %></div>
-      <div><%= f.label :package_name, "خطة الرسوم / الباقة", class: "ds-label" %><%= f.text_field :package_name, class: "ds-control mt-2", placeholder: "مثال: باقة شهرية" %></div>
-      <div><%= f.label :learning_goals, "المنهج المراد تعلمه", class: "ds-label" %><%= f.text_area :learning_goals, rows: 2, class: "ds-control mt-2" %></div>
+      <div><%= f.label :assigned_teacher_profile_id, "المعلم المسؤول", class: "ds-label" %><%= f.collection_select :assigned_teacher_profile_id, teachers, :id, :display_name, { include_blank: "— اختر معلّمًا —" }, class: "ds-control mt-2" %></div>
+      <div><%= f.label :course_offering_id, "العرض التعليمي / الكورس (اختياري)", class: "ds-label" %><%= f.collection_select :course_offering_id, offerings, :id, :title_ar, { include_blank: "بدون — يمكن الإلحاق لاحقاً" }, class: "ds-control mt-2" %></div>
+      <div>
+        <p class="ds-label">المناهج (اختر واحدًا أو أكثر)</p>
+        <div class="mt-2 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3.5 py-3 text-xs text-gray-400">لا توجد مناهج بعد — تُنشأ من صفحة المنهج.</div>
+      </div>
+      <div><%= f.label :fee_plan_id, "خطة الرسوم", class: "ds-label" %><%= f.collection_select :fee_plan_id, fee_plans, :id, :name, { include_blank: "بدون" }, class: "ds-control mt-2" %></div>
+      <%# Not part of the Madarak reference form, kept: required for StudentProfile#missing_required_fields, %>
+      <%# which gates whether a profile can ever reach "verified" status. %>
+      <div class="md:col-span-2"><%= f.label :learning_goals, "المنهج المراد تعلمه", class: "ds-label" %><%= f.text_area :learning_goals, rows: 2, class: "ds-control mt-2" %></div>
     </div>
   </fieldset>
 
-  <fieldset class="ds-card p-5"><legend class="ds-section-title">الجدول والسعر</legend><p class="mt-1 ds-caption">إعداد مواعيد الطالب الأساسية وتفاصيل الحصة.</p>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title">الجدول والسعر</legend><p class="mt-1 ds-caption">تُولَّد الحصص ورابط Zoom تلقائيًا حسب الجدول.</p>
+    <details class="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-3.5" open>
+      <summary class="ds-label cursor-pointer select-none">طالب حالي عنده حصص بالفعل؟ (اختياري)</summary>
+      <p class="mt-2.5 text-xs leading-7 text-gray-500">لو الطالب قديم وعنده اشتراك جارٍ، فعّل الخيار وأدخل عدد الحصص التي أخذها والمتبقية. سيبدأ العدّاد من مكانه الصحيح، ولن تُصدر فاتورة الآن — تُصدر فاتورة التجديد تلقائيًا بعد آخر حصة متبقية.</p>
+      <label class="mt-2.5 mb-2.5 flex items-center gap-2 text-sm font-bold text-gray-900"><%= f.check_box :existing_student, class: "h-4 w-4" %> نعم، طالب حالي</label>
+      <div class="grid gap-3.5 md:grid-cols-2">
+        <div><%= f.label :prior_sessions_taken, "حصص أخذها بالفعل", class: "ds-label" %><%= f.number_field :prior_sessions_taken, min: 0, max: 500, value: (profile.prior_sessions_taken || 0), class: "ds-control mt-2" %></div>
+        <div><%= f.label :remaining_sessions_at_onboarding, "حصص متبقية له", class: "ds-label" %><%= f.number_field :remaining_sessions_at_onboarding, min: 0, max: 500, value: (profile.remaining_sessions_at_onboarding || 0), class: "ds-control mt-2" %></div>
+      </div>
+    </details>
     <div class="mt-4 grid gap-4 md:grid-cols-4">
-      <div><%= f.label :sessions_per_month, "حصص / شهر", class: "ds-label" %><%= f.number_field :sessions_per_month, min: 1, value: 8, class: "ds-control mt-2" %></div>
-      <div><%= f.label :lesson_duration_minutes, "مدة الحصة (دقيقة)", class: "ds-label" %><%= f.number_field :lesson_duration_minutes, min: 1, value: 45, class: "ds-control mt-2" %></div>
-      <div><%= f.label :weekly_lesson_count, "تكرار أسبوعي", class: "ds-label" %><%= f.number_field :weekly_lesson_count, min: 1, value: 2, class: "ds-control mt-2" %></div>
-      <div><%= f.label :session_type, "نوع الحصة", class: "ds-label" %><%= f.select :session_type, [["فردي (1:1)", "individual"], ["جماعي", "group"]], {}, class: "ds-control mt-2" %></div>
-      <div class="md:col-span-2"><%= f.label :trial_lesson_at, "موعد الحصة التجريبية", class: "ds-label" %><%= f.datetime_local_field :trial_lesson_at, class: "ds-control mt-2" %></div>
-      <% weekday_options = StudentProfile::WEEKDAYS.map { |day| [t("scheduling.catalogs.weekdays.#{day}"), day] } %>
-      <% 3.times do |index| %>
-        <% position = index + 1 %>
-        <div class="schedule-slot-field md:col-span-2"><%= f.label "schedule_weekday_#{position}", "يوم الحصة #{position}", class: "ds-label" %><%= f.select "schedule_weekday_#{position}", weekday_options, { include_blank: position == 1 ? "اختر اليوم" : "موعد إضافي اختياري" }, class: "ds-control schedule-weekday-select mt-2" %></div>
-        <div class="schedule-slot-field md:col-span-2"><%= f.label "schedule_time_#{position}", "وقت الحصة #{position}", class: "ds-label" %><%= f.time_field "schedule_time_#{position}", class: "ds-control mt-2" %></div>
-      <% end %>
-      <div><%= f.label :weekly_price, "السعر الأسبوعي", class: "ds-label" %><%= f.number_field :weekly_price, min: 0, step: 0.01, class: "ds-control mt-2" %></div>
-      <div><%= f.label :billing_currency, "العملة", class: "ds-label" %><%= f.select :billing_currency, %w[EGP USD EUR GBP SAR AED].map { |c| [c, c] }, {}, class: "ds-control mt-2" %></div>
+      <div><%= f.label :sessions_per_month, "عدد الحصص المشتراة", class: "ds-label" %><%= f.number_field :sessions_per_month, min: 1, max: 672, value: 8, class: "ds-control mt-2" %>
+        <p class="mt-1 text-[11px] leading-relaxed text-gray-400">الإجمالي، لا الشهري. المدة تُحسب من مواعيدك الأسبوعية.</p></div>
+      <div><%= f.label :lesson_duration_minutes, "مدة الحصة (دقيقة)", class: "ds-label" %><%= f.number_field :lesson_duration_minutes, min: 15, max: 120, value: 45, class: "ds-control mt-2" %></div>
+      <div><%= f.label :schedule_generation_weeks, "توليد لكام أسبوع", class: "ds-label" %><%= f.number_field :schedule_generation_weeks, min: 1, max: 48, value: 4, class: "ds-control mt-2" %>
+        <p class="mt-1 ds-caption">حتى 48 أسبوع (سنة كاملة).</p></div>
+      <div><%= f.label :session_type, "نوع الحصة", class: "ds-label" %><%= f.select :session_type, [["فردي (1:1)", "individual"], ["جماعي (حلقة)", "group"]], {}, class: "ds-control mt-2" %></div>
+    </div>
+    <p class="text-xs text-gray-400">«جماعي»: الطلاب اللي تحدّدهم جماعي لنفس المعلّم في نفس اليوم والوقت يدخلوا نفس الرابط تلقائيًا، وتُحتسب ساعة الحلقة للمعلّم مرة واحدة.</p>
+    <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-3.5">
+      <%= f.label :trial_lesson_at, "موعد الحصة التجريبية (للطالب التجريبي)", class: "ds-label" %><%= f.datetime_local_field :trial_lesson_at, class: "ds-control mt-2" %>
+      <p class="mt-1.5 text-xs text-emerald-800">لو حدّدته، تُنشأ حصة تجريبية تلقائيًا بالرابط، وبعد حضورها يُطلب من الطالب إن كان يرغب بالاشتراك — ويصلك إشعار لتفعيله.</p>
+    </div>
+
+    <div data-controller="schedule-slots">
+      <p class="ds-label">مواعيد الحصص (يوم + وقت لكل حصة)</p>
+      <%= hidden_field_tag "student_profile[slots_json]", "", data: { "schedule-slots-target": "hidden" } %>
+      <datalist id="mh-subjects">
+        <% %w[حفظ تجويد مراجعة نورانية تلاوة تفسير عربية فقه].each do |s| %><option value="<%= s %>"></option><% end %>
+      </datalist>
+      <div class="mt-2 flex flex-col gap-2" data-schedule-slots-target="container"></div>
+      <template data-schedule-slots-target="template">
+        <div class="grid grid-cols-[1.1fr_1fr_0.85fr_1.1fr_auto] items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2" data-schedule-slots-row data-action="change->schedule-slots#sync input->schedule-slots#sync">
+          <select class="ds-control min-w-0" data-slot-field="weekday">
+            <% StudentProfile::WEEKDAYS.each_with_index do |day, i| %><option value="<%= day %>" <%= "selected" if i.zero? %>><%= t("scheduling.catalogs.weekdays.#{day}") %></option><% end %>
+          </select>
+          <input type="time" class="ds-control min-w-0" style="direction:ltr" value="17:00" data-slot-field="time">
+          <select class="ds-control min-w-0" title="مدة الحصة" data-slot-field="duration">
+            <% [15, 20, 30, 45, 60, 90, 120].each do |m| %><option value="<%= m %>" <%= "selected" if m == 45 %>><%= m %> د</option><% end %>
+          </select>
+          <input list="mh-subjects" placeholder="المادة (حفظ، تجويد…)" class="ds-control min-w-0" data-slot-field="subject">
+          <button type="button" aria-label="حذف" class="w-8 shrink-0 text-lg font-bold text-red-500" data-action="schedule-slots#remove">×</button>
+        </div>
+      </template>
+      <button type="button" class="mt-2.5 rounded-full bg-amber-50 px-4 py-2 text-xs font-bold text-amber-800" data-action="schedule-slots#add">+ إضافة موعد</button>
+      <p class="mt-2 text-[11px] leading-relaxed text-gray-500">كل حصة ليها يومها ووقتها ومدتها ومادتها. يعني تقدر تحط الأحد ساعة حفظ، والثلاثاء نص ساعة تجويد — والحصص واللينكات بتتعمل على الأساس ده بالظبط، والمعلّم بياخد أجره على المدة الحقيقية.</p>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-4">
+      <div><%= f.label :weekly_price, "السعر الشهري", class: "ds-label" %><%= f.number_field :weekly_price, min: 0, step: 0.01, value: 60, class: "ds-control mt-2" %></div>
+      <div><%= f.label :billing_currency, "العملة", class: "ds-label" %><%= f.select :billing_currency, [["EGP ج.م", "EGP"], ["USD $", "USD"], ["SAR ر.س", "SAR"], ["AED د.إ", "AED"]], {}, class: "ds-control mt-2" %></div>
     </div>
   </fieldset>
 
-  <fieldset class="ds-card p-5"><legend class="ds-section-title">ولي الأمر والإخوة</legend><p class="mt-1 ds-caption">اربط ولي أمر موجوداً أو أنشئ واحداً جديداً، ويمكن ربط أخ أو أخت مسجلين مسبقاً.</p>
-    <div class="mt-4 grid gap-4 md:grid-cols-3">
-      <div class="md:col-span-3"><%= f.label :existing_guardian_id, "ولي أمر موجود", class: "ds-label" %><%= f.collection_select :existing_guardian_id, guardians, :id, :full_name, { include_blank: "إنشاء ولي أمر جديد أو بدون ولي أمر" }, class: "ds-control mt-2" %></div>
-      <div><%= f.label :guardian_name, "اسم ولي الأمر الجديد", class: "ds-label" %><%= f.text_field :guardian_name, class: "ds-control mt-2" %></div>
-      <div><%= f.label :guardian_email, "بريد ولي الأمر", class: "ds-label" %><%= f.email_field :guardian_email, class: "ds-control mt-2", dir: "ltr" %></div>
-      <div><%= f.label :guardian_phone, "هاتف / واتساب ولي الأمر", class: "ds-label" %><%= f.telephone_field :guardian_phone, class: "ds-control mt-2", dir: "ltr" %></div>
-      <div class="md:col-span-3"><%= f.label :sibling_student_profile_id, "إضافة أخ أو أخت مسجلين", class: "ds-label" %><%= f.collection_select :sibling_student_profile_id, students, :id, :display_name, { include_blank: "بدون" }, class: "ds-control mt-2" %></div>
-    </div>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title">إضافة إخوة (اختياري)</legend><p class="mt-1 ds-caption">إخوة يدخلون حلقة واحدة بنفس الرابط ونفس المعلّم في نفس الموعد.</p>
+    <p class="text-xs leading-7 text-gray-500">سجّل إخوة الطالب (حتى ٤) تحت نفس ولي الأمر ونفس المعلّم، ليدخلوا جميعًا حلقة واحدة بنفس الرابط في نفس الموعد.</p>
+    <%# Madarak adds up to 4 NEW siblings inline (not built here — see follow-ups). QA's existing %>
+    <%# link-to-an-existing-student-profile picker is kept as the closest working approximation. %>
+    <div class="mt-3"><%= f.label :sibling_student_profile_id, "إضافة أخ أو أخت مسجلين", class: "ds-label" %><%= f.collection_select :sibling_student_profile_id, students, :id, :display_name, { include_blank: "بدون" }, class: "ds-control mt-2" %></div>
   </fieldset>
 
-  <fieldset class="ds-card p-5"><legend class="ds-section-title">حسابات الدخول</legend><p class="mt-1 ds-caption">سيُنشأ الحساب وتُرسل دعوة التفعيل بالطريقة المتاحة في إعدادات الأكاديمية.</p>
+  <fieldset class="ds-card p-5"><legend class="ds-section-title">حسابات الدخول</legend><p class="mt-1 ds-caption">بيانات ولي الأمر اختيارية — لو الطالب معندوش ولي أمر سيبها فاضية. تُنشأ الحسابات تلقائيًا وتُرسَل الدعوات.</p>
     <div class="mt-4 grid gap-4 md:grid-cols-3">
-      <div><%= f.label :email, "بريد الطالب *", class: "ds-label" %><%= f.email_field :email, value: params.dig(:student_profile, :email), required: true, class: "ds-control mt-2", dir: "ltr" %></div>
-      <div><%= f.label :phone_number, "هاتف الطالب", class: "ds-label" %><%= f.telephone_field :phone_number, required: true, class: "ds-control mt-2", dir: "ltr" %></div>
-      <div><%= f.label :whatsapp_number, "واتساب الطالب", class: "ds-label" %><%= f.telephone_field :whatsapp_number, class: "ds-control mt-2", dir: "ltr" %></div>
-      <div><%= f.label :preferred_contact_method, "طريقة التواصل", class: "ds-label" %><%= f.select :preferred_contact_method, [["واتساب", "whatsapp"], ["البريد", "email"], ["الهاتف", "phone"]], {}, class: "ds-control mt-2" %></div>
-      <div><%= f.label :account_delivery_method, "إرسال بيانات الدخول", class: "ds-label" %><%= f.select :account_delivery_method, [["واتساب", "whatsapp"], ["البريد", "email"], ["كلاهما", "both"]], {}, class: "ds-control mt-2" %></div>
-      <div><%= f.label :preferred_interface_locale, "لغة الرسائل والواجهة", class: "ds-label" %><%= f.select :preferred_interface_locale, [["العربية", "ar"], ["English", "en"]], {}, class: "ds-control mt-2" %></div>
+      <div><%= f.label :guardian_name, "اسم ولي الأمر (اختياري)", class: "ds-label" %><%= f.text_field :guardian_name, class: "ds-control mt-2", placeholder: "أبو عبد الله" %></div>
+      <div class="md:col-span-2">
+        <%= f.label :guardian_phone, "هاتف ولي الأمر ودولته (اختياري)", class: "ds-label" %>
+        <div class="mt-2 grid grid-cols-[10rem_1fr] gap-2">
+          <%= f.select :guardian_phone_country_code, StudentProfile::PHONE_COUNTRY_CODES.map { |code, (name, dial)| ["#{name} +#{dial}", code] }, {}, class: "ds-control min-w-0" %>
+          <%= f.telephone_field :guardian_phone, class: "ds-control min-w-0", dir: "ltr", placeholder: "1001234567" %>
+        </div>
+        <p class="mt-1 ds-caption">اكتب الرقم من غير كود الدولة ومن غير الصفر — مثال: 1001234567.</p>
+      </div>
+      <div><%= f.label :account_delivery_method, "طريقة الإشعار", class: "ds-label" %><%= f.select :account_delivery_method, [["واتساب (الأساسي)", "whatsapp"], ["واتساب والبريد", "both"]], {}, class: "ds-control mt-2" %></div>
+      <div><%= f.label :preferred_interface_locale, "لغة الرسائل", class: "ds-label" %><%= f.select :preferred_interface_locale, [["العربية", "ar"], ["English", "en"]], {}, class: "ds-control mt-2" %>
+        <p class="mt-1 ds-caption">لغة رسائل الواتساب والبريد لهذه العائلة.</p></div>
+      <div><%= f.label :guardian_email, "بريد ولي الأمر (اختياري)", class: "ds-label" %><%= f.email_field :guardian_email, class: "ds-control mt-2", dir: "ltr", placeholder: "parent@example.com" %></div>
+      <div><%= f.label :email, "بريد الطالب (اختياري)", class: "ds-label" %><%= f.email_field :email, value: params.dig(:student_profile, :email), class: "ds-control mt-2", dir: "ltr", placeholder: "student@example.com" %></div>
+      <div><%= f.label :whatsapp_number, "واتساب الطالب (اختياري)", class: "ds-label" %><%= f.telephone_field :whatsapp_number, class: "ds-control mt-2", dir: "ltr", placeholder: "مثال: 201012345678" %>
+        <p class="mt-1 ds-caption">رقم الطالب نفسه — لو اتحط، رسائله تروح عليه بدل ولي الأمر. اكتب كود الدولة للأرقام الأجنبية.</p></div>
     </div>
   </fieldset>
-  <div class="flex gap-3"><%= render "shared/components/button", label: "حفظ الطالب وإرسال الدعوة", type: "submit" %><%= render "shared/components/button", label: "إلغاء", href: admin_students_path, variant: :secondary %></div>
+  <div class="flex gap-3"><%= render "shared/components/button", label: "حفظ الطالب", type: "submit" %><%= render "shared/components/button", label: "إلغاء", href: admin_students_path, variant: :secondary %></div>
 <% end %>

@@ -1,0 +1,14 @@
+<%= render "shared/page_header", title: t("parent_portal.notifications.title"),
+           description: t("parent_portal.notifications.description") %>
+<div class="ds-card overflow-hidden">
+  <% @notifications.each do |notification| %>
+    <article class="portal-record-row">
+      <span class="grid size-11 place-items-center rounded-full bg-app-primary-soft text-app-primary"><%= icon :message %></span>
+      <div class="min-w-0 flex-1"><h2 class="text-sm font-bold"><%= notification.subject %></h2>
+        <p class="mt-1 line-clamp-2 ds-caption"><%= notification.message_snapshot %></p></div>
+      <time class="ds-caption" dir="ltr"><%= l(notification.created_at.in_time_zone(current_user.time_zone), format: :short) %></time>
+    </article>
+  <% end %>
+  <% if @notifications.empty? %><%= render "shared/components/empty_state", icon: :message,
+    title: t("parent_portal.notifications.empty"), description: t("parent_portal.notifications.empty_hint") %><% end %>
+</div>

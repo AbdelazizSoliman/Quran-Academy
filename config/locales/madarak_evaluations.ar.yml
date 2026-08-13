@@ -1,0 +1,20 @@
+ar:
+  madarak_evaluations:
+    description: "سجّل مستوى الطالب في معايير الأكاديمية الأربعة، ثم راجع التقييم وانشره."
+    sections:
+      student: "الطالب وبيانات التقييم"
+      scores: "التقييم"
+    fields:
+      student: "الطالب"
+      memorization: "الحفظ"
+      tajweed: "التجويد"
+      attendance: "الحضور"
+      behavior: "السلوك"
+      overall: "النتيجة"
+      date: "التاريخ"
+      status: "الحالة"
+      actions: "الإجراءات"
+    actions:
+      save_draft: "حفظ التقييم"
+    errors:
+      incomplete_scores: "اختر تقييمًا صحيحًا للحفظ والتجويد والحضور والسلوك."

@@ -19,7 +19,9 @@ module Admin
     end
 
     def call
-      relation = search(@relation.joins(:program).includes(:program, :enrollments))
+      relation = search(@relation.joins(:program).includes(
+        :program, :enrollments, :teacher_profiles, scheduled_lessons: :teacher_profile
+      ))
       relation = filters(relation)
       relation.distinct.order(ordering)
     end

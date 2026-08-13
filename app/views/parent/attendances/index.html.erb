@@ -1,0 +1,15 @@
+<%= render "shared/page_header", title: t("parent_portal.attendance.title"),
+           description: t("parent_portal.attendance.description") %>
+<div class="ds-card overflow-hidden">
+  <% @attendances.each do |attendance| %>
+    <article class="portal-record-row">
+      <span class="portal-avatar"><%= attendance.student_profile.display_name.to_s.first %></span>
+      <div class="min-w-0 flex-1"><h2 class="truncate text-sm font-bold"><%= attendance.student_profile.display_name %> · <%= dashboard_lesson_title(attendance.scheduled_lesson) %></h2>
+        <p class="mt-1 ds-caption" dir="ltr"><%= l(attendance.scheduled_lesson.starts_at.in_time_zone(current_user.time_zone), format: :short) %></p></div>
+      <%= render "shared/components/badge", label: t("attendance.statuses.#{attendance.status}"),
+                 variant: attendance.status.in?(%w[present late left_early]) ? :success : :warning %>
+    </article>
+  <% end %>
+  <% if @attendances.empty? %><%= render "shared/components/empty_state", icon: :check_circle,
+    title: t("parent_portal.attendance.empty"), description: t("parent_portal.attendance.empty_hint") %><% end %>
+</div>

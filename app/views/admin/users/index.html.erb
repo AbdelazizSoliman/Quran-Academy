@@ -1,77 +1,90 @@
-<% new_action = render("shared/components/button", label: t("admin.users.actions.new"), href: new_admin_user_path, icon: :plus) %>
-<%= render "shared/page_header",
-           title: t("admin.users.index.title"),
-           description: t("admin.users.index.description"),
-           primary_action: new_action %>
+<% new_action = render("shared/components/button", label: t("madarak_team.invite"),
+                                                   href: new_admin_user_path, icon: :plus) %>
+<%= render "shared/page_header", title: t("madarak_team.title"),
+                                 description: t("madarak_team.description"),
+                                 primary_action: new_action %>
 
-<% filters_body = capture do %>
-  <%= form_with url: admin_users_path, method: :get, class: "grid gap-4 lg:grid-cols-6", data: { component: "user-filters" } do |form| %>
-    <div class="lg:col-span-2">
-      <%= form.label :query, t("admin.users.filters.query"), class: "ds-label" %>
-      <%= form.search_field :query, value: params[:query], class: "ds-control mt-2", autocomplete: "off" %>
-    </div>
-    <% { role: User.roles.keys, status: User.statuses.keys, preferred_locale: %w[ar en] }.each do |field, values| %>
-      <div>
-        <%= form.label field, t("admin.users.fields.#{field}"), class: "ds-label" %>
-        <%= form.select field,
-                        [[t("admin.users.filters.all"), ""]] + values.map { |value| [t(field == :preferred_locale ? "admin.users.locales.#{value}" : "#{field.to_s.pluralize}.#{value}"), value] },
-                        { selected: params[field] }, class: "ds-control mt-2" %>
-      </div>
-    <% end %>
-    <div class="flex items-end gap-2">
-      <%= render "shared/components/button", label: t("actions.search"), type: "submit", icon: :search %>
-      <%= render "shared/components/button", label: t("admin.users.filters.clear"), href: admin_users_path, variant: :ghost %>
-    </div>
+<section class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="<%= t("madarak_team.title") %>">
+  <% @team_counts.each do |key, value| %>
+    <%= render "shared/components/stat_card", label: t("madarak_team.counts.#{key}"),
+                                                value:, icon: :users %>
   <% end %>
-<% end %>
-<%= render "shared/components/card", body: filters_body %>
+</section>
 
-<div class="mt-6 overflow-hidden rounded-xl border border-app-border bg-app-surface shadow-sm" data-component="admin-users-table">
-  <div class="overflow-x-auto">
-    <table class="min-w-full divide-y divide-app-border">
-      <caption class="sr-only"><%= t("admin.users.index.caption") %></caption>
-      <thead class="bg-app-muted">
-        <tr>
-          <% %w[name email role status preferred_locale time_zone sign_in_count last_sign_in_at created_at actions].each do |field| %>
-            <th scope="col" class="whitespace-nowrap px-4 py-3 text-start ds-table-heading">
-              <% if field.in?(Admin::UsersQuery::SORTS.keys) %>
-                <% direction = params[:sort] == field && params[:direction] != "asc" ? "asc" : "desc" %>
-                <%= link_to t("admin.users.fields.#{field}"), admin_users_path(request.query_parameters.merge(sort: field, direction:)), class: "hover:text-app-primary" %>
-              <% else %>
-                <%= t("admin.users.fields.#{field}") %>
-              <% end %>
-            </th>
-          <% end %>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-app-border">
-        <% @users.each do |user| %>
-          <tr class="hover:bg-app-muted/50">
-            <th scope="row" class="whitespace-nowrap px-4 py-3 text-start text-sm font-semibold"><%= link_to user.full_name, admin_user_path(user), class: "text-app-primary hover:underline" %></th>
-            <td class="whitespace-nowrap px-4 py-3 text-sm"><%= user.email %></td>
-            <td class="px-4 py-3"><%= user_role_badge(user) %></td>
-            <td class="px-4 py-3"><%= user_status_badge(user) %></td>
-            <td class="px-4 py-3 text-sm"><%= t("admin.users.locales.#{user.preferred_locale}") %></td>
-            <td class="whitespace-nowrap px-4 py-3 text-sm"><%= user.time_zone %></td>
-            <td class="px-4 py-3 text-sm"><%= user.sign_in_count %></td>
-            <td class="whitespace-nowrap px-4 py-3 text-sm"><%= localized_datetime(user.last_sign_in_at) %></td>
-            <td class="whitespace-nowrap px-4 py-3 text-sm"><%= localized_datetime(user.created_at) %></td>
-            <td class="px-4 py-3">
-              <%= render "shared/components/dropdown",
-                         icon_only: true,
-                         aria_label: t("accessibility.row_actions"),
-                         items: [
-                           { label: t("actions.view"), href: admin_user_path(user), icon: :users },
-                           { label: t("actions.edit"), href: edit_admin_user_path(user), icon: :settings }
-                         ] %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+<%= render "shared/components/alert", variant: :information,
+           title: t("madarak_team.fields.access"), message: t("madarak_team.role_based_hint") %>
+
+<%= form_with url: admin_users_path, method: :get,
+              class: "ds-card mb-6 mt-6 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-4",
+              data: { component: "user-filters" } do |form| %>
+  <div class="xl:col-span-2">
+    <%= form.label :query, t("admin.users.filters.query"), class: "ds-label" %>
+    <%= form.search_field :query, value: params[:query], class: "ds-control mt-2", autocomplete: "off" %>
   </div>
+  <div>
+    <%= form.label :role, t("madarak_team.fields.role"), class: "ds-label" %>
+    <%= form.select :role,
+                    [[t("admin.users.filters.all"), ""]] +
+                      User.roles.keys.map { |role| [t("roles.#{role}"), role] },
+                    { selected: params[:role] }, class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :status, t("madarak_team.fields.status"), class: "ds-label" %>
+    <%= form.select :status,
+                    [[t("admin.users.filters.all"), ""]] +
+                      User.statuses.keys.map { |status| [t("statuses.#{status}"), status] },
+                    { selected: params[:status] }, class: "ds-control mt-2" %>
+  </div>
+  <div class="flex items-end gap-2 xl:col-span-4">
+    <%= render "shared/components/button", label: t("actions.search"), type: :submit, icon: :search %>
+    <%= render "shared/components/button", label: t("admin.users.filters.clear"),
+                                                  href: admin_users_path, variant: :secondary %>
+  </div>
+<% end %>
+
+<div class="ds-card overflow-x-auto" data-component="admin-users-table">
+  <table class="min-w-[980px] w-full">
+    <caption class="sr-only"><%= t("madarak_team.title") %></caption>
+    <thead class="bg-app-surface-muted">
+      <tr>
+        <% %i[member role status access last_activity invited_at actions].each do |field| %>
+          <th scope="col" class="whitespace-nowrap px-4 py-3 text-start text-sm font-semibold">
+            <%= t("madarak_team.fields.#{field}") %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-app-border">
+      <% @users.each do |user| %>
+        <tr class="hover:bg-app-surface-muted">
+          <th scope="row" class="px-4 py-3 text-start">
+            <%= link_to user.full_name, admin_user_path(user), class: "font-semibold text-app-primary hover:underline" %>
+            <p class="mt-1 text-sm" dir="ltr"><%= user.email %></p>
+          </th>
+          <td class="px-4 py-3"><%= user_role_badge(user) %></td>
+          <td class="px-4 py-3"><%= user_status_badge(user) %></td>
+          <td class="px-4 py-3 text-sm"><%= t("madarak_team.access.#{user.role}") %></td>
+          <td class="whitespace-nowrap px-4 py-3 text-sm"><%= localized_datetime(user.last_sign_in_at) %></td>
+          <td class="whitespace-nowrap px-4 py-3 text-sm"><%= localized_datetime(user.created_at) %></td>
+          <td class="px-4 py-3">
+            <%= render "shared/components/dropdown",
+                       icon_only: true,
+                       aria_label: t("accessibility.row_actions"),
+                       items: [
+                         { label: t("actions.view"), href: admin_user_path(user), icon: :users },
+                         { label: t("actions.edit"), href: edit_admin_user_path(user), icon: :settings }
+                       ] %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
   <% if @users.empty? %>
-    <div class="p-5"><%= render "shared/components/empty_state", icon: :users, title: t("admin.users.empty.title"), description: t("admin.users.empty.description") %></div>
+    <div class="p-5">
+      <%= render "shared/components/empty_state", icon: :users,
+                 title: t("admin.users.empty.title"), description: t("admin.users.empty.description") %>
+    </div>
   <% end %>
 </div>
 
@@ -79,8 +92,16 @@
   <nav class="mt-5 flex flex-wrap justify-between gap-3" aria-label="<%= t("accessibility.pagination") %>">
     <p class="ds-caption"><%= t("pagination.summary", from: @pagy.from, to: @pagy.to, total: @pagy.count) %></p>
     <div class="flex gap-2">
-      <% if @pagy.previous %><%= link_to t("pagination.previous"), admin_users_path(request.query_parameters.merge(page: @pagy.previous)), class: button_classes(variant: :secondary, size: :small) %><% end %>
-      <% if @pagy.next %><%= link_to t("pagination.next"), admin_users_path(request.query_parameters.merge(page: @pagy.next)), class: button_classes(variant: :secondary, size: :small) %><% end %>
+      <% if @pagy.previous %>
+        <%= link_to t("pagination.previous"),
+                    admin_users_path(request.query_parameters.merge(page: @pagy.previous)),
+                    class: button_classes(variant: :secondary, size: :small) %>
+      <% end %>
+      <% if @pagy.next %>
+        <%= link_to t("pagination.next"),
+                    admin_users_path(request.query_parameters.merge(page: @pagy.next)),
+                    class: button_classes(variant: :secondary, size: :small) %>
+      <% end %>
     </div>
   </nav>
 <% end %>

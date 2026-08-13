@@ -17,6 +17,7 @@ FactoryBot.define do
       role { :student }
       preferred_locale { "en" }
     end
+    trait(:guardian) { role { :guardian } }
 
     trait(:active) { status { :active } }
     trait(:pending) { status { :pending } }

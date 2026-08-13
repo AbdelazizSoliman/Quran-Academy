@@ -1,4 +1,101 @@
-<% action = current_user.admin? ? render("shared/components/button", label: t("academic.actions.new_assessment"), href: new_admin_student_assessment_path, icon: :plus) : nil %>
-<%= render "shared/page_header", title: t("academic.assessments.index"), description: t("academic.assessments.description"), primary_action: action %>
-<%= render "shared/academic/assessment_list", assessments: @assessments, path: ->(assessment) { admin_student_assessment_path(assessment) } %>
-<% if @pagy.pages > 1 %><p class="mt-5 ds-caption"><%= t("pagination.summary", from: @pagy.from, to: @pagy.to, total: @pagy.count) %></p><% end %>
+<% action = current_user.admin? ? render("shared/components/button", label: t("academic.actions.new_assessment"),
+                                                                     href: new_admin_student_assessment_path,
+                                                                     icon: :plus) : nil %>
+<%= render "shared/page_header", title: t("academic.assessments.index"),
+                                 description: t("madarak_evaluations.description"),
+                                 primary_action: action %>
+
+<%= form_with url: admin_student_assessments_path, method: :get,
+              class: "ds-card mb-6 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6" do |form| %>
+  <div>
+    <%= form.label :student_id, t("madarak_evaluations.fields.student"), class: "ds-label" %>
+    <%= form.collection_select :student_id, @students, :id, :display_name,
+                               { include_blank: t("actions.all"), selected: params[:student_id] },
+                               class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :teacher_id, t("academic.fields.teacher"), class: "ds-label" %>
+    <%= form.collection_select :teacher_id, @teachers, :id, :display_name,
+                               { include_blank: t("actions.all"), selected: params[:teacher_id] },
+                               class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :status, t("madarak_evaluations.fields.status"), class: "ds-label" %>
+    <%= form.select :status,
+                    StudentAssessment::STATUSES.map { |status| [t("academic.statuses.#{status}"), status] },
+                    { include_blank: t("actions.all"), selected: params[:status] },
+                    class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :from, t("scheduling.fields.from"), class: "ds-label" %>
+    <%= form.date_field :from, value: params[:from], class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :to, t("scheduling.fields.to"), class: "ds-label" %>
+    <%= form.date_field :to, value: params[:to], class: "ds-control mt-2" %>
+  </div>
+  <div class="flex items-end gap-2">
+    <%= render "shared/components/button", label: t("actions.filter"), type: :submit %>
+    <%= render "shared/components/button", label: t("actions.reset"),
+                                                  href: admin_student_assessments_path,
+                                                  variant: :secondary %>
+  </div>
+<% end %>
+
+<div class="ds-card overflow-x-auto">
+  <table class="min-w-[1100px] w-full">
+    <thead class="bg-app-surface-muted">
+      <tr>
+        <% %i[student memorization tajweed attendance behavior overall date status actions].each do |field| %>
+          <th scope="col" class="whitespace-nowrap px-4 py-3 text-start text-sm font-semibold">
+            <%= t("madarak_evaluations.fields.#{field}") %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-app-border">
+      <% @assessments.each do |assessment| %>
+        <% scores = assessment.scores.index_by { |score| score.assessment_rubric_item.assessment_category.code } %>
+        <tr class="hover:bg-app-surface-muted">
+          <td class="px-4 py-3">
+            <strong><%= assessment.student_profile.display_name %></strong>
+            <p class="mt-1 ds-caption"><%= assessment.teacher_profile.display_name %></p>
+          </td>
+          <% %w[memorization tajweed attendance behavior].each do |code| %>
+            <% rating = scores[code]&.rating %>
+            <td class="px-4 py-3 text-sm">
+              <%= rating.present? ? t("academic.ratings.#{rating}") : t("academic.not_available") %>
+            </td>
+          <% end %>
+          <td class="whitespace-nowrap px-4 py-3 font-semibold">
+            <%= assessment.overall_score || t("academic.not_available") %><%= "%" if assessment.overall_score %>
+          </td>
+          <td class="whitespace-nowrap px-4 py-3 text-sm" dir="ltr"><%= assessment.assessment_date %></td>
+          <td class="whitespace-nowrap px-4 py-3 text-sm"><%= t("academic.statuses.#{assessment.status}") %></td>
+          <td class="whitespace-nowrap px-4 py-3">
+            <div class="flex flex-wrap gap-2">
+              <%= render "shared/components/button", label: t("actions.view"),
+                                                    href: admin_student_assessment_path(assessment),
+                                                    variant: :secondary, size: :small %>
+              <% if current_user.admin? && assessment.draft? %>
+                <%= render "shared/components/button", label: t("actions.edit"),
+                                                      href: edit_admin_student_assessment_path(assessment),
+                                                      variant: :secondary, size: :small %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @assessments.empty? %>
+  <div class="mt-6">
+    <%= render "shared/components/empty_state", icon: :reports, title: t("academic.empty"), description: "" %>
+  </div>
+<% end %>
+
+<% if @pagy.pages > 1 %>
+  <div class="mt-6"><%== @pagy.series_nav %></div>
+<% end %>

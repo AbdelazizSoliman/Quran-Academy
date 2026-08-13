@@ -1,0 +1,119 @@
+<% actions = capture do %>
+  <div class="flex flex-wrap gap-2">
+    <%= render "shared/components/button", label: t("students.actions.new"), href: new_admin_student_path, icon: :plus %>
+    <%= render "shared/components/button", label: t("students.madarak.import"), href: import_admin_students_path, variant: :secondary %>
+    <%= render "shared/components/button", label: t("students.madarak.export"),
+                                           href: export_admin_students_path(request.query_parameters.except(:page)),
+                                           variant: :secondary %>
+  </div>
+<% end %>
+
+<%= render "shared/page_header", title: t("students.index.title"),
+                                 description: t("students.index.description"),
+                                 primary_action: actions %>
+
+<% teachers = TeacherProfile.where.not(profile_status: "archived").order(:display_name) %>
+<% countries = StudentProfile.where.not(country_of_residence: [nil, ""]).distinct.order(:country_of_residence).pluck(:country_of_residence) %>
+
+<% filters = capture do %>
+  <%= form_with url: admin_students_path, method: :get, class: "space-y-3" do |form| %>
+    <div class="grid gap-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div class="lg:col-span-2">
+        <%= form.search_field :q, value: params[:q], placeholder: t("students.madarak.search_placeholder"),
+                                  class: "ds-control" %>
+      </div>
+      <%= form.select :learning_status,
+                      [[t("students.madarak.all_statuses"), ""]] + StudentProfile::LEARNING_STATUSES.map { |value| [t("student_profiles.catalogs.learning_statuses.#{value}"), value] },
+                      { selected: params[:learning_status] }, class: "ds-control" %>
+      <%= form.collection_select :teacher_id, teachers, :id, :display_name,
+                                 { include_blank: t("students.madarak.all_teachers"), selected: params[:teacher_id] },
+                                 class: "ds-control" %>
+      <%= form.select :country, [[t("students.madarak.all_countries"), ""]] + countries.map { |value| [value, value] },
+                      { selected: params[:country] }, class: "ds-control" %>
+      <%= form.select :billing_currency,
+                      [[t("students.madarak.all_currencies"), ""]] + StudentProfile::CURRENCIES.map { |value| [value, value] },
+                      { selected: params[:billing_currency] }, class: "ds-control" %>
+      <%= form.select :current_quran_level,
+                      [[t("students.madarak.all_levels"), ""]] + StudentProfile::QURAN_LEVELS.map { |value| [t("student_profiles.catalogs.quran_levels.#{value}"), value] },
+                      { selected: params[:current_quran_level] }, class: "ds-control" %>
+      <%= form.select :gender,
+                      [[t("students.madarak.all_genders"), ""]] + StudentProfile::GENDERS.map { |value| [t("student_profiles.catalogs.genders.#{value}"), value] },
+                      { selected: params[:gender] }, class: "ds-control" %>
+      <%= form.select :age_group,
+                      [[t("students.madarak.all_ages"), ""], [t("students.madarak.age_under_13"), "under_13"],
+                       [t("students.madarak.age_13_17"), "13_17"], [t("students.madarak.age_18_plus"), "18_plus"]],
+                      { selected: params[:age_group] }, class: "ds-control" %>
+      <%= form.select :guardian,
+                      [[t("students.filters.guardian"), ""], [t("students.filters.has_guardian"), "present"],
+                       [t("students.filters.missing_guardian"), "missing"]],
+                      { selected: params[:guardian] }, class: "ds-control" %>
+    </div>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <p class="ds-caption"><%= t("students.madarak.results_count", count: @pagy.count) %></p>
+      <div class="flex gap-2">
+        <%= render "shared/components/button", label: t("actions.search"), type: "submit", icon: :search %>
+        <%= render "shared/components/button", label: t("students.filters.clear"), href: admin_students_path, variant: :ghost %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+<%= render "shared/components/card", body: filters %>
+
+<% if @profiles.any? %>
+  <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <% @profiles.each do |profile| %>
+      <% guardianship = profile.student_guardianships.find { |link| link.active? && link.primary_contact? } || profile.student_guardianships.find(&:active?) %>
+      <% guardian = guardianship&.guardian %>
+      <article class="rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex min-w-0 items-center gap-3">
+            <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-app-primary text-lg font-bold text-white">
+              <%= (profile.display_name.presence || profile.user.full_name).first %>
+            </div>
+            <div class="min-w-0">
+              <%= link_to profile.display_name.presence || profile.user.full_name, admin_student_path(profile),
+                          class: "block truncate font-bold text-app-primary" %>
+              <p class="ds-caption" dir="ltr"><%= profile.public_id %></p>
+            </div>
+          </div>
+          <%= student_learning_status_badge(profile) %>
+        </div>
+
+        <dl class="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+          <div><dt class="ds-caption"><%= t("students.madarak.assigned_teacher") %></dt><dd class="mt-1 truncate font-medium"><%= profile.assigned_teacher_profile&.display_name || t("students.madarak.unassigned") %></dd></div>
+          <div><dt class="ds-caption"><%= t("students.madarak.level") %></dt><dd class="mt-1"><%= t("student_profiles.catalogs.quran_levels.#{profile.current_quran_level}") %></dd></div>
+          <div><dt class="ds-caption"><%= t("students.madarak.guardian") %></dt><dd class="mt-1 truncate font-medium"><%= guardian&.full_name || t("students.madarak.no_guardian") %></dd></div>
+          <div><dt class="ds-caption"><%= t("students.madarak.country") %></dt><dd class="mt-1"><%= profile.country_of_residence.presence || t("student_profiles.not_configured") %></dd></div>
+          <div class="col-span-2"><dt class="ds-caption"><%= t("students.madarak.contact") %></dt><dd class="mt-1" dir="ltr"><%= profile.whatsapp_number.presence || profile.phone_number.presence || guardian&.phone_number || t("student_profiles.not_configured") %></dd></div>
+        </dl>
+
+        <div class="mt-5">
+          <div class="flex items-center justify-between gap-3 text-xs">
+            <span class="text-app-muted-foreground"><%= t("students.madarak.profile_completion") %></span>
+            <strong><%= profile.completion_percentage %>%</strong>
+          </div>
+          <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-app-muted">
+            <div class="h-full rounded-full bg-app-primary" style="width: <%= profile.completion_percentage %>%"></div>
+          </div>
+        </div>
+
+        <div class="mt-5 flex items-center justify-between border-t border-app-border pt-4">
+          <%= student_profile_status_badge(profile) %>
+          <div class="flex gap-2">
+            <%= link_to t("actions.view"), admin_student_path(profile), class: button_classes(variant: :ghost, size: :small) %>
+            <%= link_to t("actions.edit"), edit_admin_student_path(profile), class: button_classes(variant: :secondary, size: :small) %>
+          </div>
+        </div>
+      </article>
+    <% end %>
+  </div>
+<% else %>
+  <div class="mt-6"><%= render "shared/components/empty_state", icon: :users, title: t("students.empty.title"), description: t("students.empty.description"), primary_action: actions %></div>
+<% end %>
+
+<% if @pagy.pages > 1 %>
+  <div class="mt-5 flex justify-end gap-2">
+    <% if @pagy.previous %><%= link_to t("pagination.previous"), admin_students_path(request.query_parameters.merge(page: @pagy.previous)), class: button_classes(variant: :secondary, size: :small) %><% end %>
+    <% if @pagy.next %><%= link_to t("pagination.next"), admin_students_path(request.query_parameters.merge(page: @pagy.next)), class: button_classes(variant: :secondary, size: :small) %><% end %>
+  </div>
+<% end %>

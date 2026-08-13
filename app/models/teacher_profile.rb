@@ -21,6 +21,8 @@ class TeacherProfile < ApplicationRecord
   has_many :availability_exceptions, class_name: "TeacherAvailabilityException",
                                      inverse_of: :teacher_profile, dependent: :restrict_with_exception
   has_many :scheduled_lessons, dependent: :restrict_with_exception
+  has_many :course_offering_teachers, inverse_of: :teacher_profile, dependent: :restrict_with_exception
+  has_many :course_offerings, through: :course_offering_teachers
   has_many :enrollment_lesson_schedules, dependent: :restrict_with_exception
   has_many :assigned_students, class_name: "StudentProfile", foreign_key: :assigned_teacher_profile_id,
                                inverse_of: :assigned_teacher_profile, dependent: :nullify

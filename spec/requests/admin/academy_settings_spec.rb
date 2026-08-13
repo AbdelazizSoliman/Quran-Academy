@@ -70,6 +70,36 @@ RSpec.describe "Academy settings administration" do
     expect(setting.events.count).to eq(1)
   end
 
+  it "applies the single-academy brand name and colors to the application layout" do
+    setting.update!(
+      academy_name: "Al Noor Quran Academy",
+      primary_color: "#123456",
+      secondary_color: "#ABCDEF",
+      slug: "al-noor",
+      custom_domain: "academy.example.test"
+    )
+    sign_in admin
+
+    get admin_settings_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Al Noor Quran Academy", "--color-primary: #123456",
+                                     I18n.t("madarak_branding.section", locale: :ar),
+                                     "academy.example.test")
+  end
+
+  it "rejects unsafe branding values without auditing them" do
+    sign_in admin
+
+    patch admin_settings_path, params: {
+      academy_setting: valid_update.merge(primary_color: "red; display:none", slug: "../academy",
+                                          logo_url: "javascript:alert(1)", custom_domain: "https://bad.test")
+    }
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(setting.events.count).to eq(0)
+    expect(setting.reload.primary_color).to eq("#0B654F")
+  end
   it "rejects invalid changes, preserves submitted values, and creates no audit" do
     sign_in admin
     patch admin_settings_path, params: {
@@ -110,7 +140,9 @@ RSpec.describe "Academy settings administration" do
 
   def valid_update
     {
-      academy_name: "Al Noor Academy", legal_name: "Al Noor Learning", contact_email: "contact@example.test",
+      academy_name: "Al Noor Academy", legal_name: "Al Noor Learning", logo_url: "https://example.test/logo.png",
+      primary_color: "#0B654F", secondary_color: "#A85D09", slug: "al-noor", custom_domain: "academy.example.test",
+      contact_email: "contact@example.test",
       website_url: "https://example.test", country_code: "EG", default_locale: "ar",
       default_time_zone: "Cairo", day_starts_at: "08:00", day_ends_at: "22:00",
       default_lesson_duration_minutes: 30, minimum_lesson_duration_minutes: 15,

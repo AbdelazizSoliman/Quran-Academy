@@ -1,5 +1,6 @@
 module Admin
   class TeacherPayrollsController < SchedulingBaseController
+    before_action -> { require_release_feature!(:payroll) }
     before_action :require_admin!, except: %i[index show]
     before_action :set_payroll, except: %i[index new create]
 

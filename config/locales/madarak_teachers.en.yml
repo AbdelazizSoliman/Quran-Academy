@@ -1,0 +1,23 @@
+en:
+  teachers:
+    madarak:
+      import: "Import from Excel"
+      export: "Export data"
+      search_placeholder: "Search by teacher, code, email, or phone"
+      all_countries: "All countries"
+      utilization: "Utilization"
+      assigned_students: "Assigned students"
+      context: "Country, language, and specialization"
+      compensation: "Compensation"
+      no_capacity: "Not configured"
+      this_week: "This week"
+      import_description: "Upload an Excel-compatible CSV file to create teachers with the onboarding fields."
+      import_file: "Teachers file"
+      import_file_required: "Choose a teachers file first."
+      import_submit: "Upload and import teachers"
+      import_template: "Import file columns"
+      import_hint: "Every row must include at least first name, last name, and email. Separate work days with semicolons."
+      import_success: "%{count} teachers were imported successfully."
+      import_partial: "%{count} teachers were imported; %{errors} rows could not be imported."
+      import_errors_title: "Rows that need review"
+      import_line_error: "Line %{line}: %{error}"

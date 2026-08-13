@@ -1,5 +1,6 @@
 module Admin
   class ExamSessionsController < SchedulingBaseController
+    before_action -> { require_release_feature!(:exams) }
     before_action :require_admin!, except: %i[index show]
     before_action :set_exam, except: %i[index new create]
 

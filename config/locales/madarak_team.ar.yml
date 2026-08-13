@@ -1,0 +1,27 @@
+ar:
+  navigation:
+    users: "الفريق والصلاحيات"
+  madarak_team:
+    title: "الفريق والصلاحيات — إدارة المستخدمين"
+    description: "ادعُ أعضاء الأكاديمية وتحكم في أدوار الوصول وحالة الحساب."
+    invite: "دعوة عضو"
+    counts:
+      admins: "المالكون والمديرون"
+      staff: "فريق التشغيل"
+      teachers: "المعلمون"
+      active: "الأعضاء النشطون"
+    fields:
+      member: "العضو"
+      role: "الدور"
+      status: "الحالة"
+      access: "نطاق الوصول"
+      last_activity: "آخر دخول"
+      invited_at: "تاريخ الدعوة"
+      actions: "الإجراءات"
+    access:
+      admin: "النظام بالكامل"
+      staff: "تشغيل الأكاديمية"
+      teacher: "بوابة المعلم"
+      student: "بوابة الطالب"
+      guardian: "بوابة ولي الأمر"
+    role_based_hint: "في V1 تُمنح الصلاحيات بأمان حسب الدور. تخصيص الوحدات لكل عضو مؤجل إلى V2."

@@ -1,0 +1,13 @@
+ar:
+  students:
+    madarak:
+      import_description: "ارفع ملف CSV متوافقًا مع Excel لإضافة الطلاب بنفس بيانات إنشاء الطالب."
+      import_file: "ملف الطلاب"
+      import_file_required: "اختر ملف الطلاب أولًا."
+      import_submit: "رفع واستيراد الطلاب"
+      import_template: "أعمدة ملف الاستيراد"
+      import_hint: "يجب أن يحتوي كل صف على الاسم الأول واسم العائلة والبريد الإلكتروني على الأقل."
+      import_success: "تم استيراد %{count} طالب بنجاح."
+      import_partial: "تم استيراد %{count} طالب، وتعذر استيراد %{errors} صف."
+      import_errors_title: "صفوف تحتاج إلى مراجعة"
+      import_line_error: "السطر %{line}: %{error}"

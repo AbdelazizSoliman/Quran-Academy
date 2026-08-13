@@ -1,0 +1,18 @@
+ar:
+  course_offerings:
+    madarak:
+      teachers: "المعلمون"
+      students: "الطلاب"
+      schedule: "المواعيد"
+      assignments: "المعلمون والطلاب"
+      assignments_hint: "اختر معلمي الدورة والطلاب عند الإنشاء، ثم أكمل مواعيد كل تسجيل من الجدولة."
+      unassigned: "غير مسند"
+      students_count:
+        zero: "لا يوجد طلاب مسجلون"
+        one: "طالب واحد مسجل"
+        other: "%{count} طلاب مسجلون"
+      manage_students_hint: "تُدار إضافة الطلاب وحالاتهم من سجل التسجيلات للحفاظ على التاريخ."
+      invalid_teachers: "يتضمن اختيار المعلمين سجلًا غير صالح أو مؤرشفًا."
+      invalid_students: "يتضمن اختيار الطلاب سجلًا غير صالح أو مؤرشفًا."
+      assignment_warning: "تم حفظ الدورة، لكن بعض الإسنادات تحتاج إلى مراجعة: %{errors}"
+      assignment_success: "تم ربط %{teachers} معلم وإضافة %{students} تسجيل طالب."

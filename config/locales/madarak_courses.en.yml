@@ -1,0 +1,18 @@
+en:
+  course_offerings:
+    madarak:
+      teachers: "Teachers"
+      students: "Students"
+      schedule: "Schedule"
+      assignments: "Teachers and students"
+      assignments_hint: "Select course teachers and initial students, then complete each enrollment schedule in Scheduling."
+      unassigned: "Unassigned"
+      students_count:
+        zero: "No enrolled students"
+        one: "One enrolled student"
+        other: "%{count} enrolled students"
+      manage_students_hint: "Add students and transition their statuses from Enrollments so history is preserved."
+      invalid_teachers: "The teacher selection includes an invalid or archived profile."
+      invalid_students: "The student selection includes an invalid or archived profile."
+      assignment_warning: "The course was saved, but some assignments need review: %{errors}"
+      assignment_success: "%{teachers} teachers linked and %{students} student enrollments created."

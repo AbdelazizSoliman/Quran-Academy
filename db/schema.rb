@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_13_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -45,6 +45,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.string "contact_phone"
     t.string "country_code", default: "EG", null: false
     t.datetime "created_at", null: false
+    t.string "custom_domain"
     t.time "day_ends_at", default: "2000-01-01 22:00:00", null: false
     t.time "day_starts_at", default: "2000-01-01 08:00:00", null: false
     t.integer "default_lesson_duration_minutes", default: 30, null: false
@@ -68,6 +69,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.boolean "lesson_reminders_enabled", default: true, null: false
     t.boolean "lesson_report_notifications_enabled", default: true, null: false
     t.boolean "lesson_report_whatsapp_enabled", default: true, null: false
+    t.string "logo_url"
     t.integer "maximum_booking_window_days", default: 90, null: false
     t.integer "maximum_lesson_duration_minutes", default: 120, null: false
     t.integer "minimum_booking_notice_hours", default: 2, null: false
@@ -76,11 +78,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.string "payroll_currency", default: "EGP", null: false
     t.string "payroll_period", default: "monthly", null: false
     t.string "postal_code"
+    t.string "primary_color", default: "#0B654F", null: false
     t.integer "reschedule_notice_hours", default: 12, null: false
     t.integer "second_late_reminder_minutes", default: 20, null: false
     t.integer "second_lesson_reminder_minutes_before", default: 60, null: false
+    t.string "secondary_color", default: "#A85D09", null: false
     t.string "short_name"
     t.string "singleton_key", default: "current", null: false
+    t.string "slug", default: "quran-academy", null: false
     t.boolean "sms_notifications_enabled", default: false, null: false
     t.string "state_or_region"
     t.integer "student_cancellation_notice_hours", default: 12, null: false
@@ -98,6 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.string "whatsapp_number"
     t.string "working_days", default: ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday"], null: false, array: true
     t.index ["singleton_key"], name: "index_academy_settings_on_singleton_key", unique: true
+    t.index ["slug"], name: "index_academy_settings_on_slug", unique: true
     t.index ["updated_by_id"], name: "index_academy_settings_on_updated_by_id"
     t.check_constraint "day_starts_at < day_ends_at", name: "academy_settings_operating_hours"
     t.check_constraint "default_teacher_rate >= 0::numeric AND default_lesson_price >= 0::numeric", name: "academy_settings_nonnegative_money"
@@ -321,6 +327,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.index ["event_type"], name: "index_course_offering_events_on_event_type"
   end
 
+  create_table "course_offering_teachers", force: :cascade do |t|
+    t.bigint "course_offering_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.bigint "teacher_profile_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_offering_id", "teacher_profile_id"], name: "idx_course_offering_teachers_unique", unique: true
+    t.index ["course_offering_id"], name: "index_course_offering_teachers_on_course_offering_id"
+    t.index ["created_by_id"], name: "index_course_offering_teachers_on_created_by_id"
+    t.index ["teacher_profile_id"], name: "index_course_offering_teachers_on_teacher_profile_id"
+  end
+
   create_table "course_offerings", force: :cascade do |t|
     t.boolean "accepts_new_enrollments", default: false, null: false
     t.integer "capacity"
@@ -532,6 +550,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'scheduled'::character varying::text, 'completed'::character varying::text, 'reviewed'::character varying::text, 'published'::character varying::text, 'archived'::character varying::text])", name: "exam_session_status"
   end
 
+  create_table "fee_plans", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.decimal "amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.string "billing_cycle", default: "monthly", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "currency", default: "EGP", null: false
+    t.integer "invoice_day", default: 7, null: false
+    t.string "name", null: false
+    t.string "public_id", null: false
+    t.decimal "tax_percentage", precision: 5, scale: 2, default: "0.0", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["active"], name: "index_fee_plans_on_active"
+    t.index ["created_by_id"], name: "index_fee_plans_on_created_by_id"
+    t.index ["public_id"], name: "index_fee_plans_on_public_id", unique: true
+    t.index ["updated_by_id"], name: "index_fee_plans_on_updated_by_id"
+    t.check_constraint "billing_cycle::text = ANY (ARRAY['per_lesson'::character varying, 'weekly'::character varying, 'monthly'::character varying, 'package'::character varying]::text[])", name: "fee_plan_billing_cycle"
+    t.check_constraint "invoice_day >= 1 AND invoice_day <= 31", name: "fee_plan_invoice_day_range"
+    t.check_constraint "tax_percentage >= 0::numeric AND tax_percentage <= 100::numeric", name: "fee_plan_tax_percentage_range"
+  end
+
   create_table "guardian_events", force: :cascade do |t|
     t.bigint "actor_id", null: false
     t.datetime "created_at", null: false
@@ -562,6 +602,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
     t.bigint "updated_by_id"
+    t.bigint "user_id"
     t.string "whatsapp_number"
     t.index "lower((email)::text)", name: "index_guardians_on_lower_email"
     t.index ["created_by_id"], name: "index_guardians_on_created_by_id"
@@ -569,6 +610,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.index ["public_id"], name: "index_guardians_on_public_id", unique: true
     t.index ["status"], name: "index_guardians_on_status"
     t.index ["updated_by_id"], name: "index_guardians_on_updated_by_id"
+    t.index ["user_id"], name: "index_guardians_on_user_id", unique: true
   end
 
   create_table "lesson_attendance_events", force: :cascade do |t|
@@ -1214,6 +1256,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
   create_table "student_profiles", force: :cascade do |t|
     t.string "account_delivery_method", default: "whatsapp", null: false
     t.bigint "assigned_teacher_profile_id"
+    t.decimal "attendance_percentage", precision: 5, scale: 2, default: "100.0", null: false
     t.string "billing_currency", default: "EGP", null: false
     t.string "city"
     t.string "country_of_residence"
@@ -1225,6 +1268,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.string "display_name"
     t.string "emergency_contact_name"
     t.string "emergency_contact_phone"
+    t.boolean "existing_student", default: false, null: false
+    t.bigint "fee_plan_id"
     t.string "gender", default: "unspecified", null: false
     t.string "guardian_email"
     t.string "guardian_name"
@@ -1247,10 +1292,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.string "preferred_contact_method", default: "email", null: false
     t.string "preferred_interface_locale", default: "en", null: false
     t.string "preferred_learning_language"
+    t.integer "prior_sessions_taken"
     t.string "profile_status", default: "draft", null: false
     t.string "public_id", null: false
     t.string "reading_level", default: "not_started", null: false
+    t.integer "remaining_sessions_at_onboarding"
     t.text "safeguarding_notes"
+    t.integer "schedule_generation_weeks"
     t.jsonb "schedule_slots", default: [], null: false
     t.time "schedule_time"
     t.string "schedule_weekday"
@@ -1271,6 +1319,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
     t.index ["assigned_teacher_profile_id"], name: "index_student_profiles_on_assigned_teacher_profile_id"
     t.index ["created_by_id"], name: "index_student_profiles_on_created_by_id"
     t.index ["date_of_birth"], name: "index_student_profiles_on_date_of_birth"
+    t.index ["fee_plan_id"], name: "index_student_profiles_on_fee_plan_id"
     t.index ["joined_on"], name: "index_student_profiles_on_joined_on"
     t.index ["learning_status"], name: "index_student_profiles_on_learning_status"
     t.index ["preferred_learning_language"], name: "index_student_profiles_on_preferred_learning_language"
@@ -1627,6 +1676,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
   add_foreign_key "communication_logs", "users", column: "recipient_user_id", on_delete: :nullify
   add_foreign_key "course_offering_events", "course_offerings", on_delete: :restrict
   add_foreign_key "course_offering_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "course_offering_teachers", "course_offerings"
+  add_foreign_key "course_offering_teachers", "teacher_profiles"
+  add_foreign_key "course_offering_teachers", "users", column: "created_by_id"
   add_foreign_key "course_offerings", "programs", on_delete: :restrict
   add_foreign_key "course_offerings", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "course_offerings", "users", column: "updated_by_id", on_delete: :nullify
@@ -1653,10 +1705,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
   add_foreign_key "exam_sessions", "teacher_profiles", on_delete: :restrict
   add_foreign_key "exam_sessions", "users", column: "created_by_id", on_delete: :restrict
   add_foreign_key "exam_sessions", "users", column: "updated_by_id", on_delete: :restrict
+  add_foreign_key "fee_plans", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "fee_plans", "users", column: "updated_by_id", on_delete: :restrict
   add_foreign_key "guardian_events", "guardians", on_delete: :restrict
   add_foreign_key "guardian_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "guardians", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "guardians", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "guardians", "users", on_delete: :restrict
   add_foreign_key "lesson_attendance_events", "lesson_attendances", on_delete: :restrict
   add_foreign_key "lesson_attendance_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "lesson_attendances", "scheduled_lesson_enrollments", on_delete: :restrict
@@ -1730,6 +1785,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_110000) do
   add_foreign_key "student_guardianships", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "student_profile_events", "student_profiles", on_delete: :restrict
   add_foreign_key "student_profile_events", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "student_profiles", "fee_plans", on_delete: :nullify
   add_foreign_key "student_profiles", "student_profiles", column: "sibling_student_profile_id"
   add_foreign_key "student_profiles", "teacher_profiles", column: "assigned_teacher_profile_id"
   add_foreign_key "student_profiles", "users", column: "created_by_id", on_delete: :nullify

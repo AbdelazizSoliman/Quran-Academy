@@ -51,6 +51,7 @@ en:
       short: "%b %d, %Y at %H:%M"
   date:
     formats:
+      default: "%B %d, %Y"
       long: "%B %d, %Y"
   app:
     name: "Quran Academy"

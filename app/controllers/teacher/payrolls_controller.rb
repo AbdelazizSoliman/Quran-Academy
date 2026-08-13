@@ -1,5 +1,6 @@
 module Teacher
   class PayrollsController < ApplicationController
+    before_action -> { require_release_feature!(:payroll) }
     before_action :require_teacher!
 
     def index

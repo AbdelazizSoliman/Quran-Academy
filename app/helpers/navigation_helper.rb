@@ -1,6 +1,6 @@
 module NavigationHelper
   NAVIGATION_ITEMS = {
-    dashboard: { icon: :home, roles: %i[admin staff teacher student] },
+    dashboard: { icon: :home, roles: %i[admin staff teacher student guardian] },
     users: { icon: :users, roles: %i[admin], path: :admin_users_path },
     invitations: { icon: :users, roles: %i[admin], path: :admin_account_invitations_path },
     students: { icon: :users, roles: %i[admin], path: :admin_students_path },
@@ -8,6 +8,13 @@ module NavigationHelper
     teachers: { icon: :users, roles: %i[admin], path: :admin_teachers_path },
     teacher_profile: { icon: :users, roles: %i[teacher], path: :teacher_profile_path },
     student_profile: { icon: :users, roles: %i[student], path: :student_profile_path },
+    guardian_children: { icon: :users, roles: %i[guardian], path: :guardian_students_path },
+    guardian_schedule: { icon: :calendar, roles: %i[guardian], path: :guardian_schedule_index_path },
+    guardian_attendance: { icon: :check_circle, roles: %i[guardian], path: :guardian_attendances_path },
+    guardian_reports: { icon: :reports, roles: %i[guardian], path: :guardian_reports_path },
+    guardian_notifications: { icon: :message, roles: %i[guardian], path: :guardian_notifications_path },
+    guardian_profile: { icon: :users, roles: %i[guardian], path: :guardian_profile_path },
+    fee_plans: { icon: :wallet, roles: %i[admin], path: :admin_fee_plans_path },
     programs: { icon: :reports, roles: %i[admin], path: :admin_programs_path },
     course_offerings: { icon: :calendar, roles: %i[admin], path: :admin_course_offerings_path },
     enrollments: { icon: :check_circle, roles: %i[admin], path: :admin_enrollments_path },
@@ -19,11 +26,11 @@ module NavigationHelper
     schedule: { icon: :calendar, roles: %i[admin staff], path: :admin_scheduled_lessons_path },
     attendance: { icon: :check_circle, roles: %i[admin staff teacher student] },
     whatsapp: { icon: :message, roles: %i[admin staff teacher student] },
-    payroll: { icon: :wallet, roles: %i[admin teacher] },
+    payroll: { icon: :wallet, roles: %i[admin teacher], feature: :payroll },
     reports: { icon: :reports, roles: %i[admin staff teacher] },
     assessments: { icon: :reports, roles: %i[admin staff teacher student] },
-    exams: { icon: :calendar, roles: %i[admin staff teacher] },
-    certificates: { icon: :check_circle, roles: %i[admin staff student] },
+    exams: { icon: :calendar, roles: %i[admin staff teacher], feature: :exams },
+    certificates: { icon: :check_circle, roles: %i[admin staff student], feature: :certificates },
     academic_progress: { icon: :reports, roles: %i[admin staff teacher student] },
     notifications: { icon: :message, roles: %i[admin staff teacher student] },
     settings: { icon: :settings, roles: %i[admin], path: :admin_settings_path }
@@ -32,16 +39,20 @@ module NavigationHelper
   def nav_item_classes(active: false)
     base = "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition " \
            "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 " \
-           "focus-visible:outline-app-primary"
+           "focus-visible:outline-white"
 
-    return "#{base} bg-app-primary-soft text-app-primary" if active
+    return "#{base} bg-white/15 text-white shadow-sm" if active
 
-    "#{base} text-app-secondary hover:bg-app-muted hover:text-app-text"
+    "#{base} text-emerald-50/75 hover:bg-white/10 hover:text-white"
   end
 
   def navigation_items_for(user)
     role = user&.role&.to_sym
-    NAVIGATION_ITEMS.select { |_key, item| role.nil? || item[:roles].include?(role) }
+    NAVIGATION_ITEMS.select do |_key, item|
+      permitted_role = role.nil? || item[:roles].include?(role)
+      enabled_feature = item[:feature].nil? || ReleaseFeatures.enabled?(item[:feature])
+      permitted_role && enabled_feature
+    end
   end
 
   def navigation_path(key, item)

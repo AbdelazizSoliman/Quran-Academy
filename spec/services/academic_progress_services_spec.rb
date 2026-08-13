@@ -17,6 +17,15 @@ RSpec.describe "Academic progress services" do
     expect(assessment.events.pluck(:event_type)).to eq(["created"])
   end
 
+  it "keeps the standard Madarak template idempotent" do
+    first = Assessments::MadarakTemplate.ensure!(actor: admin)
+    second = Assessments::MadarakTemplate.ensure!(actor: admin)
+
+    expect(second).to eq(first)
+    expect(first.rubric_items.joins(:assessment_category).pluck("assessment_categories.code"))
+      .to match_array(%w[memorization tajweed attendance behavior])
+    expect(first.rubric_items.pluck(:scoring_type, :weight).uniq).to eq([["rating", 25.to_d]])
+  end
   it "calculates weighted percentages and letter grades" do
     assessment = create(:student_assessment)
     first = create(:assessment_rubric_item, assessment_template: assessment.assessment_template, weight: 3)

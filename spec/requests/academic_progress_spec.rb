@@ -20,6 +20,51 @@ RSpec.describe "Academic progress administration" do
     expect(response).to have_http_status(:forbidden)
   end
 
+  it "creates a complete four-measure Madarak evaluation in one step" do
+    enrollment = create(:enrollment, :active)
+    teacher = create(:teacher_profile, :active, :verified)
+    sign_in admin
+
+    expect do
+      post admin_student_assessments_path, params: {
+        student_assessment: {
+          enrollment_id: enrollment.id,
+          teacher_profile_id: teacher.id,
+          assessment_date: Date.current,
+          notes: "Weekly review"
+        },
+        quick_scores: {
+          memorization: "excellent",
+          tajweed: "very_good",
+          attendance: "good",
+          behavior: "fair"
+        }
+      }
+    end.to change(StudentAssessment, :count).by(1)
+
+    assessment = StudentAssessment.last
+    expect(response).to redirect_to(admin_student_assessment_path(assessment))
+    expect(assessment.status).to eq("draft")
+    expect(assessment.overall_score).to eq(80)
+    expect(assessment.scores.includes(assessment_rubric_item: :assessment_category)
+                     .to_h { |score| [score.assessment_rubric_item.assessment_category.code, score.rating] })
+      .to eq("memorization" => "excellent", "tajweed" => "very_good",
+             "attendance" => "good", "behavior" => "fair")
+  end
+
+  it "shows the Madarak evaluation columns and filters" do
+    assessment = create(:student_assessment)
+    sign_in admin
+
+    get admin_student_assessments_path
+
+    expect(response).to have_http_status(:ok)
+    %i[student memorization tajweed attendance behavior overall date status actions].each do |field|
+      expect(response.body).to include(I18n.t("madarak_evaluations.fields.#{field}", locale: :ar))
+    end
+    expect(response.body).to include(assessment.student_profile.display_name)
+    expect(response.body).to include('name="student_id"', 'name="teacher_id"', 'name="status"')
+  end
   it "does not expose destructive routes" do
     paths = %w[/admin/student_assessments/1 /admin/exam_sessions/1 /admin/certificates/1
                /admin/assessment_templates/1 /admin/assessment_categories/1]
@@ -51,10 +96,13 @@ RSpec.describe "Student academic records" do
                                             enrollment: create(:enrollment, student_profile: student), status: "published")
     draft = create(:student_assessment, student_profile: student,
                                         enrollment: create(:enrollment, student_profile: student), status: "draft")
+    student.user.update!(preferred_locale: "ar")
     sign_in student.user
 
     get student_assessments_path
+    expect(response).to have_http_status(:ok)
     expect(response.body).to include(published.public_id)
+    expect(response.body).to include(I18n.l(published.assessment_date, locale: :ar))
     expect(response.body).not_to include(draft.public_id)
     get student_assessment_path(draft)
     expect(response).to have_http_status(:not_found)

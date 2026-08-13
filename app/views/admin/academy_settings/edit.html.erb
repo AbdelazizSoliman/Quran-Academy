@@ -8,6 +8,37 @@
   <% identity = capture { render "text_fields", form:, setting: @setting, fields: { academy_name: :text_field, legal_name: :text_field, short_name: :text_field, description: :textarea } } %>
   <%= render "shared/components/card", title: t("admin.settings.sections.identity"), body: identity %>
 
+  <% branding = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div class="sm:col-span-2">
+        <%= form.label :logo_url, t("madarak_branding.fields.logo_url"), class: "ds-label" %>
+        <%= form.url_field :logo_url, class: "ds-control mt-2", dir: "ltr" %>
+      </div>
+      <% %i[primary_color secondary_color].each do |field| %>
+        <div>
+          <%= form.label field, t("madarak_branding.fields.#{field}"), class: "ds-label" %>
+          <div class="mt-2 flex items-center gap-3">
+            <%= form.color_field field, class: "h-11 w-16 rounded-lg border border-app-border bg-app-surface p-1" %>
+            <code class="rounded-lg bg-app-surface-muted px-3 py-2 text-sm" dir="ltr"><%= @setting.public_send(field) %></code>
+          </div>
+        </div>
+      <% end %>
+      <div>
+        <%= form.label :slug, t("madarak_branding.fields.slug"), class: "ds-label" %>
+        <%= form.text_field :slug, class: "ds-control mt-2", dir: "ltr" %>
+      </div>
+      <div>
+        <%= form.label :custom_domain, t("madarak_branding.fields.custom_domain"), class: "ds-label" %>
+        <%= form.text_field :custom_domain, class: "ds-control mt-2", dir: "ltr" %>
+      </div>
+    </div>
+    <div class="mt-5">
+      <%= render "shared/components/alert", variant: :information,
+                 title: t("madarak_branding.section"), message: t("madarak_branding.hint") %>
+    </div>
+  <% end %>
+  <%= render "shared/components/card", title: t("madarak_branding.section"), body: branding %>
+
   <% contact = capture { render "text_fields", form:, setting: @setting, fields: { contact_email: :email_field, contact_phone: :telephone_field, whatsapp_number: :telephone_field, website_url: :url_field, address_line_1: :text_field, address_line_2: :text_field, city: :text_field, state_or_region: :text_field, postal_code: :text_field, country_code: :text_field } } %>
   <%= render "shared/components/card", title: t("admin.settings.sections.contact"), body: contact %>
 

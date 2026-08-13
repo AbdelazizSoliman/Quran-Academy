@@ -2,6 +2,7 @@ module DashboardHelper
   def dashboard_schedule_path
     return teacher_schedule_index_path if current_user&.teacher?
     return student_schedule_index_path if current_user&.student?
+    return guardian_schedule_index_path if current_user&.guardian?
 
     admin_scheduled_lessons_path
   end
@@ -13,6 +14,7 @@ module DashboardHelper
   def dashboard_reports_path
     return teacher_reports_path if current_user&.teacher?
     return student_reports_path if current_user&.student?
+    return guardian_reports_path if current_user&.guardian?
 
     admin_operational_reports_path
   end

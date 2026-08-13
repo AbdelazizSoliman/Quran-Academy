@@ -76,6 +76,7 @@ ar:
       student_type: "نوع الطالب"
       profile_status: "حالة الملف"
       learning_status: "حالة التعلم"
+      fee_plan_id: "خطة الرسوم"
       joined_on: "تاريخ الانضمام"
       left_on: "تاريخ المغادرة"
       internal_notes: "ملاحظات داخلية"
@@ -88,7 +89,7 @@ ar:
       genders: { male: "ذكر", female: "أنثى", unspecified: "غير محدد" }
       student_types: { adult: "بالغ", minor: "قاصر", child: "طفل" }
       profile_statuses: { draft: "مسودة", complete: "مكتمل", verified: "موثق", archived: "مؤرشف" }
-      learning_statuses: { prospective: "محتمل", trial: "تجريبي", active: "نشط", paused: "متوقف مؤقتاً", completed: "مكتمل", departed: "غادر" }
+      learning_statuses: { prospective: "محتمل", trial: "تجريبي", active: "نشط", paused: "متوقف مؤقتاً", completed: "مكتمل", departed: "غادر", at_risk: "متعثّر", inactive: "غير نشط" }
       contact_methods: { email: "البريد", phone: "الهاتف", whatsapp: "واتساب", guardian: "ولي الأمر" }
       quran_levels: { beginner: "مبتدئ", elementary: "ابتدائي", intermediate: "متوسط", advanced: "متقدم" }
       reading_levels: { not_started: "لم يبدأ", letters: "حروف", words: "كلمات", sentences: "جمل", fluent: "طليق" }

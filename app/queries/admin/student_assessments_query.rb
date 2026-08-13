@@ -9,7 +9,8 @@ module Admin
     end
 
     def call
-      scope = @relation.includes(:assessment_template, teacher_profile: :user, student_profile: :user)
+      scope = @relation.includes(:assessment_template, teacher_profile: :user, student_profile: :user,
+                                   scores: { assessment_rubric_item: :assessment_category })
                        .where(assessment_date: date_range)
       scope = scope.where(status: @params[:status]) if StudentAssessment::STATUSES.include?(@params[:status])
       scope = scope.where(teacher_profile_id: @params[:teacher_id]) if @params[:teacher_id].present?

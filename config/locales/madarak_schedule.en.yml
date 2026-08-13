@@ -1,0 +1,14 @@
+en:
+  scheduling:
+    weekly:
+      description: "Weekly academy schedule from %{from} to %{to}."
+      previous: "Previous week"
+      today: "Today"
+      next: "Next week"
+      calendar_label: "Weekly lesson calendar"
+      lessons_count:
+        one: "1 lesson"
+        other: "%{count} lessons"
+      students: "Students"
+      no_students: "No students assigned"
+      no_lessons: "No lessons"

@@ -107,6 +107,7 @@ en:
       student_type: "Student type"
       profile_status: "Profile status"
       learning_status: "Learning status"
+      fee_plan_id: "Fee plan"
       joined_on: "Joined on"
       left_on: "Left on"
       internal_notes: "Internal notes"
@@ -121,7 +122,7 @@ en:
       genders: { male: "Male", female: "Female", unspecified: "Unspecified" }
       student_types: { adult: "Adult", minor: "Minor", child: "Child" }
       profile_statuses: { draft: "Draft", complete: "Complete", verified: "Verified", archived: "Archived" }
-      learning_statuses: { prospective: "Prospective", trial: "Trial", active: "Active", paused: "Paused", completed: "Completed", departed: "Departed" }
+      learning_statuses: { prospective: "Prospective", trial: "Trial", active: "Active", paused: "Paused", completed: "Completed", departed: "Departed", at_risk: "At risk", inactive: "Inactive" }
       contact_methods: { email: "Email", phone: "Phone", whatsapp: "WhatsApp", guardian: "Guardian" }
       quran_levels: { beginner: "Beginner", elementary: "Elementary", intermediate: "Intermediate", advanced: "Advanced" }
       reading_levels: { not_started: "Not started", letters: "Letters", words: "Words", sentences: "Sentences", fluent: "Fluent" }

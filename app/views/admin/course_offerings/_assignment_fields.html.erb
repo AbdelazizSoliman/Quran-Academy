@@ -1,0 +1,30 @@
+<fieldset class="ds-card p-5">
+  <legend class="ds-section-title"><%= t("course_offerings.madarak.assignments") %></legend>
+  <p class="mt-2 ds-supporting"><%= t("course_offerings.madarak.assignments_hint") %></p>
+  <div class="mt-4 grid gap-4 sm:grid-cols-2">
+    <% selected_teacher_ids = params.dig(:course_offering, :teacher_profile_ids) || offering.teacher_profile_ids %>
+    <div>
+      <%= label_tag "course_offering_teacher_profile_ids", t("course_offerings.madarak.teachers"), class: "ds-label" %>
+      <%= hidden_field_tag "course_offering[teacher_profile_ids][]", "" %>
+      <%= select_tag "course_offering[teacher_profile_ids][]",
+                     options_from_collection_for_select(@teacher_profiles, :id, :display_name, selected_teacher_ids),
+                     multiple: true, size: 8, class: "ds-control mt-2" %>
+    </div>
+
+    <% if offering.new_record? %>
+      <% selected_student_ids = params.dig(:course_offering, :student_profile_ids) %>
+      <div>
+        <%= label_tag "course_offering_student_profile_ids", t("course_offerings.madarak.students"), class: "ds-label" %>
+        <%= select_tag "course_offering[student_profile_ids][]",
+                       options_from_collection_for_select(@student_profiles, :id, :display_name, selected_student_ids),
+                       multiple: true, size: 8, class: "ds-control mt-2" %>
+      </div>
+    <% else %>
+      <div class="rounded-xl bg-app-muted p-4">
+        <p class="font-semibold"><%= t("course_offerings.madarak.students_count", count: offering.enrollments.size) %></p>
+        <p class="mt-2 ds-caption"><%= t("course_offerings.madarak.manage_students_hint") %></p>
+        <%= render "shared/components/button", label: t("enrollments.index.title"), href: admin_enrollments_path(course_offering_id: offering.id), variant: :secondary, size: :small, class: "mt-4" %>
+      </div>
+    <% end %>
+  </div>
+</fieldset>

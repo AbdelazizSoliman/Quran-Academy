@@ -48,6 +48,12 @@
       <div class="mt-4 grid gap-4 sm:grid-cols-3">
         <div><%= form.label :learning_status, t("student_profiles.fields.learning_status"), class: "ds-label" %><%= form.select :learning_status, StudentProfile::LEARNING_STATUSES.map { |v| [t("student_profiles.catalogs.learning_statuses.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
         <% %i[joined_on left_on].each do |field| %><div><%= form.label field, t("student_profiles.fields.#{field}"), class: "ds-label" %><%= form.date_field field, class: "ds-control mt-2" %></div><% end %>
+        <div>
+          <%= form.label :fee_plan_id, t("student_profiles.fields.fee_plan_id"), class: "ds-label" %>
+          <% fee_plan_options = FeePlan.active.ordered.to_a %>
+          <% fee_plan_options << profile.fee_plan if profile.fee_plan && !profile.fee_plan.active? %>
+          <%= form.collection_select :fee_plan_id, fee_plan_options, :id, :name, { include_blank: t("fee_plans.none") }, class: "ds-control mt-2" %>
+        </div>
       </div>
     </fieldset>
     <fieldset class="ds-card border-red-200 p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.sensitive") %></legend>

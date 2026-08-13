@@ -6,6 +6,7 @@ class Guardian < ApplicationRecord
 
   belongs_to :created_by, class_name: "User", optional: true, inverse_of: :created_guardians
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_guardians
+  belongs_to :user, optional: true, inverse_of: :guardian_profile
   has_many :student_guardianships, dependent: :restrict_with_exception
   has_many :student_profiles, through: :student_guardianships
   has_many :events, class_name: "GuardianEvent", dependent: :restrict_with_exception
@@ -25,9 +26,11 @@ class Guardian < ApplicationRecord
   validates :preferred_language, inclusion: { in: LANGUAGES }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
   validates :phone_number, :whatsapp_number, length: { maximum: 30 }, allow_blank: true
+  validates :user_id, uniqueness: true, allow_nil: true
   validates :internal_notes, length: { maximum: 5_000 }, allow_blank: true
   validate :active_has_contact
   validate :preferred_contact_available
+  validate :user_must_be_guardian
 
   scope :recent_first, -> { order(created_at: :desc, id: :desc) }
 
@@ -61,5 +64,9 @@ class Guardian < ApplicationRecord
 
     errors.add(preferred_contact_method,
                :required_for_preference)
+  end
+
+  def user_must_be_guardian
+    errors.add(:user, :must_be_guardian) if user && !user.guardian?
   end
 end

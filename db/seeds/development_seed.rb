@@ -77,8 +77,10 @@ module DevelopmentSeed
 
   def create_guardian_links
     @students.first(2).each_with_index do |student, index|
-      guardian = create(:guardian, full_name: "Guardian #{index + 1}",
-                                   email: "guardian#{index + 1}@demo.quran-academy.test",
+      guardian_user = demo_user(:guardian, "guardian#{index + 1}", "Guardian", "#{index + 1}", locale: "en")
+      guardian = create(:guardian, user: guardian_user,
+                                   full_name: guardian_user.full_name,
+                                   email: guardian_user.email,
                                    phone_number: "+20114000000#{index + 1}",
                                    whatsapp_number: "+20114000000#{index + 1}", created_by: @admin, updated_by: @admin)
       create(:student_guardianship, student_profile: student, guardian:, created_by: @admin, updated_by: @admin,

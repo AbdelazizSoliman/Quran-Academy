@@ -2,7 +2,11 @@ class StudentProfile < ApplicationRecord
   GENDERS = %w[male female unspecified].freeze
   STUDENT_TYPES = %w[adult minor child].freeze
   PROFILE_STATUSES = %w[draft complete verified archived].freeze
-  LEARNING_STATUSES = %w[prospective trial active paused completed departed].freeze
+  # "at_risk" and "inactive" are the two Madarak-vocabulary values with no clean prior QA
+  # equivalent; added additively (nothing renamed/removed) to avoid a data migration while still
+  # letting the create form's status select match Madarak exactly. A full vocabulary reconciliation
+  # remains a separate, larger decision (see docs/madarak-implementation-plan.md Task 3).
+  LEARNING_STATUSES = %w[prospective trial active paused completed departed at_risk inactive].freeze
   CONTACT_METHODS = %w[email phone whatsapp guardian].freeze
   INTERFACE_LOCALES = %w[ar en].freeze
   LEARNING_LANGUAGES = %w[ar en].freeze
@@ -14,6 +18,24 @@ class StudentProfile < ApplicationRecord
   DELIVERY_METHODS = %w[email whatsapp both].freeze
   CURRENCIES = %w[EGP USD EUR GBP SAR AED].freeze
   WEEKDAYS = %w[sunday monday tuesday wednesday thursday friday saturday].freeze
+  LESSON_SUBJECTS = %w[memorization tajweed revision general].freeze
+  # Exact list, order, flags, and Arabic names as rendered by the real Madarak "New Student" page
+  # (source: user-provided rendered DOM HTML, 2026-08-12) — not the app's own prior approximation.
+  COUNTRY_DIAL_CODES = {
+    "EG" => ["🇪🇬", "مصر", "20"], "SA" => ["🇸🇦", "السعودية", "966"], "AE" => ["🇦🇪", "الإمارات", "971"],
+    "KW" => ["🇰🇼", "الكويت", "965"], "QA" => ["🇶🇦", "قطر", "974"], "BH" => ["🇧🇭", "البحرين", "973"],
+    "OM" => ["🇴🇲", "عُمان", "968"], "JO" => ["🇯🇴", "الأردن", "962"], "PS" => ["🇵🇸", "فلسطين", "970"],
+    "LB" => ["🇱🇧", "لبنان", "961"], "SY" => ["🇸🇾", "سوريا", "963"], "IQ" => ["🇮🇶", "العراق", "964"],
+    "YE" => ["🇾🇪", "اليمن", "967"], "SD" => ["🇸🇩", "السودان", "249"], "LY" => ["🇱🇾", "ليبيا", "218"],
+    "TN" => ["🇹🇳", "تونس", "216"], "DZ" => ["🇩🇿", "الجزائر", "213"], "MA" => ["🇲🇦", "المغرب", "212"],
+    "MR" => ["🇲🇷", "موريتانيا", "222"], "SO" => ["🇸🇴", "الصومال", "252"], "DJ" => ["🇩🇯", "جيبوتي", "253"],
+    "TR" => ["🇹🇷", "تركيا", "90"], "US" => ["🇺🇸", "الولايات المتحدة", "1"], "GB" => ["🇬🇧", "بريطانيا", "44"],
+    "CA" => ["🇨🇦", "كندا", "1"], "DE" => ["🇩🇪", "ألمانيا", "49"], "FR" => ["🇫🇷", "فرنسا", "33"],
+    "NL" => ["🇳🇱", "هولندا", "31"], "SE" => ["🇸🇪", "السويد", "46"], "MY" => ["🇲🇾", "ماليزيا", "60"],
+    "ID" => ["🇮🇩", "إندونيسيا", "62"], "PK" => ["🇵🇰", "باكستان", "92"]
+  }.freeze
+  COUNTRIES = COUNTRY_DIAL_CODES.transform_values { |(flag, name, _dial)| "#{flag} #{name}" }.freeze
+  PHONE_COUNTRY_CODES = COUNTRY_DIAL_CODES.transform_values { |(flag, name, dial)| ["#{flag} #{name}", dial] }.freeze
   SENSITIVE_FIELDS = %w[
     medical_notes safeguarding_notes special_learning_needs internal_notes
     emergency_contact_name emergency_contact_phone guardian_name guardian_phone guardian_email
@@ -23,6 +45,7 @@ class StudentProfile < ApplicationRecord
   belongs_to :assigned_teacher_profile, class_name: "TeacherProfile", optional: true,
                                                 inverse_of: :assigned_students
   belongs_to :sibling_student_profile, class_name: "StudentProfile", optional: true
+  belongs_to :fee_plan, optional: true, inverse_of: :student_profiles
   belongs_to :created_by, class_name: "User", optional: true, inverse_of: :created_student_profiles
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_student_profiles
 
@@ -43,7 +66,7 @@ class StudentProfile < ApplicationRecord
   before_validation :normalize_values
   before_validation :generate_public_id, on: :create
 
-  validates :public_id, presence: true, uniqueness: true, format: { with: /\ASTD-[A-Z0-9]{10}\z/ }
+  validates :public_id, presence: true, uniqueness: true, format: { with: /\ASTD-[A-Z0-9]{1,20}\z/ }
   validates :user_id, uniqueness: true
   validates :gender, inclusion: { in: GENDERS }
   validates :student_type, inclusion: { in: STUDENT_TYPES }
@@ -61,10 +84,15 @@ class StudentProfile < ApplicationRecord
   validates :billing_currency, inclusion: { in: CURRENCIES }
   validates :schedule_weekday, inclusion: { in: WEEKDAYS }, allow_blank: true
   validates :memorized_juz_count, numericality: { only_integer: true, in: 0..30 }, allow_nil: true
+  validates :attendance_percentage, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
+  validates :schedule_generation_weeks, numericality: { only_integer: true, in: 1..48 }, allow_nil: true
+  validates :prior_sessions_taken, :remaining_sessions_at_onboarding,
+            numericality: { only_integer: true, in: 0..500 }, allow_nil: true
   validates :discount_percentage, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :wallet_balance, :weekly_price, numericality: { greater_than_or_equal_to: 0 }
-  validates :weekly_lesson_count, :sessions_per_month, :lesson_duration_minutes,
-            numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+  validates :weekly_lesson_count, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+  validates :sessions_per_month, numericality: { only_integer: true, in: 1..672 }, allow_nil: true
+  validates :lesson_duration_minutes, numericality: { only_integer: true, in: 15..120 }, allow_nil: true
   validates :phone_number, :whatsapp_number, :guardian_phone, :emergency_contact_phone,
             length: { maximum: 30 }, allow_blank: true
   validates :guardian_email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
@@ -141,7 +169,7 @@ class StudentProfile < ApplicationRecord
   end
 
   def generate_public_id
-    self.public_id ||= "STD-#{SecureRandom.alphanumeric(10).upcase}"
+    self.public_id = public_id.to_s.strip.upcase.presence || "STD-#{SecureRandom.alphanumeric(10).upcase}"
   end
 
   def user_must_be_student

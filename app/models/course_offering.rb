@@ -7,6 +7,8 @@ class CourseOffering < ApplicationRecord
   belongs_to :created_by, class_name: "User", optional: true, inverse_of: :created_course_offerings
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_course_offerings
   has_many :enrollments, dependent: :restrict_with_exception
+  has_many :course_offering_teachers, inverse_of: :course_offering, dependent: :restrict_with_exception
+  has_many :teacher_profiles, through: :course_offering_teachers
   has_many :events, class_name: "CourseOfferingEvent", dependent: :restrict_with_exception
   has_many :scheduled_lessons, dependent: :restrict_with_exception
   has_many :exam_sessions, dependent: :restrict_with_exception

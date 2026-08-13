@@ -1,6 +1,6 @@
 module Admin
   class TeachersController < BaseController
-    before_action :set_profile, except: %i[index new create]
+    before_action :set_profile, except: %i[index import import_create export new create]
 
     ONBOARDING_KEYS = [
       :first_name, :last_name, :email, :display_name, :phone_number, :whatsapp_number, :online_meeting_url,
@@ -21,6 +21,37 @@ module Admin
 
     def index
       @pagy, @profiles = pagy(:offset, Admin::TeachersQuery.new(params:).call, limit: 15)
+      @teacher_metrics = Admin::TeacherMetrics.new(profiles: @profiles).call
+    end
+
+    def import; end
+
+    def import_create
+      upload = params[:file]
+      unless upload.respond_to?(:tempfile)
+        flash.now[:alert] = t("teachers.madarak.import_file_required")
+        return render :import, status: :unprocessable_content
+      end
+
+      @result = Admin::TeachersCsvImport.new(actor: current_user, io: upload.tempfile).call
+      if @result.errors.empty?
+        redirect_to admin_teachers_path, notice: t("teachers.madarak.import_success", count: @result.created_count)
+      else
+        flash.now[:alert] = t("teachers.madarak.import_partial", count: @result.created_count,
+                            errors: @result.errors.size)
+        render :import, status: :unprocessable_content
+      end
+    rescue CSV::MalformedCSVError => e
+      @import_error = e.message
+      render :import, status: :unprocessable_content
+    end
+
+    def export
+      profiles = Admin::TeachersQuery.new(params:).call
+      metrics = Admin::TeacherMetrics.new(profiles:).call
+      data = Admin::TeachersCsvExport.new(profiles, metrics:).call
+      send_data "\uFEFF#{data}", filename: "quran-academy-teachers-#{Date.current}.csv",
+                                type: "text/csv; charset=utf-8"
     end
 
     def show

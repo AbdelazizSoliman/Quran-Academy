@@ -60,6 +60,7 @@ module Admin
         profile = case user.role
                   when "teacher" then create_teacher_profile(user)
                   when "student" then create_student_profile(user)
+                  when "guardian" then create_guardian_profile(user)
                   else create_staff_profile(user)
                   end
         raise ActiveRecord::RecordInvalid, profile if profile.errors.any?
@@ -89,6 +90,21 @@ module Admin
       def create_staff_profile(user)
         user.create_staff_profile!(@contact.merge(display_name: user.full_name,
                                                   created_by: @actor, updated_by: @actor))
+      end
+
+      def create_guardian_profile(user)
+        user.create_guardian_profile!(
+          full_name: user.full_name,
+          gender: "unspecified",
+          email: user.email,
+          phone_number: @contact[:phone_number],
+          whatsapp_number: @contact[:whatsapp_number],
+          preferred_contact_method: delivery_method == "whatsapp" ? "whatsapp" : "email",
+          preferred_language: user.preferred_locale.presence || "ar",
+          status: "active",
+          created_by: @actor,
+          updated_by: @actor
+        )
       end
 
       def delivery_method = @attributes[:account_delivery_method].presence || "email"

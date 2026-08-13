@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --color-background: #f8faf9;
+  --color-background: #f5f7f4;
   --color-surface: #ffffff;
-  --color-surface-muted: #f1f5f3;
-  --color-border: #dce5e0;
-  --color-text-primary: #17201c;
-  --color-text-secondary: #52615a;
-  --color-text-muted: #7a8981;
-  --color-primary: #087a55;
-  --color-primary-hover: #066344;
-  --color-primary-soft: #e8f7f0;
-  --color-success: #087a55;
+  --color-surface-muted: #eff4f1;
+  --color-border: #dce6e1;
+  --color-text-primary: #14251f;
+  --color-text-secondary: #52665e;
+  --color-text-muted: #7a8d85;
+  --color-primary: #0b654f;
+  --color-primary-hover: #084d3d;
+  --color-primary-soft: #e5f3ed;
+  --color-success: #0b654f;
   --color-warning: #a85d09;
   --color-danger: #b42318;
   --color-information: #175cd3;
@@ -19,8 +19,8 @@
 
   --font-sans: "Noto Sans Arabic", "Noto Sans", "Segoe UI", Tahoma, Arial, sans-serif;
   --radius-control: 0.75rem;
-  --radius-card: 1rem;
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.04);
+  --radius-card: 0.875rem;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 5px 18px rgb(15 23 42 / 0.035);
   --control-height: 2.75rem;
   --card-padding: 1.25rem;
   --section-space: 1.5rem;
@@ -136,6 +136,82 @@
 
   .ds-skeleton {
     @apply animate-pulse rounded-lg bg-slate-200;
+  }
+
+  .portal-hero {
+    @apply mb-6 flex flex-col gap-6 overflow-hidden rounded-2xl bg-[#0b4f42] p-6 text-white shadow-sm sm:p-8 lg:flex-row lg:items-center lg:justify-between;
+  }
+
+  .portal-hero h2 {
+    @apply text-2xl font-bold sm:text-3xl;
+  }
+
+  .portal-hero p:not(.portal-eyebrow) {
+    @apply mt-2 max-w-2xl text-sm leading-7 text-emerald-50/80;
+  }
+
+  .portal-eyebrow {
+    @apply mb-2 text-xs font-bold text-[#e0c77d];
+  }
+
+  .portal-hero-action {
+    @apply inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-[#c8a34f] px-5 py-2.5 text-sm font-bold text-[#17342b] shadow-sm transition hover:bg-[#d5b760] focus-visible:outline-white;
+  }
+
+  .portal-stat-grid {
+    @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-4;
+  }
+
+  .portal-card-header {
+    @apply flex items-center justify-between gap-4 border-b border-app-border px-5 py-4;
+  }
+
+  .portal-text-link {
+    @apply text-sm font-bold text-app-primary hover:text-app-primary-hover;
+  }
+
+  .portal-lesson-row {
+    @apply grid gap-3 px-5 py-4 sm:grid-cols-[7rem_minmax(0,1fr)_auto_auto] sm:items-center;
+  }
+
+  .portal-lesson-row time {
+    @apply text-sm font-bold text-app-primary;
+  }
+
+  .portal-lesson-row h3 {
+    @apply truncate text-sm font-bold text-app-text;
+  }
+
+  .portal-lesson-row p {
+    @apply mt-1 text-xs text-app-subtle;
+  }
+
+  .portal-quick-link {
+    @apply flex min-h-12 items-center gap-3 rounded-xl border border-app-border bg-app-surface px-3 py-2.5 text-sm font-semibold text-app-text transition hover:border-app-primary hover:bg-app-primary-soft;
+  }
+
+  .portal-avatar {
+    @apply grid size-11 shrink-0 place-items-center rounded-full bg-app-primary-soft font-bold text-app-primary;
+  }
+
+  .portal-list-card {
+    @apply flex items-center gap-4 p-4 transition hover:border-app-primary;
+  }
+
+  .portal-date-block {
+    @apply grid size-14 shrink-0 place-items-center rounded-xl bg-app-primary-soft text-center text-app-primary;
+  }
+
+  .portal-date-block strong {
+    @apply block text-lg leading-none;
+  }
+
+  .portal-date-block small {
+    @apply block text-[10px] font-bold uppercase;
+  }
+
+  .portal-record-row {
+    @apply flex items-center gap-4 border-b border-app-border px-5 py-4 last:border-b-0;
   }
 }
 

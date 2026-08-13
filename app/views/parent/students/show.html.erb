@@ -1,0 +1,28 @@
+<%= render "shared/page_header", title: @student.display_name, description: @student.public_id,
+           primary_action: link_to(t("portal.actions.open_schedule"), guardian_schedule_index_path, class: "button-primary") %>
+<div class="grid gap-6 xl:grid-cols-3">
+  <section class="ds-card p-5 xl:col-span-2">
+    <h2 class="ds-section-title"><%= t("parent_portal.students.learning_summary") %></h2>
+    <dl class="mt-5 grid gap-4 sm:grid-cols-2">
+      <% { teacher: @student.assigned_teacher_profile&.display_name,
+           quran_level: t("student_profiles.catalogs.quran_levels.#{@student.current_quran_level}"),
+           memorized: t("parent_portal.students.juz_count", count: @student.memorized_juz_count || 0),
+           progress: number_to_percentage(@student.student_progress&.completion_percentage || 0, precision: 0) }.each do |key, value| %>
+        <div class="rounded-xl bg-app-muted p-4"><dt class="ds-caption"><%= t("parent_portal.students.#{key}") %></dt>
+          <dd class="mt-1 font-bold"><%= value.presence || "-" %></dd></div>
+      <% end %>
+    </dl>
+  </section>
+  <aside class="ds-card p-5">
+    <h2 class="ds-section-title"><%= t("parent_portal.students.upcoming") %></h2>
+    <div class="mt-4 space-y-3">
+      <% @upcoming_lessons.each do |lesson| %>
+        <%= link_to guardian_schedule_path(lesson), class: "block rounded-xl border border-app-border p-3 hover:border-app-primary" do %>
+          <strong class="text-sm"><%= dashboard_lesson_title(lesson) %></strong>
+          <p class="mt-1 ds-caption" dir="ltr"><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :short) %></p>
+        <% end %>
+      <% end %>
+      <% if @upcoming_lessons.empty? %><p class="ds-supporting"><%= t("portal.shared.no_lessons") %></p><% end %>
+    </div>
+  </aside>
+</div>

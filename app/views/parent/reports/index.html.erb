@@ -1,0 +1,59 @@
+<%= render "shared/page_header", title: t("parent_portal.reports.title"),
+           description: t("parent_portal.reports.description") %>
+<section class="mb-8" aria-labelledby="guardian-evaluations-title">
+  <h2 id="guardian-evaluations-title" class="mb-4 ds-section-title"><%= t("academic.assessments.index") %></h2>
+  <div class="grid gap-5 lg:grid-cols-2">
+    <% @assessments.each do |assessment| %>
+      <% scores = assessment.scores.index_by { |score| score.assessment_rubric_item.assessment_category.code } %>
+      <article class="ds-card p-5">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-bold text-app-primary"><%= assessment.student_profile.display_name %></p>
+            <h3 class="mt-1 font-bold"><%= assessment.assessment_template.localized_name %></h3>
+          </div>
+          <time class="ds-caption" dir="ltr"><%= assessment.assessment_date %></time>
+        </div>
+        <dl class="mt-4 grid grid-cols-2 gap-3">
+          <% %w[memorization tajweed attendance behavior].each do |code| %>
+            <% rating = scores[code]&.rating %>
+            <div class="rounded-xl bg-app-surface-muted p-3">
+              <dt class="ds-caption"><%= t("madarak_evaluations.fields.#{code}") %></dt>
+              <dd class="mt-1 text-sm font-semibold">
+                <%= rating.present? ? t("academic.ratings.#{rating}") : t("academic.not_available") %>
+              </dd>
+            </div>
+          <% end %>
+        </dl>
+        <p class="mt-4 font-semibold">
+          <%= t("madarak_evaluations.fields.overall") %>:
+          <%= assessment.overall_score || t("academic.not_available") %><%= "%" if assessment.overall_score %>
+        </p>
+      </article>
+    <% end %>
+  </div>
+  <% if @assessments.empty? %>
+    <%= render "shared/components/empty_state", icon: :reports,
+               title: t("academic.empty"), description: "" %>
+  <% end %>
+</section>
+
+<h2 class="mb-4 ds-section-title"><%= t("portal.actions.lesson_reports") %></h2>
+<div class="grid gap-5 lg:grid-cols-2">
+  <% @entries.each do |entry| %>
+    <article class="ds-card p-5">
+      <div class="flex items-start justify-between gap-3">
+        <div><p class="text-sm font-bold text-app-primary"><%= entry.student_profile.display_name %></p>
+          <h2 class="mt-1 font-bold"><%= dashboard_lesson_title(entry.scheduled_lesson) %></h2></div>
+        <time class="ds-caption" dir="ltr"><%= l(entry.scheduled_lesson.starts_at.in_time_zone(current_user.time_zone), format: :short) %></time>
+      </div>
+      <dl class="mt-4 grid grid-cols-2 gap-3">
+        <div class="rounded-xl bg-app-muted p-3"><dt class="ds-caption"><%= t("parent_portal.reports.performance") %></dt><dd class="mt-1 text-sm font-semibold"><%= t("lesson_reports.progress_levels.#{entry.performance_level}") %></dd></div>
+        <div class="rounded-xl bg-app-muted p-3"><dt class="ds-caption"><%= t("parent_portal.reports.engagement") %></dt><dd class="mt-1 text-sm font-semibold"><%= t("lesson_reports.engagement_levels.#{entry.engagement_level}") %></dd></div>
+      </dl>
+      <% if entry.guardian_visible_notes.present? %><p class="mt-4 ds-body"><%= entry.guardian_visible_notes %></p><% end %>
+      <% if entry.homework.present? %><div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3"><strong class="text-sm text-amber-900"><%= t("parent_portal.reports.homework") %></strong><p class="mt-1 text-sm text-amber-800"><%= entry.homework %></p></div><% end %>
+    </article>
+  <% end %>
+</div>
+<% if @entries.empty? %><%= render "shared/components/empty_state", icon: :reports,
+  title: t("parent_portal.reports.empty"), description: t("parent_portal.reports.empty_hint") %><% end %>

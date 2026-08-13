@@ -1,0 +1,20 @@
+en:
+  madarak_evaluations:
+    description: "Record Quran learning quality using the same four academy measures, then review and publish it."
+    sections:
+      student: "Student and lesson context"
+      scores: "Evaluation"
+    fields:
+      student: "Student"
+      memorization: "Memorization"
+      tajweed: "Tajweed"
+      attendance: "Attendance"
+      behavior: "Behavior"
+      overall: "Overall score"
+      date: "Date"
+      status: "Status"
+      actions: "Actions"
+    actions:
+      save_draft: "Save evaluation"
+    errors:
+      incomplete_scores: "Choose a valid rating for memorization, Tajweed, attendance, and behavior."

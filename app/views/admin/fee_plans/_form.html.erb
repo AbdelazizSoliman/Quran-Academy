@@ -1,0 +1,35 @@
+<%= form_with model: [:admin, fee_plan], class: "ds-card grid gap-5 p-5 sm:grid-cols-2" do |form| %>
+  <div class="sm:col-span-2">
+    <%= form.label :name, t("fee_plans.fields.name"), class: "ds-label" %>
+    <%= form.text_field :name, required: true, class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :amount, t("fee_plans.fields.amount"), class: "ds-label" %>
+    <%= form.number_field :amount, min: 0, step: 0.01, required: true, class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :currency, t("fee_plans.fields.currency"), class: "ds-label" %>
+    <%= form.text_field :currency, maxlength: 3, required: true, class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :billing_cycle, t("fee_plans.fields.billing_cycle"), class: "ds-label" %>
+    <%= form.select :billing_cycle,
+                     FeePlan::BILLING_CYCLES.map { |cycle| [t("fee_plans.billing_cycles.#{cycle}"), cycle] },
+                     {}, class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :tax_percentage, t("fee_plans.fields.tax_percentage"), class: "ds-label" %>
+    <%= form.number_field :tax_percentage, min: 0, max: 100, step: 0.01, class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :invoice_day, t("fee_plans.fields.invoice_day"), class: "ds-label" %>
+    <%= form.number_field :invoice_day, min: 1, max: 31, class: "ds-control mt-2" %>
+  </div>
+  <label class="flex items-center gap-2">
+    <%= form.check_box :active, class: "ds-checkbox" %>
+    <%= t("fee_plans.fields.active") %>
+  </label>
+  <div class="sm:col-span-2">
+    <%= render "shared/components/button", label: t("actions.save"), type: "submit" %>
+  </div>
+<% end %>

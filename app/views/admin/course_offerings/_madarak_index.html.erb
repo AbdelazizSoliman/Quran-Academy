@@ -1,0 +1,50 @@
+<% action = render("shared/components/button", label: t("course_offerings.actions.new"), href: new_admin_course_offering_path, icon: :plus) %>
+<%= render "shared/page_header", title: t("course_offerings.index.title"), description: t("course_offerings.index.description"), primary_action: action %>
+
+<%= form_with url: admin_course_offerings_path, method: :get, class: "ds-card grid gap-4 p-5 md:grid-cols-4" do |form| %>
+  <div><%= form.label :q, t("actions.search"), class: "ds-label" %><%= form.search_field :q, value: params[:q], class: "ds-control mt-2" %></div>
+  <div><%= form.label :status, t("course_offerings.fields.status"), class: "ds-label" %><%= form.select :status, [[t("teachers.filters.all"), ""]] + CourseOffering::STATUSES.map { |value| [t("academic.catalogs.offering_statuses.#{value}"), value] }, { selected: params[:status] }, class: "ds-control mt-2" %></div>
+  <div><%= form.label :program_id, t("course_offerings.fields.program"), class: "ds-label" %><%= form.collection_select :program_id, Program.order(:name_en), :id, :name_en, { include_blank: t("teachers.filters.all"), selected: params[:program_id] }, class: "ds-control mt-2" %></div>
+  <div class="flex items-end gap-2"><%= render "shared/components/button", label: t("actions.search"), type: "submit" %><%= render "shared/components/button", label: t("teachers.filters.clear"), href: admin_course_offerings_path, variant: :ghost %></div>
+<% end %>
+
+<div class="mt-6 overflow-x-auto rounded-xl border border-app-border bg-app-surface shadow-sm">
+  <table class="min-w-full divide-y divide-app-border">
+    <thead class="bg-app-muted">
+      <tr>
+        <% %i[title].each do |field| %><th class="px-4 py-3 text-start ds-table-heading"><%= t("course_offerings.fields.#{field}") %></th><% end %>
+        <th class="px-4 py-3 text-start ds-table-heading"><%= t("course_offerings.madarak.teachers") %></th>
+        <th class="px-4 py-3 text-start ds-table-heading"><%= t("course_offerings.madarak.students") %></th>
+        <th class="px-4 py-3 text-start ds-table-heading"><%= t("course_offerings.fields.capacity") %></th>
+        <th class="px-4 py-3 text-start ds-table-heading"><%= t("course_offerings.madarak.schedule") %></th>
+        <th class="px-4 py-3 text-start ds-table-heading"><%= t("course_offerings.fields.status") %></th>
+        <th class="px-4 py-3 text-start ds-table-heading"><%= t("course_offerings.fields.actions") %></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-app-border">
+      <% @offerings.each do |offering| %>
+        <% teachers = (offering.teacher_profiles.to_a + offering.scheduled_lessons.map(&:teacher_profile)).uniq %>
+        <% students_count = offering.enrollments.count { |enrollment| enrollment.status.in?(CourseOffering::CAPACITY_STATUSES) } %>
+        <tr class="hover:bg-app-muted/50">
+          <th class="px-4 py-3 text-start">
+            <%= link_to localized_offering_title(offering), admin_course_offering_path(offering), class: "font-semibold text-app-primary" %>
+            <p class="mt-1 ds-caption"><%= localized_program_name(offering.program) %></p>
+            <p class="mt-1 ds-caption" dir="ltr"><%= offering.code %> · <%= offering.public_id %></p>
+          </th>
+          <td class="min-w-44 px-4 py-3 text-sm"><%= teachers.any? ? teachers.map(&:display_name).to_sentence : t("course_offerings.madarak.unassigned") %></td>
+          <td class="px-4 py-3 text-center text-sm font-bold"><%= students_count %></td>
+          <td class="whitespace-nowrap px-4 py-3 text-sm"><%= students_count %> / <%= offering.capacity || "∞" %></td>
+          <td class="whitespace-nowrap px-4 py-3 text-sm">
+            <p><%= academic_value(offering.planned_start_on) %></p>
+            <p class="mt-1 ds-caption"><%= academic_value(offering.planned_end_on) %></p>
+          </td>
+          <td class="px-4 py-3"><%= offering_status_badge(offering) %></td>
+          <td class="px-4 py-3"><%= link_to t("actions.view"), admin_course_offering_path(offering), class: button_classes(variant: :ghost, size: :small) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @offerings.empty? %><div class="mt-6"><%= render "shared/components/empty_state", icon: :calendar, title: t("course_offerings.empty.title"), description: t("course_offerings.empty.description"), primary_action: action %></div><% end %>
+<% if @pagy.pages > 1 %><div class="mt-6"><%== @pagy.series_nav %></div><% end %>

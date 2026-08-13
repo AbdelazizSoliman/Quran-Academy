@@ -7,7 +7,7 @@ module StudentProfiles
       memorized_surahs memorized_juz_count learning_goals learning_notes special_learning_needs
       medical_notes safeguarding_notes emergency_contact_name emergency_contact_phone student_type
       learning_status joined_on left_on internal_notes wallet_balance discount_percentage
-      assigned_teacher_profile_id package_name weekly_lesson_count lesson_duration_minutes
+      assigned_teacher_profile_id fee_plan_id package_name weekly_lesson_count lesson_duration_minutes
       sessions_per_month session_type trial_lesson_at schedule_weekday schedule_time schedule_slots weekly_price
       billing_currency guardian_name guardian_email guardian_phone account_delivery_method sibling_student_profile_id
     ].freeze

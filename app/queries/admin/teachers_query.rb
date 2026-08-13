@@ -62,11 +62,13 @@ module Admin
 
     def scalar_filters(relation)
       filtered = valid_user_status? ? relation.where(users: { status: @params[:user_status] }) : relation
-      %i[employment_status engagement_type profile_status].each do |attribute|
+      %i[employment_status engagement_type profile_status gender compensation_unit].each do |attribute|
         value = @params[attribute]
         catalog = TeacherProfile.const_get(attribute.to_s.pluralize.upcase)
         filtered = filtered.where(attribute => value) if value.to_s.in?(catalog)
       end
+      country = @params[:country].to_s.strip
+      filtered = filtered.where(country_of_residence: country) if country.present?
       filtered
     end
 

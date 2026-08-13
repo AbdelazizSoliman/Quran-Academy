@@ -9,6 +9,9 @@ class AcademySetting < ApplicationRecord
   BILLING_CYCLES = %w[per_lesson weekly monthly package].freeze
   CURRENCY_PATTERN = /\A[A-Z]{3}\z/
   COUNTRY_PATTERN = /\A[A-Z]{2}\z/
+  HEX_COLOR_PATTERN = /\A#[0-9A-F]{6}\z/i
+  SLUG_PATTERN = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
+  DOMAIN_PATTERN = /\A[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\z/
 
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_academy_settings
   has_many :events, class_name: "AcademySettingEvent", dependent: :restrict_with_exception
@@ -18,7 +21,10 @@ class AcademySetting < ApplicationRecord
   validates :legal_name, :short_name, length: { maximum: 150 }, allow_blank: true
   validates :description, length: { maximum: 2_000 }, allow_blank: true
   validates :contact_email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
-  validates :website_url, format: { with: %r{\Ahttps?://[^\s]+\z} }, allow_blank: true
+  validates :website_url, :logo_url, format: { with: %r{\Ahttps?://[^\s]+\z} }, allow_blank: true
+  validates :primary_color, :secondary_color, format: { with: HEX_COLOR_PATTERN }
+  validates :slug, presence: true, uniqueness: true, format: { with: SLUG_PATTERN }, length: { maximum: 80 }
+  validates :custom_domain, format: { with: DOMAIN_PATTERN }, length: { maximum: 253 }, allow_blank: true
   validates :contact_phone, :whatsapp_number, length: { maximum: 30 }, allow_blank: true
   validates :country_code, format: { with: COUNTRY_PATTERN }
   validates :default_locale, inclusion: { in: INTERFACE_LOCALES }
@@ -74,12 +80,21 @@ class AcademySetting < ApplicationRecord
 
   def normalize_values
     normalize_contact_email
+    normalize_branding
     normalize_region_codes
     normalize_collection_values
   end
 
   def normalize_contact_email
     self.contact_email = contact_email.to_s.strip.downcase.presence
+  end
+
+  def normalize_branding
+    self.logo_url = logo_url.to_s.strip.presence
+    self.primary_color = primary_color.to_s.strip.upcase
+    self.secondary_color = secondary_color.to_s.strip.upcase
+    self.slug = slug.to_s.strip.downcase
+    self.custom_domain = custom_domain.to_s.strip.downcase.presence
   end
 
   def normalize_region_codes

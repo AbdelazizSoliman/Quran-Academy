@@ -1,0 +1,15 @@
+en:
+  navigation:
+    fee_plans: "Fees & Subscriptions"
+  fee_plans:
+    index: { title: "Fees & Subscriptions", description: "Create recurring fee plans, assign them to students for automatic billing, or split an amount into scheduled installments." }
+    recurring: { title: "Recurring Fee Plans", description: "A plan that automatically invoices assigned students every cycle." }
+    students: "Students"
+    actions: { create: "Create plan", edit_fee_plan: "Edit fee plan" }
+    fields: { name: "Plan name", amount: "Amount", currency: "Currency", billing_cycle: "Billing cycle", tax_percentage: "Tax", invoice_day: "Invoice day", active: "Active" }
+    billing_cycles: { per_lesson: "Per lesson", weekly: "Weekly", monthly: "Monthly", package: "Package" }
+    messages: { saved: "Fee plan saved.", deleted: "Fee plan deleted.", confirm_delete: "Delete this plan?" }
+    empty: { title: "No fee plans yet", description: "Create your first recurring fee plan from the form above." }
+    active: "Active"
+    inactive: "Inactive"
+    none: "None"

@@ -15,25 +15,23 @@ RSpec.describe "Admin students" do
     expect(response.body).to include('dir="ltr"')
   end
 
-  it "renders every onboarding weekday select as a non-shrinking single-line control" do
+  it "renders the onboarding schedule-slot template with a full weekday select" do
     get new_admin_student_path(locale: "ar")
 
     expect(response).to have_http_status(:ok)
     document = Nokogiri::HTML(response.body)
-    3.times do |index|
-      field = document.at_css("#student_profile_schedule_weekday_#{index + 1}")
-      expect(field["class"].split).to include("ds-control", "schedule-weekday-select")
-      expect(field.parent["class"].split).to include("schedule-slot-field", "md:col-span-2")
-      expect(field.css("option").map(&:text)).to include("الأحد", "الاثنين", "الثلاثاء")
-      expect(field.css("option").map(&:text)).not_to include(*"Translation missing".chars)
-    end
+    field = document.at_css("template [data-slot-field='weekday']")
+    expect(field["class"].split).to include("ds-control")
+    expect(field.css("option").map(&:text)).to include("الأحد", "الاثنين", "الثلاثاء")
+    expect(field.css("option").map(&:text)).not_to include(*"Translation missing".chars)
+    expect(document.at_css("[data-schedule-slots-target='hidden']")).to be_present
   end
 
   it "creates, updates, verifies, archives, and restores with audits" do
     expect do
       post admin_students_path, params: {
-        student_profile: { first_name: "New", last_name: "Learner", email: "new.learner@example.test",
-                           display_name: "New Learner", country_of_residence: "EG",
+        student_profile: { full_name: "New Learner", email: "new.learner@example.test",
+                           country_of_residence: "EG",
                            preferred_learning_language: "en", learning_goals: "Read fluently" }
       }
     end.to change(StudentProfile, :count).by(1)
@@ -53,25 +51,54 @@ RSpec.describe "Admin students" do
     existing = create(:user, :student, email: "taken@example.test")
     expect do
       post admin_students_path, params: {
-        student_profile: { first_name: "Dup", last_name: "Learner", email: existing.email }
+        student_profile: { full_name: "Dup Learner", email: existing.email }
       }
     end.not_to change(StudentProfile, :count)
     expect(response).to have_http_status(:unprocessable_content)
+  end
+
+  it "creates an account without an email using an internal placeholder and skips the invitation" do
+    expect do
+      expect do
+        post admin_students_path, params: { student_profile: { full_name: "NoEmail Learner" } }
+      end.not_to change(ActionMailer::Base.deliveries, :count)
+    end.to change(StudentProfile, :count).by(1)
+    profile = StudentProfile.find_by!(display_name: "NoEmail Learner")
+    expect(profile.user.email).to end_with("@no-email.quranacademy.internal")
+  end
+
+  it "splits a single-word name by repeating it as the last name" do
+    post admin_students_path, params: { student_profile: { full_name: "Muhammad", email: "muhammad@example.test" } }
+    profile = User.find_by!(email: "muhammad@example.test").student_profile
+    expect(profile.user.first_name).to eq("Muhammad")
+    expect(profile.user.last_name).to eq("Muhammad")
+  end
+
+  it "reuses an existing guardian with a matching phone number instead of creating a duplicate" do
+    guardian = create(:guardian, phone_number: "+201001234567")
+    expect do
+      post admin_students_path, params: {
+        student_profile: { full_name: "Sibling Learner", guardian_name: "Someone Else",
+                           guardian_phone_country_code: "EG", guardian_phone: "1001234567" }
+      }
+    end.not_to change(Guardian, :count)
+    profile = StudentProfile.find_by!(display_name: "Sibling Learner")
+    expect(profile.guardians).to contain_exactly(guardian)
   end
 
   it "creates an authoritative enrollment schedule and slots from onboarding metadata" do
     teacher = create(:teacher_profile, :active, :verified,
                      online_meeting_url: "https://meet.example.test/teacher")
     offering = create(:course_offering, :open, planned_start_on: Date.current)
+    slots = [{ weekday: "sunday", time: "18:00" }, { weekday: "tuesday", time: "19:30" }]
 
     expect do
       post admin_students_path, params: {
         student_profile: {
-          first_name: "Scheduled", last_name: "Learner", email: "scheduled@example.test",
-          display_name: "Scheduled Learner", assigned_teacher_profile_id: teacher.id,
+          full_name: "Scheduled Learner", email: "scheduled@example.test",
+          assigned_teacher_profile_id: teacher.id,
           course_offering_id: offering.id, lesson_duration_minutes: 45, weekly_lesson_count: 2,
-          schedule_weekday_1: "sunday", schedule_time_1: "18:00",
-          schedule_weekday_2: "tuesday", schedule_time_2: "19:30"
+          slots_json: slots.to_json
         }
       }
     end.to change(EnrollmentLessonSchedule, :count).by(1)
@@ -88,13 +115,13 @@ RSpec.describe "Admin students" do
     teacher = create(:teacher_profile, :active, :verified,
                      online_meeting_url: "https://meet.example.test/teacher")
     offering = create(:course_offering, :open, planned_start_on: Date.current)
+    slots = [{ weekday: Date.current.strftime("%A").downcase, time: "18:00" }]
 
     post admin_students_path, params: {
       student_profile: {
-        first_name: "Conflict", last_name: "Learner", email: "conflict@example.test",
+        full_name: "Conflict Learner", email: "conflict@example.test",
         assigned_teacher_profile_id: teacher.id, course_offering_id: offering.id,
-        lesson_duration_minutes: 45, schedule_weekday_1: Date.current.strftime("%A").downcase,
-        schedule_time_1: "18:00"
+        lesson_duration_minutes: 45, slots_json: slots.to_json
       }
     }
 
@@ -115,6 +142,51 @@ RSpec.describe "Admin students" do
     expect(profile.user).to eq(student_user)
     expect(profile.public_id).not_to eq("STD-HACKED0000")
     expect(profile.profile_status).to eq("draft")
+  end
+
+  it "shows only active fee plans in the onboarding fee plan dropdown" do
+    active_plan = create(:fee_plan, name: "Active Plan")
+    inactive_plan = create(:fee_plan, :inactive, name: "Inactive Plan")
+
+    get new_admin_student_path
+
+    expect(response.body).to include(active_plan.name)
+    expect(response.body).not_to include(inactive_plan.name)
+  end
+
+  it "creates a student with a selected fee plan, independent of any course offering" do
+    fee_plan = create(:fee_plan)
+    post admin_students_path, params: {
+      student_profile: { full_name: "Plan Learner", email: "plan.learner@example.test", fee_plan_id: fee_plan.id }
+    }
+    profile = StudentProfile.find_by!(display_name: "Plan Learner")
+    expect(profile.fee_plan).to eq(fee_plan)
+    expect(profile.course_offerings).to be_empty
+  end
+
+  it "creates a student with no fee plan selected" do
+    post admin_students_path, params: {
+      student_profile: { full_name: "Planless Learner", email: "planless.learner@example.test" }
+    }
+    profile = StudentProfile.find_by!(display_name: "Planless Learner")
+    expect(profile.fee_plan_id).to be_nil
+  end
+
+  it "shows the currently assigned fee plan selected when editing, changes it, and can remove it" do
+    plan_one = create(:fee_plan, name: "Plan One")
+    plan_two = create(:fee_plan, name: "Plan Two")
+    profile = create(:student_profile, user: student_user, fee_plan: plan_one)
+
+    get edit_admin_student_path(profile)
+    document = Nokogiri::HTML(response.body)
+    selected = document.at_css("select#student_profile_fee_plan_id option[selected]")
+    expect(selected&.attr("value")).to eq(plan_one.id.to_s)
+
+    patch admin_student_path(profile), params: { student_profile: { fee_plan_id: plan_two.id } }
+    expect(profile.reload.fee_plan).to eq(plan_two)
+
+    patch admin_student_path(profile), params: { student_profile: { fee_plan_id: "" } }
+    expect(profile.reload.fee_plan_id).to be_nil
   end
 
   it "redirects unauthenticated users and forbids non-admin roles" do

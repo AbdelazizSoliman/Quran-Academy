@@ -51,6 +51,7 @@ ar:
       short: "%d/%m/%Y، %H:%M"
   date:
     formats:
+      default: "%d/%m/%Y"
       long: "%d/%m/%Y"
   app:
     name: "أكاديمية القرآن"

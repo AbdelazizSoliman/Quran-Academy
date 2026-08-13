@@ -1,0 +1,15 @@
+ar:
+  navigation:
+    fee_plans: "الرسوم والاشتراكات"
+  fee_plans:
+    index: { title: "الرسوم والاشتراكات", description: "أنشئ خطط رسوم متكررة، عيّنها للطلاب لفوترة تلقائية، أو قسم مبلغاً على أقساط مجدولة." }
+    recurring: { title: "خطط الرسوم المتكررة", description: "خطة تُفوتر تلقائياً كل دورة للطلاب المعيّنين عليها." }
+    students: "الطلاب"
+    actions: { create: "إنشاء خطة", edit_fee_plan: "تعديل خطة الرسوم" }
+    fields: { name: "اسم الخطة", amount: "المبلغ", currency: "العملة", billing_cycle: "دورة الفوترة", tax_percentage: "ضريبة", invoice_day: "يوم إصدار الفاتورة", active: "نشطة" }
+    billing_cycles: { per_lesson: "لكل حصة", weekly: "أسبوعي", monthly: "شهري", package: "باقة" }
+    messages: { saved: "تم حفظ خطة الرسوم.", deleted: "تم حذف خطة الرسوم.", confirm_delete: "هل تريد حذف هذه الخطة؟" }
+    empty: { title: "لا توجد خطط رسوم بعد", description: "أنشئ أول خطة رسوم متكررة من النموذج أعلاه." }
+    active: "نشطة"
+    inactive: "غير نشطة"
+    none: "بدون"

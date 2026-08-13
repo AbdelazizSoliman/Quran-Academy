@@ -1,0 +1,25 @@
+<%= render "shared/page_header", title: t("parent_portal.profile.title"),
+           description: t("parent_portal.profile.description") %>
+<% if @guardian %>
+  <div class="grid gap-6 lg:grid-cols-2">
+    <section class="ds-card p-5"><h2 class="ds-section-title"><%= @guardian.full_name %></h2>
+      <dl class="mt-5 space-y-4">
+        <% { email: @guardian.email, phone_number: @guardian.phone_number,
+             whatsapp_number: @guardian.whatsapp_number, city: @guardian.city }.each do |key, value| %>
+          <div><dt class="ds-caption"><%= t("guardians.fields.#{key}") %></dt><dd class="mt-1 font-semibold"><%= value.presence || "-" %></dd></div>
+        <% end %>
+      </dl>
+    </section>
+    <section class="ds-card p-5"><h2 class="ds-section-title"><%= t("parent_portal.profile.linked_children") %></h2>
+      <div class="mt-4 space-y-3"><% @guardianships.each do |link| %>
+        <%= link_to guardian_student_path(link.student_profile), class: "portal-quick-link" do %>
+          <span class="portal-avatar"><%= link.student_profile.display_name.to_s.first %></span>
+          <span><strong class="block"><%= link.student_profile.display_name %></strong><small class="ds-caption"><%= t("guardianships.catalogs.relationship_types.#{link.relationship_type}") %></small></span>
+        <% end %>
+      <% end %></div>
+    </section>
+  </div>
+<% else %>
+  <%= render "shared/components/empty_state", icon: :users, title: t("parent_portal.profile.missing"),
+             description: t("parent_portal.profile.missing_hint") %>
+<% end %>

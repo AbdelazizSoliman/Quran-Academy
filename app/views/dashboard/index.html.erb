@@ -1,4 +1,11 @@
-<% content_for :title, "#{t("dashboard.title")} | #{t("app.name")}" %>
+<% content_for :title, "#{t("dashboard.title")} | #{academy_brand_name}" %>
+<% if current_user.teacher? %>
+  <%= render "dashboard/teacher_portal" %>
+<% elsif current_user.student? %>
+  <%= render "dashboard/student_portal" %>
+<% elsif current_user.guardian? %>
+  <%= render "dashboard/guardian_portal" %>
+<% else %>
 <%= render "shared/page_header", title: t("dashboard.title"), description: t("dashboard.subtitle") %>
 
 <section class="ds-card relative mb-6 overflow-hidden border-app-primary bg-app-primary p-6 text-white sm:p-8" aria-labelledby="welcome-title">
@@ -74,3 +81,4 @@
 <div class="mt-6">
   <%= render "shared/components/card", title: t("dashboard.quick_actions"), subtitle: t("dashboard.quick_actions_description"), body: quick_actions %>
 </div>
+<% end %>

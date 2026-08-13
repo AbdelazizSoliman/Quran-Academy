@@ -5,6 +5,7 @@
     <% %i[code title_ar title_en].each do |field| %><div><%= f.label field, t("course_offerings.fields.#{field}"), class: "ds-label" %><%= f.text_field field, class: "ds-control mt-2", dir: field == :code ? "ltr" : nil %></div><% end %>
     <% %i[description_ar description_en].each do |field| %><div><%= f.label field, t("course_offerings.fields.#{field}"), class: "ds-label" %><%= f.text_area field, rows: 3, class: "ds-control mt-2" %></div><% end %>
   </div></fieldset>
+  <%= render "assignment_fields", offering: offering %>
   <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("course_offerings.sections.operation") %></legend><div class="mt-4 grid gap-4 sm:grid-cols-3">
     <div><%= f.label :learning_language, t("course_offerings.fields.learning_language"), class: "ds-label" %><%= f.select :learning_language, (offering.program&.supported_learning_languages || []).map { |v| [t("academy.languages.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
     <div><%= f.label :delivery_mode, t("course_offerings.fields.delivery_mode"), class: "ds-label" %><%= f.select :delivery_mode, CourseOffering::DELIVERY_MODES.map { |v| [t("academic.catalogs.delivery_modes.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>

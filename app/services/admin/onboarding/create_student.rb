@@ -2,20 +2,26 @@ module Admin
   module Onboarding
     class CreateStudent
       PROFILE_KEYS = %i[
-        display_name gender date_of_birth nationality country_of_residence city student_type learning_status
-        phone_number whatsapp_number preferred_contact_method preferred_interface_locale preferred_learning_language
+        public_id gender date_of_birth nationality country_of_residence city student_type
+        learning_status phone_number whatsapp_number preferred_interface_locale preferred_learning_language
         native_language current_quran_level reading_level tajweed_level memorization_level memorized_juz_count
-        learning_goals learning_notes wallet_balance discount_percentage assigned_teacher_profile_id package_name
-        weekly_lesson_count lesson_duration_minutes sessions_per_month session_type trial_lesson_at
-        weekly_price billing_currency guardian_name guardian_email guardian_phone account_delivery_method
-        sibling_student_profile_id
+        attendance_percentage learning_goals learning_notes existing_student prior_sessions_taken
+        remaining_sessions_at_onboarding
+        assigned_teacher_profile_id fee_plan_id weekly_lesson_count lesson_duration_minutes sessions_per_month
+        session_type trial_lesson_at
+        weekly_price billing_currency schedule_generation_weeks guardian_name guardian_email guardian_phone
+        account_delivery_method sibling_student_profile_id
       ].freeze
 
-      SCHEDULE_POSITIONS = 1..3
+      # Fields that Madarak's reference form marks optional-with-a-sensible-default (e.g. Quran
+      # level, guardian details): if left blank, drop the key entirely so the column's DB default
+      # applies, rather than persisting an empty string into a validated/enum-like column.
+      OPTIONAL_WITH_DEFAULT_KEYS = %i[gender current_quran_level].freeze
 
       def initialize(actor:, attributes:)
         @actor = actor
         @attributes = attributes.to_h.symbolize_keys
+        OPTIONAL_WITH_DEFAULT_KEYS.each { |key| @attributes.delete(key) if @attributes[key].blank? }
       end
 
       def call
@@ -30,7 +36,7 @@ module Admin
           attach_or_create_guardian(profile)
           enrollment = create_enrollment(profile)
           create_lesson_schedule(profile, enrollment)
-          AccountInvitations::CreateAndSend.new(user:, actor: @actor).call
+          AccountInvitations::CreateAndSend.new(user:, actor: @actor).call unless placeholder_email?(user.email)
         end
         profile
       rescue ActiveRecord::RecordInvalid => e
@@ -40,10 +46,17 @@ module Admin
 
       private
 
+      # Madarak treats the student's own email/WhatsApp as optional (the guardian is the primary
+      # contact for minors). QA's shared User/Devise model still requires a unique email to
+      # authenticate, so an unset email is backed by an internal placeholder rather than blocking
+      # account creation; #email_addresses.any? above skips sending an invitation in that case.
       def build_user
+        submitted_email = @attributes[:email].to_s.strip.presence
+        first_name, last_name = name_parts
         User.new(
-          first_name: @attributes[:first_name], last_name: @attributes[:last_name],
-          email: @attributes[:email], role: :student, status: :pending,
+          first_name:, last_name:,
+          email: submitted_email || placeholder_email,
+          role: :student, status: :pending,
           preferred_locale: @attributes[:preferred_interface_locale].presence || "ar", time_zone: "Cairo"
         ).tap do |user|
           password = SecureRandom.base64(48)
@@ -51,38 +64,95 @@ module Admin
         end
       end
 
+      # Madarak's on-screen form has a single "اسم الطالب" field; QA's shared User model keeps
+      # first/last name for consistency across all roles, so the single name is split on the
+      # first space. Arabic compound names (e.g. "عبد الله") won't split perfectly, but the two
+      # halves are never shown separately back to the admin (only the joined full name is), so
+      # this is a cosmetic imprecision, not a data-loss risk.
+      #
+      # CSV bulk import (Admin::StudentsCsvImport) still submits the older first_name/last_name
+      # columns independently of this form, so that path is honored first when present.
+      def name_parts
+        return [@attributes[:first_name], @attributes[:last_name]] if @attributes[:first_name].present?
+
+        parts = @attributes[:full_name].to_s.strip.split(/\s+/, 2)
+        first = parts[0].presence || "طالب"
+        # User#last_name is validated present; a single-word name (common in Arabic) has no
+        # second part to use, so fall back to repeating the first word rather than relaxing that
+        # shared validation (which every role's account creation relies on).
+        [first, parts[1].presence || first]
+      end
+
+      PLACEHOLDER_EMAIL_DOMAIN = "no-email.quranacademy.internal".freeze
+
+      def placeholder_email
+        "std-#{SecureRandom.hex(8)}@#{PLACEHOLDER_EMAIL_DOMAIN}"
+      end
+
+      def placeholder_email?(email)
+        email.to_s.end_with?("@#{PLACEHOLDER_EMAIL_DOMAIN}")
+      end
+
       def profile_attributes(user)
         slots = schedule_slots
         @attributes.slice(*PROFILE_KEYS).merge(
           display_name: @attributes[:display_name].presence || user.full_name,
           joined_on: Date.current,
+          guardian_phone: normalized_guardian_phone,
           schedule_slots: slots,
           schedule_weekday: slots.first&.fetch("weekday", nil),
           schedule_time: slots.first&.fetch("time", nil)
         )
       end
 
+      def normalized_guardian_phone
+        digits = @attributes[:guardian_phone].to_s.gsub(/\D/, "")
+        return @attributes[:guardian_phone] if digits.blank?
+
+        iso2 = @attributes[:guardian_phone_country_code].to_s.upcase
+        dial = StudentProfile::PHONE_COUNTRY_CODES.dig(iso2, 1)
+        dial ? "+#{dial}#{digits}" : @attributes[:guardian_phone]
+      end
+
+      # Madarak stores the dynamic, unlimited slot list as one JSON-encoded hidden field
+      # (name="slots") rather than a fixed number of named params; each entry may carry a
+      # per-slot subject/duration in addition to weekday+time.
       def schedule_slots
-        SCHEDULE_POSITIONS.filter_map do |position|
-          weekday = @attributes[:"schedule_weekday_#{position}"].to_s.downcase.presence
-          time = @attributes[:"schedule_time_#{position}"].to_s.presence
+        raw = @attributes[:slots_json].presence
+        return [] if raw.blank?
+
+        parsed = begin
+          JSON.parse(raw)
+        rescue JSON::ParserError
+          []
+        end
+        Array(parsed).filter_map do |slot|
+          slot = slot.to_h
+          weekday = slot["weekday"].to_s.downcase.presence
+          time = slot["time"].to_s.presence
           next if weekday.blank? && time.blank?
 
-          { "weekday" => weekday, "time" => time }
+          { "weekday" => weekday, "time" => time,
+            "subject" => slot["subject"].to_s.presence, "duration" => slot["duration"].to_s.presence }.compact
         end
       end
 
+      # Madarak's form has no "existing guardian" picker at all — a guardian is just typed fresh
+      # each time. To avoid creating a duplicate Guardian record when a second child of the same
+      # family enrolls, an existing guardian with a matching phone number is reused automatically.
       def attach_or_create_guardian(profile)
-        guardian = Guardian.find_by(id: @attributes[:existing_guardian_id])
-        return attach_guardian(profile, guardian) if guardian
         return if @attributes[:guardian_name].blank?
+
+        phone = normalized_guardian_phone
+        existing = Guardian.where.not(status: "archived").find_by(phone_number: phone) if phone.present?
+        return attach_guardian(profile, existing) if existing
 
         result = Admin::StudentGuardianships::CreateGuardianAndAttach.new(
           actor: @actor, student_profile: profile,
           guardian_attributes: {
             full_name: @attributes[:guardian_name], email: @attributes[:guardian_email],
-            phone_number: @attributes[:guardian_phone], whatsapp_number: @attributes[:guardian_phone],
-            preferred_contact_method: @attributes[:guardian_phone].present? ? "whatsapp" : "email",
+            phone_number: phone, whatsapp_number: phone,
+            preferred_contact_method: phone.present? ? "whatsapp" : "email",
             preferred_language: @attributes[:preferred_interface_locale].presence || "ar", status: "active"
           },
           relationship_attributes: guardianship_attributes
@@ -114,8 +184,7 @@ module Admin
           actor: @actor, student_profile: profile, course_offering: offering,
           attributes: {
             application_source: "administrator",
-            preferred_schedule_notes: schedule_note,
-            administrator_notes: @attributes[:package_name]
+            preferred_schedule_notes: schedule_note
           }
         ).call
         raise ActiveRecord::RecordInvalid, enrollment unless enrollment.persisted?
@@ -127,12 +196,13 @@ module Admin
         return unless enrollment&.persisted? && profile.assigned_teacher_profile && complete_schedule_slots.any?
         return if profile.lesson_duration_minutes.blank?
 
+        starts_on = enrollment.course_offering.planned_start_on || Date.current
         schedule = EnrollmentLessonSchedules::Create.new(
           actor: @actor, enrollment:,
           attributes: {
             teacher_profile: profile.assigned_teacher_profile,
-            starts_on: enrollment.course_offering.planned_start_on || Date.current,
-            ends_on: enrollment.course_offering.planned_end_on,
+            starts_on:,
+            ends_on: generation_ends_on(starts_on, enrollment),
             lesson_duration_minutes: profile.lesson_duration_minutes,
             time_zone: profile.user.time_zone, status: "active"
           },
@@ -141,9 +211,21 @@ module Admin
         raise ActiveRecord::RecordInvalid, schedule unless schedule.persisted?
       end
 
+      # Madarak's "generate for how many weeks" onboarding field controls how far ahead the
+      # recurring schedule is generated; the course offering's own end date still wins if it's
+      # sooner, so a short course never overruns its planned end.
+      def generation_ends_on(starts_on, enrollment)
+        weeks = @attributes[:schedule_generation_weeks].presence&.to_i
+        offering_end = enrollment.course_offering.planned_end_on
+        return offering_end if weeks.blank? || weeks <= 0
+
+        weeks_end = starts_on + weeks.weeks
+        [offering_end, weeks_end].compact.min
+      end
+
       def complete_schedule_slots
         schedule_slots.filter_map do |slot|
-          next unless slot.values.all?(&:present?)
+          next if slot["weekday"].blank? || slot["time"].blank?
 
           { weekday: slot.fetch("weekday"), starts_at_local: slot.fetch("time") }
         end

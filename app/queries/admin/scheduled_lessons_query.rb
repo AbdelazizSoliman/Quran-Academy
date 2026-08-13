@@ -18,7 +18,7 @@ module Admin
 
     def call
       scope = @relation.joins(:teacher_profile, course_offering: :program)
-                       .includes(:teacher_profile, :course_offering, :enrollments)
+                       .includes(:teacher_profile, :course_offering, enrollments: :student_profile)
       scope = search(scope)
       scope = filters(scope)
       scope.distinct.order(sort_column => direction, "scheduled_lessons.id" => :asc)

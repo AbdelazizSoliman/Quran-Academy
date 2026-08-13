@@ -4,7 +4,13 @@ module Admin
     before_action :set_lesson, except: %i[index new create]
 
     def index
-      @pagy, @lessons = pagy(:offset, ScheduledLessonsQuery.new(params:).call, limit: 20)
+      @week_start = selected_week.beginning_of_week(:sunday)
+      @week_end = @week_start + 6.days
+      query_params = params.to_unsafe_h.merge(from: @week_start.iso8601, to: @week_end.iso8601)
+      @lessons = ScheduledLessonsQuery.new(params: query_params).call.to_a
+      @lessons_by_day = @lessons.group_by { |lesson| lesson.starts_at.in_time_zone(academy_time_zone).to_date }
+      @teachers = TeacherProfile.available_for_scheduling.order(:display_name)
+      @offerings = CourseOffering.where(status: %w[draft open in_progress]).order(:title_en)
     end
 
     def show
@@ -90,6 +96,16 @@ module Admin
     end
 
     private
+
+    def selected_week
+      Date.iso8601(params[:week].to_s)
+    rescue Date::Error
+      Date.current
+    end
+
+    def academy_time_zone
+      @academy_time_zone ||= AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+    end
 
     def load_show_data
       @events = @lesson.events.includes(:actor).recent_first.limit(30)

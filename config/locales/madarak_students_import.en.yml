@@ -1,0 +1,13 @@
+en:
+  students:
+    madarak:
+      import_description: "Upload an Excel-compatible CSV file to create students with the onboarding fields."
+      import_file: "Students file"
+      import_file_required: "Choose a students file first."
+      import_submit: "Upload and import students"
+      import_template: "Import file columns"
+      import_hint: "Every row must include at least first name, last name, and email."
+      import_success: "%{count} students were imported successfully."
+      import_partial: "%{count} students were imported; %{errors} rows could not be imported."
+      import_errors_title: "Rows that need review"
+      import_line_error: "Line %{line}: %{error}"

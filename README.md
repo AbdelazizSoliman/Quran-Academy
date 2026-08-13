@@ -231,7 +231,7 @@ user's existing sessions are rejected on their next authenticated request.
 `UserAccountEvent` records creation, meaningful updates, approval, status changes, role
 changes, and password resets with safe JSON metadata. It is intentionally account-specific,
 not a general auditing or granular permissions framework. Teacher, student, staff, and
-guardian profile models remain intentionally unimplemented.
+guardian profiles extend these accounts while authorization remains role-based.
 
 ## Academy settings
 
@@ -302,8 +302,8 @@ safeguarding data lives in a one-to-one `StudentProfile`. Administrators explici
 profiles for existing student-role accounts. Profiles use immutable public IDs and protect
 their owning user from an invalid role change.
 
-Guardians are deliberately non-authenticated domain records: there is no guardian role,
-login, invitation, or portal. `StudentGuardianship` provides many-to-many relationships with
+Guardians can have an authenticated account and a dedicated parent portal. `StudentGuardianship`
+provides many-to-many relationships with
 relationship type, one transactional active primary contact per student, emergency/legal/
 academic authority flags, communication-readiness flags, and effective dates. Adults may
 have no guardian; verified minors require a usable active guardian, exactly one primary
@@ -316,9 +316,9 @@ masked change markers instead of duplicating their contents. Students can edit o
 own safe contact and learning-preference fields. Profiles, guardians, and relationships are
 archived or ended rather than hard-deleted.
 
-Programs, courses, enrollment, teacher assignment, scheduling, lessons, attendance, billing,
-payments, communications, uploads, background jobs, and guardian authentication remain out
-of scope.
+Guardian authentication, child-scoped schedules, attendance, lesson reports, notifications,
+and profile views are available through the parent portal. Payments, outbound communications,
+uploads, and background jobs remain out of scope.
 
 ## Technology stack
 
@@ -398,6 +398,7 @@ All demo accounts use the password `DemoPass123!`. Useful accounts are:
 - `staff@demo.quran-academy.test`
 - `teacher1@demo.quran-academy.test` through `teacher3@demo.quran-academy.test`
 - `student1@demo.quran-academy.test` through `student10@demo.quran-academy.test`
+- `guardian1@demo.quran-academy.test` and `guardian2@demo.quran-academy.test`
 
 ## Running tests
 

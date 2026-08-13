@@ -1,0 +1,15 @@
+<%= render "shared/page_header", title: t("parent_portal.schedule.title"),
+           description: t("parent_portal.schedule.description") %>
+<div class="space-y-4">
+  <% @lessons.each do |lesson| %>
+    <%= link_to guardian_schedule_path(lesson), class: "ds-card portal-list-card" do %>
+      <span class="portal-date-block"><strong><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :day) %></strong>
+        <small><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :month) %></small></span>
+      <span class="min-w-0 flex-1"><strong class="block truncate"><%= dashboard_lesson_title(lesson) %></strong>
+        <small class="mt-1 block text-app-subtle"><%= lesson.teacher_profile.display_name %> · <span dir="ltr"><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :time) %></span></small></span>
+      <%= scheduling_status_badge(lesson) %>
+    <% end %>
+  <% end %>
+</div>
+<% if @lessons.empty? %><%= render "shared/components/empty_state", icon: :calendar,
+  title: t("portal.shared.no_lessons"), description: t("portal.guardian.no_lessons_hint") %><% end %>

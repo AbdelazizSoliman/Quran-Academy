@@ -74,6 +74,43 @@ RSpec.describe "Teacher scheduling requests" do
     expect(response.body).to include(I18n.t("forms.errors_title", locale: :ar))
   end
 
+  it "renders the selected Sunday-to-Saturday week as a seven-day calendar" do
+    selected_day = Date.new(2026, 8, 12)
+    week_start = selected_day.beginning_of_week(:sunday)
+    inside = create(:scheduled_lesson, title_ar: "Inside week", title_en: "Inside week", starts_at: week_start.noon, ends_at: week_start.noon + 45.minutes)
+    outside = create(:scheduled_lesson, title_ar: "Outside week", title_en: "Outside week", starts_at: (week_start + 7.days).noon,
+                                        ends_at: (week_start + 7.days).noon + 45.minutes)
+    sign_in admin
+
+    get admin_scheduled_lessons_path(week: selected_day.iso8601)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("grid-cols-7", inside.title_ar)
+    expect(response.body).not_to include(outside.title_ar)
+    expect(response.body).to include((week_start - 7.days).iso8601, (week_start + 7.days).iso8601)
+  end
+
+  it "filters the weekly calendar by teacher, offering, and status" do
+    week_start = Date.new(2026, 8, 9)
+    teacher = create(:teacher_profile, :active, :verified)
+    offering = create(:course_offering, :open)
+    matching = create(:scheduled_lesson, :scheduled, title_ar: "Matching lesson", title_en: "Matching lesson", teacher_profile: teacher, course_offering: offering,
+                                                     starts_at: week_start.noon, ends_at: week_start.noon + 45.minutes)
+    other = create(:scheduled_lesson, title_ar: "Other lesson", title_en: "Other lesson", starts_at: (week_start + 1.day).noon,
+                                      ends_at: (week_start + 1.day).noon + 45.minutes)
+    sign_in admin
+
+    get admin_scheduled_lessons_path(
+      week: week_start.iso8601,
+      teacher_profile_id: teacher.id,
+      course_offering_id: offering.id,
+      status: "scheduled"
+    )
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(matching.title_ar, teacher.display_name, offering.title_en)
+    expect(response.body).not_to include(other.title_ar)
+  end
   it "allows staff read-only access but blocks staff mutations" do
     sign_in create(:user, :staff)
     get admin_scheduled_lessons_path

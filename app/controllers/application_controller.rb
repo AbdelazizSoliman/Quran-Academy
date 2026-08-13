@@ -16,6 +16,16 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def require_release_feature!(feature)
+    head :not_found unless ReleaseFeatures.enabled?(feature)
+  end
+
+  helper_method :release_feature_enabled?, :academy_setting
+
+  def release_feature_enabled?(feature)
+    ReleaseFeatures.enabled?(feature)
+  end
+
   def use_locale(&)
     requested_locale = request.query_parameters["locale"] if public_locale_selection?
     locale = supported_locale(requested_locale) ||

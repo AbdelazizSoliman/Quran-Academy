@@ -1,0 +1,18 @@
+ar:
+  scheduling:
+    weekly:
+      description: "جدول الأكاديمية الأسبوعي من %{from} إلى %{to}."
+      previous: "الأسبوع السابق"
+      today: "اليوم"
+      next: "الأسبوع التالي"
+      calendar_label: "تقويم الحصص الأسبوعي"
+      lessons_count:
+        zero: "لا توجد حصص"
+        one: "حصة واحدة"
+        two: "حصتان"
+        few: "%{count} حصص"
+        many: "%{count} حصة"
+        other: "%{count} حصة"
+      students: "الطلاب"
+      no_students: "لم يُضف طلاب"
+      no_lessons: "لا توجد حصص"

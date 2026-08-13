@@ -1,8 +1,9 @@
 module StudentAssessments
   class Create
-    def initialize(actor:, attributes:)
+    def initialize(actor:, attributes:, category_scores: {})
       @actor = actor
       @attributes = attributes
+      @category_scores = category_scores.to_h.stringify_keys
     end
 
     def call
@@ -10,10 +11,13 @@ module StudentAssessments
       assessment.student_profile = assessment.enrollment&.student_profile
       assessment.created_by = assessment.updated_by = @actor
       return forbidden(assessment) unless authorized?(assessment)
+      return assessment unless valid_category_scores?(assessment)
 
       StudentAssessment.transaction do
         assessment.save!
         initialize_scores!(assessment)
+        apply_category_scores!(assessment)
+        recalculate!(assessment) if @category_scores.any?
         event!(assessment, "created", after_data: snapshot(assessment))
       end
       assessment
@@ -39,6 +43,29 @@ module StudentAssessments
       assessment.assessment_template.rubric_items.find_each do |rubric|
         assessment.scores.create!(assessment_rubric_item: rubric)
       end
+    end
+
+    def valid_category_scores?(assessment)
+      return true if @category_scores.empty?
+
+      expected = Assessments::MadarakTemplate::CATEGORIES.keys
+      valid = expected.all? do |code|
+        AssessmentRubricItem::RATINGS.include?(@category_scores[code])
+      end
+      assessment.errors.add(:base, I18n.t("madarak_evaluations.errors.incomplete_scores")) unless valid
+      valid
+    end
+
+    def apply_category_scores!(assessment)
+      assessment.scores.includes(assessment_rubric_item: :assessment_category).find_each do |score|
+        code = score.assessment_rubric_item.assessment_category.code
+        score.update!(rating: @category_scores.fetch(code)) if @category_scores.key?(code)
+      end
+    end
+
+    def recalculate!(assessment)
+      result = Assessments::GradeCalculator.new(scores: assessment.scores.includes(:assessment_rubric_item)).call
+      assessment.update!(overall_score: result[:percentage], letter_grade: result[:letter_grade])
     end
 
     def event!(assessment, event_type, after_data: {})

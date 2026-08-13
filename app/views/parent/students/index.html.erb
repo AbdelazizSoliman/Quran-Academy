@@ -1,0 +1,23 @@
+<%= render "shared/page_header", title: t("parent_portal.students.title"),
+           description: t("parent_portal.students.description") %>
+<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+  <% @students.each do |student| %>
+    <%= link_to guardian_student_path(student), class: "ds-card group p-5 transition hover:-translate-y-0.5 hover:border-app-primary" do %>
+      <div class="flex items-center gap-4">
+        <span class="portal-avatar"><%= student.display_name.to_s.first %></span>
+        <div class="min-w-0"><h2 class="truncate font-bold text-app-text"><%= student.display_name %></h2>
+          <p class="ds-caption"><%= student.public_id %></p></div>
+      </div>
+      <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-app-border pt-4">
+        <div><dt class="ds-caption"><%= t("parent_portal.students.teacher") %></dt>
+          <dd class="mt-1 text-sm font-semibold"><%= student.assigned_teacher_profile&.display_name || "-" %></dd></div>
+        <div><dt class="ds-caption"><%= t("parent_portal.students.progress") %></dt>
+          <dd class="mt-1 text-sm font-semibold"><%= number_to_percentage(student.student_progress&.completion_percentage || 0, precision: 0) %></dd></div>
+      </dl>
+    <% end %>
+  <% end %>
+</div>
+<% if @students.empty? %>
+  <%= render "shared/components/empty_state", icon: :users, title: t("portal.guardian.no_children"),
+             description: t("portal.guardian.no_children_hint") %>
+<% end %>

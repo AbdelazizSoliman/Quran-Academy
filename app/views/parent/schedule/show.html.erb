@@ -1,0 +1,16 @@
+<%= render "shared/page_header", title: dashboard_lesson_title(@lesson),
+           description: @lesson.public_id, badge: scheduling_status_badge(@lesson) %>
+<div class="grid gap-6 lg:grid-cols-2">
+  <section class="ds-card p-5"><h2 class="ds-section-title"><%= t("parent_portal.schedule.details") %></h2>
+    <dl class="mt-5 space-y-4">
+      <div><dt class="ds-caption"><%= t("parent_portal.schedule.time") %></dt><dd class="mt-1 font-semibold" dir="ltr"><%= l(@lesson.starts_at.in_time_zone(current_user.time_zone), format: :long) %></dd></div>
+      <div><dt class="ds-caption"><%= t("parent_portal.schedule.teacher") %></dt><dd class="mt-1 font-semibold"><%= @lesson.teacher_profile.display_name %></dd></div>
+      <div><dt class="ds-caption"><%= t("parent_portal.schedule.location") %></dt><dd class="mt-1 font-semibold"><%= dashboard_lesson_location(@lesson) %></dd></div>
+    </dl>
+  </section>
+  <section class="ds-card p-5"><h2 class="ds-section-title"><%= t("parent_portal.schedule.children") %></h2>
+    <div class="mt-4 space-y-3"><% @students.each do |student| %>
+      <%= link_to student.display_name, guardian_student_path(student), class: "portal-quick-link" %>
+    <% end %></div>
+  </section>
+</div>

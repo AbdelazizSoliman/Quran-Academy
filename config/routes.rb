@@ -54,6 +54,7 @@ Rails.application.routes.draw do
         patch :restore
       end
     end
+    resources :fee_plans, only: %i[index create edit update destroy]
     resources :course_offerings, except: :destroy do
       member do
         patch :open
@@ -90,6 +91,11 @@ Rails.application.routes.draw do
     end
     resource :settings, only: %i[show edit update], controller: :academy_settings
     resources :teachers, except: :destroy do
+      collection do
+        get :import
+        post :import, action: :import_create
+        get :export
+      end
       member do
         patch :verify
         patch :archive
@@ -97,6 +103,11 @@ Rails.application.routes.draw do
       end
     end
     resources :students, except: :destroy do
+      collection do
+        get :import
+        post :import, action: :import_create
+        get :export
+      end
       member do
         patch :verify
         patch :archive
@@ -256,6 +267,14 @@ Rails.application.routes.draw do
     end
     resources :attendances, only: %i[index show]
     resources :reports, only: %i[index show]
+  end
+  namespace :parent, path: "guardian", as: "guardian" do
+    resource :profile, only: :show, controller: :profiles
+    resources :students, only: %i[index show]
+    resources :schedule, only: %i[index show]
+    resources :attendances, only: :index
+    resources :reports, only: :index
+    resources :notifications, only: :index
   end
   root "dashboard#index"
   constraints LocalEnvironmentConstraint.new do

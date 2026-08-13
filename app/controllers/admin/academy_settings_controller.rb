@@ -35,7 +35,8 @@ module Admin
 
     def scalar_fields
       %i[
-        academy_name legal_name short_name description contact_email contact_phone whatsapp_number
+        academy_name legal_name short_name description logo_url primary_color secondary_color slug custom_domain
+        contact_email contact_phone whatsapp_number
         website_url address_line_1 address_line_2 city state_or_region postal_code country_code
         default_locale default_time_zone day_starts_at day_ends_at default_lesson_duration_minutes
         minimum_lesson_duration_minutes maximum_lesson_duration_minutes lesson_duration_step_minutes

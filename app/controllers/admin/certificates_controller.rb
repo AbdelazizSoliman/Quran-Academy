@@ -1,5 +1,6 @@
 module Admin
   class CertificatesController < SchedulingBaseController
+    before_action -> { require_release_feature!(:certificates) }
     before_action :require_admin!, except: %i[index show]
 
     def index

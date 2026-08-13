@@ -1,0 +1,10 @@
+en:
+  madarak_branding:
+    section: "Branding and academy address"
+    hint: "These settings belong to this academy only; there is no platform subscription or multi-academy selector."
+    fields:
+      logo_url: "Logo URL"
+      primary_color: "Primary color"
+      secondary_color: "Secondary color"
+      slug: "Academy slug"
+      custom_domain: "Custom domain"

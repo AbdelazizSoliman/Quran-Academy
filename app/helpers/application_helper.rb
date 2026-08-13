@@ -52,6 +52,7 @@ module ApplicationHelper
     empty: '<path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16v13H4V7Zm3-3h10M8 11h8M8 15h5"/>',
     home: '<path stroke-linecap="round" stroke-linejoin="round" d="m3 11 9-8 9 8v10h-6v-6H9v6H3V11Z"/>',
     information: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-4m0-4h.01m9 4a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>',
+    layers: '<path stroke-linecap="round" stroke-linejoin="round" d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5m-18 5 9 5 9-5"/>',
     message: '<path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H8l-4 4V5Zm4 5h8m-8 3h5"/>',
     plus: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/>',
     reports: '<path stroke-linecap="round" stroke-linejoin="round" d="M5 20V10h4v10H5Zm6 0V4h4v16h-4Zm6 0v-7h4v7h-4Z"/>',
@@ -99,5 +100,14 @@ module ApplicationHelper
     attributes["aria-label"] = label unless decorative
 
     tag.svg(**attributes) { ICON_PATHS.fetch(name.to_sym).html_safe } # rubocop:disable Rails/OutputSafety
+  end
+  def academy_brand_name
+    academy_setting&.academy_name.presence || t("app.name")
+  end
+
+  def academy_brand_style
+    primary = academy_setting&.primary_color.presence || "#0B654F"
+    secondary = academy_setting&.secondary_color.presence || "#A85D09"
+    "--color-primary: #{primary}; --color-primary-hover: color-mix(in srgb, #{primary} 82%, black); "       "--color-primary-soft: color-mix(in srgb, #{primary} 12%, white); --color-warning: #{secondary};"
   end
 end

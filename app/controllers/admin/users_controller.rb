@@ -4,8 +4,15 @@ module Admin
     rescue_from Users::Operation::Forbidden, with: :operation_forbidden
 
     def index
-      scope = UsersQuery.new(params:).call
-      @pagy, @users = pagy(:offset, scope, limit: 15)
+      @team_scope = User.where(role: %w[admin staff teacher])
+      scope = params[:role].to_s.in?(%w[student guardian]) ? User.all : @team_scope
+      @team_counts = {
+        admins: @team_scope.admin.count,
+        staff: @team_scope.staff.count,
+        teachers: @team_scope.teacher.count,
+        active: @team_scope.active.count
+      }
+      @pagy, @users = pagy(:offset, UsersQuery.new(scope:, params:).call, limit: 15)
     end
 
     def show

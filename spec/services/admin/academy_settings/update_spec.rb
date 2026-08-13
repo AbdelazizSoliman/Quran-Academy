@@ -9,7 +9,8 @@ RSpec.describe Admin::AcademySettings::Update do
   it "updates, tracks the actor, normalizes arrays, and audits only changed fields" do
     result = described_class.new(
       setting:, actor:,
-      attributes: { academy_name: "Updated Academy", supported_locales: ["", "en", "ar", "en"],
+      attributes: { academy_name: "Updated Academy", primary_color: "#123456", slug: "updated-academy",
+                    supported_locales: ["", "en", "ar", "en"],
                     working_days: %w[monday sunday monday], default_teacher_rate: "250.50" }
     ).call
 
@@ -18,7 +19,7 @@ RSpec.describe Admin::AcademySettings::Update do
     expect(result.working_days).to eq(%w[sunday monday])
     expect(result.updated_by).to eq(actor)
     expect(result.events.last.metadata.keys).to contain_exactly(
-      "academy_name", "working_days", "default_teacher_rate"
+      "academy_name", "primary_color", "slug", "working_days", "default_teacher_rate"
     )
   end
 

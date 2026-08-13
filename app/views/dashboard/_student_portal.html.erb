@@ -1,0 +1,61 @@
+<%= render "shared/page_header",
+           title: t("portal.student.title", name: current_user.first_name),
+           description: t("portal.student.subtitle") %>
+
+<section class="portal-hero" aria-labelledby="student-welcome">
+  <div>
+    <p class="portal-eyebrow"><%= t("portal.shared.today", date: l(Date.current, format: :long)) %></p>
+    <h2 id="student-welcome"><%= t("portal.student.welcome") %></h2>
+    <p><%= t("portal.student.welcome_message") %></p>
+  </div>
+  <%= link_to t("portal.actions.join_next"), student_schedule_index_path, class: "portal-hero-action" %>
+</section>
+
+<section class="portal-stat-grid" aria-label="<%= t("portal.shared.summary") %>">
+  <%= render "shared/components/stat_card", label: t("portal.student.enrollments"),
+             value: @portal[:active_enrollments_count], note: t("portal.student.enrollments_note"), icon: :reports %>
+  <%= render "shared/components/stat_card", label: t("portal.student.attendance"),
+             value: number_to_percentage(@portal[:attendance][:rate], precision: 0),
+             note: t("portal.student.attendance_note", attended: @portal[:attendance][:attended], total: @portal[:attendance][:total]), icon: :check_circle %>
+  <%= render "shared/components/stat_card", label: t("portal.student.progress"),
+             value: number_to_percentage(@portal[:progress]&.completion_percentage || 0, precision: 0),
+             note: t("portal.student.progress_note"), icon: :reports %>
+  <%= render "shared/components/stat_card", label: t("portal.student.reports"),
+             value: @portal[:reports_count], note: t("portal.student.reports_note"), icon: :message %>
+</section>
+
+<div class="mt-6 grid gap-6 xl:grid-cols-3">
+  <section class="ds-card overflow-hidden xl:col-span-2" aria-labelledby="student-today">
+    <div class="portal-card-header">
+      <div><h2 id="student-today" class="ds-section-title"><%= t("portal.shared.today_lessons") %></h2>
+        <p class="ds-caption"><%= t("portal.student.today_hint") %></p></div>
+      <%= link_to t("actions.view_all"), student_schedule_index_path, class: "portal-text-link" %>
+    </div>
+    <% if @portal[:today_lessons].any? %>
+      <div class="divide-y divide-app-border">
+        <% @portal[:today_lessons].each do |lesson| %>
+          <article class="portal-lesson-row">
+            <time datetime="<%= lesson.starts_at.iso8601 %>"><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :time) %></time>
+            <div><h3><%= dashboard_lesson_title(lesson) %></h3>
+              <p><%= lesson.teacher_profile.display_name %></p></div>
+            <%= scheduling_status_badge(lesson) %>
+            <%= link_to t("portal.actions.open_lesson"), student_schedule_path(lesson), class: "button-secondary" %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <%= render "shared/components/empty_state", icon: :calendar,
+                 title: t("portal.shared.no_lessons"), description: t("portal.student.no_lessons_hint") %>
+    <% end %>
+  </section>
+
+  <aside class="ds-card p-5" aria-labelledby="student-actions">
+    <h2 id="student-actions" class="ds-section-title"><%= t("portal.shared.quick_actions") %></h2>
+    <div class="mt-4 grid gap-3">
+      <%= link_to student_schedule_index_path, class: "portal-quick-link" do %><%= icon :calendar %><span><%= t("portal.actions.open_schedule") %></span><% end %>
+      <%= link_to student_progress_path, class: "portal-quick-link" do %><%= icon :reports %><span><%= t("portal.actions.progress") %></span><% end %>
+      <%= link_to student_reports_path, class: "portal-quick-link" do %><%= icon :check_circle %><span><%= t("portal.actions.lesson_reports") %></span><% end %>
+      <%= link_to student_notifications_path, class: "portal-quick-link" do %><%= icon :message %><span><%= t("portal.actions.notifications") %></span><% end %>
+    </div>
+  </aside>
+</div>

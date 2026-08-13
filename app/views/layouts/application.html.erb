@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>" dir="<%= I18n.locale == :ar ? "rtl" : "ltr" %>">
   <head>
-    <title><%= content_for(:title) || t("app.name") %></title>
+    <title><%= content_for(:title) || academy_brand_name %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="<%= t("app.description") %>">
-    <meta name="application-name" content="<%= t("app.name") %>">
-    <meta name="theme-color" content="#065f46">
+    <meta name="application-name" content="<%= academy_brand_name %>">
+    <meta name="theme-color" content="<%= academy_setting&.primary_color || "#0B654F" %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= yield :head %>
@@ -15,7 +15,8 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen bg-slate-50 text-slate-900 antialiased"
+  <body class="min-h-screen bg-app-background text-app-text antialiased"
+        style="<%= academy_brand_style %>"
         data-time-zone="<%= Time.zone.name %>"
         data-controller="sidebar">
     <a href="#main-content" class="sr-only z-50 rounded-md bg-white px-4 py-2 text-emerald-800 focus:not-sr-only focus:fixed focus:right-4 focus:top-4">
