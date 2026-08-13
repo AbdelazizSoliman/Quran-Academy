@@ -68,8 +68,9 @@ module Admin
     end
 
     def attendance
-      @attendances = @lesson.lesson_attendances.includes(:events,
-                                                         scheduled_lesson_enrollment: { enrollment: :student_profile })
+      @attendances = @lesson.lesson_attendances.includes(
+        :events, scheduled_lesson_enrollment: [:student_profile, { enrollment: :student_profile }]
+      )
       @events = @lesson.events.includes(:actor).recent_first.limit(50)
       render "admin/lesson_attendances/show"
     end
@@ -109,10 +110,15 @@ module Admin
 
     def load_show_data
       @events = @lesson.events.includes(:actor).recent_first.limit(30)
-      @participants = @lesson.scheduled_lesson_enrollments.includes(enrollment: { student_profile: :user })
+      @participants = @lesson.scheduled_lesson_enrollments.includes(:student_profile,
+                                                                    enrollment: { student_profile: :user })
       participant_ids = @participants.map(&:enrollment_id)
-      @available_enrollments = @lesson.course_offering.enrollments.where(status: %w[approved active paused])
-                                      .where.not(id: participant_ids).includes(:student_profile).order(:id)
+      @available_enrollments = if @lesson.course_offering
+                                 @lesson.course_offering.enrollments.where(status: %w[approved active paused])
+                                        .where.not(id: participant_ids).includes(:student_profile).order(:id)
+                               else
+                                 Enrollment.none
+                               end
     end
 
     def set_lesson

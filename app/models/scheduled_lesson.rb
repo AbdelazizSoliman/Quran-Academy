@@ -7,7 +7,7 @@ class ScheduledLesson < ApplicationRecord
   ATTENDANCE_STATUSES = %w[not_opened open locked reopened].freeze
   TEACHER_ATTENDANCE_STATUSES = %w[not_checked_in on_time late absent administrator_override].freeze
 
-  belongs_to :course_offering, inverse_of: :scheduled_lessons
+  belongs_to :course_offering, inverse_of: :scheduled_lessons, optional: true
   belongs_to :teacher_profile, inverse_of: :scheduled_lessons
   belongs_to :created_by, class_name: "User", optional: true, inverse_of: :created_scheduled_lessons
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_scheduled_lessons

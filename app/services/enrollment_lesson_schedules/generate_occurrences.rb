@@ -65,18 +65,28 @@ module EnrollmentLessonSchedules
 
     def create_lesson(slot, date)
       starts_at = local_start(date, slot.starts_at_local)
-      offering = @schedule.enrollment.course_offering
+      attributes = @schedule.enrollment ? enrollment_lesson_attributes : direct_lesson_attributes
       Admin::ScheduledLessons::Create.new(
         actor: @actor,
-        attributes: {
-          course_offering_id: offering.id, teacher_profile_id: @schedule.teacher_profile_id,
-          title_ar: offering.title_ar, title_en: offering.title_en, starts_at:,
+        attributes: attributes.merge(
+          teacher_profile_id: @schedule.teacher_profile_id, starts_at:,
           ends_at: starts_at + @schedule.lesson_duration_minutes.minutes, academy_time_zone: @schedule.time_zone,
-          delivery_mode: lesson_delivery_mode(offering.delivery_mode), location_name: nil,
-          online_meeting_url: nil, scheduling_source: "recurring",
+          location_name: nil, online_meeting_url: nil, scheduling_source: "recurring",
           enrollment_lesson_schedule_slot_id: slot.id, recurrence_date: date
-        }
+        )
       ).call
+    end
+
+    def enrollment_lesson_attributes
+      offering = @schedule.enrollment.course_offering
+      { course_offering_id: offering.id, title_ar: offering.title_ar, title_en: offering.title_en,
+        delivery_mode: lesson_delivery_mode(offering.delivery_mode) }
+    end
+
+    def direct_lesson_attributes
+      student = @schedule.student_profile
+      { course_offering_id: nil, title_ar: "درس خاص مع #{student.display_name}",
+        title_en: "Private lesson with #{student.display_name}", delivery_mode: "online" }
     end
 
     def local_start(date, time)
@@ -89,7 +99,8 @@ module EnrollmentLessonSchedules
 
     def add_participant(lesson)
       Admin::ScheduledLessons::Participants::Add.new(
-        actor: @actor, lesson:, enrollment: @schedule.enrollment
+        actor: @actor, lesson:, enrollment: @schedule.enrollment,
+        student_profile: @schedule.enrollment ? nil : @schedule.student_profile
       ).call
     end
 

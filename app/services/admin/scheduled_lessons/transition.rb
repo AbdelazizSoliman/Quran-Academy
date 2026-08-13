@@ -91,7 +91,9 @@ module Admin
       def check_conflicts
         result = Scheduling::ConflictCheck.call(
           lesson: @lesson, starts_at: @lesson.starts_at, ends_at: @lesson.ends_at,
-          teacher_profile: @lesson.teacher_profile, enrollment_ids: @lesson.enrollments.ids
+          teacher_profile: @lesson.teacher_profile, enrollment_ids: @lesson.enrollments.ids,
+          student_profile_ids: @lesson.scheduled_lesson_enrollments.where.not(student_profile_id: nil)
+                                      .pluck(:student_profile_id)
         )
         @lesson.errors.add(:base, :schedule_conflict) if result.conflicts?
       end
@@ -106,6 +108,8 @@ module Admin
       end
 
       def offering_usable?
+        return true unless @lesson.course_offering
+
         @lesson.course_offering.status != "cancelled" && !@lesson.course_offering.archived?
       end
 

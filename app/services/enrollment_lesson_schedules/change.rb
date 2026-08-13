@@ -18,6 +18,7 @@ module EnrollmentLessonSchedules
         supersede_old!
         cancel_future_occurrences!
         replacement = Create.new(actor: @actor, enrollment: @schedule.enrollment,
+                                 student_profile: @schedule.enrollment ? nil : @schedule.student_profile,
                                  attributes: replacement_attributes, slots: @slots).call
         raise ActiveRecord::Rollback if replacement.errors.any?
 

@@ -22,6 +22,50 @@ RSpec.describe "Teacher scheduling services" do
     expect(result.conflicts?).to be(true)
   end
 
+  it "prevents double-booking an enrollment-backed student across different lessons" do
+    first = create(:scheduled_lesson, :scheduled)
+    participation = create(:scheduled_lesson_enrollment, scheduled_lesson: first)
+    second = build(:scheduled_lesson, teacher_profile: create(:teacher_profile, :active, :verified),
+                                      starts_at: first.starts_at + 15.minutes, ends_at: first.ends_at + 15.minutes)
+
+    result = Scheduling::ConflictCheck.call(lesson: second, starts_at: second.starts_at, ends_at: second.ends_at,
+                                            teacher_profile: second.teacher_profile,
+                                            enrollment_ids: [participation.enrollment_id])
+
+    expect(result.conflicts?).to be(true)
+    expect(result.student_conflicts).to contain_exactly(first)
+  end
+
+  it "prevents double-booking a direct-participation student across different lessons" do
+    profile = create(:student_profile, :complete)
+    first = create(:scheduled_lesson, :scheduled, course_offering: nil)
+    create(:scheduled_lesson_enrollment, scheduled_lesson: first, enrollment: nil, student_profile: profile)
+    second = build(:scheduled_lesson, teacher_profile: create(:teacher_profile, :active, :verified),
+                                      starts_at: first.starts_at + 15.minutes, ends_at: first.ends_at + 15.minutes)
+
+    result = Scheduling::ConflictCheck.call(lesson: second, starts_at: second.starts_at, ends_at: second.ends_at,
+                                            teacher_profile: second.teacher_profile, enrollment_ids: [],
+                                            student_profile_ids: [profile.id])
+
+    expect(result.conflicts?).to be(true)
+    expect(result.student_conflicts).to contain_exactly(first)
+  end
+
+  it "allows an unrelated student to be scheduled at the same time as a direct participant" do
+    profile = create(:student_profile, :complete)
+    other_profile = create(:student_profile, :complete)
+    first = create(:scheduled_lesson, :scheduled, course_offering: nil)
+    create(:scheduled_lesson_enrollment, scheduled_lesson: first, enrollment: nil, student_profile: profile)
+    second = build(:scheduled_lesson, teacher_profile: create(:teacher_profile, :active, :verified),
+                                      starts_at: first.starts_at + 15.minutes, ends_at: first.ends_at + 15.minutes)
+
+    result = Scheduling::ConflictCheck.call(lesson: second, starts_at: second.starts_at, ends_at: second.ends_at,
+                                            teacher_profile: second.teacher_profile, enrollment_ids: [],
+                                            student_profile_ids: [other_profile.id])
+
+    expect(result.conflicts?).to be(false)
+  end
+
   it "records explicit scheduling lifecycle events" do
     lesson = create(:scheduled_lesson)
     result = Admin::ScheduledLessons::Transition.new(actor: admin, lesson:, action: :cancel,

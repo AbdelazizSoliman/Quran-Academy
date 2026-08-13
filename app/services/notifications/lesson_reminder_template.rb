@@ -23,17 +23,15 @@ module Notifications
 
     def self.counterpart(notification, lesson)
       locale = notification.recipient_locale
-      unless notification.recipient_user.teacher?
-        return lesson.teacher_profile.display_name
-      end
+      return lesson.teacher_profile.display_name unless notification.recipient_user.teacher?
 
       students = student_names(lesson)
       students.one? ? students.first : I18n.t("notifications.messages.students", locale:)
     end
 
     def self.student_names(lesson)
-      lesson.scheduled_lesson_enrollments.expected.includes(enrollment: :student_profile)
-            .map { |item| item.enrollment.student_profile.display_name }
+      lesson.scheduled_lesson_enrollments.expected.includes(:student_profile, enrollment: :student_profile)
+            .filter_map { |item| item.student_profile&.display_name }
     end
 
     def self.localized_date_and_time(notification, local_start)

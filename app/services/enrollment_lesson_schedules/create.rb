@@ -1,14 +1,16 @@
 module EnrollmentLessonSchedules
   class Create
-    def initialize(actor:, enrollment:, attributes:, slots:)
+    def initialize(actor:, attributes:, slots:, enrollment: nil, student_profile: nil)
       @actor = actor
       @enrollment = enrollment
+      @student_profile = student_profile
       @attributes = attributes.to_h.symbolize_keys
       @slots = Array(slots)
     end
 
     def call
-      schedule = @enrollment.lesson_schedules.new(@attributes)
+      schedule = EnrollmentLessonSchedule.new(@attributes.merge(enrollment: @enrollment,
+                                                                student_profile: @student_profile))
       schedule.created_by = schedule.updated_by = @actor
       EnrollmentLessonSchedule.transaction(requires_new: true) do
         schedule.save!

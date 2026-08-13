@@ -193,30 +193,42 @@ module Admin
       end
 
       def create_lesson_schedule(profile, enrollment)
-        return unless enrollment&.persisted? && profile.assigned_teacher_profile && complete_schedule_slots.any?
+        return unless profile.assigned_teacher_profile && complete_schedule_slots.any?
         return if profile.lesson_duration_minutes.blank?
 
+        if enrollment&.persisted?
+          create_enrollment_backed_schedule(profile, enrollment)
+        elsif profile.fee_plan_id.present?
+          create_direct_schedule(profile)
+        end
+      end
+
+      def create_enrollment_backed_schedule(profile, enrollment)
         starts_on = enrollment.course_offering.planned_start_on || Date.current
-        schedule = EnrollmentLessonSchedules::Create.new(
-          actor: @actor, enrollment:,
-          attributes: {
-            teacher_profile: profile.assigned_teacher_profile,
-            starts_on:,
-            ends_on: generation_ends_on(starts_on, enrollment),
-            lesson_duration_minutes: profile.lesson_duration_minutes,
-            time_zone: profile.user.time_zone, status: "active"
-          },
-          slots: complete_schedule_slots
-        ).call
+        build_schedule!(profile, starts_on, enrollment.course_offering.planned_end_on, enrollment:)
+      end
+
+      # Fee-plan-only students have no course offering to anchor the schedule to, so it starts
+      # today and runs only as far as the requested generation window (no offering end date cap).
+      def create_direct_schedule(profile)
+        build_schedule!(profile, Date.current, nil, student_profile: profile)
+      end
+
+      def build_schedule!(profile, starts_on, offering_end, enrollment: nil, student_profile: nil)
+        attributes = { teacher_profile: profile.assigned_teacher_profile, starts_on:,
+                       ends_on: generation_ends_on(starts_on, offering_end),
+                       lesson_duration_minutes: profile.lesson_duration_minutes,
+                       time_zone: profile.user.time_zone, status: "active" }
+        schedule = EnrollmentLessonSchedules::Create.new(actor: @actor, enrollment:, student_profile:,
+                                                         attributes:, slots: complete_schedule_slots).call
         raise ActiveRecord::RecordInvalid, schedule unless schedule.persisted?
       end
 
       # Madarak's "generate for how many weeks" onboarding field controls how far ahead the
-      # recurring schedule is generated; the course offering's own end date still wins if it's
+      # recurring schedule is generated; a course offering's own end date still wins if it's
       # sooner, so a short course never overruns its planned end.
-      def generation_ends_on(starts_on, enrollment)
+      def generation_ends_on(starts_on, offering_end)
         weeks = @attributes[:schedule_generation_weeks].presence&.to_i
-        offering_end = enrollment.course_offering.planned_end_on
         return offering_end if weeks.blank? || weeks <= 0
 
         weeks_end = starts_on + weeks.weeks

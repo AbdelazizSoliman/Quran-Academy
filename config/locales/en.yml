@@ -40,6 +40,8 @@ en:
       language_not_supported: "does not match the offering's supported learning language"
       profile_not_verified: "requires a verified student profile before activation"
       placement_incomplete: "requires completed or waived placement before activation"
+      participant_required: "must reference an enrollment or a student profile"
+      participant_conflict: "cannot reference both an enrollment and a student profile"
   activerecord:
     attributes:
       user:

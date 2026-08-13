@@ -20,6 +20,7 @@ module Notifications
       notification = build_notification
       return invalid(notification, :forbidden) unless authorized?
       return invalid(notification, :invalid_source) unless source_valid?
+
       existing = Notification.find_by(idempotency_key: @idempotency_key) if @idempotency_key.present?
       return existing if existing
       return recipient_failure(notification, :channel_disabled) unless channel_enabled?
@@ -98,13 +99,18 @@ module Notifications
     def recipient_belongs_to_source?
       case @source
       when AccountInvitation then @source.user_id == @recipient.id
-      when ScheduledLesson
-        @source.teacher_profile.user_id == @recipient.id ||
-          @source.enrollments.joins(student_profile: :user).exists?(users: { id: @recipient.id })
+      when ScheduledLesson then recipient_in_lesson?
       when LessonReport then @source.lesson_student_reports.joins(student_profile: :user).exists?(users: { id: @recipient.id })
       when Certificate then @source.student_profile.user_id == @recipient.id
       else false
       end
+    end
+
+    def recipient_in_lesson?
+      @source.teacher_profile.user_id == @recipient.id ||
+        @source.scheduled_lesson_enrollments.any? do |participation|
+          participation.student_profile&.user_id == @recipient.id
+        end
     end
 
     def notification_type_enabled?
@@ -130,9 +136,11 @@ module Notifications
     def channel_allowed_for_type?(setting)
       return invitation_channel_allowed?(setting) if @type == "account_invitation"
       return @channel == "whatsapp" if @type.in?(%w[lesson_pre_reminder lesson_late_reminder lesson_reminder
-                                                     late_reminder lesson_cancelled
-                                                     lesson_rescheduled lesson_report])
-      return @channel == "email" || (@channel == "whatsapp" && setting.certificate_whatsapp_enabled?) if @type == "certificate"
+                                                    late_reminder lesson_cancelled
+                                                    lesson_rescheduled lesson_report])
+      if @type == "certificate"
+        return @channel == "email" || (@channel == "whatsapp" && setting.certificate_whatsapp_enabled?)
+      end
 
       false
     end
@@ -171,11 +179,13 @@ module Notifications
 
     def invitation_expiry = AcademySetting.current.invitation_expires_after_hours.hours.from_now
     def stored_message(body) = @type == "account_invitation" ? I18n.t("notifications.secure_link_omitted") : body
+
     def invitation_payload(body)
       return unless @type == "account_invitation"
 
       Notifications::SecurePayload.encrypt(body)
     end
+
     def locale = @recipient.preferred_locale.to_s.presence_in(%w[ar en]) || AcademySetting.current.default_locale
     def provider_name = @channel == "whatsapp" ? "meta_whatsapp" : "resend"
 

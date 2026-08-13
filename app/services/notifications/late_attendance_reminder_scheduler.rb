@@ -30,7 +30,7 @@ module Notifications
                .where(starts_at: lower_bound..upper_bound)
                .includes(teacher_profile: :user,
                          scheduled_lesson_enrollments: [
-                           :lesson_attendance, { enrollment: { student_profile: :user } }
+                           :lesson_attendance, { student_profile: :user }, { enrollment: { student_profile: :user } }
                          ])
     end
 
@@ -57,7 +57,7 @@ module Notifications
           Rails.logger.info("LessonReminder skipped reason=already_joined")
           next
         end
-        participation.enrollment.student_profile.user
+        participation.student_profile&.user
       end
     end
 

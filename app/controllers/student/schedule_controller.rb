@@ -41,13 +41,15 @@ module Student
     def set_lesson
       @lesson = current_user.student_profile.scheduled_lessons.operational
                             .includes(:teacher_profile, :course_offering,
-                                      scheduled_lesson_enrollments: { enrollment: :student_profile })
+                                      scheduled_lesson_enrollments: [
+                                        :student_profile, { enrollment: :student_profile }
+                                      ])
                             .find(params.expect(:id))
     end
 
     def expected_participant
       @lesson.scheduled_lesson_enrollments.find do |item|
-        item.enrollment.student_profile.user_id == current_user.id && item.expected?
+        item.student_profile&.user_id == current_user.id && item.expected?
       end
     end
 

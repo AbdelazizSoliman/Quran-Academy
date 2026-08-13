@@ -17,8 +17,9 @@ module Student
     private
 
     def own_attendances
-      LessonAttendance.joins(:scheduled_lesson, scheduled_lesson_enrollment: :enrollment)
-                      .where(enrollments: { student_profile_id: current_user.student_profile.id })
+      LessonAttendance.joins(:scheduled_lesson)
+                      .where(scheduled_lesson_enrollment_id: current_user.student_profile
+                                                                          .scheduled_lesson_enrollments.select(:id))
     end
 
     def require_student!

@@ -52,6 +52,40 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     )
   end
 
+  it "sends pre-reminders for a direct (enrollment-less) participation with no course offering" do
+    lesson, participation = lesson_with_direct_student(starts_at: now + 15.minutes)
+
+    expect { pre_sweep }.to change(Notification, :count).by(2)
+    expect(Notification.pluck(:recipient_user_id)).to contain_exactly(
+      lesson.teacher_profile.user_id, participation.student_profile.user_id
+    )
+  end
+
+  it "sends a late reminder to an absent direct-participation student" do
+    _lesson, participation = lesson_with_direct_student(starts_at: now - 5.minutes, teacher_joined: true)
+    create_attendance(participation)
+
+    expect { late_sweep }.to change(Notification, :count).by(1)
+    expect(Notification.last.recipient_user).to eq(participation.student_profile.user)
+  end
+
+  it "falls back to the guardian's WhatsApp number for a direct-participation student with no number" do
+    lesson, participation = lesson_with_direct_student(starts_at: now + 15.minutes)
+    student = participation.student_profile
+    student.update!(student_type: "adult", whatsapp_number: nil, phone_number: nil,
+                    preferred_contact_method: "whatsapp")
+    guardian = create(:guardian, whatsapp_number: "+201001234570")
+    create(:student_guardianship, student_profile: student, guardian:, primary_contact: true, status: "active")
+
+    pre_sweep
+
+    notification = Notification.find_by(recipient_user: student.user, notification_type: "lesson_pre_reminder")
+    expect(notification).to be_present
+    expect(notification.recipient_guardian).to eq(guardian)
+    expect(notification.guardian_is_fallback).to be(true)
+    expect(lesson.course_offering_id).to be_nil
+  end
+
   it "does not send a pre-reminder outside the one-minute due window" do
     lesson_with_student(starts_at: now + 15.minutes + 1.second)
     expect { pre_sweep }.not_to change(Notification, :count)
@@ -178,7 +212,7 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     pre_sweep
 
     address = Notifications::RecipientResolver.new(user: lesson.teacher_profile.user, channel: "whatsapp").call
-                                               .provider_address
+                                              .provider_address
     teacher_delivery = deliveries.find { |item| item[:recipient] == address }
     expected = I18n.t("notifications.messages.students", locale: lesson.teacher_profile.user.preferred_locale)
     expect(body_texts(teacher_delivery).second).to eq(expected)
@@ -302,6 +336,20 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     participation = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
     participation.enrollment.student_profile.update!(preferred_contact_method: "whatsapp",
                                                      whatsapp_number: "+201001234568")
+    [lesson, participation]
+  end
+
+  def lesson_with_direct_student(starts_at:, teacher_joined: false)
+    teacher_status = teacher_joined ? "on_time" : "not_checked_in"
+    lesson = create(:scheduled_lesson, :scheduled, course_offering: nil, starts_at:, ends_at: starts_at + 45.minutes,
+                                                   academy_time_zone: "Cairo",
+                                                   online_meeting_url: "https://meet.example.test/lesson",
+                                                   teacher_checked_in_at: teacher_joined ? now - 1.minute : nil,
+                                                   teacher_attendance_status: teacher_status)
+    profile = create(:student_profile, :complete, preferred_contact_method: "whatsapp",
+                                                  whatsapp_number: "+201001234569")
+    participation = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson, enrollment: nil,
+                                                         student_profile: profile)
     [lesson, participation]
   end
 

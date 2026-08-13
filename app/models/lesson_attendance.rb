@@ -27,8 +27,7 @@ class LessonAttendance < ApplicationRecord
   scope :finalized, -> { where(status: FINAL_STATUSES) }
   scope :chronological, -> { order(created_at: :asc, id: :asc) }
 
-  delegate :enrollment, to: :scheduled_lesson_enrollment
-  delegate :student_profile, to: :enrollment
+  delegate :enrollment, :student_profile, to: :scheduled_lesson_enrollment
 
   STATUSES.each { |value| define_method(:"#{value}?") { status == value } }
 

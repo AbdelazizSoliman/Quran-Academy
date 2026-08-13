@@ -164,6 +164,47 @@ RSpec.describe "Admin students" do
     expect(profile.course_offerings).to be_empty
   end
 
+  it "generates real scheduled lessons for a fee-plan-only student with no program, offering, or enrollment" do
+    teacher = create(:teacher_profile, :active, :verified,
+                     online_meeting_url: "https://meet.example.test/teacher")
+    weekday = Date.current.strftime("%A").downcase
+    create(:teacher_availability, teacher_profile: teacher, weekday:, starts_at_local: "09:00",
+                                  ends_at_local: "21:00", time_zone: "Cairo",
+                                  effective_from: Date.current - 1.week, availability_type: "teaching")
+    fee_plan = create(:fee_plan)
+    slots = [{ weekday:, time: "10:00" }]
+
+    expect do
+      post admin_students_path, params: {
+        student_profile: {
+          full_name: "Direct Learner", email: "direct.learner@example.test",
+          assigned_teacher_profile_id: teacher.id, fee_plan_id: fee_plan.id,
+          lesson_duration_minutes: 30, weekly_lesson_count: 1, schedule_generation_weeks: 4,
+          slots_json: slots.to_json
+        }
+      }
+    end.to change(ScheduledLesson, :count).by_at_least(1)
+
+    profile = StudentProfile.find_by!(display_name: "Direct Learner")
+    expect(profile.enrollments).to be_empty
+    expect(Program.count).to eq(0)
+    expect(CourseOffering.count).to eq(0)
+
+    schedule = profile.direct_lesson_schedules.first
+    expect(schedule).to be_present
+    expect(schedule.enrollment).to be_nil
+    expect(schedule.teacher_profile).to eq(teacher)
+
+    lesson = profile.scheduled_lessons.first
+    expect(lesson.course_offering_id).to be_nil
+    expect(lesson.teacher_profile).to eq(teacher)
+    expect(lesson).to be_scheduled
+
+    participation = lesson.scheduled_lesson_enrollments.first
+    expect(participation.enrollment_id).to be_nil
+    expect(participation.student_profile).to eq(profile)
+  end
+
   it "creates a student with no fee plan selected" do
     post admin_students_path, params: {
       student_profile: { full_name: "Planless Learner", email: "planless.learner@example.test" }

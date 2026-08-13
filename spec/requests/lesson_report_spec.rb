@@ -61,6 +61,27 @@ RSpec.describe "Lesson report requests" do
     expect(response).to have_http_status(:not_found)
   end
 
+  it "shows a fee-plan-only student their own direct-participation report" do
+    profile = create(:student_profile, :complete)
+    direct_lesson = create(:scheduled_lesson, status: "completed", course_offering: nil, started_at: 1.hour.ago,
+                                              ended_at: Time.current, completed_at: Time.current,
+                                              attendance_status: "locked")
+    create(:scheduled_lesson_enrollment, scheduled_lesson: direct_lesson, enrollment: nil, student_profile: profile)
+    report = LessonReports::Initialize.new(actor: direct_lesson.teacher_profile.user, lesson: direct_lesson).call
+    entry = report.lesson_student_reports.first
+    report.update!(status: "reviewed", lesson_summary: "Direct summary")
+    entry.update!(status: "completed")
+
+    sign_in profile.user
+    get student_reports_path
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(direct_lesson.title_en)
+
+    get student_report_path(entry)
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Direct summary")
+  end
+
   it "prepares and manually confirms a communication without claiming delivery on creation" do
     report = initialized_report
     entry = report.lesson_student_reports.first

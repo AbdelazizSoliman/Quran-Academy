@@ -37,8 +37,7 @@ class LessonStudentReport < ApplicationRecord
   validate :participant_matches_lesson
   validate :valid_tajweed_topics
 
-  delegate :enrollment, to: :scheduled_lesson_enrollment
-  delegate :student_profile, to: :enrollment
+  delegate :enrollment, :student_profile, to: :scheduled_lesson_enrollment
   delegate :scheduled_lesson, to: :lesson_report
 
   scope :student_visible, -> { where(status: "completed") }

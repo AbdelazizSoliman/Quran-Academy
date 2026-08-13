@@ -28,7 +28,8 @@ module Notifications
       upper_bound = @now + MINUTES_BEFORE.minutes
       @relation.where(status: "scheduled").where("starts_at > ? AND starts_at <= ?", lower_bound, upper_bound)
                .includes(teacher_profile: :user,
-                         scheduled_lesson_enrollments: { enrollment: { student_profile: :user } })
+                         scheduled_lesson_enrollments: [{ student_profile: :user },
+                                                        { enrollment: { student_profile: :user } }])
     end
 
     def notify_lesson(lesson)
@@ -50,8 +51,8 @@ module Notifications
     end
 
     def recipients(lesson)
-      students = lesson.scheduled_lesson_enrollments.select(&:expected?).map do |participation|
-        participation.enrollment.student_profile.user
+      students = lesson.scheduled_lesson_enrollments.select(&:expected?).filter_map do |participation|
+        participation.student_profile&.user
       end
       [lesson.teacher_profile.user, *students].uniq(&:id)
     end

@@ -43,6 +43,24 @@ RSpec.describe "Lesson attendance requests" do
     expect(response).to have_http_status(:not_found)
   end
 
+  it "shows a fee-plan-only student their own direct-participation attendance" do
+    profile = create(:student_profile, :complete)
+    direct_lesson = create(:scheduled_lesson, :in_progress, course_offering: nil, starts_at: 1.hour.ago,
+                                                            ends_at: 1.hour.from_now)
+    direct_participant = create(:scheduled_lesson_enrollment, scheduled_lesson: direct_lesson, enrollment: nil,
+                                                              student_profile: profile)
+    direct_attendance = create(:lesson_attendance, scheduled_lesson: direct_lesson,
+                                                   scheduled_lesson_enrollment: direct_participant)
+
+    sign_in profile.user
+    get student_attendances_path
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(direct_lesson.title_en)
+
+    get student_attendance_path(direct_attendance)
+    expect(response).to have_http_status(:ok)
+  end
+
   it "has no attendance destroy routes" do
     routes = Rails.application.routes.routes.select do |route|
       route.verb.to_s.include?("DELETE") && route.path.spec.to_s.match?(/attendance|lesson_attendance/)

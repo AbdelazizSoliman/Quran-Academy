@@ -9,8 +9,9 @@ module Admin
     end
 
     def show
-      @attendances = @lesson.lesson_attendances.includes(:events,
-                                                         scheduled_lesson_enrollment: { enrollment: :student_profile })
+      @attendances = @lesson.lesson_attendances.includes(
+        :events, scheduled_lesson_enrollment: [:student_profile, { enrollment: :student_profile }]
+      )
       @events = @lesson.events.includes(:actor).recent_first.limit(50)
     end
 

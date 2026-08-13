@@ -25,6 +25,28 @@ RSpec.describe EnrollmentLessonSchedule do
     expect(build(:enrollment_lesson_schedule, status: "cancelled")).to be_valid
   end
 
+  it "supports a direct student_profile schedule with no enrollment" do
+    profile = create(:student_profile, :complete)
+    schedule = create(:enrollment_lesson_schedule, enrollment: nil, student_profile: profile)
+
+    expect(schedule.enrollment).to be_nil
+    expect(schedule.student_profile).to eq(profile)
+  end
+
+  it "falls back to the enrollment's student_profile when there is no direct student_profile" do
+    schedule = create(:enrollment_lesson_schedule)
+
+    expect(schedule.student_profile).to eq(schedule.enrollment.student_profile)
+  end
+
+  it "requires exactly one of enrollment or student_profile" do
+    neither = build(:enrollment_lesson_schedule, enrollment: nil, student_profile: nil)
+    both = build(:enrollment_lesson_schedule, student_profile: create(:student_profile, :complete))
+
+    expect(neither).not_to be_valid
+    expect(both).not_to be_valid
+  end
+
   it "validates weekdays, times, and duplicate weekday/time slots" do
     schedule = create(:enrollment_lesson_schedule)
     create(:enrollment_lesson_schedule_slot, enrollment_lesson_schedule: schedule, weekday: "sunday",

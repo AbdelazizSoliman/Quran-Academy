@@ -18,11 +18,19 @@ module Admin
 
     private
 
+    # scheduled_lesson_enrollments.enrollment_id and scheduled_lessons.course_offering_id are both
+    # nullable now (direct fee-plan-only participation), so the student join has to fall back from
+    # the direct student_profile_id to the enrollment's, via a single LEFT JOIN — a plain
+    # `joins(scheduled_lesson_enrollment: { enrollment: :student_profile })` would INNER JOIN away
+    # every direct-participation attendance row instead of just leaving it unsorted.
     def base_scope
-      @relation.joins(scheduled_lesson_enrollment: { enrollment: :student_profile },
-                      scheduled_lesson: [:teacher_profile, { course_offering: :program }])
-               .includes(:recorded_by, :last_adjusted_by, scheduled_lesson_enrollment: { enrollment: :student_profile },
-                                                          scheduled_lesson: %i[teacher_profile course_offering])
+      @relation.joins(:scheduled_lesson_enrollment, :scheduled_lesson)
+               .joins("LEFT JOIN enrollments ON enrollments.id = scheduled_lesson_enrollments.enrollment_id")
+               .joins("LEFT JOIN student_profiles ON student_profiles.id = " \
+                      "COALESCE(scheduled_lesson_enrollments.student_profile_id, enrollments.student_profile_id)")
+               .includes(:recorded_by, :last_adjusted_by,
+                         scheduled_lesson_enrollment: [:student_profile, { enrollment: :student_profile }],
+                         scheduled_lesson: %i[teacher_profile course_offering])
     end
 
     def date_range

@@ -39,17 +39,16 @@ module Dashboard
     end
 
     def attendance_summary(child)
-      scope = LessonAttendance.joins(scheduled_lesson_enrollment: :enrollment)
-                              .where(enrollments: { student_profile_id: child.id })
+      scope = LessonAttendance.where(scheduled_lesson_enrollment_id: child.scheduled_lesson_enrollments.select(:id))
       total = scope.where(status: LessonAttendance::FINAL_STATUSES).count
       attended = scope.where(status: ATTENDED).count
       { total:, attended:, rate: total.zero? ? 0 : ((attended.to_f / total) * 100).round }
     end
 
     def visible_reports(child)
-      LessonStudentReport.student_visible.joins(:scheduled_lesson_enrollment, :lesson_report)
+      LessonStudentReport.student_visible.joins(:lesson_report)
                          .where(lesson_reports: { status: %w[reviewed locked] },
-                                scheduled_lesson_enrollments: { enrollment_id: child.enrollment_ids })
+                                scheduled_lesson_enrollment_id: child.scheduled_lesson_enrollments.select(:id))
     end
 
     def empty_result(children)

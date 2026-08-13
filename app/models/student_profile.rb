@@ -43,7 +43,7 @@ class StudentProfile < ApplicationRecord
 
   belongs_to :user, inverse_of: :student_profile
   belongs_to :assigned_teacher_profile, class_name: "TeacherProfile", optional: true,
-                                                inverse_of: :assigned_students
+                                        inverse_of: :assigned_students
   belongs_to :sibling_student_profile, class_name: "StudentProfile", optional: true
   belongs_to :fee_plan, optional: true, inverse_of: :student_profiles
   belongs_to :created_by, class_name: "User", optional: true, inverse_of: :created_student_profiles
@@ -51,8 +51,10 @@ class StudentProfile < ApplicationRecord
 
   has_many :enrollments, dependent: :restrict_with_exception
   has_many :course_offerings, through: :enrollments
-  has_many :scheduled_lesson_enrollments, through: :enrollments
-  has_many :scheduled_lessons, -> { distinct }, through: :scheduled_lesson_enrollments
+  has_many :direct_scheduled_lesson_enrollments, class_name: "ScheduledLessonEnrollment",
+                                                 dependent: :restrict_with_exception, inverse_of: :student_profile
+  has_many :direct_lesson_schedules, class_name: "EnrollmentLessonSchedule",
+                                     dependent: :restrict_with_exception, inverse_of: :student_profile
   has_many :student_guardianships, dependent: :restrict_with_exception
   has_many :guardians, through: :student_guardianships
   has_many :events, class_name: "StudentProfileEvent", inverse_of: :student_profile,
@@ -127,6 +129,17 @@ class StudentProfile < ApplicationRecord
     student_guardianships.active
   end
 
+  # Participation spans both scheduling paths: enrollment-backed (Program -> CourseOffering ->
+  # Enrollment) and direct (fee-plan-only students attached straight to a ScheduledLessonEnrollment).
+  # A plain has_many :through can only follow one path, so this reuses the shared resolver scope.
+  def scheduled_lesson_enrollments
+    ScheduledLessonEnrollment.for_student_profile_ids(id)
+  end
+
+  def scheduled_lessons
+    ScheduledLesson.where(id: scheduled_lesson_enrollments.select(:scheduled_lesson_id)).distinct
+  end
+
   def guardian_requirements_met?
     active_guardianships.any? { |link| link.primary_contact? && link.emergency_contact? && link.legal_guardian? }
   end
@@ -138,7 +151,8 @@ class StudentProfile < ApplicationRecord
   end
 
   def completion_percentage
-    total = missing_required_fields.length + (missing_required_fields.empty? ? 1 : 0)
+    missing_required_fields.length
+    (missing_required_fields.empty? ? 1 : 0)
     return 100 if missing_required_fields.empty?
 
     required_count = 9

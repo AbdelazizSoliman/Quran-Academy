@@ -97,7 +97,7 @@
                 <div>
                   <dt class="ds-caption"><%= t("scheduling.weekly.students") %></dt>
                   <dd class="mt-0.5">
-                    <%= lesson.enrollments.first(2).map { |enrollment| enrollment.student_profile.display_name }.to_sentence.presence || t("scheduling.weekly.no_students") %>
+                    <%= lesson.scheduled_lesson_enrollments.filter_map { |item| item.student_profile&.display_name }.first(2).to_sentence.presence || t("scheduling.weekly.no_students") %>
                     <% if lesson.enrollments.size > 2 %>
                       <span class="text-app-primary">+<%= lesson.enrollments.size - 2 %></span>
                     <% end %>
@@ -105,7 +105,7 @@
                 </div>
                 <div>
                   <dt class="ds-caption"><%= t("scheduling.fields.offering") %></dt>
-                  <dd class="mt-0.5"><%= lesson.course_offering.title_en %></dd>
+                  <dd class="mt-0.5"><%= lesson.course_offering&.title_en %></dd>
                 </div>
               </dl>
             <% end %>

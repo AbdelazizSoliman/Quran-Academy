@@ -11,7 +11,9 @@ module Teacher
                            alert: @report.errors.full_messages.to_sentence
       end
 
-      @entries = @report.lesson_student_reports.includes(scheduled_lesson_enrollment: { enrollment: :student_profile })
+      @entries = @report.lesson_student_reports.includes(
+        scheduled_lesson_enrollment: [:student_profile, { enrollment: :student_profile }]
+      )
     end
 
     def edit; end

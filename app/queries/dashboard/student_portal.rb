@@ -28,8 +28,7 @@ module Dashboard
     private
 
     def attendance_scope
-      LessonAttendance.joins(scheduled_lesson_enrollment: :enrollment)
-                      .where(enrollments: { student_profile_id: @profile.id })
+      LessonAttendance.where(scheduled_lesson_enrollment_id: @profile.scheduled_lesson_enrollments.select(:id))
     end
 
     def attendance_summary
@@ -39,9 +38,9 @@ module Dashboard
     end
 
     def visible_reports
-      LessonStudentReport.student_visible.joins(:scheduled_lesson_enrollment, :lesson_report)
+      LessonStudentReport.student_visible.joins(:lesson_report)
                          .where(lesson_reports: { status: %w[reviewed locked] },
-                                scheduled_lesson_enrollments: { enrollment_id: @profile.enrollment_ids })
+                                scheduled_lesson_enrollment_id: @profile.scheduled_lesson_enrollments.select(:id))
     end
 
     def empty_result

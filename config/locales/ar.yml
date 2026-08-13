@@ -40,6 +40,8 @@ ar:
       language_not_supported: "لا تتوافق لغة تعلم الطالب مع اللغة المدعومة في العرض"
       profile_not_verified: "يتطلب ملف طالب موثقًا قبل التفعيل"
       placement_incomplete: "يتطلب إكمال تحديد المستوى أو الإعفاء منه قبل التفعيل"
+      participant_required: "يجب أن يشير إلى تسجيل أو ملف طالب"
+      participant_conflict: "لا يمكن أن يشير إلى تسجيل وملف طالب في آن واحد"
   activerecord:
     attributes:
       user:

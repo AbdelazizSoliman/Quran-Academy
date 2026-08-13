@@ -9,6 +9,16 @@ RSpec.describe LessonAttendance do
       .to raise_error(ActiveRecord::ReadonlyAttributeError)
   end
 
+  it "resolves the correct student for a direct (enrollment-less) participation" do
+    profile = create(:student_profile, :complete)
+    lesson = create(:scheduled_lesson, course_offering: nil)
+    participation = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson, enrollment: nil,
+                                                         student_profile: profile)
+    attendance = create(:lesson_attendance, scheduled_lesson_enrollment: participation, scheduled_lesson: lesson)
+
+    expect(attendance.student_profile).to eq(profile)
+  end
+
   it "allows only controlled statuses and nonnegative lateness" do
     expect(build(:lesson_attendance, status: "unknown", minutes_late: -1)).not_to be_valid
   end

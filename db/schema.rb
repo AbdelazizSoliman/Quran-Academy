@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_13_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_13_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -436,11 +436,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_150000) do
     t.datetime "created_at", null: false
     t.bigint "created_by_id"
     t.date "ends_on"
-    t.bigint "enrollment_id", null: false
+    t.bigint "enrollment_id"
     t.integer "lesson_duration_minutes", null: false
     t.string "public_id", null: false
     t.date "starts_on", null: false
     t.string "status", default: "active", null: false
+    t.bigint "student_profile_id"
     t.bigint "teacher_profile_id", null: false
     t.string "time_zone", null: false
     t.datetime "updated_at", null: false
@@ -450,9 +451,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_150000) do
     t.index ["enrollment_id"], name: "idx_enrollment_schedules_one_active", unique: true, where: "((status)::text = 'active'::text)"
     t.index ["enrollment_id"], name: "index_enrollment_lesson_schedules_on_enrollment_id"
     t.index ["public_id"], name: "index_enrollment_lesson_schedules_on_public_id", unique: true
+    t.index ["student_profile_id"], name: "index_enrollment_lesson_schedules_on_student_profile_id"
     t.index ["teacher_profile_id"], name: "index_enrollment_lesson_schedules_on_teacher_profile_id"
     t.index ["updated_by_id"], name: "index_enrollment_lesson_schedules_on_updated_by_id"
     t.check_constraint "ends_on IS NULL OR ends_on >= starts_on", name: "enrollment_schedule_date_order"
+    t.check_constraint "enrollment_id IS NOT NULL OR student_profile_id IS NOT NULL", name: "enrollment_lesson_schedules_participant_required"
     t.check_constraint "lesson_duration_minutes > 0", name: "enrollment_schedule_duration_positive"
   end
 
@@ -567,7 +570,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_150000) do
     t.index ["created_by_id"], name: "index_fee_plans_on_created_by_id"
     t.index ["public_id"], name: "index_fee_plans_on_public_id", unique: true
     t.index ["updated_by_id"], name: "index_fee_plans_on_updated_by_id"
-    t.check_constraint "billing_cycle::text = ANY (ARRAY['per_lesson'::character varying, 'weekly'::character varying, 'monthly'::character varying, 'package'::character varying]::text[])", name: "fee_plan_billing_cycle"
+    t.check_constraint "billing_cycle::text = ANY (ARRAY['per_lesson'::character varying::text, 'weekly'::character varying::text, 'monthly'::character varying::text, 'package'::character varying::text])", name: "fee_plan_billing_cycle"
     t.check_constraint "invoice_day >= 1 AND invoice_day <= 31", name: "fee_plan_invoice_day_range"
     t.check_constraint "tax_percentage >= 0::numeric AND tax_percentage <= 100::numeric", name: "fee_plan_tax_percentage_range"
   end
@@ -926,15 +929,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_150000) do
   create_table "scheduled_lesson_enrollments", force: :cascade do |t|
     t.bigint "added_by_id"
     t.datetime "created_at", null: false
-    t.bigint "enrollment_id", null: false
+    t.bigint "enrollment_id"
     t.string "participation_status", default: "expected", null: false
     t.bigint "scheduled_lesson_id", null: false
+    t.bigint "student_profile_id"
     t.datetime "updated_at", null: false
     t.index ["added_by_id"], name: "index_scheduled_lesson_enrollments_on_added_by_id"
     t.index ["enrollment_id"], name: "index_scheduled_lesson_enrollments_on_enrollment_id"
     t.index ["participation_status"], name: "index_scheduled_lesson_enrollments_on_participation_status"
     t.index ["scheduled_lesson_id", "enrollment_id"], name: "index_scheduled_lesson_enrollments_unique", unique: true
+    t.index ["scheduled_lesson_id", "student_profile_id"], name: "index_scheduled_lesson_enrollments_direct_unique", unique: true
     t.index ["scheduled_lesson_id"], name: "index_scheduled_lesson_enrollments_on_scheduled_lesson_id"
+    t.index ["student_profile_id"], name: "index_scheduled_lesson_enrollments_on_student_profile_id"
+    t.check_constraint "enrollment_id IS NOT NULL OR student_profile_id IS NOT NULL", name: "scheduled_lesson_enrollments_participant_required"
   end
 
   create_table "scheduled_lesson_events", force: :cascade do |t|
@@ -965,7 +972,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_150000) do
     t.bigint "cancelled_by_id"
     t.datetime "completed_at"
     t.text "completion_notes"
-    t.bigint "course_offering_id", null: false
+    t.bigint "course_offering_id"
     t.datetime "created_at", null: false
     t.bigint "created_by_id"
     t.string "delivery_mode", default: "online", null: false
@@ -1690,6 +1697,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_150000) do
   add_foreign_key "enrollment_lesson_schedule_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "enrollment_lesson_schedule_slots", "enrollment_lesson_schedules", on_delete: :restrict
   add_foreign_key "enrollment_lesson_schedules", "enrollments", on_delete: :restrict
+  add_foreign_key "enrollment_lesson_schedules", "student_profiles", on_delete: :restrict
   add_foreign_key "enrollment_lesson_schedules", "teacher_profiles", on_delete: :restrict
   add_foreign_key "enrollment_lesson_schedules", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "enrollment_lesson_schedules", "users", column: "updated_by_id", on_delete: :nullify
@@ -1748,6 +1756,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_150000) do
   add_foreign_key "programs", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "scheduled_lesson_enrollments", "enrollments", on_delete: :restrict
   add_foreign_key "scheduled_lesson_enrollments", "scheduled_lessons", on_delete: :restrict
+  add_foreign_key "scheduled_lesson_enrollments", "student_profiles", on_delete: :restrict
   add_foreign_key "scheduled_lesson_enrollments", "users", column: "added_by_id", on_delete: :nullify
   add_foreign_key "scheduled_lesson_events", "scheduled_lessons", on_delete: :restrict
   add_foreign_key "scheduled_lesson_events", "users", column: "actor_id", on_delete: :restrict

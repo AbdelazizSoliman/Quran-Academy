@@ -17,12 +17,10 @@ module Student
     private
 
     def visible_entries
-      LessonStudentReport.student_visible.joins(:scheduled_lesson_enrollment,
-                                                lesson_report: :scheduled_lesson)
+      LessonStudentReport.student_visible.joins(lesson_report: :scheduled_lesson)
                          .where(lesson_reports: { status: %w[reviewed locked] },
-                                scheduled_lesson_enrollments: {
-                                  enrollment_id: current_user.student_profile.enrollment_ids
-                                })
+                                scheduled_lesson_enrollment_id: current_user.student_profile
+                                                                             .scheduled_lesson_enrollments.select(:id))
                          .where(scheduled_lessons: { status: "completed" })
     end
 

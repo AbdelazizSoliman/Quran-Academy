@@ -16,9 +16,9 @@ module Parent
 
     def visible_reports_for(student)
       LessonStudentReport.student_visible
-                         .joins(:scheduled_lesson_enrollment, lesson_report: :scheduled_lesson)
+                         .joins(lesson_report: :scheduled_lesson)
                          .where(lesson_reports: { status: %w[reviewed locked] },
-                                scheduled_lesson_enrollments: { enrollment_id: student.enrollment_ids })
+                                scheduled_lesson_enrollment_id: student.scheduled_lesson_enrollments.select(:id))
                          .includes(lesson_report: { scheduled_lesson: :teacher_profile })
                          .order("scheduled_lessons.starts_at DESC")
     end

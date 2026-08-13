@@ -100,4 +100,32 @@ RSpec.describe EnrollmentLessonSchedules::GenerateOccurrences do
   def generate(through_date:, from_date: Date.new(2026, 8, 9))
     described_class.new(schedule:, actor: admin, from_date:, through_date:).call
   end
+
+  context "with a direct student_profile schedule and no enrollment" do
+    let(:student_profile) { create(:student_profile, :complete) }
+    let(:direct_schedule) do
+      create(:enrollment_lesson_schedule, enrollment: nil, student_profile:, teacher_profile: teacher,
+                                          starts_on: Date.new(2026, 8, 9), time_zone: "Riyadh",
+                                          lesson_duration_minutes: 30, created_by: admin, updated_by: admin)
+    end
+
+    it "generates real scheduled lessons with the teacher and student attached directly, no course offering" do
+      slot = create(:enrollment_lesson_schedule_slot, enrollment_lesson_schedule: direct_schedule,
+                                                      weekday: "sunday", starts_at_local: "18:00")
+
+      result = described_class.new(schedule: direct_schedule, actor: admin, from_date: Date.new(2026, 8, 9),
+                                   through_date: Date.new(2026, 8, 9)).call
+
+      expect(result.generated.size).to eq(1)
+      lesson = slot.scheduled_lessons.first
+      expect(lesson).to be_present
+      expect(lesson).to be_scheduled
+      expect(lesson.course_offering_id).to be_nil
+      expect(lesson.teacher_profile).to eq(teacher)
+
+      participation = lesson.scheduled_lesson_enrollments.sole
+      expect(participation.enrollment_id).to be_nil
+      expect(participation.student_profile).to eq(student_profile)
+    end
+  end
 end

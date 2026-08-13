@@ -6,7 +6,7 @@
 <%= render "shared/components/card", title: t("scheduling.sections.lesson") do %>
   <p><%= @lesson.teacher_profile.display_name %></p>
   <p class="mt-2" dir="ltr"><%= scheduling_time(@lesson.starts_at, zone: ActiveSupport::TimeZone[current_user.time_zone]) %></p>
-  <p class="mt-2"><%= @lesson.course_offering.title_en %></p>
+  <p class="mt-2"><%= @lesson.course_offering&.title_en %></p>
 
   <% if @participant && @lesson.safe_online_meeting_join_url.present? %>
     <%= link_to t("scheduling.actions.join_online"), join_student_schedule_path(@lesson),

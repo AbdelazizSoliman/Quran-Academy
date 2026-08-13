@@ -62,6 +62,30 @@ RSpec.describe "Parent portal" do
     end
     expect(response.body).not_to include(draft.assessment_date.to_s, private_assessment.student_profile.display_name)
   end
+
+  it "shows attendance and reports for a fee-plan-only (direct-participation) linked child" do
+    direct_child = create(:student_profile, display_name: "Direct Child")
+    create(:student_guardianship, guardian:, student_profile: direct_child, status: "active")
+    lesson = create(:scheduled_lesson, status: "completed", course_offering: nil, started_at: 1.hour.ago,
+                                       ended_at: Time.current, completed_at: Time.current,
+                                       attendance_status: "locked")
+    participant = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson, enrollment: nil,
+                                                       student_profile: direct_child)
+    create(:lesson_attendance, scheduled_lesson: lesson, scheduled_lesson_enrollment: participant, status: "present")
+    report = LessonReports::Initialize.new(actor: lesson.teacher_profile.user, lesson:).call
+    entry = report.lesson_student_reports.first
+    report.update!(status: "reviewed")
+    entry.update!(status: "completed")
+
+    get guardian_attendances_path
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Direct Child")
+
+    get guardian_reports_path
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Direct Child")
+  end
+
   it "forbids non-guardian accounts" do
     sign_out guardian_user
     sign_in create(:user, :student)
