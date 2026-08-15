@@ -81,11 +81,36 @@ module Notifications
     end
 
     def deliverable_skip_reason
-      return "whatsapp_disabled" unless enabled?
+      return whatsapp_disabled_reason unless enabled?
       return "not_configured" unless configured?
 
       "invalid_or_stale_token"
     end
+
+    # "whatsapp_disabled" previously covered three independent gates (one ENV kill switch, two
+    # per-academy DB flags) — this pinpoints which one is actually false, without guessing.
+    def whatsapp_disabled_reason
+      log_enabled_diagnostics
+      return "whatsapp_disabled:global_flag" unless global_whatsapp_enabled?
+      return "whatsapp_disabled:academy_whatsapp_flag" unless academy_whatsapp_enabled?
+
+      "whatsapp_disabled:academy_invitation_flag"
+    end
+
+    # global_whatsapp_enabled = WhatsappConfiguration.enabled? (ENV WHATSAPP_ENABLED); the other
+    # two are AcademySetting/db columns, independent of any Render env var.
+    def log_enabled_diagnostics
+      Rails.logger.info(
+        "AccountSetupDelivery enabled-check invitation_id=#{@invitation.public_id} " \
+        "env_WHATSAPP_ENABLED=#{ENV.fetch('WHATSAPP_ENABLED', nil).inspect} " \
+        "global_whatsapp_enabled=#{global_whatsapp_enabled?} academy_whatsapp=#{academy_whatsapp_enabled?} " \
+        "academy_invitation=#{academy_invitation_enabled?}"
+      )
+    end
+
+    def global_whatsapp_enabled? = WhatsappConfiguration.enabled?
+    def academy_whatsapp_enabled? = AcademySetting.current.whatsapp_notifications_enabled?
+    def academy_invitation_enabled? = AcademySetting.current.invitation_notifications_enabled?
 
     # WhatsApp delivery runs in a background job, after the invitation-creating transaction has
     # already committed, so this is the first point at which a real (not merely enqueued) success
@@ -117,11 +142,7 @@ module Notifications
       AccountSetupTemplate.call(display_name:, email: @invitation.user.email, url_suffix: suffix)
     end
 
-    def enabled?
-      WhatsappConfiguration.enabled? &&
-        AcademySetting.current.whatsapp_notifications_enabled? &&
-        AcademySetting.current.invitation_notifications_enabled?
-    end
+    def enabled? = global_whatsapp_enabled? && academy_whatsapp_enabled? && academy_invitation_enabled?
 
     def configured? = WhatsappConfiguration.configured?
 
