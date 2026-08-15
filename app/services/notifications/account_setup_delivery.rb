@@ -7,28 +7,84 @@ module Notifications
     end
 
     def call
-      return unless deliverable?
-
-      recipient = resolved_recipient
-      return unless recipient.valid?
-
-      deliver_to(recipient)
+      Rails.logger.info("AccountSetupDelivery started invitation_id=#{@invitation.public_id}")
+      recipient = eligible_recipient
+      recipient && deliver_to(recipient)
     rescue StandardError => e
-      Rails.logger.error("WhatsApp account setup delivery skipped (#{e.class})")
+      Rails.logger.error(
+        "AccountSetupDelivery skipped invitation_id=#{@invitation.public_id} " \
+        "exception=#{e.class} message=#{redact(e.message)}"
+      )
       nil
     end
 
     private
 
+    # An exception raised anywhere in this flow could, in principle, embed the raw invitation
+    # token or the WhatsApp access token in its message (e.g. a URI-building or HTTP-library
+    # error quoting its input) — both are stripped defensively before ever reaching the logs.
+    def redact(message)
+      return message if message.blank?
+
+      [@token, ENV.fetch("WHATSAPP_ACCESS_TOKEN", nil)].compact.reduce(message) do |redacted, secret|
+        secret.present? ? redacted.gsub(secret, "[redacted]") : redacted
+      end
+    end
+
+    def eligible_recipient
+      unless deliverable?
+        log_skip(reason: deliverable_skip_reason)
+        return
+      end
+
+      recipient = resolved_recipient
+      return recipient if recipient.valid?
+
+      log_skip(reason: "invalid_recipient:#{recipient.error}", recipient_masked: recipient.masked_address)
+      nil
+    end
+
     def deliver_to(recipient)
       suffix = url_suffix(recipient.locale)
-      return if suffix.blank?
+      unless suffix
+        log_skip(reason: "url_suffix_unavailable", recipient_masked: recipient.masked_address)
+        return
+      end
 
-      key = idempotency_key
-      notification = Notification.find_by(idempotency_key: key) ||
-                      create_and_send(recipient:, template: template(suffix), idempotency_key: key)
+      notification = find_or_create_notification(recipient, suffix)
+      log_result(notification, recipient)
       mark_invitation_sent(notification)
       notification
+    end
+
+    def find_or_create_notification(recipient, suffix)
+      key = idempotency_key
+      Notification.find_by(idempotency_key: key) ||
+        create_and_send(recipient:, template: template(suffix), idempotency_key: key)
+    end
+
+    def log_skip(reason:, recipient_masked: nil)
+      Rails.logger.info(
+        "AccountSetupDelivery skipped invitation_id=#{@invitation.public_id} reason=#{reason} " \
+        "recipient=#{recipient_masked.inspect}"
+      )
+    end
+
+    def log_result(notification, recipient)
+      Rails.logger.info(
+        "AccountSetupDelivery result invitation_id=#{@invitation.public_id} " \
+        "recipient=#{recipient.masked_address.inspect} status=#{notification.status} " \
+        "http_status=#{notification.http_status.inspect} provider_status=#{notification.provider_status.inspect} " \
+        "provider_message_id=#{notification.provider_message_id.inspect} " \
+        "error_code=#{notification.failure_code.inspect} error_message=#{notification.failure_reason.inspect}"
+      )
+    end
+
+    def deliverable_skip_reason
+      return "whatsapp_disabled" unless enabled?
+      return "not_configured" unless configured?
+
+      "invalid_or_stale_token"
     end
 
     # WhatsApp delivery runs in a background job, after the invitation-creating transaction has

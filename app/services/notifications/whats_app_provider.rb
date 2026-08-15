@@ -14,13 +14,16 @@ module Notifications
     end
 
     def deliver(recipient:, body:, template: nil, **)
-      Rails.logger.info("WhatsApp provider called")
+      Rails.logger.info("WhatsApp provider called recipient=#{mask(recipient).inspect}")
       result = delivery_result(recipient:, body:, template:)
-      log_response(result)
+      log_response(result, recipient)
       result
     rescue SocketError, SystemCallError, Timeout::Error, OpenSSL::SSL::SSLError => e
-      result = failure(e.class.name, "WhatsApp delivery failed")
-      log_response(result)
+      # e.message is never interpolated here: transport-level exceptions can embed arbitrary
+      # request context (host, URI) from the underlying library, so only the exception class
+      # (a fixed, safe set of Ruby/OpenSSL constant names) is recorded.
+      result = failure(e.class.name, "WhatsApp delivery failed (#{e.class})")
+      log_response(result, recipient)
       result
     end
 
@@ -37,16 +40,45 @@ module Notifications
       parsed = parse_response(response.body)
       return success(parsed, response.code.to_i) if response.is_a?(Net::HTTPSuccess)
 
-      error = parsed.fetch("error", {})
-      failure(error["code"].to_s.presence || "provider_error", "WhatsApp provider rejected the request",
-              safe_response(parsed), response.code.to_i)
+      rejection(parsed, response.code.to_i, body:, template:)
     end
 
-    def log_response(result)
-      details = { success: result.success?, http_status: result.http_status,
+    def rejection(parsed, http_status, body:, template:)
+      error = parsed.fetch("error", {})
+      message = redact(error["message"], body:, template:).presence || "WhatsApp provider rejected the request"
+      failure(error["code"].to_s.presence || "provider_error", message, safe_response(parsed), http_status)
+    end
+
+    # error["message"] can echo back parts of the outbound request (Meta sometimes quotes an
+    # invalid parameter value in its validation error), and the button parameter we send is
+    # derived from the raw invitation token — so any outbound dynamic value is stripped from the
+    # logged/persisted message before it's ever written anywhere.
+    def redact(message, body:, template:)
+      return message if message.blank?
+
+      outbound_dynamic_values(body, template).reduce(message) do |redacted, value|
+        value.present? ? redacted.gsub(value, "[redacted]") : redacted
+      end
+    end
+
+    def outbound_dynamic_values(body, template)
+      values = [body]
+      return values unless template
+
+      values + template.fetch(:components, []).flat_map { |component| component[:parameters] || [] }
+                                              .filter_map { |parameter| parameter[:text] }
+    end
+
+    def log_response(result, recipient)
+      details = { recipient: mask(recipient), success: result.success?, http_status: result.http_status,
                   provider_status: result.provider_status, provider_message_id: result.provider_message_id,
-                  error_code: result.error_code }.compact
+                  error_code: result.error_code, error_message: result.error_message }.compact
       Rails.logger.info("WhatsApp provider response #{details.inspect}")
+    end
+
+    def mask(recipient)
+      value = recipient.to_s
+      "+#{'*' * [value.length - 4, 0].max}#{value.last(4)}"
     end
 
     def request(recipient:, body:, template:)
