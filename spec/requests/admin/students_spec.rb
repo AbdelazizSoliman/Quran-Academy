@@ -305,6 +305,44 @@ RSpec.describe "Admin students" do
     expect(profile.reload.fee_plan_id).to be_nil
   end
 
+  it "shows and persists teacher, schedule, and price fields on the edit page" do
+    teacher = create(:teacher_profile, :active, :verified, display_name: "Sheikh Ahmed")
+    profile = create(:student_profile, user: student_user, assigned_teacher_profile: teacher,
+                                       lesson_duration_minutes: 30, weekly_lesson_count: 2,
+                                       schedule_slots: [{ "weekday" => "sunday", "time" => "18:00",
+                                                          "duration" => "30", "subject" => "حفظ" }])
+
+    get edit_admin_student_path(profile)
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(I18n.t("student_profiles.sections.teacher_curriculum", locale: :ar),
+                                     I18n.t("student_profiles.sections.schedule_price", locale: :ar))
+    document = Nokogiri::HTML(response.body)
+    selected_teacher = document.at_css("select#student_profile_assigned_teacher_profile_id option[selected]")
+    expect(selected_teacher&.text).to eq("Sheikh Ahmed")
+    expect(document.at_css("#student_profile_lesson_duration_minutes")["value"]).to eq("30")
+    expect(document.at_css("select[data-slot-field='weekday'] option[selected]")["value"]).to eq("sunday")
+
+    new_teacher = create(:teacher_profile, :active, :verified)
+    slots = [{ weekday: "tuesday", time: "19:00", duration: "45", subject: "تجويد" }]
+    patch admin_student_path(profile), params: {
+      student_profile: {
+        assigned_teacher_profile_id: new_teacher.id, lesson_duration_minutes: 45, weekly_lesson_count: 3,
+        weekly_price: 100, billing_currency: "EGP", slots_json: slots.to_json
+      }
+    }
+
+    profile.reload
+    expect(response).to redirect_to(admin_student_path(profile))
+    expect(profile.assigned_teacher_profile).to eq(new_teacher)
+    expect(profile.lesson_duration_minutes).to eq(45)
+    expect(profile.weekly_lesson_count).to eq(3)
+    expect(profile.weekly_price).to eq(100)
+    expect(profile.schedule_slots).to eq(
+      [{ "weekday" => "tuesday", "time" => "19:00", "duration" => "45", "subject" => "تجويد" }]
+    )
+    expect(profile.schedule_weekday).to eq("tuesday")
+  end
+
   it "redirects unauthenticated users and forbids non-admin roles" do
     sign_out admin
     get admin_students_path

@@ -42,7 +42,7 @@ ar:
       missing: { title: "ملف الطالب غير جاهز بعد", description: "حسابك نشط، لكن الإدارة لم تنشئ ملفك الأكاديمي بعد.", help: "تواصل مع إدارة الأكاديمية لتهيئة ملفك." }
   student_profiles:
     not_configured: "غير مُعد"
-    sections: { account: "ربط الحساب", identity: "الهوية والبيانات", contact: "بيانات الاتصال", learning: "ملف التعلم", lifecycle: "دورة التعلم", sensitive: "معلومات حساسة — للإدارة فقط", guardians: "أولياء الأمور", audit: "سجل التغييرات", profile: "ملفي", completeness: "اكتمال الملف" }
+    sections: { account: "ربط الحساب", identity: "الهوية والبيانات", contact: "بيانات الاتصال", learning: "ملف التعلم", lifecycle: "دورة التعلم", teacher_curriculum: "المعلّم والمنهج", schedule_price: "الجدول والسعر", sensitive: "معلومات حساسة — للإدارة فقط", guardians: "أولياء الأمور", audit: "سجل التغييرات", profile: "ملفي", completeness: "اكتمال الملف" }
     fields:
       user: "حساب الطالب"
       student: "الطالب"
@@ -83,7 +83,16 @@ ar:
       completion: "الاكتمال"
       actions: "الإجراءات"
       guardian_requirements: "متطلبات ولي الأمر"
-    form: { sensitive_hint: "هذه القيم خاصة بالإدارة وتُحجب في سجل التغييرات." }
+      assigned_teacher_profile_id: "المعلم المسؤول"
+      weekly_lesson_count: "عدد الحصص الأسبوعية"
+      lesson_duration_minutes: "مدة الحصة (دقيقة)"
+      sessions_per_month: "عدد الحصص المشتراة"
+      schedule_generation_weeks: "توليد لكام أسبوع"
+      session_type: "نوع الحصة"
+      weekly_price: "السعر"
+      billing_currency: "العملة"
+      slots: "مواعيد الحصص الأسبوعية"
+    form: { sensitive_hint: "هذه القيم خاصة بالإدارة وتُحجب في سجل التغييرات.", slots_hint: "كل موعد له يومه ووقته ومدته ومادته الخاصة.", schedule_price_hint: "تعديل هذه الحقول يحدّث جدول الطالب وسعره المخزَّن، ولا يُعيد توليد الحصص التي أُنشئت مسبقًا.", add_slot: "إضافة موعد" }
     completeness: { missing: "النواقص: %{fields}", age_mismatch: "نوع الطالب المخزن لا يطابق العمر المحسوب ويجب مراجعته قبل التوثيق." }
     catalogs:
       genders: { male: "ذكر", female: "أنثى", unspecified: "غير محدد" }
@@ -95,6 +104,7 @@ ar:
       reading_levels: { not_started: "لم يبدأ", letters: "حروف", words: "كلمات", sentences: "جمل", fluent: "طليق" }
       tajweed_levels: { none: "لا يوجد", basic: "أساسي", intermediate: "متوسط", advanced: "متقدم" }
       memorization_levels: { none: "لا يوجد", short_surahs: "سور قصيرة", juz_amma: "جزء عم", multiple_ajzaa: "أجزاء متعددة", advanced: "متقدم" }
+      session_types: { individual: "فردي (1:1)", group: "جماعي (حلقة)" }
     audit:
       created: "أنشأ %{actor} هذا الملف"
       updated: "حدّث %{actor} هذا الملف"

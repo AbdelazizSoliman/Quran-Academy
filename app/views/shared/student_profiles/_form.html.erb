@@ -48,14 +48,52 @@
       <div class="mt-4 grid gap-4 sm:grid-cols-3">
         <div><%= form.label :learning_status, t("student_profiles.fields.learning_status"), class: "ds-label" %><%= form.select :learning_status, StudentProfile::LEARNING_STATUSES.map { |v| [t("student_profiles.catalogs.learning_statuses.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
         <% %i[joined_on left_on].each do |field| %><div><%= form.label field, t("student_profiles.fields.#{field}"), class: "ds-label" %><%= form.date_field field, class: "ds-control mt-2" %></div><% end %>
+      </div>
+    </fieldset>
+
+    <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.teacher_curriculum") %></legend>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <div><%= form.label :assigned_teacher_profile_id, t("student_profiles.fields.assigned_teacher_profile_id"), class: "ds-label" %><%= form.collection_select :assigned_teacher_profile_id, teachers, :id, :display_name, { include_blank: true }, class: "ds-control mt-2" %></div>
         <div>
           <%= form.label :fee_plan_id, t("student_profiles.fields.fee_plan_id"), class: "ds-label" %>
-          <% fee_plan_options = FeePlan.active.ordered.to_a %>
-          <% fee_plan_options << profile.fee_plan if profile.fee_plan && !profile.fee_plan.active? %>
+          <% fee_plan_options = fee_plans || FeePlan.active.ordered.to_a %>
+          <% fee_plan_options = fee_plan_options.to_a %>
+          <% fee_plan_options << profile.fee_plan if profile.fee_plan && fee_plan_options.exclude?(profile.fee_plan) %>
           <%= form.collection_select :fee_plan_id, fee_plan_options, :id, :name, { include_blank: t("fee_plans.none") }, class: "ds-control mt-2" %>
         </div>
       </div>
     </fieldset>
+
+    <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.schedule_price") %></legend>
+      <p class="mt-1 ds-caption"><%= t("student_profiles.form.schedule_price_hint") %></p>
+      <div class="mt-4 grid gap-4 sm:grid-cols-4">
+        <div><%= form.label :weekly_lesson_count, t("student_profiles.fields.weekly_lesson_count"), class: "ds-label" %><%= form.number_field :weekly_lesson_count, min: 1, class: "ds-control mt-2" %></div>
+        <div><%= form.label :sessions_per_month, t("student_profiles.fields.sessions_per_month"), class: "ds-label" %><%= form.number_field :sessions_per_month, min: 1, max: 672, class: "ds-control mt-2" %></div>
+        <div><%= form.label :lesson_duration_minutes, t("student_profiles.fields.lesson_duration_minutes"), class: "ds-label" %><%= form.number_field :lesson_duration_minutes, min: 15, max: 120, class: "ds-control mt-2" %></div>
+        <div><%= form.label :schedule_generation_weeks, t("student_profiles.fields.schedule_generation_weeks"), class: "ds-label" %><%= form.number_field :schedule_generation_weeks, min: 1, max: 48, class: "ds-control mt-2" %></div>
+        <div><%= form.label :session_type, t("student_profiles.fields.session_type"), class: "ds-label" %><%= form.select :session_type, StudentProfile::SESSION_TYPES.map { |v| [t("student_profiles.catalogs.session_types.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>
+        <div><%= form.label :weekly_price, t("student_profiles.fields.weekly_price"), class: "ds-label" %><%= form.number_field :weekly_price, min: 0, step: 0.01, class: "ds-control mt-2" %></div>
+        <div><%= form.label :billing_currency, t("student_profiles.fields.billing_currency"), class: "ds-label" %><%= form.select :billing_currency, StudentProfile::CURRENCIES, {}, class: "ds-control mt-2" %></div>
+      </div>
+
+      <div class="mt-4" data-controller="schedule-slots">
+        <p class="ds-label"><%= t("student_profiles.fields.slots") %></p>
+        <%= hidden_field_tag "student_profile[slots_json]", "", data: { "schedule-slots-target": "hidden" } %>
+        <datalist id="mh-subjects">
+          <% %w[حفظ تجويد مراجعة نورانية تلاوة تفسير عربية فقه].each do |s| %><option value="<%= s %>"></option><% end %>
+        </datalist>
+        <div class="mt-2 flex flex-col gap-2" data-schedule-slots-target="container">
+          <% profile.schedule_slots.each do |slot| %><%= render "shared/student_profiles/schedule_slot_row", slot: %><% end %>
+        </div>
+        <template data-schedule-slots-target="template">
+          <%= render "shared/student_profiles/schedule_slot_row",
+                     slot: { "weekday" => StudentProfile::WEEKDAYS.first, "time" => "17:00", "duration" => "45", "subject" => nil } %>
+        </template>
+        <button type="button" class="mt-2.5 rounded-full bg-amber-50 px-4 py-2 text-xs font-bold text-amber-800" data-action="schedule-slots#add">+ <%= t("student_profiles.form.add_slot") %></button>
+        <p class="mt-2 ds-caption"><%= t("student_profiles.form.slots_hint") %></p>
+      </div>
+    </fieldset>
+
     <fieldset class="ds-card border-red-200 p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.sensitive") %></legend>
       <p class="mt-2 ds-caption"><%= t("student_profiles.form.sensitive_hint") %></p>
       <div class="mt-4 grid gap-4 sm:grid-cols-2">

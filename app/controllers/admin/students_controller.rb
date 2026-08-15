@@ -22,6 +22,8 @@ module Admin
       memorized_surahs memorized_juz_count learning_goals learning_notes special_learning_needs
       medical_notes safeguarding_notes emergency_contact_name emergency_contact_phone student_type
       learning_status joined_on left_on internal_notes fee_plan_id
+      assigned_teacher_profile_id lesson_duration_minutes weekly_lesson_count sessions_per_month
+      schedule_generation_weeks session_type weekly_price billing_currency
     ].freeze
 
     def index
@@ -69,7 +71,9 @@ module Admin
       load_onboarding_collections
     end
 
-    def edit; end
+    def edit
+      load_onboarding_collections
+    end
 
     def create
       service = Admin::Onboarding::CreateStudent.new(actor: current_user, attributes: onboarding_params)
@@ -85,8 +89,10 @@ module Admin
     end
 
     def update
-      @profile = Admin::StudentProfiles::Update.new(actor: current_user, profile: @profile,
-                                                    attributes: update_params).call
+      load_onboarding_collections
+      @profile = Admin::StudentProfiles::Update.new(
+        actor: current_user, profile: @profile, attributes: update_params.merge(schedule_slot_attributes)
+      ).call
       respond_to_save("updated", :edit)
     end
 
@@ -130,6 +136,16 @@ module Admin
 
     def update_params
       params.expect(student_profile: UPDATE_KEYS).to_h
+    end
+
+    # slots_json isn't a real column (schedule_slots is), so it's parsed separately here rather
+    # than being permitted directly into UPDATE_KEYS and mass-assigned.
+    def schedule_slot_attributes
+      return {} unless params[:student_profile]&.key?(:slots_json)
+
+      slots = StudentProfile.parse_slots_json(params.dig(:student_profile, :slots_json))
+      { schedule_slots: slots, schedule_weekday: slots.first&.fetch("weekday", nil),
+        schedule_time: slots.first&.fetch("time", nil) }
     end
 
     def respond_to_save(message, template)

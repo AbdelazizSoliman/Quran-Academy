@@ -117,26 +117,9 @@ module Admin
       end
 
       # Madarak stores the dynamic, unlimited slot list as one JSON-encoded hidden field
-      # (name="slots") rather than a fixed number of named params; each entry may carry a
-      # per-slot subject/duration in addition to weekday+time.
+      # (name="slots") rather than a fixed number of named params.
       def schedule_slots
-        raw = @attributes[:slots_json].presence
-        return [] if raw.blank?
-
-        parsed = begin
-          JSON.parse(raw)
-        rescue JSON::ParserError
-          []
-        end
-        Array(parsed).filter_map do |slot|
-          slot = slot.to_h
-          weekday = slot["weekday"].to_s.downcase.presence
-          time = slot["time"].to_s.presence
-          next if weekday.blank? && time.blank?
-
-          { "weekday" => weekday, "time" => time,
-            "subject" => slot["subject"].to_s.presence, "duration" => slot["duration"].to_s.presence }.compact
-        end
+        StudentProfile.parse_slots_json(@attributes[:slots_json])
       end
 
       # Madarak's form has no "existing guardian" picker at all — a guardian is just typed fresh

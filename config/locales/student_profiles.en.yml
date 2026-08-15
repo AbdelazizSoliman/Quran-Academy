@@ -70,6 +70,8 @@ en:
       contact: "Contact information"
       learning: "Learning profile"
       lifecycle: "Learning lifecycle"
+      teacher_curriculum: "Teacher and curriculum"
+      schedule_price: "Schedule and price"
       sensitive: "Sensitive information — administrators only"
       guardians: "Guardians"
       audit: "Audit history"
@@ -115,7 +117,21 @@ en:
       completion: "Completion"
       actions: "Actions"
       guardian_requirements: "Guardian requirements"
-    form: { sensitive_hint: "These values are restricted to administrators and are masked in audit history." }
+      assigned_teacher_profile_id: "Assigned teacher"
+      weekly_lesson_count: "Weekly lesson count"
+      lesson_duration_minutes: "Lesson duration (minutes)"
+      sessions_per_month: "Sessions purchased"
+      schedule_generation_weeks: "Generate for how many weeks"
+      session_type: "Session type"
+      weekly_price: "Price"
+      billing_currency: "Currency"
+      slots: "Weekly lesson slots"
+    form: {
+      sensitive_hint: "These values are restricted to administrators and are masked in audit history.",
+      slots_hint: "Each slot has its own weekday, time, duration, and subject.",
+      schedule_price_hint: "Editing these fields updates the student's stored schedule and price; it does not retroactively regenerate already-created lessons.",
+      add_slot: "Add a slot"
+    }
     completeness:
       missing: "Missing: %{fields}"
       age_mismatch: "The stored student type does not match the calculated age and must be reviewed before verification."
@@ -129,6 +145,7 @@ en:
       reading_levels: { not_started: "Not started", letters: "Letters", words: "Words", sentences: "Sentences", fluent: "Fluent" }
       tajweed_levels: { none: "None", basic: "Basic", intermediate: "Intermediate", advanced: "Advanced" }
       memorization_levels: { none: "None", short_surahs: "Short surahs", juz_amma: "Juz Amma", multiple_ajzaa: "Multiple Ajzaa", advanced: "Advanced" }
+      session_types: { individual: "Individual (1:1)", group: "Group (halaqah)" }
     audit:
       created: "%{actor} created this profile"
       updated: "%{actor} updated this profile"

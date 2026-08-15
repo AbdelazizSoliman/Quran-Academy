@@ -107,6 +107,30 @@ class StudentProfile < ApplicationRecord
   PROFILE_STATUSES.each { |value| define_method(:"#{value}?") { profile_status == value } }
   LEARNING_STATUSES.each { |value| define_method(:"#{value}?") { learning_status == value } }
 
+  # Parses the onboarding/edit form's single JSON-encoded "slots" field (dynamic, unlimited list)
+  # into the array-of-hashes shape #schedule_slots expects. Shared by student creation and editing
+  # so the two forms interpret the same slot payload identically.
+  def self.parse_slots_json(raw)
+    Array(safe_parse_json(raw)).filter_map do |slot|
+      slot = slot.to_h
+      weekday = slot["weekday"].to_s.downcase.presence
+      time = slot["time"].to_s.presence
+      next if weekday.blank? && time.blank?
+
+      { "weekday" => weekday, "time" => time,
+        "subject" => slot["subject"].to_s.presence, "duration" => slot["duration"].to_s.presence }.compact
+    end
+  end
+
+  def self.safe_parse_json(raw)
+    return [] if raw.blank?
+
+    JSON.parse(raw)
+  rescue JSON::ParserError
+    []
+  end
+  private_class_method :safe_parse_json
+
   def age(reference_date = Date.current)
     return if date_of_birth.blank?
 
