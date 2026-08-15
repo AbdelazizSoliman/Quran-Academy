@@ -12,7 +12,7 @@ module Admin
       lesson_duration_minutes weekly_lesson_count session_type trial_lesson_at weekly_price
       billing_currency schedule_generation_weeks account_delivery_method
       guardian_name guardian_email guardian_phone guardian_phone_country_code sibling_student_profile_id
-      slots_json
+      slots_json time_zone
     ].freeze
 
     UPDATE_KEYS = %i[
@@ -23,7 +23,7 @@ module Admin
       medical_notes safeguarding_notes emergency_contact_name emergency_contact_phone student_type
       learning_status joined_on left_on internal_notes fee_plan_id
       assigned_teacher_profile_id lesson_duration_minutes weekly_lesson_count sessions_per_month
-      schedule_generation_weeks session_type weekly_price billing_currency
+      schedule_generation_weeks session_type weekly_price billing_currency time_zone
     ].freeze
 
     def index
@@ -90,9 +90,12 @@ module Admin
 
     def update
       load_onboarding_collections
+      attributes = update_params
+      time_zone = attributes.delete(:time_zone)
       @profile = Admin::StudentProfiles::Update.new(
-        actor: current_user, profile: @profile, attributes: update_params.merge(schedule_slot_attributes)
+        actor: current_user, profile: @profile, attributes: attributes.merge(schedule_slot_attributes)
       ).call
+      update_user_time_zone(time_zone) if @profile.errors.empty? && time_zone.present?
       respond_to_save("updated", :edit)
     end
 
@@ -136,6 +139,11 @@ module Admin
 
     def update_params
       params.expect(student_profile: UPDATE_KEYS).to_h
+    end
+
+    def update_user_time_zone(time_zone)
+      user = Admin::Users::Update.new(actor: current_user, user: @profile.user, attributes: { time_zone: }).call
+      user.errors.full_messages.each { |error| @profile.errors.add(:base, error) }
     end
 
     # slots_json isn't a real column (schedule_slots is), so it's parsed separately here rather

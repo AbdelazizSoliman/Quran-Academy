@@ -35,7 +35,7 @@ class TeacherAvailability < ApplicationRecord
 
   def normalize_values
     self.weekday = weekday.to_s.downcase
-    self.time_zone = "Cairo" if time_zone.blank?
+    self.time_zone = EffectiveTimeZone.for(teacher_profile&.user) if time_zone.blank?
   end
 
   def generate_public_id

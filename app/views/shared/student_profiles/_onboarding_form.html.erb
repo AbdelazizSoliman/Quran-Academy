@@ -9,7 +9,9 @@
       <div><%= f.label :gender, "النوع (اختياري)", class: "ds-label" %><%= f.select :gender, [["— غير محدد —", ""], ["ذكر", "male"], ["أنثى", "female"]], {}, class: "ds-control mt-2" %></div>
       <div><%= f.label :learning_status, "الحالة", class: "ds-label" %><%= f.select :learning_status, [["نشط", "active"], ["تجريبي", "trial"], ["متعثّر", "at_risk"], ["غير نشط", "inactive"]], {}, class: "ds-control mt-2" %></div>
       <div><%= f.label :country_of_residence, "دولة الطالب", class: "ds-label" %><%= f.select :country_of_residence, StudentProfile::COUNTRIES.map { |code, name| [name, code] }, {}, class: "ds-control mt-2" %>
-        <p class="mt-1 ds-caption">على أساسها يُحدَّد توقيت الطالب — كل المواعيد والرسائل تظهر له بتوقيت دولته.</p></div>
+        <p class="mt-1 ds-caption">تُستخدم لبيانات الإقامة؛ حدّد المنطقة الزمنية بشكل مستقل.</p></div>
+      <% selected_time_zone = params.dig(:student_profile, :time_zone).presence || EffectiveTimeZone.for %>
+      <div><%= label_tag "student_profile_time_zone", t("admin.users.fields.time_zone"), class: "ds-label" %><%= select_tag "student_profile[time_zone]", options_for_select(ActiveSupport::TimeZone.all.map { |zone| [zone.to_s, zone.name] }, selected_time_zone), id: "student_profile_time_zone", class: "ds-control mt-2" %></div>
       <div><%= f.label :current_quran_level, "المستوى (اختياري)", class: "ds-label" %><%= f.select :current_quran_level, [["مبتدئ", "beginner"], ["متوسط", "intermediate"], ["متقدّم", "advanced"]], { include_blank: "— بدون —" }, class: "ds-control mt-2" %></div>
       <div><%= f.label :memorized_juz_count, "الأجزاء المحفوظة", class: "ds-label" %><%= f.number_field :memorized_juz_count, min: 0, max: 30, step: 1, value: (profile.memorized_juz_count || 0), class: "ds-control mt-2" %></div>
       <div><%= f.label :attendance_percentage, "نسبة الحضور %", class: "ds-label" %><%= f.number_field :attendance_percentage, min: 0, max: 100, step: 1, value: (profile.attendance_percentage || 100), class: "ds-control mt-2" %></div>

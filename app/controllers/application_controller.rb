@@ -40,11 +40,7 @@ class ApplicationController < ActionController::Base
   end
 
   def use_time_zone(&)
-    zones = ActiveSupport::TimeZone.all.map(&:name)
-    zone = current_user&.time_zone.presence_in(zones) ||
-           academy_setting&.default_time_zone.presence_in(zones) ||
-           "Cairo"
-    Time.use_zone(zone, &)
+    Time.use_zone(EffectiveTimeZone.for(current_user), &)
   end
 
   def supported_locale(locale)

@@ -83,7 +83,7 @@ module Teacher
     end
 
     def schedule_window
-      zone_name = AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+      zone_name = EffectiveTimeZone.for(current_user)
       academy_now = Time.current.in_time_zone(zone_name)
       academy_now.beginning_of_day..(academy_now + 30.days).end_of_day
     end

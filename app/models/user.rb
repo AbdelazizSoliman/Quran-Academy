@@ -123,7 +123,7 @@ class User < ApplicationRecord
 
   def apply_preference_defaults
     self.preferred_locale = student? ? "en" : "ar" if preferred_locale.blank?
-    self.time_zone = "Cairo" if time_zone.blank?
+    self.time_zone = EffectiveTimeZone.for if time_zone.blank?
   end
 
   def teacher_profile_role_integrity

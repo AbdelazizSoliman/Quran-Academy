@@ -54,6 +54,26 @@ RSpec.describe "Admin teacher profiles" do
     expect(profile.events.pluck(:event_type)).to eq(%w[created])
   end
 
+  it "defaults onboarding and availability to the academy timezone and accepts a teacher override" do
+    AcademySetting.current.update!(default_time_zone: "Riyadh")
+    sign_in admin
+    post admin_teachers_path, params: {
+      teacher_profile: { first_name: "Riyadh", last_name: "Teacher", email: "riyadh@example.test",
+                         display_name: "Riyadh Teacher", employment_status: "active", time_zone: "Riyadh",
+                         work_days: %w[sunday], work_start_time: "09:00", work_end_time: "17:00" }
+    }
+
+    profile = TeacherProfile.find_by!(display_name: "Riyadh Teacher")
+    expect(profile.user.time_zone).to eq("Riyadh")
+    expect(profile.availabilities.sole.time_zone).to eq("Riyadh")
+
+    post admin_teachers_path, params: {
+      teacher_profile: { first_name: "Default", last_name: "Teacher", email: "default-zone@example.test",
+                         display_name: "Default Zone Teacher", employment_status: "candidate" }
+    }
+    expect(TeacherProfile.find_by!(display_name: "Default Zone Teacher").user.time_zone).to eq("Riyadh")
+  end
+
   it "stores a default meeting URL during onboarding and exposes the field for editing" do
     sign_in admin
     post admin_teachers_path, params: {

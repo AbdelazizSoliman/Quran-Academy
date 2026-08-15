@@ -65,7 +65,8 @@ module Admin
           first_name:, last_name:,
           email: submitted_email || placeholder_email,
           role: :student, status: :pending,
-          preferred_locale: @attributes[:preferred_interface_locale].presence || "ar", time_zone: "Cairo"
+          preferred_locale: @attributes[:preferred_interface_locale].presence || "ar",
+          time_zone: effective_time_zone
         ).tap do |user|
           password = SecureRandom.base64(48)
           user.password = user.password_confirmation = password
@@ -96,6 +97,8 @@ module Admin
       def placeholder_email
         "std-#{SecureRandom.hex(8)}@#{PLACEHOLDER_EMAIL_DOMAIN}"
       end
+
+      def effective_time_zone = @attributes[:time_zone].presence || EffectiveTimeZone.for
 
       def profile_attributes(user)
         slots = schedule_slots

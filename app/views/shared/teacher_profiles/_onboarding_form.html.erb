@@ -12,6 +12,8 @@
       <div class="md:col-span-2"><%= f.label :online_meeting_url, t("teacher_profiles.fields.online_meeting_url"), class: "ds-label" %><%= f.url_field :online_meeting_url, class: "ds-control mt-2", dir: "ltr" %><p class="mt-2 ds-caption"><%= t("teacher_profiles.form.online_meeting_url_hint") %></p></div>
       <div><%= f.label :notification_method, "طريقة الإشعار", class: "ds-label" %><%= f.select :notification_method, [["واتساب (الأساسي)", "whatsapp"], ["البريد", "email"], ["كلاهما", "both"]], {}, class: "ds-control mt-2" %></div>
       <div><%= f.label :message_language, "لغة الرسائل", class: "ds-label" %><%= f.select :message_language, [["العربية", "ar"], ["English", "en"]], {}, class: "ds-control mt-2" %></div>
+      <% selected_time_zone = params.dig(:teacher_profile, :time_zone).presence || EffectiveTimeZone.for %>
+      <div><%= label_tag "teacher_profile_time_zone", t("admin.users.fields.time_zone"), class: "ds-label" %><%= select_tag "teacher_profile[time_zone]", options_for_select(ActiveSupport::TimeZone.all.map { |zone| [zone.to_s, zone.name] }, selected_time_zone), id: "teacher_profile_time_zone", class: "ds-control mt-2" %></div>
     </div>
   </fieldset>
 

@@ -31,7 +31,7 @@ class TeacherAvailabilityException < ApplicationRecord
   private
 
   def normalize_values
-    self.time_zone = "Cairo" if time_zone.blank?
+    self.time_zone = EffectiveTimeZone.for(teacher_profile&.user) if time_zone.blank?
   end
 
   def generate_public_id

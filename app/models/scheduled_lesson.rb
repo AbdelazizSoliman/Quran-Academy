@@ -65,7 +65,7 @@ class ScheduledLesson < ApplicationRecord
   private
 
   def normalize_values
-    self.academy_time_zone = "Cairo" if academy_time_zone.blank?
+    self.academy_time_zone = EffectiveTimeZone.for if academy_time_zone.blank?
   end
 
   def normalize_online_meeting_url
@@ -77,7 +77,7 @@ class ScheduledLesson < ApplicationRecord
   end
 
   def snapshot_academy_zone
-    self.academy_time_zone ||= AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+    self.academy_time_zone ||= EffectiveTimeZone.for
   end
 
   def time_order

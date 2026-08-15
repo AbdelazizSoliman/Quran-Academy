@@ -14,6 +14,15 @@ RSpec.describe TeacherScheduling do
                                                starts_at_local: "11:00", ends_at_local: "13:00")
       expect(duplicate).not_to be_valid
     end
+
+    it "defaults a blank timezone to the teacher's effective timezone" do
+      teacher = create(:teacher_profile, user: create(:user, :teacher, time_zone: "Riyadh"),
+                                         employment_status: "active")
+      availability = build(:teacher_availability, teacher_profile: teacher, time_zone: nil)
+
+      expect(availability).to be_valid
+      expect(availability.time_zone).to eq("Riyadh")
+    end
   end
 
   describe TeacherAvailabilityException do
@@ -22,6 +31,15 @@ RSpec.describe TeacherScheduling do
       expect(exception).to be_valid
       exception.starts_at_local = "09:00"
       expect(exception).not_to be_valid
+    end
+
+    it "defaults a blank timezone to the teacher's effective timezone" do
+      teacher = create(:teacher_profile, user: create(:user, :teacher, time_zone: "Riyadh"),
+                                         employment_status: "active")
+      exception = build(:teacher_availability_exception, teacher_profile: teacher, time_zone: nil)
+
+      expect(exception).to be_valid
+      expect(exception.time_zone).to eq("Riyadh")
     end
   end
 

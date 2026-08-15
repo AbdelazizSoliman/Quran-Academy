@@ -21,6 +21,7 @@ module Admin
           user.save!
           profile = Admin::TeacherProfiles::Create.new(actor: @actor, user:, attributes: profile_attributes(user)).call
           raise ActiveRecord::RecordInvalid, profile unless profile.persisted?
+
           create_availabilities(profile) if profile.employment_status == "active"
           AccountInvitations::CreateAndSend.new(user:, actor: @actor).call
         end
@@ -35,15 +36,18 @@ module Admin
       def build_user
         user = User.new(first_name: @attributes[:first_name], last_name: @attributes[:last_name],
                         email: @attributes[:email], role: :teacher, status: :pending,
-                        preferred_locale: @attributes[:message_language].presence || "ar", time_zone: "Cairo")
+                        preferred_locale: @attributes[:message_language].presence || "ar",
+                        time_zone: effective_time_zone)
         password = SecureRandom.base64(48)
         user.password = user.password_confirmation = password
         user
       end
 
       def profile_attributes(user)
-        @attributes.slice(*PROFILE_KEYS).merge(display_name: @attributes[:display_name].presence || user.full_name,
-                                              joined_on: @attributes[:joined_on].presence || Date.current)
+        @attributes.slice(*PROFILE_KEYS).merge(
+          display_name: @attributes[:display_name].presence || user.full_name,
+          joined_on: @attributes[:joined_on].presence || Date.current
+        )
       end
 
       def create_availabilities(profile)
@@ -52,13 +56,19 @@ module Admin
         Array(@attributes[:work_days]).compact_blank.each do |day|
           availability = Admin::TeacherAvailabilities::Create.new(
             actor: @actor, teacher_profile: profile,
-            attributes: { weekday: day, starts_at_local: @attributes[:work_start_time],
-                          ends_at_local: @attributes[:work_end_time], availability_type: "general",
-                          status: "active", effective_from: Date.current, time_zone: "Cairo" }
+            attributes: availability_attributes(day, profile.user)
           ).call
           raise ActiveRecord::RecordInvalid, availability unless availability.persisted?
         end
       end
+
+      def availability_attributes(day, user)
+        { weekday: day, starts_at_local: @attributes[:work_start_time], ends_at_local: @attributes[:work_end_time],
+          availability_type: "general", status: "active", effective_from: Date.current,
+          time_zone: EffectiveTimeZone.for(user) }
+      end
+
+      def effective_time_zone = @attributes[:time_zone].presence || EffectiveTimeZone.for
 
       def build_error_profile(record)
         profile = TeacherProfile.new(profile_attributes(record.is_a?(User) ? record : User.new))

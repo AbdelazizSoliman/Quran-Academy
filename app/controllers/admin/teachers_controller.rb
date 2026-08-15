@@ -4,7 +4,7 @@ module Admin
 
     ONBOARDING_KEYS = [
       :first_name, :last_name, :email, :display_name, :phone_number, :whatsapp_number, :online_meeting_url,
-      :notification_method, :message_language, :employment_status, :workload_percentage, :on_leave,
+      :notification_method, :message_language, :time_zone, :employment_status, :workload_percentage, :on_leave,
       :work_start_time, :work_end_time, :compensation_unit, :default_lesson_rate, :monthly_salary,
       :compensation_currency, :mid_period_previous_dues, { work_days: [] }
     ].freeze
@@ -15,7 +15,7 @@ module Admin
       :highest_qualification, :qualification_details, :years_of_teaching_experience,
       :quran_teaching_experience_years, :tajweed_qualification, :ijazah_status, :ijazah_details,
       :employment_status, :engagement_type, :joined_on, :left_on, :default_lesson_rate,
-      :compensation_currency, :compensation_unit, :internal_notes, :work_start_time, :work_end_time,
+      :compensation_currency, :compensation_unit, :internal_notes, :work_start_time, :work_end_time, :time_zone,
       { teaching_languages: [], student_age_groups: [], teaching_specializations: [], work_days: [] }
     ].freeze
 
@@ -75,9 +75,12 @@ module Admin
     end
 
     def update
+      attributes = update_params
+      time_zone = attributes.delete(:time_zone)
       @profile = Admin::TeacherProfiles::Update.new(
-        actor: current_user, profile: @profile, attributes: update_params
+        actor: current_user, profile: @profile, attributes:
       ).call
+      update_user_time_zone(time_zone) if @profile.errors.empty? && time_zone.present?
       respond_to_save("updated")
     end
 
@@ -113,6 +116,11 @@ module Admin
         end
         render template, status: :unprocessable_content
       end
+    end
+
+    def update_user_time_zone(time_zone)
+      user = Admin::Users::Update.new(actor: current_user, user: @profile.user, attributes: { time_zone: }).call
+      user.errors.full_messages.each { |error| @profile.errors.add(:base, error) }
     end
   end
 end

@@ -18,7 +18,7 @@ module Admin
     end
 
     def new
-      @lesson = ScheduledLesson.new(academy_time_zone: AcademySetting.current_or_nil&.default_time_zone || "Cairo")
+      @lesson = ScheduledLesson.new(academy_time_zone: EffectiveTimeZone.for)
       load_options
       load_students
     end
@@ -114,7 +114,7 @@ module Admin
     end
 
     def academy_time_zone
-      @academy_time_zone ||= AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+      @academy_time_zone ||= EffectiveTimeZone.for
     end
 
     def load_show_data

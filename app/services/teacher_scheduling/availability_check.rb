@@ -11,7 +11,7 @@ module TeacherScheduling
       @teacher_profile = teacher_profile
       @starts_at = starts_at
       @ends_at = ends_at
-      @academy_time_zone = academy_time_zone || AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+      @academy_time_zone = EffectiveTimeZone.normalize(academy_time_zone) || EffectiveTimeZone.for
     end
 
     def call
@@ -35,8 +35,7 @@ module TeacherScheduling
     end
 
     def teacher_zone
-      @teacher_profile.availabilities.active.teaching_capable.where.not(time_zone: nil).pick(:time_zone) ||
-        @teacher_profile.user.time_zone || @academy_time_zone
+      EffectiveTimeZone.for(@teacher_profile.user)
     end
 
     def prepare_context

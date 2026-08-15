@@ -29,7 +29,7 @@ module Admin
       def normalize_attributes
         attributes = @attributes.to_h.symbolize_keys
         zone = persisted_academy_zone || attributes[:academy_time_zone].presence ||
-               AcademySetting.current_or_nil&.default_time_zone || "Cairo"
+               EffectiveTimeZone.for
         attributes.merge(academy_time_zone: zone,
                          starts_at: parse_datetime(attributes[:starts_at], zone),
                          ends_at: parse_datetime(attributes[:ends_at], zone))

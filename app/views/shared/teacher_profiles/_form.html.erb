@@ -30,6 +30,9 @@
           <% end %>
         </div>
       <% end %>
+      <% if admin_mode %>
+        <div><%= label_tag "teacher_profile_time_zone", t("admin.users.fields.time_zone"), class: "ds-label" %><%= select_tag "teacher_profile[time_zone]", options_for_select(ActiveSupport::TimeZone.all.map { |zone| [zone.to_s, zone.name] }, profile.user&.time_zone || EffectiveTimeZone.for), id: "teacher_profile_time_zone", class: "ds-control mt-2" %></div>
+      <% end %>
       <div class="sm:col-span-2">
         <%= form.label :bio, t("teacher_profiles.fields.bio"), class: "ds-label" %>
         <%= form.text_area :bio, class: "ds-control mt-2", rows: 4 %>

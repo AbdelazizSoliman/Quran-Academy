@@ -7,7 +7,7 @@ module Notifications
 
     def self.call(notification:, url_suffix:)
       lesson = notification.source
-      local_start = lesson.starts_at.in_time_zone(lesson.academy_time_zone)
+      local_start = lesson.starts_at.in_time_zone(EffectiveTimeZone.for(notification.recipient_user))
       values = body_values(notification, lesson, local_start)
       body = { type: "body", parameters: values.map { |value| { type: "text", text: value.to_s } } }
       button = { type: "button", sub_type: "url", index: "0",

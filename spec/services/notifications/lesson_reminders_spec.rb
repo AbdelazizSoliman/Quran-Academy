@@ -182,6 +182,57 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     expect(teacher_suffix).to eq("teacher/schedule/#{lesson.id}/join")
   end
 
+  context "with recipient-local time zones", :aggregate_failures do
+    let(:now) { Time.zone.parse("2026-01-08 09:00:00 UTC") }
+
+    it "keeps the absolute trigger instant while formatting a Cairo student's time instead of academy Riyadh" do
+      AcademySetting.current.update!(default_time_zone: "Riyadh")
+      lesson, participation = lesson_with_student(starts_at: now + 15.minutes)
+      student = participation.student_profile.user
+      student.update!(time_zone: "Cairo")
+
+      pre_sweep
+
+      notification = Notification.find_by!(source: lesson, recipient_user: student)
+      delivery = deliveries.find { |item| item[:recipient] == "201001234568" }
+      expect(notification.scheduled_at).to eq(now)
+      expect(body_texts(delivery).first).to end_with("11:15")
+      expect(lesson.starts_at).to eq(now + 15.minutes)
+    end
+
+    it "keeps the absolute trigger instant while formatting a Riyadh teacher's time instead of academy Cairo" do
+      AcademySetting.current.update!(default_time_zone: "Cairo")
+      lesson, = lesson_with_student(starts_at: now + 15.minutes)
+      lesson.teacher_profile.user.update!(time_zone: "Riyadh")
+
+      pre_sweep
+
+      notification = Notification.find_by!(source: lesson, recipient_user: lesson.teacher_profile.user)
+      address = Notifications::RecipientResolver.new(user: lesson.teacher_profile.user, channel: "whatsapp").call
+                                                .provider_address
+      delivery = deliveries.find { |item| item[:recipient] == address }
+      expect(notification.scheduled_at).to eq(now)
+      expect(body_texts(delivery).first).to end_with("12:15")
+      expect(lesson.starts_at).to eq(now + 15.minutes)
+    end
+
+    it "uses the student timezone when delivery falls back to a guardian number" do
+      AcademySetting.current.update!(default_time_zone: "Riyadh")
+      lesson, participation = lesson_with_direct_student(starts_at: now + 15.minutes)
+      student = participation.student_profile
+      student.user.update!(time_zone: "Cairo")
+      student.update!(whatsapp_number: nil, phone_number: nil)
+      guardian = create(:guardian, whatsapp_number: "+201001234570")
+      create(:student_guardianship, student_profile: student, guardian:, primary_contact: true, status: "active")
+
+      pre_sweep
+
+      delivery = deliveries.find { |item| item[:recipient] == "201001234570" }
+      expect(body_texts(delivery).first).to end_with("11:15")
+      expect(Notification.find_by!(source: lesson, recipient_user: student.user).recipient_guardian).to eq(guardian)
+    end
+  end
+
   %w[en en_US].each do |language|
     it "accepts #{language} for lesson reminders and passes it to Meta" do
       ENV["WHATSAPP_LESSON_REMINDER_LANGUAGE"] = language

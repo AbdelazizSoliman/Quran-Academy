@@ -44,6 +44,10 @@
   </fieldset>
 
   <% if admin_mode %>
+    <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("admin.users.fields.time_zone") %></legend>
+      <div class="mt-4"><%= label_tag "student_profile_time_zone", t("admin.users.fields.time_zone"), class: "ds-label" %><%= select_tag "student_profile[time_zone]", options_for_select(ActiveSupport::TimeZone.all.map { |zone| [zone.to_s, zone.name] }, profile.user&.time_zone || EffectiveTimeZone.for), id: "student_profile_time_zone", class: "ds-control mt-2" %></div>
+    </fieldset>
+
     <fieldset class="ds-card p-5"><legend class="ds-section-title"><%= t("student_profiles.sections.lifecycle") %></legend>
       <div class="mt-4 grid gap-4 sm:grid-cols-3">
         <div><%= form.label :learning_status, t("student_profiles.fields.learning_status"), class: "ds-label" %><%= form.select :learning_status, StudentProfile::LEARNING_STATUSES.map { |v| [t("student_profiles.catalogs.learning_statuses.#{v}"), v] }, {}, class: "ds-control mt-2" %></div>

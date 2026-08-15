@@ -57,6 +57,18 @@ RSpec.describe "Admin students" do
     expect(profile.events.count).to eq(5)
   end
 
+  it "defaults onboarding to the academy timezone and allows editing the student's timezone" do
+    AcademySetting.current.update!(default_time_zone: "Riyadh")
+    post admin_students_path, params: {
+      student_profile: { full_name: "Zone Learner", email: "zone.learner@example.test" }
+    }
+    profile = StudentProfile.find_by!(display_name: "Zone Learner")
+    expect(profile.user.time_zone).to eq("Riyadh")
+
+    patch admin_student_path(profile), params: { student_profile: { time_zone: "Cairo" } }
+    expect(profile.user.reload.time_zone).to eq("Cairo")
+  end
+
   it "rejects onboarding with a duplicate email without creating a profile" do
     existing = create(:user, :student, email: "taken@example.test")
     expect do

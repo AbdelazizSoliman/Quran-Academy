@@ -50,6 +50,20 @@ RSpec.describe "Teacher scheduling services" do
     expect(outside_result.available?).to be(false)
   end
 
+  it "interprets profile working hours in the teacher timezone, independent of academy timezone" do
+    AcademySetting.current.update!(default_time_zone: "Cairo")
+    teacher = create(:teacher_profile, :active, :verified,
+                     user: create(:user, :teacher, time_zone: "Riyadh"),
+                     work_days: %w[thursday], work_start_time: "09:00", work_end_time: "17:00")
+    inside = Time.find_zone!("Riyadh").local(2026, 1, 8, 9, 30)
+    outside = Time.find_zone!("Riyadh").local(2026, 1, 8, 8, 30)
+
+    expect(TeacherScheduling::AvailabilityCheck.call(teacher_profile: teacher, starts_at: inside,
+                                                      ends_at: inside + 30.minutes)).to be_available
+    expect(TeacherScheduling::AvailabilityCheck.call(teacher_profile: teacher, starts_at: outside,
+                                                      ends_at: outside + 30.minutes)).not_to be_available
+  end
+
   it "still blocks an overlapping lesson for a teacher who is all-day available via work_days" do
     teacher = create(:teacher_profile, :active, :verified, work_days: %w[thursday], work_start_time: nil,
                                                            work_end_time: nil)
