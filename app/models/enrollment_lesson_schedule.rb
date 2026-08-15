@@ -11,6 +11,7 @@ class EnrollmentLessonSchedule < ApplicationRecord
                                                  inverse_of: :enrollment_lesson_schedule
   has_many :events, class_name: "EnrollmentLessonScheduleEvent", dependent: :restrict_with_exception
   has_many :generation_issues, through: :slots
+  has_many :scheduled_lessons, through: :slots
 
   attr_readonly :public_id, :enrollment_id, :student_profile_id
   before_validation :generate_public_id, on: :create

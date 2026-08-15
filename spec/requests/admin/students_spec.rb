@@ -15,6 +15,16 @@ RSpec.describe "Admin students" do
     expect(response.body).to include('dir="ltr"')
   end
 
+  it "renders the index for every learning status, including at_risk and inactive" do
+    StudentProfile::LEARNING_STATUSES.each do |status|
+      create(:student_profile, learning_status: status, display_name: "Learner #{status}")
+    end
+
+    get admin_students_path
+
+    expect(response).to have_http_status(:ok)
+  end
+
   it "renders the onboarding schedule-slot template with a full weekday select" do
     get new_admin_student_path(locale: "ar")
 
@@ -203,6 +213,71 @@ RSpec.describe "Admin students" do
     participation = lesson.scheduled_lesson_enrollments.first
     expect(participation.enrollment_id).to be_nil
     expect(participation.student_profile).to eq(profile)
+
+    get admin_scheduled_lessons_path(week: lesson.starts_at.to_date.beginning_of_week(:sunday).iso8601)
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(profile.display_name)
+
+    sign_out admin
+    sign_in teacher.user
+    get teacher_schedule_index_path
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(profile.display_name)
+
+    sign_out teacher.user
+    profile.user.update!(status: "active")
+    sign_in profile.user
+    get student_schedule_index_path
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(profile.display_name)
+  end
+
+  it "shows no generation warning when every lesson occurrence is generated successfully" do
+    teacher = create(:teacher_profile, :active, :verified,
+                     online_meeting_url: "https://meet.example.test/teacher")
+    weekday = Date.current.strftime("%A").downcase
+    create(:teacher_availability, teacher_profile: teacher, weekday:, starts_at_local: "09:00",
+                                  ends_at_local: "21:00", time_zone: "Cairo",
+                                  effective_from: Date.current - 1.week, availability_type: "teaching")
+    fee_plan = create(:fee_plan)
+
+    post admin_students_path, params: {
+      student_profile: {
+        full_name: "Fully Scheduled Learner", email: "fully.scheduled@example.test",
+        assigned_teacher_profile_id: teacher.id, fee_plan_id: fee_plan.id,
+        lesson_duration_minutes: 30, weekly_lesson_count: 1, schedule_generation_weeks: 1,
+        slots_json: [{ weekday:, time: "10:00" }].to_json
+      }
+    }
+
+    profile = StudentProfile.find_by!(display_name: "Fully Scheduled Learner")
+    expect(response).to redirect_to(admin_student_path(profile))
+    expect(flash[:warning]).to be_nil
+  end
+
+  it "warns clearly, without failing student creation, when lesson generation fails for every occurrence" do
+    teacher = create(:teacher_profile, :active, :verified,
+                     online_meeting_url: "https://meet.example.test/teacher")
+    fee_plan = create(:fee_plan)
+    weekday = Date.current.strftime("%A").downcase
+
+    expect do
+      post admin_students_path, params: {
+        student_profile: {
+          full_name: "Unavailable Teacher Learner", email: "unavailable.teacher.learner@example.test",
+          assigned_teacher_profile_id: teacher.id, fee_plan_id: fee_plan.id,
+          lesson_duration_minutes: 30, weekly_lesson_count: 1, schedule_generation_weeks: 1,
+          slots_json: [{ weekday:, time: "10:00" }].to_json
+        }
+      }
+    end.to change(StudentProfile, :count).by(1)
+
+    profile = StudentProfile.find_by!(display_name: "Unavailable Teacher Learner")
+    expect(response).to redirect_to(admin_student_path(profile))
+    expect(flash[:warning]).to be_present
+    expect(flash[:warning]).to include("Teacher unavailable")
+    expect(ScheduledLesson.where(teacher_profile: teacher)).to be_empty
+    expect(profile.direct_lesson_schedules.first.generation_issues.unresolved).not_to be_empty
   end
 
   it "creates a student with no fee plan selected" do

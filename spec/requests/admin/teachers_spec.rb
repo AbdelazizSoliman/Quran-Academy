@@ -72,6 +72,65 @@ RSpec.describe "Admin teacher profiles" do
                                      I18n.t("teacher_profiles.form.online_meeting_url_hint", locale: :ar))
   end
 
+  it "shows working start/end time fields on the edit page, preselected with existing values" do
+    profile = create(:teacher_profile, user: teacher_user, work_days: %w[sunday thursday],
+                                       work_start_time: "09:00", work_end_time: "17:00")
+    sign_in admin
+
+    get edit_admin_teacher_path(profile)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(I18n.t("teacher_profiles.fields.work_start_time", locale: :ar),
+                                     I18n.t("teacher_profiles.fields.work_end_time", locale: :ar))
+    document = Nokogiri::HTML(response.body)
+    expect(document.at_css("#teacher_profile_work_start_time")["value"]).to start_with("09:00")
+    expect(document.at_css("#teacher_profile_work_end_time")["value"]).to start_with("17:00")
+    expect(document.at_css("input[name='teacher_profile[work_days][]'][value='sunday']")["checked"]).to eq("checked")
+    expect(document.at_css("input[name='teacher_profile[work_days][]'][value='monday']")["checked"]).to be_nil
+  end
+
+  it "persists edited working days and hours, and allows clearing them for all-day availability" do
+    profile = create(:teacher_profile, user: teacher_user, employment_status: "active")
+    sign_in admin
+
+    patch admin_teacher_path(profile), params: {
+      teacher_profile: valid_attributes.merge(work_days: %w[thursday], work_start_time: "09:00",
+                                              work_end_time: "17:00")
+    }
+
+    profile.reload
+    expect(profile.work_days).to eq(%w[thursday])
+    expect(profile.work_start_time.strftime("%H:%M")).to eq("09:00")
+    expect(profile.work_end_time.strftime("%H:%M")).to eq("17:00")
+
+    patch admin_teacher_path(profile), params: {
+      teacher_profile: valid_attributes.merge(work_days: %w[thursday], work_start_time: "", work_end_time: "")
+    }
+
+    profile.reload
+    expect(profile.work_days).to eq(%w[thursday])
+    expect(profile.work_start_time).to be_nil
+    expect(profile.work_end_time).to be_nil
+
+    starts_at = Time.find_zone!("Cairo").local(2026, 8, 13, 22, 0)
+    result = TeacherScheduling::AvailabilityCheck.call(teacher_profile: profile, starts_at:,
+                                                       ends_at: starts_at + 30.minutes)
+    expect(result.available?).to be(true)
+  end
+
+  it "rejects providing only one working time on update" do
+    profile = create(:teacher_profile, user: teacher_user)
+    sign_in admin
+
+    patch admin_teacher_path(profile), params: {
+      teacher_profile: valid_attributes.merge(work_days: %w[thursday], work_start_time: "09:00",
+                                              work_end_time: "")
+    }
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(profile.reload.work_start_time).to be_nil
+  end
+
   it "redacts the complete meeting URL from teacher profile audit metadata" do
     profile = create(:teacher_profile, user: teacher_user)
     sign_in admin

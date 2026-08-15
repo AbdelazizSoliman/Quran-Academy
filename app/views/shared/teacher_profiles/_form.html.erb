@@ -113,6 +113,27 @@
     </fieldset>
 
     <fieldset class="ds-card p-5">
+      <legend class="ds-section-title"><%= t("teacher_profiles.sections.availability") %></legend>
+      <fieldset class="mt-4">
+        <legend class="ds-label"><%= t("teacher_profiles.fields.work_days") %></legend>
+        <%= hidden_field_tag "teacher_profile[work_days][]", "" %>
+        <div class="mt-3 flex flex-wrap gap-3">
+          <% TeacherProfile::WORK_DAYS.each do |day| %>
+            <label class="rounded-full border border-app-border px-3 py-2">
+              <%= check_box_tag "teacher_profile[work_days][]", day, profile.work_days.include?(day) %>
+              <%= t("scheduling.catalogs.weekdays.#{day}") %>
+            </label>
+          <% end %>
+        </div>
+      </fieldset>
+      <div class="mt-4 grid gap-5 sm:grid-cols-2">
+        <div><%= form.label :work_start_time, t("teacher_profiles.fields.work_start_time"), class: "ds-label" %><%= form.time_field :work_start_time, class: "ds-control mt-2", aria: { invalid: profile.errors[:work_start_time].any? } %></div>
+        <div><%= form.label :work_end_time, t("teacher_profiles.fields.work_end_time"), class: "ds-label" %><%= form.time_field :work_end_time, class: "ds-control mt-2", aria: { invalid: profile.errors[:work_end_time].any? } %></div>
+      </div>
+      <p class="mt-2 ds-caption"><%= t("teacher_profiles.form.work_hours_hint") %></p>
+    </fieldset>
+
+    <fieldset class="ds-card p-5">
       <legend class="ds-section-title"><%= t("teacher_profiles.sections.compensation") %></legend>
       <p class="mt-2 ds-caption"><%= t("teacher_profiles.form.compensation_hint") %></p>
       <div class="mt-4 grid gap-5 sm:grid-cols-3">

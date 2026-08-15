@@ -15,8 +15,8 @@ module Admin
       :highest_qualification, :qualification_details, :years_of_teaching_experience,
       :quran_teaching_experience_years, :tajweed_qualification, :ijazah_status, :ijazah_details,
       :employment_status, :engagement_type, :joined_on, :left_on, :default_lesson_rate,
-      :compensation_currency, :compensation_unit, :internal_notes,
-      { teaching_languages: [], student_age_groups: [], teaching_specializations: [] }
+      :compensation_currency, :compensation_unit, :internal_notes, :work_start_time, :work_end_time,
+      { teaching_languages: [], student_age_groups: [], teaching_specializations: [], work_days: [] }
     ].freeze
 
     def index
@@ -38,7 +38,7 @@ module Admin
         redirect_to admin_teachers_path, notice: t("teachers.madarak.import_success", count: @result.created_count)
       else
         flash.now[:alert] = t("teachers.madarak.import_partial", count: @result.created_count,
-                            errors: @result.errors.size)
+                                                                 errors: @result.errors.size)
         render :import, status: :unprocessable_content
       end
     rescue CSV::MalformedCSVError => e
@@ -51,7 +51,7 @@ module Admin
       metrics = Admin::TeacherMetrics.new(profiles:).call
       data = Admin::TeachersCsvExport.new(profiles, metrics:).call
       send_data "\uFEFF#{data}", filename: "quran-academy-teachers-#{Date.current}.csv",
-                                type: "text/csv; charset=utf-8"
+                                 type: "text/csv; charset=utf-8"
     end
 
     def show

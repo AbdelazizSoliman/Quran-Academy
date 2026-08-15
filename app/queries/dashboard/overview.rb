@@ -57,12 +57,7 @@ module Dashboard
     end
 
     def student_lessons
-      student_enrollment_ids = @user.student_profile&.enrollments&.select(:id)
-      return ::ScheduledLesson.none unless student_enrollment_ids
-
-      ::ScheduledLesson.joins(:scheduled_lesson_enrollments)
-                     .where(scheduled_lesson_enrollments: { enrollment_id: student_enrollment_ids })
-                     .distinct
+      @user.student_profile&.scheduled_lessons || ::ScheduledLesson.none
     end
 
     def attendance_scope
@@ -73,11 +68,7 @@ module Dashboard
 
       return scope unless @user.student?
 
-      scope.where(
-        scheduled_lesson_enrollments: {
-          enrollment_id: @user.student_profile&.enrollments&.select(:id)
-        }
-      )
+      scope.where(scheduled_lesson_enrollment_id: @user.student_profile&.scheduled_lesson_enrollments&.select(:id))
     end
 
     def attendance_statistics
@@ -90,7 +81,7 @@ module Dashboard
     def late_attendances
       attendance_scope.where(status: "late")
                       .includes(scheduled_lesson: :teacher_profile,
-                                scheduled_lesson_enrollment: { enrollment: :student_profile })
+                                scheduled_lesson_enrollment: [:student_profile, { enrollment: :student_profile }])
                       .order(arrival_at: :desc, id: :desc)
     end
 

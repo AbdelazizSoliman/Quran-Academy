@@ -42,6 +42,8 @@ ar:
       placement_incomplete: "يتطلب إكمال تحديد المستوى أو الإعفاء منه قبل التفعيل"
       participant_required: "يجب أن يشير إلى تسجيل أو ملف طالب"
       participant_conflict: "لا يمكن أن يشير إلى تسجيل وملف طالب في آن واحد"
+      work_time_required: "يجب إدخاله مع وقت العمل الآخر"
+      student_required: "يجب اختيار طالب لإنشاء حصة طالب مباشرة"
   activerecord:
     attributes:
       user:
@@ -51,6 +53,9 @@ ar:
     formats:
       long: "%d/%m/%Y، %H:%M"
       short: "%d/%m/%Y، %H:%M"
+      day: "%d"
+      month: "%m"
+      time: "%H:%M"
   date:
     formats:
       default: "%d/%m/%Y"
@@ -530,6 +535,7 @@ ar:
       capabilities: "قدرات التدريس"
       emergency: "جهة اتصال الطوارئ"
       employment: "العمل"
+      availability: "جدول العمل"
       compensation: "إعدادات التعويض الافتراضية"
       meeting: "الاجتماع عبر الإنترنت"
       administration: "المعلومات الإدارية"
@@ -564,6 +570,9 @@ ar:
       teaching_specializations: "تخصصات التدريس"
       employment_status: "حالة العمل"
       engagement_type: "نوع الارتباط"
+      work_days: "أيام العمل"
+      work_start_time: "بداية الدوام"
+      work_end_time: "نهاية الدوام"
       profile_status: "حالة الملف"
       joined_on: "تاريخ الانضمام"
       left_on: "تاريخ المغادرة"
@@ -581,6 +590,7 @@ ar:
       select_teacher: "اختر حساب معلّم مؤهلاً"
       compensation_hint: "قيم افتراضية فقط؛ لا يتم احتساب رواتب أو تنفيذ مدفوعات."
       online_meeting_url_hint: "سيُستخدم هذا الرابط تلقائيًا لدروس هذا المعلّم عبر الإنترنت ما لم يُحدد رابط خاص للدرس."
+      work_hours_hint: "اترك الوقتين فارغين ليكون المعلّم متاحًا طوال اليوم في أيام العمل المحددة."
     completeness:
       value: "مكتمل بنسبة %{value}%"
       missing: "المطلوب استكماله: %{fields}"

@@ -102,4 +102,34 @@ RSpec.describe TeacherProfile do
       expect(build(:teacher_profile, online_meeting_url: url)).not_to be_valid
     end
   end
+
+  it "allows blank working hours on selected work days" do
+    profile = build(:teacher_profile, work_days: %w[sunday tuesday thursday], work_start_time: nil,
+                                      work_end_time: nil)
+
+    expect(profile).to be_valid
+  end
+
+  it "allows a configured working start and end time" do
+    profile = build(:teacher_profile, work_days: %w[monday], work_start_time: "09:00", work_end_time: "17:00")
+
+    expect(profile).to be_valid
+  end
+
+  it "rejects providing only one of the working start/end times" do
+    only_start = build(:teacher_profile, work_start_time: "09:00", work_end_time: nil)
+    only_end = build(:teacher_profile, work_start_time: nil, work_end_time: "17:00")
+
+    expect(only_start).not_to be_valid
+    expect(only_start.errors.of_kind?(:work_end_time, :work_time_required)).to be true
+    expect(only_end).not_to be_valid
+    expect(only_end.errors.of_kind?(:work_start_time, :work_time_required)).to be true
+  end
+
+  it "requires the working end time to be after the working start time" do
+    profile = build(:teacher_profile, work_start_time: "17:00", work_end_time: "09:00")
+
+    expect(profile).not_to be_valid
+    expect(profile.errors.of_kind?(:work_end_time, :after_start)).to be true
+  end
 end

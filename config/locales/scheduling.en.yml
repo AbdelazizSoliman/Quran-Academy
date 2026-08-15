@@ -47,6 +47,8 @@ en:
     fields:
       teacher: "Teacher"
       offering: "Course offering"
+      lesson_type: "Lesson type"
+      student: "Student"
       weekday: "Weekday"
       time: "Time"
       starts_at_local: "Local start time"
@@ -76,6 +78,7 @@ en:
       exception_types: { unavailable: "Unavailable", available_override: "Available override" }
       statuses: { active: "Active", inactive: "Inactive", draft: "Draft", scheduled: "Scheduled", in_progress: "In progress", completed: "Completed", cancelled: "Cancelled", archived: "Archived" }
       delivery_modes: { online: "Online", onsite: "Onsite", hybrid: "Hybrid" }
+      lesson_types: { course_offering: "Course Offering lesson", direct_student: "Student lesson" }
       participation_statuses: { expected: "Expected", removed: "Removed" }
       events: { created: "Created", updated: "Updated", activated: "Activated", deactivated: "Deactivated", scheduled: "Scheduled", rescheduled: "Rescheduled", started: "Started", completed: "Completed", cancelled: "Cancelled", archived: "Archived", participant_added: "Participant added", participant_removed: "Participant removed", teacher_checked_in: "Teacher checked in", teacher_marked_absent: "Teacher marked absent", attendance_opened: "Attendance opened", attendance_locked: "Attendance locked", attendance_reopened: "Attendance reopened" }
     messages: { created: "Created successfully.", updated: "Updated successfully.", activate: "Availability activated.", deactivate: "Availability deactivated.", archive: "Archived successfully.", cancel: "Exception cancelled.", cancelled: "Lesson cancelled.", schedule: "Lesson scheduled.", start: "Lesson started.", complete: "Lesson completed.", rescheduled: "Lesson rescheduled.", participant_updated: "Participant updated." }

@@ -52,6 +52,7 @@ en:
       verify: "Student profile verified."
       archive: "Student profile archived."
       restore: "Student profile restored."
+      generation_partial: "%{generated} lesson(s) were generated. %{failed} occurrence(s) failed to schedule: %{reasons}."
     user_card: { title: "Student profile" }
   student:
     profile:

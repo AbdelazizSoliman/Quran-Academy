@@ -42,6 +42,8 @@ en:
       placement_incomplete: "requires completed or waived placement before activation"
       participant_required: "must reference an enrollment or a student profile"
       participant_conflict: "cannot reference both an enrollment and a student profile"
+      work_time_required: "must be provided together with the other working time"
+      student_required: "a student must be selected for a direct student lesson"
   activerecord:
     attributes:
       user:
@@ -51,6 +53,9 @@ en:
     formats:
       long: "%B %d, %Y at %H:%M"
       short: "%b %d, %Y at %H:%M"
+      day: "%d"
+      month: "%b"
+      time: "%H:%M"
   date:
     formats:
       default: "%B %d, %Y"
@@ -530,6 +535,7 @@ en:
       capabilities: "Teaching capabilities"
       emergency: "Emergency contact"
       employment: "Employment"
+      availability: "Working schedule"
       compensation: "Compensation defaults"
       meeting: "Online meeting"
       administration: "Administrative information"
@@ -564,6 +570,9 @@ en:
       teaching_specializations: "Teaching specializations"
       employment_status: "Employment status"
       engagement_type: "Engagement type"
+      work_days: "Working days"
+      work_start_time: "Working start time"
+      work_end_time: "Working end time"
       profile_status: "Profile status"
       joined_on: "Joined date"
       left_on: "Departure date"
@@ -581,6 +590,7 @@ en:
       select_teacher: "Select an eligible teacher account"
       compensation_hint: "Defaults only; no payroll calculation or payment is performed."
       online_meeting_url_hint: "This link will be used automatically for this teacher's online lessons unless a lesson-specific link is provided."
+      work_hours_hint: "Leave both times blank to make the teacher available all day on the selected working days."
     completeness:
       value: "%{value}% complete"
       missing: "Still needed: %{fields}"

@@ -55,7 +55,7 @@ module Admin
       profiles = Admin::MadarakStudentsQuery.new(params:).call
       data = Admin::StudentsCsvExport.new(profiles).call
       send_data "\uFEFF#{data}", filename: "quran-academy-students-#{Date.current}.csv",
-                                type: "text/csv; charset=utf-8"
+                                 type: "text/csv; charset=utf-8"
     end
 
     def show
@@ -65,15 +65,18 @@ module Admin
 
     def new
       @profile = StudentProfile.new(learning_status: "active", current_quran_level: nil,
-                                     country_of_residence: "EG")
+                                    country_of_residence: "EG")
       load_onboarding_collections
     end
 
     def edit; end
 
     def create
-      @profile = Admin::Onboarding::CreateStudent.new(actor: current_user, attributes: onboarding_params).call
+      service = Admin::Onboarding::CreateStudent.new(actor: current_user, attributes: onboarding_params)
+      @profile = service.call
       if @profile.persisted? && @profile.errors.empty?
+        warning = generation_warning(service.schedule)
+        flash[:warning] = warning if warning
         redirect_to admin_student_path(@profile), notice: t("students.messages.created"), status: :see_other
       else
         load_onboarding_collections
@@ -82,7 +85,8 @@ module Admin
     end
 
     def update
-      @profile = Admin::StudentProfiles::Update.new(actor: current_user, profile: @profile, attributes: update_params).call
+      @profile = Admin::StudentProfiles::Update.new(actor: current_user, profile: @profile,
+                                                    attributes: update_params).call
       respond_to_save("updated", :edit)
     end
 
@@ -97,6 +101,20 @@ module Admin
 
     def set_profile
       @profile = StudentProfile.includes(:user).find(params.expect(:id))
+    end
+
+    # The lesson schedule (if any) already finished generating synchronously by the time the
+    # onboarding service returns, so failures are visible immediately — not silently dropped.
+    def generation_warning(schedule)
+      return unless schedule&.persisted?
+
+      failed = schedule.generation_issues.unresolved
+      return if failed.empty?
+
+      reasons = failed.reorder(nil).group(:reason_code).count
+                      .map { |code, count| "#{code.humanize} (#{count})" }.join(", ")
+      t("students.messages.generation_partial", generated: schedule.scheduled_lessons.count,
+                                                failed: failed.size, reasons:)
     end
 
     def load_onboarding_collections

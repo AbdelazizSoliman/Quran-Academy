@@ -98,8 +98,8 @@
                   <dt class="ds-caption"><%= t("scheduling.weekly.students") %></dt>
                   <dd class="mt-0.5">
                     <%= lesson.scheduled_lesson_enrollments.filter_map { |item| item.student_profile&.display_name }.first(2).to_sentence.presence || t("scheduling.weekly.no_students") %>
-                    <% if lesson.enrollments.size > 2 %>
-                      <span class="text-app-primary">+<%= lesson.enrollments.size - 2 %></span>
+                    <% if lesson.scheduled_lesson_enrollments.size > 2 %>
+                      <span class="text-app-primary">+<%= lesson.scheduled_lesson_enrollments.size - 2 %></span>
                     <% end %>
                   </dd>
                 </div>

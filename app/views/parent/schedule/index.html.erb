@@ -6,7 +6,7 @@
       <span class="portal-date-block"><strong><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :day) %></strong>
         <small><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :month) %></small></span>
       <span class="min-w-0 flex-1"><strong class="block truncate"><%= dashboard_lesson_title(lesson) %></strong>
-        <small class="mt-1 block text-app-subtle"><%= lesson.teacher_profile.display_name %> · <span dir="ltr"><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :time) %></span></small></span>
+        <small class="mt-1 block text-app-subtle"><%= lesson.teacher_profile.display_name %> Â· <span dir="ltr"><%= l(lesson.starts_at.in_time_zone(current_user.time_zone), format: :time) %></span></small></span>
       <%= scheduling_status_badge(lesson) %>
     <% end %>
   <% end %>

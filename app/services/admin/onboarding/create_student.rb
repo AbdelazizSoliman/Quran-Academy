@@ -1,6 +1,8 @@
 module Admin
   module Onboarding
     class CreateStudent
+      attr_reader :schedule
+
       PROFILE_KEYS = %i[
         public_id gender date_of_birth nationality country_of_residence city student_type
         learning_status phone_number whatsapp_number preferred_interface_locale preferred_learning_language
@@ -219,9 +221,9 @@ module Admin
                        ends_on: generation_ends_on(starts_on, offering_end),
                        lesson_duration_minutes: profile.lesson_duration_minutes,
                        time_zone: profile.user.time_zone, status: "active" }
-        schedule = EnrollmentLessonSchedules::Create.new(actor: @actor, enrollment:, student_profile:,
-                                                         attributes:, slots: complete_schedule_slots).call
-        raise ActiveRecord::RecordInvalid, schedule unless schedule.persisted?
+        @schedule = EnrollmentLessonSchedules::Create.new(actor: @actor, enrollment:, student_profile:,
+                                                          attributes:, slots: complete_schedule_slots).call
+        raise ActiveRecord::RecordInvalid, @schedule unless @schedule.persisted?
       end
 
       # Madarak's "generate for how many weeks" onboarding field controls how far ahead the

@@ -159,11 +159,15 @@ class TeacherProfile < ApplicationRecord
     errors.add(:left_on, :blank) if employment_status == "departed" && left_on.blank?
   end
 
+  # Optional together: a blank pair means "available all day" on the selected work days.
   def work_time_order
-    return if work_start_time.blank? || work_end_time.blank? || work_end_time > work_start_time
+    return if work_start_time.blank? && work_end_time.blank?
+    return errors.add(missing_work_time_field, :work_time_required) if [work_start_time, work_end_time].any?(&:blank?)
 
-    errors.add(:work_end_time, :after_start)
+    errors.add(:work_end_time, :after_start) unless work_end_time > work_start_time
   end
+
+  def missing_work_time_field = work_start_time.blank? ? :work_start_time : :work_end_time
 
   def complete_profile_readiness
     return unless profile_status.in?(%w[complete verified])

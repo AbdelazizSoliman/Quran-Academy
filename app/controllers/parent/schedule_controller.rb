@@ -8,15 +8,18 @@ module Parent
 
     def show
       @lesson = accessible_lessons.includes(:teacher_profile, :course_offering).find(params.expect(:id))
-      @students = guardian_students.joins(enrollments: :scheduled_lesson_enrollments)
-                                   .where(scheduled_lesson_enrollments: { scheduled_lesson_id: @lesson.id }).distinct
+      participant_ids = @lesson.scheduled_lesson_enrollments.filter_map { |item| item.student_profile&.id }
+      @students = guardian_students.where(id: participant_ids)
     end
 
     private
 
+    # scheduled_lesson_enrollments.enrollment_id is nullable (direct fee-plan-only participation
+    # has none), so this has to resolve through the shared student-participation scope rather than
+    # an inner join on :enrollment — otherwise a guardian's fee-plan-only child's lessons vanish here.
     def accessible_lessons
-      ScheduledLesson.joins(scheduled_lesson_enrollments: :enrollment)
-                     .where(enrollments: { student_profile_id: guardian_students.select(:id) }).distinct
+      participations = ScheduledLessonEnrollment.for_student_profile_ids(guardian_students.select(:id))
+      ScheduledLesson.where(id: participations.select(:scheduled_lesson_id))
     end
   end
 end

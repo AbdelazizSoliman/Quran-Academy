@@ -86,6 +86,22 @@ RSpec.describe "Parent portal" do
     expect(response.body).to include("Direct Child")
   end
 
+  it "shows the guardian schedule for a fee-plan-only (direct-participation) linked child" do
+    direct_child = create(:student_profile, display_name: "Direct Child")
+    create(:student_guardianship, guardian:, student_profile: direct_child, status: "active")
+    lesson = create(:scheduled_lesson, :scheduled, course_offering: nil, title_en: "Direct Child Lesson",
+                                                   starts_at: 1.day.from_now, ends_at: 1.day.from_now + 30.minutes)
+    create(:scheduled_lesson_enrollment, scheduled_lesson: lesson, enrollment: nil, student_profile: direct_child)
+
+    get guardian_schedule_index_path
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Direct Child Lesson")
+
+    get guardian_schedule_path(lesson)
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(lesson.public_id, "Direct Child")
+  end
+
   it "forbids non-guardian accounts" do
     sign_out guardian_user
     sign_in create(:user, :student)

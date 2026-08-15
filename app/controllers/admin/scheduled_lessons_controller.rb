@@ -20,6 +20,7 @@ module Admin
     def new
       @lesson = ScheduledLesson.new(academy_time_zone: AcademySetting.current_or_nil&.default_time_zone || "Cairo")
       load_options
+      load_students
     end
 
     def edit
@@ -27,7 +28,15 @@ module Admin
     end
 
     def create
-      @lesson = ScheduledLessons::Create.new(actor: current_user, attributes: lesson_params).call
+      attributes = lesson_params
+      @lesson = if attributes[:lesson_type] == "direct_student"
+                  ScheduledLessons::CreateDirect.new(actor: current_user, attributes:).call
+                else
+                  ScheduledLessons::Create.new(
+                    actor: current_user, attributes: attributes.except(:lesson_type, :student_profile_id)
+                  ).call
+                end
+      load_students
       respond_to_save(:created, :new)
     end
 
@@ -130,9 +139,14 @@ module Admin
       @offerings = CourseOffering.where(status: %w[draft open in_progress]).order(:title_en)
     end
 
+    def load_students
+      @students = StudentProfile.where.not(profile_status: "archived").order(:display_name)
+    end
+
     def lesson_params
       permitted = %i[course_offering_id teacher_profile_id title_ar title_en starts_at ends_at academy_time_zone
-                     delivery_mode location_name online_meeting_url scheduling_source]
+                     delivery_mode location_name online_meeting_url scheduling_source lesson_type
+                     student_profile_id]
       params.expect(scheduled_lesson: permitted)
     end
 

@@ -33,7 +33,7 @@ ar:
     sorts: { name: "الاسم", public_id: "المعرف", created_at: "تاريخ الإنشاء", joined_on: "تاريخ الانضمام", date_of_birth: "تاريخ الميلاد", profile_status: "حالة الملف", learning_status: "حالة التعلم" }
     empty: { title: "لا توجد ملفات طلاب", description: "أنشئ ملفاً لحساب طالب موجود." }
     form: { select_student: "اختر حساب طالب مؤهلاً" }
-    messages: { created: "تم إنشاء ملف الطالب.", updated: "تم تحديث ملف الطالب.", verify: "تم توثيق ملف الطالب.", archive: "تمت أرشفة ملف الطالب.", restore: "تمت استعادة ملف الطالب." }
+    messages: { created: "تم إنشاء ملف الطالب.", updated: "تم تحديث ملف الطالب.", verify: "تم توثيق ملف الطالب.", archive: "تمت أرشفة ملف الطالب.", restore: "تمت استعادة ملف الطالب.", generation_partial: "تم إنشاء %{generated} حصة. فشلت جدولة %{failed} حصة: %{reasons}." }
     user_card: { title: "ملف الطالب" }
   student:
     profile:

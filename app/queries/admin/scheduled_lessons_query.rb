@@ -17,8 +17,11 @@ module Admin
     end
 
     def call
-      scope = @relation.joins(:teacher_profile, course_offering: :program)
-                       .includes(:teacher_profile, :course_offering, enrollments: :student_profile)
+      # course_offering_id is nullable (direct fee-plan-only participation has none), so this must
+      # be a LEFT JOIN — an inner join here would silently drop every such lesson from the calendar.
+      scope = @relation.joins(:teacher_profile).left_joins(course_offering: :program)
+                       .includes(:teacher_profile, :course_offering,
+                                 scheduled_lesson_enrollments: [:student_profile, { enrollment: :student_profile }])
       scope = search(scope)
       scope = filters(scope)
       scope.distinct.order(sort_column => direction, "scheduled_lessons.id" => :asc)

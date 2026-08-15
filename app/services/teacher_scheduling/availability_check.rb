@@ -16,7 +16,7 @@ module TeacherScheduling
 
     def call
       prepare_context
-      recurring = matching_recurring
+      recurring = matching_recurring || work_days_match?
       exceptions = matching_exceptions
       unavailable = exceptions.any? { |exception| exception.exception_type == "unavailable" }
       override = exceptions.any? { |exception| exception.exception_type == "available_override" }
@@ -65,6 +65,18 @@ module TeacherScheduling
       start_seconds, end_seconds = local_seconds(record.time_zone)
       record.starts_at_local.seconds_since_midnight <= start_seconds &&
         record.ends_at_local.seconds_since_midnight >= end_seconds
+    end
+
+    # A teacher's selected work_days are a simpler, coarser recurring-availability source than
+    # TeacherAvailability records. A blank work_start_time/work_end_time pair means "available all
+    # day" on that selected day, per the onboarding business rule — never "unavailable".
+    def work_days_match?
+      return false unless @teacher_profile.work_days.include?(@weekday)
+      return true if @teacher_profile.work_start_time.blank? && @teacher_profile.work_end_time.blank?
+
+      start_seconds, end_seconds = local_seconds(teacher_zone)
+      @teacher_profile.work_start_time.seconds_since_midnight <= start_seconds &&
+        @teacher_profile.work_end_time.seconds_since_midnight >= end_seconds
     end
 
     def matching_exceptions
