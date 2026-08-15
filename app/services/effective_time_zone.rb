@@ -3,6 +3,10 @@ class EffectiveTimeZone
     normalize(user&.time_zone) || normalize(academy_time_zone) || Time.zone.name
   end
 
+  def self.local_time(time, user: nil)
+    time.in_time_zone(self.for(user))
+  end
+
   def self.normalize(value)
     ActiveSupport::TimeZone[value]&.name if value.present?
   end
