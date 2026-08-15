@@ -38,7 +38,12 @@ module Admin
           attach_or_create_guardian(profile)
           enrollment = create_enrollment(profile)
           create_lesson_schedule(profile, enrollment)
-          AccountInvitations::CreateAndSend.new(user:, actor: @actor).call unless placeholder_email?(user.email)
+          # A placeholder email only means the student has no email; it says nothing about whether
+          # they're reachable at all. account_delivery_method defaults to "whatsapp" for students,
+          # so skipping the invitation here would silently drop the WhatsApp channel too —
+          # InvitationChannels/InvitationDelivery already decide per-channel eligibility correctly
+          # (email is only attempted when the recipient's own preference actually includes it).
+          AccountInvitations::CreateAndSend.new(user:, actor: @actor).call
         end
         profile
       rescue ActiveRecord::RecordInvalid => e
@@ -51,7 +56,8 @@ module Admin
       # Madarak treats the student's own email/WhatsApp as optional (the guardian is the primary
       # contact for minors). QA's shared User/Devise model still requires a unique email to
       # authenticate, so an unset email is backed by an internal placeholder rather than blocking
-      # account creation; #email_addresses.any? above skips sending an invitation in that case.
+      # account creation. The invitation is still sent (see #call) — InvitationChannels decides
+      # per-channel eligibility independently of whether this email is real or a placeholder.
       def build_user
         submitted_email = @attributes[:email].to_s.strip.presence
         first_name, last_name = name_parts
@@ -89,10 +95,6 @@ module Admin
 
       def placeholder_email
         "std-#{SecureRandom.hex(8)}@#{PLACEHOLDER_EMAIL_DOMAIN}"
-      end
-
-      def placeholder_email?(email)
-        email.to_s.end_with?("@#{PLACEHOLDER_EMAIL_DOMAIN}")
       end
 
       def profile_attributes(user)

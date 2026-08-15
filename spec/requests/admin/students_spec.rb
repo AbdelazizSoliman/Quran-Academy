@@ -67,7 +67,7 @@ RSpec.describe "Admin students" do
     expect(response).to have_http_status(:unprocessable_content)
   end
 
-  it "creates an account without an email using an internal placeholder and skips the invitation" do
+  it "creates an account without an email using an internal placeholder and still creates an invitation" do
     expect do
       expect do
         post admin_students_path, params: { student_profile: { full_name: "NoEmail Learner" } }
@@ -75,6 +75,19 @@ RSpec.describe "Admin students" do
     end.to change(StudentProfile, :count).by(1)
     profile = StudentProfile.find_by!(display_name: "NoEmail Learner")
     expect(profile.user.email).to end_with("@no-email.quranacademy.internal")
+    # A placeholder email only means no email channel is attempted (students default to
+    # account_delivery_method: "whatsapp"); the invitation itself is still created so a WhatsApp
+    # attempt is made once the student (or a guardian) has a usable number.
+    expect(profile.user.account_invitation).to be_present
+  end
+
+  it "still creates and attempts the invitation over WhatsApp for an email-less student with a phone number" do
+    post admin_students_path, params: {
+      student_profile: { full_name: "WhatsApp Learner", whatsapp_number: "+201234567890" }
+    }
+    profile = StudentProfile.find_by!(display_name: "WhatsApp Learner")
+    expect(profile.user.account_invitation).to be_present
+    expect(Notifications::InvitationChannels.call(user: profile.user)).to eq(%w[whatsapp])
   end
 
   it "splits a single-word name by repeating it as the last name" do
@@ -230,6 +243,38 @@ RSpec.describe "Admin students" do
     get student_schedule_index_path
     expect(response).to have_http_status(:ok)
     expect(response.body).to include(profile.display_name)
+  end
+
+  it "records a granular reason_code and message when the teacher has no online_meeting_url" do
+    teacher = create(:teacher_profile, :active, :verified, online_meeting_url: nil)
+    weekday = Date.current.strftime("%A").downcase
+    create(:teacher_availability, teacher_profile: teacher, weekday:, starts_at_local: "09:00",
+                                  ends_at_local: "21:00", time_zone: "Cairo",
+                                  effective_from: Date.current - 1.week, availability_type: "teaching")
+    fee_plan = create(:fee_plan)
+    slots = [{ weekday:, time: "10:00" }]
+
+    expect do
+      post admin_students_path, params: {
+        student_profile: {
+          full_name: "Unreachable Teacher Learner", email: "unreachable.teacher@example.test",
+          assigned_teacher_profile_id: teacher.id, fee_plan_id: fee_plan.id,
+          lesson_duration_minutes: 30, weekly_lesson_count: 1, schedule_generation_weeks: 4,
+          slots_json: slots.to_json
+        }
+      }
+    end.not_to change(ScheduledLesson, :count)
+
+    profile = StudentProfile.find_by!(display_name: "Unreachable Teacher Learner")
+    schedule = profile.direct_lesson_schedules.first
+    expect(schedule).to be_present
+
+    issue = schedule.generation_issues.unresolved.first
+    expect(issue).to be_present
+    expect(issue.reason_code).to eq("online_meeting_url_required")
+    expect(issue.details["attributes"]).to include("online_meeting_url")
+    expect(issue.details["reason_codes"]).to eq(["required"])
+    expect(issue.details["messages"]).to be_present
   end
 
   it "shows no generation warning when every lesson occurrence is generated successfully" do

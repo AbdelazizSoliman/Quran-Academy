@@ -52,7 +52,7 @@ module EnrollmentLessonSchedules
           lesson = schedule_lesson(lesson)
           success = lesson.errors.empty?
         else
-          participant.errors.each { |error| lesson.errors.add(:base, error.type) }
+          merge_participant_errors!(lesson, participant)
         end
         raise ActiveRecord::Rollback unless success
       end
@@ -61,6 +61,17 @@ module EnrollmentLessonSchedules
       failed(slot, date, lesson)
     rescue ActiveRecord::RecordNotUnique
       [:skipped, slot.scheduled_lessons.find_by(recurrence_date: date)]
+    end
+
+    # Always attaches to :base — lesson.errors.add(participant_attribute, ...) would let Rails try
+    # to read that attribute off the *lesson* (a different record) while building the message and
+    # raise NoMethodError, since e.g. :enrollment/:student_profile aren't lesson attributes. The
+    # participant's original attribute is preserved by folding it into the error type instead.
+    def merge_participant_errors!(lesson, participant)
+      participant.errors.each do |error|
+        composed_type = error.attribute == :base ? error.type : :"#{error.attribute}_#{error.type}"
+        lesson.errors.add(:base, composed_type)
+      end
     end
 
     def create_lesson(slot, date)
@@ -115,18 +126,39 @@ module EnrollmentLessonSchedules
       [:generated, lesson]
     end
 
+    # Records which attribute failed and why (e.g. "online_meeting_url" + :required), not just the
+    # bare error type — a reason_code of "required" alone can't distinguish a missing teacher
+    # meeting URL from a missing course_offering/enrollment/student_profile.
     def failed(slot, date, lesson)
-      codes = lesson.errors.details.values.flatten.filter_map { |detail| detail[:error] }.map(&:to_s).uniq
+      pairs = error_detail_pairs(lesson)
       issue = EnrollmentLessonGenerationIssue.find_or_initialize_by(
         enrollment_lesson_schedule_slot: slot, recurrence_date: date
       )
-      issue.update!(reason_code: codes.first || "generation_failed", details: { "reason_codes" => codes },
-                    resolved_at: nil)
+      issue.update!(reason_code: reason_code_for(pairs), details: issue_details(pairs, lesson), resolved_at: nil)
       if issue.previous_changes.key?("id") || issue.previous_changes.key?("reason_code")
         @schedule.events.create!(actor: @actor, event_type: "generation_failed",
-                                 metadata: { "recurrence_date" => date, "reason_codes" => codes })
+                                 metadata: { "recurrence_date" => date, "reason_code" => issue.reason_code })
       end
       [:issue, issue]
+    end
+
+    def error_detail_pairs(lesson)
+      lesson.errors.details.flat_map do |attribute, details|
+        details.map { |detail| [attribute, detail[:error]] }
+      end.uniq
+    end
+
+    def reason_code_for(pairs)
+      return "generation_failed" if pairs.empty?
+
+      attribute, error = pairs.first
+      attribute == :base ? error.to_s : "#{attribute}_#{error}"
+    end
+
+    def issue_details(pairs, lesson)
+      { "reason_codes" => pairs.map { |_, error| error.to_s }.uniq,
+        "attributes" => pairs.map { |attribute, _| attribute.to_s }.uniq,
+        "messages" => lesson.errors.full_messages }
     end
 
     def resolve_issue(slot, date)
