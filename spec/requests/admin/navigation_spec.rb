@@ -12,7 +12,6 @@ RSpec.describe "Admin navigation" do
       admin_teachers_path,
       admin_scheduled_lessons_path,
       admin_academic_dashboard_path,
-      admin_teacher_payrolls_path,
       admin_fee_plans_path,
       admin_operational_reports_path
     ]

@@ -1,6 +1,6 @@
 module NavigationHelper
   ADMIN_VISIBLE_NAVIGATION = %i[
-    dashboard students teachers schedule profits_analytics finance fee_plans financial_reports
+    dashboard students teachers schedule profits_analytics fee_plans financial_reports
   ].freeze
 
   NAVIGATION_ITEMS = {
@@ -29,7 +29,6 @@ module NavigationHelper
     student_schedule: { icon: :calendar, roles: %i[student], path: :student_schedule_index_path },
     schedule: { icon: :calendar, roles: %i[admin staff], path: :admin_scheduled_lessons_path },
     profits_analytics: { icon: :reports, roles: %i[admin], path: :admin_academic_dashboard_path },
-    finance: { icon: :wallet, roles: %i[admin], path: :admin_teacher_payrolls_path },
     financial_reports: { icon: :reports, roles: %i[admin], path: :admin_operational_reports_path },
     attendance: { icon: :check_circle, roles: %i[admin staff teacher student] },
     whatsapp: { icon: :message, roles: %i[admin staff teacher student] },
