@@ -42,6 +42,7 @@ RSpec.describe "Teacher payroll services" do
     transition(payroll, :approve)
     expect(transition(payroll, :pay)).to be_paid
     expect(payroll.events.pluck(:event_type)).to include("prepared", "approved", "paid")
+    expect(payroll.finance_ledger_entries.pluck(:direction)).to contain_exactly("debit", "credit")
   end
 
   it "allows only administrators and creates no duplicate transition audit" do

@@ -1,0 +1,13 @@
+<%= render "shared/page_header", title: t("finance.invoices.title"), description: t("finance.invoices.description"), primary_action: { label: t("finance.invoices.new"), href: new_admin_finance_invoice_path } %>
+<%= render "admin/finance/navigation" %>
+<%= form_with url: admin_finance_invoices_path, method: :get, class: "ds-card mb-6 flex flex-wrap items-end gap-4 p-4" do |form| %>
+  <div><%= form.label :status, t("finance.fields.status"), class: "ds-label" %><%= form.select :status, FinanceInvoice::STATUSES.map { |value| [t("finance.invoice_statuses.#{value}"), value] }, { include_blank: true, selected: params[:status] }, class: "ds-control mt-2" %></div>
+  <%= render "shared/components/button", label: t("reports.actions.filter"), type: :submit %>
+<% end %>
+<div class="space-y-3">
+  <% @invoices.each do |invoice| %>
+    <%= link_to admin_finance_invoice_path(invoice), class: "ds-card grid gap-2 p-4 sm:grid-cols-6" do %>
+      <strong dir="ltr"><%= invoice.public_id %></strong><span><%= invoice.student_profile.user.full_name %></span><span><%= l(invoice.due_on) %></span><span><%= t("finance.invoice_statuses.#{invoice.effective_status}") %></span><span dir="ltr"><%= number_to_currency(invoice.total_amount, unit: invoice.currency) %></span><span dir="ltr"><%= number_to_currency(invoice.balance_due, unit: invoice.currency) %></span>
+    <% end %>
+  <% end %>
+</div>

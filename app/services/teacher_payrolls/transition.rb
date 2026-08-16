@@ -41,6 +41,7 @@ module TeacherPayrolls
       TeacherPayrollEvent.create!(teacher_payroll: @payroll, actor: @actor, event_type: event_type,
                                   before_data: { "status" => previous }, after_data: { "status" => rule[:to] },
                                   metadata: reason_metadata)
+      record_ledger_payment! if @action == :pay
     end
 
     def transition_attributes(rule)
@@ -57,6 +58,12 @@ module TeacherPayrolls
     end
 
     def reason_metadata = @reason.present? ? { "reason" => @reason } : {}
+
+    def record_ledger_payment!
+      entry = { entry_type: "payroll_paid", occurred_on: Date.current,
+                currency: @payroll.currency, amount: @payroll.net_amount }
+      Finance::Ledger.record_pair!(source: @payroll, actor: @actor, debit: "payroll_expense", credit: "cash", entry:)
+    end
 
     def invalid(error)
       @payroll.errors.add(:base, error)

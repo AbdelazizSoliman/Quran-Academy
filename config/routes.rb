@@ -41,6 +41,26 @@ Rails.application.routes.draw do
     resources :student_progresses, only: %i[index show update]
     get "academic_dashboard", to: "academic_dashboard#show"
     get "financial_dashboard", to: "financial_dashboard#show"
+    resources :finance_invoices, path: "finance/invoices", only: %i[index show new create] do
+      member do
+        patch :issue
+        patch :cancel
+      end
+      resources :payments, controller: :finance_payments, only: :create do
+        patch :refund, on: :member
+      end
+    end
+    resources :finance_expenses, path: "finance/expenses", only: %i[index show new create] do
+      member do
+        patch :approve
+        patch :pay
+        patch :cancel
+      end
+    end
+    resources :finance_ledger_entries, path: "finance/ledger", only: :index
+    resources :financial_reports, path: "finance/reports", only: %i[index show], param: :report do
+      get :export, on: :member
+    end
     resources :account_invitations, only: %i[index show] do
       member do
         patch :resend

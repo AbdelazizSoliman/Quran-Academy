@@ -580,9 +580,111 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_16_120000) do
     t.index ["created_by_id"], name: "index_fee_plans_on_created_by_id"
     t.index ["public_id"], name: "index_fee_plans_on_public_id", unique: true
     t.index ["updated_by_id"], name: "index_fee_plans_on_updated_by_id"
-    t.check_constraint "billing_cycle::text = ANY (ARRAY['per_lesson'::character varying::text, 'weekly'::character varying::text, 'monthly'::character varying::text, 'package'::character varying::text])", name: "fee_plan_billing_cycle"
+    t.check_constraint "billing_cycle::text = ANY (ARRAY['per_lesson'::character varying, 'weekly'::character varying, 'monthly'::character varying, 'package'::character varying]::text[])", name: "fee_plan_billing_cycle"
     t.check_constraint "invoice_day >= 1 AND invoice_day <= 31", name: "fee_plan_invoice_day_range"
     t.check_constraint "tax_percentage >= 0::numeric AND tax_percentage <= 100::numeric", name: "fee_plan_tax_percentage_range"
+  end
+
+  create_table "finance_expenses", force: :cascade do |t|
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.datetime "approved_at"
+    t.bigint "approved_by_id"
+    t.datetime "cancelled_at"
+    t.bigint "cancelled_by_id"
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "currency", null: false
+    t.text "description", null: false
+    t.date "incurred_on", null: false
+    t.datetime "paid_at"
+    t.bigint "paid_by_id"
+    t.string "payment_method"
+    t.string "public_id", null: false
+    t.string "reference"
+    t.string "status", default: "draft", null: false
+    t.datetime "updated_at", null: false
+    t.string "vendor"
+    t.index ["approved_by_id"], name: "index_finance_expenses_on_approved_by_id"
+    t.index ["cancelled_by_id"], name: "index_finance_expenses_on_cancelled_by_id"
+    t.index ["created_by_id"], name: "index_finance_expenses_on_created_by_id"
+    t.index ["paid_by_id"], name: "index_finance_expenses_on_paid_by_id"
+    t.index ["public_id"], name: "index_finance_expenses_on_public_id", unique: true
+    t.index ["status", "incurred_on"], name: "index_finance_expenses_on_status_and_incurred_on"
+    t.check_constraint "amount > 0::numeric", name: "finance_expenses_positive_amount"
+  end
+
+  create_table "finance_invoices", force: :cascade do |t|
+    t.date "billing_period_ends_on", null: false
+    t.date "billing_period_starts_on", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "currency", null: false
+    t.decimal "discount_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.date "due_on", null: false
+    t.bigint "fee_plan_id"
+    t.date "issued_on"
+    t.text "notes"
+    t.string "public_id", null: false
+    t.string "status", default: "draft", null: false
+    t.bigint "student_profile_id", null: false
+    t.decimal "subtotal", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "tax_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "total_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["created_by_id"], name: "index_finance_invoices_on_created_by_id"
+    t.index ["fee_plan_id"], name: "index_finance_invoices_on_fee_plan_id"
+    t.index ["public_id"], name: "index_finance_invoices_on_public_id", unique: true
+    t.index ["status", "due_on"], name: "index_finance_invoices_on_status_and_due_on"
+    t.index ["student_profile_id"], name: "index_finance_invoices_on_student_profile_id"
+    t.index ["updated_by_id"], name: "index_finance_invoices_on_updated_by_id"
+    t.check_constraint "billing_period_ends_on >= billing_period_starts_on", name: "finance_invoices_period_order"
+    t.check_constraint "subtotal >= 0::numeric AND discount_amount >= 0::numeric AND tax_amount >= 0::numeric AND total_amount >= 0::numeric", name: "finance_invoices_nonnegative_amounts"
+  end
+
+  create_table "finance_ledger_entries", force: :cascade do |t|
+    t.string "account", null: false
+    t.bigint "actor_id", null: false
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.string "currency", null: false
+    t.text "description"
+    t.string "direction", null: false
+    t.string "entry_type", null: false
+    t.date "occurred_on", null: false
+    t.string "public_id", null: false
+    t.bigint "source_id", null: false
+    t.string "source_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_finance_ledger_entries_on_actor_id"
+    t.index ["currency", "occurred_on"], name: "index_finance_ledger_entries_on_currency_and_occurred_on"
+    t.index ["public_id"], name: "index_finance_ledger_entries_on_public_id", unique: true
+    t.index ["source_type", "source_id"], name: "index_finance_ledger_entries_on_source_type_and_source_id"
+    t.check_constraint "amount > 0::numeric", name: "finance_ledger_entries_positive_amount"
+  end
+
+  create_table "finance_payments", force: :cascade do |t|
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.string "currency", null: false
+    t.bigint "finance_invoice_id", null: false
+    t.text "notes"
+    t.string "payment_method", null: false
+    t.string "public_id", null: false
+    t.date "received_on", null: false
+    t.bigint "recorded_by_id", null: false
+    t.string "reference"
+    t.datetime "refunded_at"
+    t.bigint "refunded_by_id"
+    t.string "status", default: "completed", null: false
+    t.datetime "updated_at", null: false
+    t.index ["finance_invoice_id"], name: "index_finance_payments_on_finance_invoice_id"
+    t.index ["public_id"], name: "index_finance_payments_on_public_id", unique: true
+    t.index ["recorded_by_id"], name: "index_finance_payments_on_recorded_by_id"
+    t.index ["refunded_by_id"], name: "index_finance_payments_on_refunded_by_id"
+    t.index ["status", "received_on"], name: "index_finance_payments_on_status_and_received_on"
+    t.check_constraint "amount > 0::numeric", name: "finance_payments_positive_amount"
   end
 
   create_table "guardian_events", force: :cascade do |t|
@@ -1726,6 +1828,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_16_120000) do
   add_foreign_key "exam_sessions", "users", column: "updated_by_id", on_delete: :restrict
   add_foreign_key "fee_plans", "users", column: "created_by_id", on_delete: :restrict
   add_foreign_key "fee_plans", "users", column: "updated_by_id", on_delete: :restrict
+  add_foreign_key "finance_expenses", "users", column: "approved_by_id", on_delete: :nullify
+  add_foreign_key "finance_expenses", "users", column: "cancelled_by_id", on_delete: :nullify
+  add_foreign_key "finance_expenses", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "finance_expenses", "users", column: "paid_by_id", on_delete: :nullify
+  add_foreign_key "finance_invoices", "fee_plans", on_delete: :nullify
+  add_foreign_key "finance_invoices", "student_profiles", on_delete: :restrict
+  add_foreign_key "finance_invoices", "users", column: "created_by_id", on_delete: :restrict
+  add_foreign_key "finance_invoices", "users", column: "updated_by_id", on_delete: :restrict
+  add_foreign_key "finance_ledger_entries", "users", column: "actor_id", on_delete: :restrict
+  add_foreign_key "finance_payments", "finance_invoices", on_delete: :restrict
+  add_foreign_key "finance_payments", "users", column: "recorded_by_id", on_delete: :restrict
+  add_foreign_key "finance_payments", "users", column: "refunded_by_id", on_delete: :nullify
   add_foreign_key "guardian_events", "guardians", on_delete: :restrict
   add_foreign_key "guardian_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "guardians", "users", column: "created_by_id", on_delete: :nullify

@@ -1,0 +1,12 @@
+<%= render "shared/page_header", title: t("finance.expenses.new") %><%= render "admin/finance/navigation" %>
+<%= form_with model: [:admin, @expense], url: admin_finance_expenses_path, class: "ds-card grid gap-5 p-6 sm:grid-cols-2" do |form| %>
+  <%= render "shared/academic/errors", record: @expense %>
+  <div><%= form.label :category, t("finance.fields.category"), class: "ds-label" %><%= form.select :category, FinanceExpense::CATEGORIES.map { |value| [t("finance.expense_categories.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+  <div><%= form.label :vendor, t("finance.fields.vendor"), class: "ds-label" %><%= form.text_field :vendor, class: "ds-control mt-2" %></div>
+  <div><%= form.label :amount, t("finance.fields.amount"), class: "ds-label" %><%= form.number_field :amount, step: 0.01, min: 0.01, class: "ds-control mt-2" %></div>
+  <div><%= form.label :currency, t("finance.fields.currency"), class: "ds-label" %><%= form.select :currency, StudentProfile::CURRENCIES, {}, class: "ds-control mt-2" %></div>
+  <div><%= form.label :incurred_on, t("finance.fields.incurred_on"), class: "ds-label" %><%= form.date_field :incurred_on, class: "ds-control mt-2" %></div>
+  <div><%= form.label :payment_method, t("finance.fields.payment_method"), class: "ds-label" %><%= form.select :payment_method, FinancePayment::METHODS.map { |value| [t("finance.payment_methods.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+  <div class="sm:col-span-2"><%= form.label :description, t("finance.fields.description"), class: "ds-label" %><%= form.text_area :description, class: "ds-control mt-2" %></div>
+  <div class="sm:col-span-2"><%= render "shared/components/button", label: t("actions.save"), type: :submit %></div>
+<% end %>

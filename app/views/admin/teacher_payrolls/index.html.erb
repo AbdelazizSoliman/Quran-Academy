@@ -1,8 +1,17 @@
 <%= render "shared/page_header", title: t("payroll.admin.index.title"), description: t("payroll.admin.index.description"), primary_action: (current_user.admin? ? { label: t("payroll.actions.generate"), href: new_admin_teacher_payroll_path } : nil) %>
+<%= render "admin/finance/navigation" if current_user.admin? %>
 <%= form_with url: admin_teacher_payrolls_path, method: :get, class: "ds-card mb-6 grid gap-4 p-4 sm:grid-cols-4" do |form| %>
   <div><%= form.label :from, t("payroll.filters.from"), class: "ds-label" %><%= form.date_field :from, value: params[:from], class: "ds-control mt-2" %></div>
   <div><%= form.label :to, t("payroll.filters.to"), class: "ds-label" %><%= form.date_field :to, value: params[:to], class: "ds-control mt-2" %></div>
   <div><%= form.label :status, t("payroll.fields.status"), class: "ds-label" %><%= form.select :status, TeacherPayroll::STATUSES.map { |value| [t("payroll.statuses.#{value}"), value] }, { include_blank: true }, class: "ds-control mt-2" %></div>
   <div class="self-end"><%= render "shared/components/button", label: t("reports.actions.filter"), type: :submit %></div>
 <% end %>
-<div class="space-y-3"><% @payrolls.each do |payroll| %><%= link_to admin_teacher_payroll_path(payroll), class: "ds-card grid gap-2 p-4 sm:grid-cols-5" do %><strong><%= payroll.teacher_profile.display_name %></strong><span dir="ltr"><%= payroll.period_starts_on %> – <%= payroll.period_ends_on %></span><span><%= t("payroll.strategies.#{payroll.calculation_strategy}") %></span><span><%= number_to_currency(payroll.net_amount, unit: payroll.currency) %></span><span><%= t("payroll.statuses.#{payroll.status}") %></span><% end %><% end %></div>
+<% if @payrolls.any? %>
+  <div class="space-y-3"><% @payrolls.each do |payroll| %><%= link_to admin_teacher_payroll_path(payroll), class: "ds-card grid gap-2 p-4 sm:grid-cols-5" do %><strong><%= payroll.teacher_profile.display_name %></strong><span dir="ltr"><%= payroll.period_starts_on %> – <%= payroll.period_ends_on %></span><span><%= t("payroll.strategies.#{payroll.calculation_strategy}") %></span><span><%= number_to_currency(payroll.net_amount, unit: payroll.currency) %></span><span><%= t("payroll.statuses.#{payroll.status}") %></span><% end %><% end %></div>
+<% else %>
+  <div class="ds-card p-8 text-center">
+    <h2 class="text-lg font-bold"><%= t("payroll.admin.index.empty_title") %></h2>
+    <p class="mt-2 ds-supporting"><%= t("payroll.admin.index.empty_description") %></p>
+    <% if current_user.admin? %><div class="mt-5"><%= render "shared/components/button", label: t("payroll.actions.generate"), href: new_admin_teacher_payroll_path %></div><% end %>
+  </div>
+<% end %>

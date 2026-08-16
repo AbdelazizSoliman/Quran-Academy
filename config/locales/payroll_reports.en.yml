@@ -1,7 +1,11 @@
 en:
   payroll:
     admin:
-      index: { title: "Teacher payroll", description: "Prepare and review teacher compensation periods." }
+      index:
+        title: "Teacher payroll"
+        description: "Prepare and review teacher compensation periods."
+        empty_title: "No payroll records yet"
+        empty_description: "Generate the first teacher payroll for a period, then review, approve, and record payment."
       new: { title: "Generate payroll" }
       edit: { title: "Adjust payroll" }
     teacher:

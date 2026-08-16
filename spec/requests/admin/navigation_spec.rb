@@ -13,7 +13,7 @@ RSpec.describe "Admin navigation" do
       admin_scheduled_lessons_path,
       admin_financial_dashboard_path,
       admin_fee_plans_path,
-      admin_operational_reports_path
+      admin_financial_reports_path
     ]
     hidden_paths = [admin_users_path, admin_account_invitations_path, admin_guardians_path, admin_settings_path]
 

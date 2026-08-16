@@ -16,6 +16,19 @@ RSpec.describe "Teacher payroll and operational reports" do
     expect(response).to have_http_status(:forbidden)
   end
 
+  it "keeps admin payroll available as a core finance page when the teacher feature is disabled" do
+    original = ENV.fetch("FEATURE_PAYROLL", nil)
+    ENV["FEATURE_PAYROLL"] = "false"
+    sign_in admin
+
+    get admin_teacher_payrolls_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(I18n.t("payroll.admin.index.empty_title", locale: :ar))
+  ensure
+    original.nil? ? ENV.delete("FEATURE_PAYROLL") : ENV["FEATURE_PAYROLL"] = original
+  end
+
   it "isolates teacher payroll history" do
     sign_in payroll.teacher_profile.user
     get teacher_payroll_path(payroll)

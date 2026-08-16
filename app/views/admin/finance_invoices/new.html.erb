@@ -1,0 +1,15 @@
+<%= render "shared/page_header", title: t("finance.invoices.new") %>
+<%= render "admin/finance/navigation" %>
+<%= form_with model: [:admin, @invoice], url: admin_finance_invoices_path, class: "ds-card grid gap-5 p-6 sm:grid-cols-2" do |form| %>
+  <%= render "shared/academic/errors", record: @invoice %>
+  <div><%= form.label :student_profile_id, t("finance.fields.student"), class: "ds-label" %><%= form.collection_select :student_profile_id, @students, :id, :display_name, {}, class: "ds-control mt-2" %></div>
+  <div><%= form.label :currency, t("finance.fields.currency"), class: "ds-label" %><%= form.select :currency, StudentProfile::CURRENCIES, {}, class: "ds-control mt-2" %></div>
+  <div><%= form.label :billing_period_starts_on, t("finance.fields.period_start"), class: "ds-label" %><%= form.date_field :billing_period_starts_on, class: "ds-control mt-2" %></div>
+  <div><%= form.label :billing_period_ends_on, t("finance.fields.period_end"), class: "ds-label" %><%= form.date_field :billing_period_ends_on, class: "ds-control mt-2" %></div>
+  <div><%= form.label :due_on, t("finance.fields.due_on"), class: "ds-label" %><%= form.date_field :due_on, class: "ds-control mt-2" %></div>
+  <div><%= form.label :subtotal, t("finance.fields.subtotal"), class: "ds-label" %><%= form.number_field :subtotal, step: 0.01, min: 0, class: "ds-control mt-2" %></div>
+  <div><%= form.label :discount_amount, t("finance.fields.discount"), class: "ds-label" %><%= form.number_field :discount_amount, step: 0.01, min: 0, class: "ds-control mt-2" %></div>
+  <div><%= form.label :tax_amount, t("finance.fields.tax"), class: "ds-label" %><%= form.number_field :tax_amount, step: 0.01, min: 0, class: "ds-control mt-2" %></div>
+  <div class="sm:col-span-2"><%= form.label :notes, t("finance.fields.notes"), class: "ds-label" %><%= form.text_area :notes, class: "ds-control mt-2" %></div>
+  <div class="sm:col-span-2"><%= render "shared/components/button", label: t("actions.save"), type: :submit %></div>
+<% end %>

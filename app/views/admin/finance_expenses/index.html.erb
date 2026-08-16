@@ -1,0 +1,3 @@
+<%= render "shared/page_header", title: t("finance.expenses.title"), primary_action: { label: t("finance.expenses.new"), href: new_admin_finance_expense_path } %>
+<%= render "admin/finance/navigation" %>
+<div class="space-y-3"><% @expenses.each do |expense| %><%= link_to admin_finance_expense_path(expense), class: "ds-card grid gap-2 p-4 sm:grid-cols-5" do %><strong><%= expense.description %></strong><span><%= t("finance.expense_categories.#{expense.category}") %></span><span><%= l(expense.incurred_on) %></span><span><%= t("finance.expense_statuses.#{expense.status}") %></span><span dir="ltr"><%= number_to_currency(expense.amount, unit: expense.currency) %></span><% end %><% end %></div>

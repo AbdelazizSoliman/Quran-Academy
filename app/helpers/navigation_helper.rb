@@ -29,7 +29,7 @@ module NavigationHelper
     student_schedule: { icon: :calendar, roles: %i[student], path: :student_schedule_index_path },
     schedule: { icon: :calendar, roles: %i[admin staff], path: :admin_scheduled_lessons_path },
     profits_analytics: { icon: :reports, roles: %i[admin], path: :admin_financial_dashboard_path },
-    financial_reports: { icon: :reports, roles: %i[admin], path: :admin_operational_reports_path },
+    financial_reports: { icon: :reports, roles: %i[admin], path: :admin_financial_reports_path },
     attendance: { icon: :check_circle, roles: %i[admin staff teacher student] },
     whatsapp: { icon: :message, roles: %i[admin staff teacher student] },
     payroll: { icon: :wallet, roles: %i[admin teacher], feature: :payroll },

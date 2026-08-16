@@ -1,0 +1,25 @@
+<%= render "shared/page_header", title: @invoice.public_id, description: @invoice.student_profile.user.full_name %>
+<%= render "admin/finance/navigation" %>
+<section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <article class="ds-card p-5"><p class="ds-caption"><%= t("finance.fields.total") %></p><p class="mt-2 text-xl font-bold" dir="ltr"><%= number_to_currency(@invoice.total_amount, unit: @invoice.currency) %></p></article>
+  <article class="ds-card p-5"><p class="ds-caption"><%= t("finance.fields.paid") %></p><p class="mt-2 text-xl font-bold" dir="ltr"><%= number_to_currency(@invoice.paid_amount, unit: @invoice.currency) %></p></article>
+  <article class="ds-card p-5"><p class="ds-caption"><%= t("finance.fields.balance") %></p><p class="mt-2 text-xl font-bold" dir="ltr"><%= number_to_currency(@invoice.balance_due, unit: @invoice.currency) %></p></article>
+  <article class="ds-card p-5"><p class="ds-caption"><%= t("finance.fields.status") %></p><p class="mt-2 text-xl font-bold"><%= t("finance.invoice_statuses.#{@invoice.effective_status}") %></p></article>
+</section>
+<div class="mt-6 flex flex-wrap gap-3">
+  <%= button_to t("finance.actions.issue"), issue_admin_finance_invoice_path(@invoice), method: :patch, class: button_classes if @invoice.draft? %>
+  <%= button_to t("finance.actions.cancel"), cancel_admin_finance_invoice_path(@invoice), method: :patch, class: button_classes(variant: :secondary) if @invoice.status.in?(%w[draft issued overdue]) %>
+</div>
+<% if @invoice.status.in?(%w[issued partially_paid overdue]) %>
+  <section class="ds-card mt-8 p-6"><h2 class="text-lg font-bold"><%= t("finance.payments.record") %></h2>
+    <%= form_with model: @payment, url: admin_finance_invoice_payments_path(@invoice), class: "mt-4 grid gap-4 sm:grid-cols-4" do |form| %>
+      <div><%= form.label :amount, t("finance.fields.amount"), class: "ds-label" %><%= form.number_field :amount, step: 0.01, min: 0.01, max: @invoice.balance_due, class: "ds-control mt-2" %></div>
+      <div><%= form.label :received_on, t("finance.fields.received_on"), class: "ds-label" %><%= form.date_field :received_on, class: "ds-control mt-2" %></div>
+      <div><%= form.label :payment_method, t("finance.fields.payment_method"), class: "ds-label" %><%= form.select :payment_method, FinancePayment::METHODS.map { |value| [t("finance.payment_methods.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+      <div class="self-end"><%= render "shared/components/button", label: t("finance.payments.record"), type: :submit %></div>
+    <% end %>
+  </section>
+<% end %>
+<section class="mt-8"><h2 class="text-lg font-bold"><%= t("finance.payments.title") %></h2><div class="mt-3 space-y-2">
+  <% @payments.each do |payment| %><div class="ds-card grid gap-2 p-4 sm:grid-cols-6"><span dir="ltr"><%= payment.public_id %></span><span><%= l(payment.received_on) %></span><span><%= t("finance.payment_methods.#{payment.payment_method}") %></span><span dir="ltr"><%= number_to_currency(payment.amount, unit: payment.currency) %></span><span><%= t("finance.payment_statuses.#{payment.status}") %></span><span><%= button_to t("finance.actions.refund"), refund_admin_finance_invoice_payment_path(@invoice, payment), method: :patch, class: button_classes(variant: :secondary) if payment.completed? %></span></div><% end %>
+</div></section>

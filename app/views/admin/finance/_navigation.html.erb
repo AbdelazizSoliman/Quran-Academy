@@ -1,0 +1,16 @@
+<nav class="mb-6 overflow-x-auto border-b" aria-label="<%= t("finance.navigation.label") %>">
+  <div class="flex min-w-max gap-1">
+    <% {
+      overview: admin_financial_dashboard_path,
+      invoices: admin_finance_invoices_path,
+      payroll: admin_teacher_payrolls_path,
+      expenses: admin_finance_expenses_path,
+      ledger: admin_finance_ledger_entries_path,
+      fees: admin_fee_plans_path,
+      reports: admin_financial_reports_path
+    }.each do |key, path| %>
+      <%= link_to t("finance.navigation.#{key}"), path,
+                  class: "border-b-2 px-4 py-3 text-sm font-semibold #{current_page?(path) ? 'border-app-primary text-app-primary' : 'border-transparent text-app-subtle hover:text-app-text'}" %>
+    <% end %>
+  </div>
+</nav>

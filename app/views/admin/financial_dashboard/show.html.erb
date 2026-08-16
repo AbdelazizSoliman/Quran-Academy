@@ -1,4 +1,5 @@
 <%= render "shared/page_header", title: t("financial_dashboard.title"), description: t("financial_dashboard.description") %>
+<%= render "admin/finance/navigation" %>
 
 <%= form_with url: admin_financial_dashboard_path, method: :get, class: "ds-card mb-6 flex flex-wrap items-end gap-4 p-4" do |form| %>
   <div>

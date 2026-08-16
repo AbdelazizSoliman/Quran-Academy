@@ -62,6 +62,7 @@ class StudentProfile < ApplicationRecord
   has_many :student_assessments, dependent: :restrict_with_exception
   has_one :student_progress, dependent: :restrict_with_exception
   has_many :certificates, dependent: :restrict_with_exception
+  has_many :finance_invoices, dependent: :restrict_with_exception
 
   attr_readonly :public_id, :user_id
 

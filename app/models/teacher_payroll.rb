@@ -11,6 +11,7 @@ class TeacherPayroll < ApplicationRecord
   belongs_to :cancelled_by, class_name: "User", optional: true
   has_many :items, class_name: "TeacherPayrollItem", dependent: :restrict_with_exception
   has_many :events, class_name: "TeacherPayrollEvent", dependent: :restrict_with_exception
+  has_many :finance_ledger_entries, as: :source, dependent: :restrict_with_exception
 
   attr_readonly :public_id, :teacher_profile_id, :period_starts_on, :period_ends_on, :calculation_strategy, :currency
   before_validation :generate_public_id, on: :create
