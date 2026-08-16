@@ -87,10 +87,10 @@
           <% %w[حفظ تجويد مراجعة نورانية تلاوة تفسير عربية فقه].each do |s| %><option value="<%= s %>"></option><% end %>
         </datalist>
         <div class="mt-2 flex flex-col gap-2" data-schedule-slots-target="container">
-          <% profile.schedule_slots.each do |slot| %><%= render "shared/student_profiles/schedule_slot_row", slot: %><% end %>
+          <% profile.schedule_slots.each do |slot| %><%= render "shared/student_profiles/schedule_slot_row", slot:, native_fields: true %><% end %>
         </div>
         <template data-schedule-slots-target="template">
-          <%= render "shared/student_profiles/schedule_slot_row",
+          <%= render "shared/student_profiles/schedule_slot_row", native_fields: true,
                      slot: { "weekday" => StudentProfile::WEEKDAYS.first, "time" => "17:00", "duration" => "45", "subject" => nil } %>
         </template>
         <button type="button" class="mt-2.5 rounded-full bg-amber-50 px-4 py-2 text-xs font-bold text-amber-800" data-action="schedule-slots#add">+ <%= t("student_profiles.form.add_slot") %></button>

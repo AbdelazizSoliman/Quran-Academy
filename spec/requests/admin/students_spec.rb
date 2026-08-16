@@ -468,6 +468,23 @@ RSpec.describe "Admin students" do
     expect(replacement.scheduled_lessons.where(status: "scheduled")).to exist
   end
 
+  it "saves native weekly schedule rows when the JavaScript JSON field is stale" do
+    profile = create(:student_profile, user: student_user,
+                                       schedule_slots: [{ "weekday" => "sunday", "time" => "18:00" }])
+
+    patch admin_student_path(profile), params: {
+      student_profile: {
+        slots_json: "",
+        schedule_rows: [{ weekday: "wednesday", time: "20:15", duration: "45", subject: "تجويد" }]
+      }
+    }
+
+    expect(response).to redirect_to(admin_student_path(profile))
+    expect(profile.reload.schedule_slots).to eq(
+      [{ "weekday" => "wednesday", "time" => "20:15", "duration" => "45", "subject" => "تجويد" }]
+    )
+  end
+
   it "redirects unauthenticated users and forbids non-admin roles" do
     sign_out admin
     get admin_students_path

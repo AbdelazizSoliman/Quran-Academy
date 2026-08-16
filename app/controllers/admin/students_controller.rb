@@ -140,7 +140,7 @@ module Admin
     end
 
     def update_params
-      params.expect(student_profile: UPDATE_KEYS).to_h
+      params.require(:student_profile).permit(*UPDATE_KEYS).to_h
     end
 
     def update_user_time_zone(time_zone)
@@ -151,11 +151,22 @@ module Admin
     # slots_json isn't a real column (schedule_slots is), so it's parsed separately here rather
     # than being permitted directly into UPDATE_KEYS and mass-assigned.
     def schedule_slot_attributes
-      return {} unless params[:student_profile]&.key?(:slots_json)
+      return {} unless params[:student_profile]&.key?(:slots_json) || submitted_schedule_rows.present?
 
-      slots = StudentProfile.parse_slots_json(params.dig(:student_profile, :slots_json))
+      slots = if submitted_schedule_rows.present?
+                rows = submitted_schedule_rows.map do |row|
+                  row.respond_to?(:permit) ? row.permit(:weekday, :time, :duration, :subject).to_h : row.to_h
+                end
+                StudentProfile.parse_slots_json(rows.to_json)
+              else
+                StudentProfile.parse_slots_json(params.dig(:student_profile, :slots_json))
+              end
       { schedule_slots: slots, schedule_weekday: slots.first&.fetch("weekday", nil),
         schedule_time: slots.first&.fetch("time", nil) }
+    end
+
+    def submitted_schedule_rows
+      Array(params.dig(:student_profile, :schedule_rows))
     end
 
     def schedule_update_requested?
