@@ -428,6 +428,46 @@ RSpec.describe "Admin students" do
     expect(profile.schedule_weekday).to eq("tuesday")
   end
 
+  it "replaces the authoritative recurring schedule and regenerates future lessons after editing weekly slots" do
+    teacher = create(:teacher_profile, :active, :verified,
+                     online_meeting_url: "https://meet.example.test/teacher")
+    %w[sunday tuesday].each do |weekday|
+      create(:teacher_availability, teacher_profile: teacher, weekday:, starts_at_local: "17:00",
+                                    ends_at_local: "21:00", effective_from: Date.current - 1.month)
+    end
+    profile = create(:student_profile, user: student_user, fee_plan: create(:fee_plan),
+                                       assigned_teacher_profile: teacher, lesson_duration_minutes: 30,
+                                       schedule_generation_weeks: 4,
+                                       schedule_slots: [{ "weekday" => "sunday", "time" => "18:00" }])
+    old_schedule = create(:enrollment_lesson_schedule, student_profile: profile, enrollment: nil,
+                                                       teacher_profile: teacher, starts_on: Date.current - 1.week,
+                                                       ends_on: Date.current + 4.weeks)
+    create(:enrollment_lesson_schedule_slot, enrollment_lesson_schedule: old_schedule,
+                                             weekday: "sunday", starts_at_local: "18:00")
+    old_future = EnrollmentLessonSchedules::GenerateOccurrences.new(
+      schedule: old_schedule, actor: admin, from_date: Date.current + 1.day,
+      through_date: Date.current + 2.weeks
+    ).call.generated.first
+
+    patch admin_student_path(profile), params: {
+      student_profile: {
+        assigned_teacher_profile_id: teacher.id, lesson_duration_minutes: 45,
+        schedule_generation_weeks: 4,
+        slots_json: [{ weekday: "tuesday", time: "19:00" }].to_json
+      }
+    }
+
+    replacement = profile.direct_lesson_schedules.active.first
+    expect(response).to redirect_to(admin_student_path(profile))
+    expect(old_schedule.reload).to be_superseded
+    expect(old_future.reload).to be_cancelled
+    expect(replacement).to be_present
+    expect(replacement.lesson_duration_minutes).to eq(45)
+    expect(replacement.slots.pluck(:weekday)).to eq(["tuesday"])
+    expect(replacement.slots.first.starts_at_local.strftime("%H:%M")).to eq("19:00")
+    expect(replacement.scheduled_lessons.where(status: "scheduled")).to exist
+  end
+
   it "redirects unauthenticated users and forbids non-admin roles" do
     sign_out admin
     get admin_students_path

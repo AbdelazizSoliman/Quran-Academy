@@ -90,12 +90,14 @@ module Admin
 
     def update
       load_onboarding_collections
+      sync_schedule = schedule_update_requested?
       attributes = update_params
       time_zone = attributes.delete(:time_zone)
       @profile = Admin::StudentProfiles::Update.new(
         actor: current_user, profile: @profile, attributes: attributes.merge(schedule_slot_attributes)
       ).call
       update_user_time_zone(time_zone) if @profile.errors.empty? && time_zone.present?
+      sync_lesson_schedule if @profile.errors.empty? && sync_schedule
       respond_to_save("updated", :edit)
     end
 
@@ -154,6 +156,19 @@ module Admin
       slots = StudentProfile.parse_slots_json(params.dig(:student_profile, :slots_json))
       { schedule_slots: slots, schedule_weekday: slots.first&.fetch("weekday", nil),
         schedule_time: slots.first&.fetch("time", nil) }
+    end
+
+    def schedule_update_requested?
+      scheduling_keys = %w[assigned_teacher_profile_id lesson_duration_minutes schedule_generation_weeks
+                           fee_plan_id slots_json time_zone]
+      params.fetch(:student_profile, {}).keys.intersect?(scheduling_keys)
+    end
+
+    def sync_lesson_schedule
+      service = Admin::StudentProfiles::SyncLessonSchedule.new(actor: current_user, profile: @profile)
+      schedule = service.call
+      warning = generation_warning(schedule)
+      flash[:warning] = warning if warning
     end
 
     def respond_to_save(message, template)
