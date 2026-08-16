@@ -31,6 +31,7 @@
       <% navigation_items_for(current_user).each do |key, item| %>
         <% active = (key == :dashboard && current_page?(root_path)) ||
                     (key == :users && controller_path.start_with?("admin/users")) ||
+                    (key == :invitations && controller_path.start_with?("admin/account_invitations")) ||
                     (key == :students && controller_path.start_with?("admin/students")) ||
                     (key == :guardians && controller_path.start_with?("admin/guardians")) ||
                     (key == :teachers && controller_path.start_with?("admin/teachers")) ||
