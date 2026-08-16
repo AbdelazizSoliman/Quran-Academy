@@ -1,1 +1,1 @@
-<%= render "shared/page_header", title: t("academic.actions.new_assessment") %><%= render "shared/academic/assessment_form", assessment: @assessment, form_model: [:teacher, @assessment], scores: [], admin: false, enrollments: @enrollments %>
+<%= render "shared/page_header", title: t("academic.actions.new_assessment") %><%= render "shared/academic/assessment_form", assessment: @assessment, form_model: [:teacher, @assessment], form_url: teacher_assessments_path, scores: [], admin: false, enrollments: @enrollments %>
