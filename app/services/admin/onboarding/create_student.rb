@@ -105,11 +105,19 @@ module Admin
         @attributes.slice(*PROFILE_KEYS).merge(
           display_name: @attributes[:display_name].presence || user.full_name,
           joined_on: Date.current,
+          preferred_contact_method: preferred_contact_method,
           guardian_phone: normalized_guardian_phone,
           schedule_slots: slots,
           schedule_weekday: slots.first&.fetch("weekday", nil),
           schedule_time: slots.first&.fetch("time", nil)
         )
+      end
+
+      def preferred_contact_method
+        return "whatsapp" if @attributes[:whatsapp_number].present? || @attributes[:phone_number].present?
+        return "guardian" if normalized_guardian_phone.present?
+
+        "email"
       end
 
       def normalized_guardian_phone

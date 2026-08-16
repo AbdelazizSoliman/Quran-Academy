@@ -339,8 +339,31 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
   it "skips recipients whose contact preference excludes WhatsApp" do
     lesson, participation = lesson_with_student(starts_at: now + 15.minutes)
     lesson.teacher_profile.update!(notification_method: "email")
-    participation.enrollment.student_profile.update!(preferred_contact_method: "email")
+    participation.enrollment.student_profile.update!(account_delivery_method: "email")
     expect { pre_sweep }.not_to change(Notification, :count)
+  end
+
+  it "uses the student's selected WhatsApp notification channel instead of the legacy contact default" do
+    lesson, participation = lesson_with_student(starts_at: now + 15.minutes)
+    lesson.teacher_profile.update!(notification_method: "email")
+    student = participation.enrollment.student_profile
+    student.update!(preferred_contact_method: "email", account_delivery_method: "whatsapp")
+
+    expect { pre_sweep }.to change(Notification.where(recipient_user: student.user), :count).by(1)
+    expect(Notification.last).to be_sent
+  end
+
+  it "formats one lesson instant as 14:40 for UTC+4 and 15:10 for UTC+4:30" do
+    lesson, participation = lesson_with_student(starts_at: Time.zone.parse("2026-08-08 10:40:00 UTC"))
+    lesson.teacher_profile.user.update!(time_zone: "Abu Dhabi")
+    participation.enrollment.student_profile.user.update!(time_zone: "Kabul")
+
+    pre_sweep(now: Time.zone.parse("2026-08-08 10:25:00 UTC"))
+
+    teacher_delivery = delivery_for(lesson.teacher_profile.user)
+    student_delivery = delivery_for(participation.enrollment.student_profile.user)
+    expect(body_texts(teacher_delivery).first).to end_with("14:40")
+    expect(body_texts(student_delivery).first).to end_with("15:10")
   end
 
   it "skips an invalid WhatsApp number without calling Meta" do
@@ -416,7 +439,7 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
                                scheduled_lesson: participation.scheduled_lesson, status:, arrival_at:)
   end
 
-  def pre_sweep = Notifications::LessonReminderScheduler.new(actor: admin, now:).call
+  def pre_sweep(now: self.now) = Notifications::LessonReminderScheduler.new(actor: admin, now:).call
   def late_sweep = Notifications::LateAttendanceReminderScheduler.new(actor: admin, now:).call
 
   def body_texts(delivery)
@@ -425,6 +448,11 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
 
   def button_parameters(delivery)
     delivery.dig(:template, :components, 1, :parameters)
+  end
+
+  def delivery_for(user)
+    address = Notifications::RecipientResolver.new(user:, channel: "whatsapp").call.provider_address
+    deliveries.find { |delivery| delivery[:recipient] == address }
   end
 
   def dispatch_failed_late_reminder(failure)
