@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Admin students" do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:admin) { create(:user, :admin) }
   let(:student_user) { create(:user, :student) }
 
@@ -255,6 +257,32 @@ RSpec.describe "Admin students" do
     get student_schedule_index_path
     expect(response).to have_http_status(:ok)
     expect(response.body).to include(profile.display_name)
+  end
+
+  it "generates onboarding lessons when the slot weekday differs in the availability timezone" do
+    travel_to(Time.find_zone!("Cairo").local(2026, 8, 16, 12, 0)) do
+      teacher = create(:teacher_profile, :active, :verified,
+                       user: create(:user, :teacher, time_zone: "Cairo"),
+                       online_meeting_url: "https://meet.example.test/teacher")
+      create(:teacher_availability, teacher_profile: teacher, time_zone: "Abu Dhabi", weekday: "monday",
+                                    starts_at_local: "00:00", ends_at_local: "02:00",
+                                    effective_from: Date.new(2026, 8, 17))
+
+      expect do
+        post admin_students_path, params: {
+          student_profile: {
+            full_name: "Timezone Learner", email: "timezone.learner@example.test", time_zone: "Cairo",
+            assigned_teacher_profile_id: teacher.id, fee_plan_id: create(:fee_plan).id,
+            lesson_duration_minutes: 30, schedule_generation_weeks: 1,
+            slots_json: [{ weekday: "sunday", time: "23:30" }].to_json
+          }
+        }
+      end.to change(ScheduledLesson, :count).by_at_least(1)
+
+      lesson = StudentProfile.find_by!(display_name: "Timezone Learner").scheduled_lessons.first
+      expect(lesson.starts_at.in_time_zone("Cairo").strftime("%A %H:%M")).to eq("Sunday 23:30")
+      expect(lesson.starts_at.in_time_zone("Abu Dhabi").strftime("%A %H:%M")).to eq("Monday 00:30")
+    end
   end
 
   it "records a granular reason_code and message when the teacher has no online_meeting_url" do

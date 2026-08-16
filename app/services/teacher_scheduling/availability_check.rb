@@ -48,16 +48,18 @@ module TeacherScheduling
 
     def matching_recurring
       recurring_windows.any? do |record|
-        effective_on_date?(record) && contains_lesson?(record)
+        record.weekday == local_weekday(record.time_zone) &&
+          effective_on_date?(record) && contains_lesson?(record)
       end
     end
 
     def recurring_windows
-      @teacher_profile.availabilities.active.teaching_capable.where(weekday: @weekday)
+      @teacher_profile.availabilities.active.teaching_capable
     end
 
     def effective_on_date?(record)
-      record.effective_from <= @date && (record.effective_until.nil? || record.effective_until >= @date)
+      date = local_date(record.time_zone)
+      record.effective_from <= date && (record.effective_until.nil? || record.effective_until >= date)
     end
 
     def contains_lesson?(record)
@@ -85,7 +87,9 @@ module TeacherScheduling
     end
 
     def exceptions_on_date
-      @teacher_profile.availability_exceptions.active.where(exception_date: @date)
+      @teacher_profile.availability_exceptions.active.select do |exception|
+        exception.exception_date == local_date(exception.time_zone)
+      end
     end
 
     def overlaps_lesson?(exception)
@@ -97,6 +101,14 @@ module TeacherScheduling
     def local_seconds(time_zone)
       zone = ActiveSupport::TimeZone[time_zone]
       [@starts_at.in_time_zone(zone).seconds_since_midnight, @ends_at.in_time_zone(zone).seconds_since_midnight]
+    end
+
+    def local_date(time_zone)
+      @starts_at.in_time_zone(time_zone).to_date
+    end
+
+    def local_weekday(time_zone)
+      @starts_at.in_time_zone(time_zone).strftime("%A").downcase
     end
 
     def conflict_reasons(matched, unavailable)

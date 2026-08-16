@@ -64,6 +64,21 @@ RSpec.describe "Teacher scheduling services" do
                                                       ends_at: outside + 30.minutes)).not_to be_available
   end
 
+  it "matches recurring availability by the availability record's local weekday" do
+    teacher = create(:teacher_profile, :active, :verified,
+                     user: create(:user, :teacher, time_zone: "Cairo"))
+    create(:teacher_availability, teacher_profile: teacher, time_zone: "Abu Dhabi", weekday: "monday",
+                                  starts_at_local: "00:00", ends_at_local: "02:00",
+                                  effective_from: Date.new(2026, 8, 17))
+    starts_at = Time.find_zone!("Cairo").local(2026, 8, 16, 23, 30)
+
+    result = TeacherScheduling::AvailabilityCheck.call(teacher_profile: teacher, starts_at:,
+                                                       ends_at: starts_at + 30.minutes,
+                                                       academy_time_zone: "Cairo")
+
+    expect(result).to be_available
+  end
+
   it "still blocks an overlapping lesson for a teacher who is all-day available via work_days" do
     teacher = create(:teacher_profile, :active, :verified, work_days: %w[thursday], work_start_time: nil,
                                                            work_end_time: nil)
