@@ -33,7 +33,7 @@ RSpec.describe NavigationHelper do
     admin = navigation_user(:admin)
 
     expect(helper.navigation_items_for(admin).keys).to eq(
-      %i[dashboard students teachers schedule profits_analytics fee_plans financial_reports]
+      %i[dashboard users students teachers schedule profits_analytics fee_plans financial_reports settings]
     )
   end
 

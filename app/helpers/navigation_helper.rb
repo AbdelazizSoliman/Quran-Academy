@@ -1,6 +1,6 @@
 module NavigationHelper
   ADMIN_VISIBLE_NAVIGATION = %i[
-    dashboard students teachers schedule profits_analytics fee_plans financial_reports
+    dashboard users students teachers schedule profits_analytics fee_plans financial_reports settings
   ].freeze
 
   NAVIGATION_ITEMS = {
