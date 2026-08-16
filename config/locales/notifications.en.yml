@@ -57,6 +57,7 @@ en:
     errors: { title: "Notification could not be sent" }
     messages:
       saved: "The delivery attempt was recorded."
+      delivery_failed: "Delivery failed. The business operation succeeded and this notification can be retried."
       students: "Enrolled students"
       counterpart_teacher: "Teacher"
       counterpart_student: "Student"

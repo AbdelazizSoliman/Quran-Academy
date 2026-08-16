@@ -25,7 +25,6 @@ RSpec.describe Notifications::InvitationDelivery do
   end
 
   before do
-    allow(AccountSetupEmailJob).to receive(:perform_later) { |**args| AccountSetupEmailJob.perform_now(**args) }
     AcademySetting.current.update!(whatsapp_notifications_enabled: true, invitation_notifications_enabled: true,
                                    email_notifications_enabled: true)
   end
@@ -41,23 +40,20 @@ RSpec.describe Notifications::InvitationDelivery do
   end
 
   def run_after_commit_callbacks
-    callback = nil
-    allow(ActiveRecord).to receive(:after_all_transactions_commit) { |&block| callback = block }
+    callbacks = []
+    allow(ActiveRecord).to receive(:after_all_transactions_commit) { |&block| callbacks << block }
     yield
-    callback&.call
+    callbacks.each(&:call)
   end
 
   it "attempts email only when notification_method is email" do
     invitation = invitation_for(notification_method: "email")
-    allow(AccountSetupWhatsAppJob).to receive(:perform_later)
-
     result = deliver(invitation)
 
     expect(result.requested).to eq(%w[email])
     expect(result.succeeded).to eq(%w[email])
     expect(result.skipped).to be_empty
     expect(ActionMailer::Base.deliveries).not_to be_empty
-    expect(AccountSetupWhatsAppJob).not_to have_received(:perform_later)
   end
 
   it "attempts whatsapp only when notification_method is whatsapp" do

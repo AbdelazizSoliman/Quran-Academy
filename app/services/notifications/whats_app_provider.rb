@@ -87,7 +87,7 @@ module Notifications
       request["Authorization"] = "Bearer #{@access_token}"
       request["Content-Type"] = "application/json"
       request.body = outbound_payload(recipient:, body:, template:).to_json
-      Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 10, read_timeout: 20) do |http|
+      Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 5, read_timeout: 10) do |http|
         http.request(request)
       end
     end

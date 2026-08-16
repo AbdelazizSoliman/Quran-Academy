@@ -24,7 +24,6 @@ RSpec.describe Admin::Onboarding::CreateTeacher do
   end
 
   before do
-    allow(AccountSetupEmailJob).to receive(:perform_later) { |**args| AccountSetupEmailJob.perform_now(**args) }
     AcademySetting.current.update!(whatsapp_notifications_enabled: true, invitation_notifications_enabled: true,
                                    email_notifications_enabled: true)
   end
@@ -40,14 +39,11 @@ RSpec.describe Admin::Onboarding::CreateTeacher do
     }
   end
 
-  # The test ActiveJob adapter enqueues without running jobs, so redirect perform_later to
-  # perform_now to exercise the real WhatsApp delivery synchronously within the test.
   def run_after_commit_callbacks
-    callback = nil
-    allow(ActiveRecord).to receive(:after_all_transactions_commit) { |&block| callback = block }
-    allow(AccountSetupWhatsAppJob).to receive(:perform_later) { |**args| AccountSetupWhatsAppJob.perform_now(**args) }
+    callbacks = []
+    allow(ActiveRecord).to receive(:after_all_transactions_commit) { |&block| callbacks << block }
     yield
-    callback&.call
+    callbacks.each(&:call)
   end
 
   it "sends both email and WhatsApp when the teacher requests both, matching the reported bug scenario" do
@@ -90,20 +86,19 @@ RSpec.describe Admin::Onboarding::CreateTeacher do
     expect(invitation.reload).to be_sent
   end
 
-  it "keeps the invitation pending, not falsely sent, until the async WhatsApp attempt actually completes" do
+  it "keeps the invitation pending until the after-commit WhatsApp attempt completes" do
     provider = instance_double(Notifications::WhatsAppProvider)
     success = Notifications::ProviderResult.new(true, "wamid.dakota", {}, 200, "accepted", nil, nil)
     allow(Notifications::WhatsAppProvider).to receive(:new).and_return(provider)
     allow(provider).to receive(:deliver).and_return(success)
 
-    callback = nil
-    allow(ActiveRecord).to receive(:after_all_transactions_commit) { |&block| callback = block }
-    allow(AccountSetupWhatsAppJob).to receive(:perform_later) { |**args| AccountSetupWhatsAppJob.perform_now(**args) }
+    callbacks = []
+    allow(ActiveRecord).to receive(:after_all_transactions_commit) { |&block| callbacks << block }
     profile = described_class.new(actor: admin, attributes: attributes(notification_method: "whatsapp")).call
     invitation = profile.user.account_invitation
 
     expect(invitation.reload).to be_pending
-    callback.call
+    callbacks.each(&:call)
     expect(invitation.reload).to be_sent
   end
 

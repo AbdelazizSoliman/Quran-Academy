@@ -57,6 +57,7 @@ ar:
     errors: { title: "تعذر إرسال الإشعار" }
     messages:
       saved: "تم تسجيل محاولة الإرسال."
+      delivery_failed: "فشل الإرسال. نجحت العملية الأساسية ويمكن إعادة محاولة هذا الإشعار."
       students: "الطلاب المسجلون"
       counterpart_teacher: "المعلم"
       counterpart_student: "الطالب"

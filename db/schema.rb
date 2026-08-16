@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_13_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_16_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -382,6 +382,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_160000) do
     t.check_constraint "enrollment_closes_on IS NULL OR enrollment_opens_on IS NULL OR enrollment_closes_on >= enrollment_opens_on", name: "offerings_enrollment_date_order"
     t.check_constraint "intended_lessons_per_week > 0", name: "offerings_frequency_positive"
     t.check_constraint "planned_end_on IS NULL OR planned_start_on IS NULL OR planned_end_on >= planned_start_on", name: "offerings_planned_date_order"
+  end
+
+  create_table "cron_runs", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.date "run_on", null: false
+    t.datetime "started_at", null: false
+    t.string "task_name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["task_name", "run_on"], name: "index_cron_runs_on_task_name_and_run_on", unique: true
   end
 
   create_table "enrollment_events", force: :cascade do |t|

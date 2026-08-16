@@ -33,8 +33,13 @@ module Admin
     def send_certificate = deliver_notification("certificate")
 
     def retry_delivery
-      NotificationAttemptJob.perform_later(notification: @notification, actor: current_user)
-      redirect_to admin_notification_path(@notification), notice: t("notifications.messages.saved")
+      Notifications::Attempt.new(notification: @notification, actor: current_user).call
+      @notification.reload
+      redirect_to admin_notification_path(@notification), **delivery_flash(@notification)
+    rescue StandardError => e
+      Rails.logger.error("Synchronous notification retry failed notification_id=#{@notification.id} " \
+                         "exception=#{e.class}")
+      redirect_to admin_notification_path(@notification), alert: t("notifications.messages.delivery_failed")
     end
 
     private
@@ -69,11 +74,18 @@ module Admin
 
     def respond_to_dispatch
       if @notification.persisted? && @notification.errors.empty?
-        redirect_to admin_notification_path(@notification), notice: t("notifications.messages.saved")
+        @notification.reload
+        redirect_to admin_notification_path(@notification), **delivery_flash(@notification)
       else
         flash.now[:alert] = @notification.errors.full_messages.to_sentence
         render :new, status: :unprocessable_content
       end
+    end
+
+    def delivery_flash(notification)
+      return { alert: notification.failure_reason } if notification.failed?
+
+      { notice: t("notifications.messages.saved") }
     end
   end
 end

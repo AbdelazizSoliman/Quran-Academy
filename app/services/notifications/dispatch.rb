@@ -44,7 +44,7 @@ module Notifications
         event!(notification, "created", after_data: { "status" => "pending" })
       end
       ActiveRecord.after_all_transactions_commit do
-        NotificationAttemptJob.perform_later(notification:, actor: @actor)
+        deliver_synchronously(notification)
       end
       notification
     rescue ActiveRecord::RecordInvalid
@@ -54,6 +54,14 @@ module Notifications
     end
 
     private
+
+    def deliver_synchronously(notification)
+      Attempt.new(notification:, actor: @actor).call
+    rescue StandardError => e
+      Rails.logger.error("Synchronous notification delivery failed notification_id=#{notification.id} " \
+                         "exception=#{e.class}")
+      notification
+    end
 
     def build_notification
       Notification.new(recipient_user: @recipient, actor: @actor, source: @source, channel: @channel,

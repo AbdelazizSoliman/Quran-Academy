@@ -35,26 +35,27 @@ RSpec.describe "WhatsApp account setup" do
   end
 
   before do
-    allow(AccountSetupEmailJob).to receive(:perform_later) { |**args| AccountSetupEmailJob.perform_now(**args) }
     AcademySetting.current.update!(whatsapp_notifications_enabled: true,
                                    invitation_notifications_enabled: true,
                                    invitation_delivery_mode: "email_and_whatsapp")
   end
 
-  it "registers WhatsApp enqueueing for after commit while preserving email delivery" do
-    callback = nil
-    allow(ActiveRecord).to receive(:after_all_transactions_commit) { |&block| callback = block }
-    allow(AccountSetupWhatsAppJob).to receive(:perform_later)
+  it "registers synchronous provider delivery for after commit while preserving email delivery" do
+    callbacks = []
+    allow(ActiveRecord).to receive(:after_all_transactions_commit) { |&block| callbacks << block }
+    provider = instance_double(Notifications::WhatsAppProvider)
+    success = Notifications::ProviderResult.new(true, "wamid.account", {}, 200, "accepted", nil, nil)
+    allow(Notifications::WhatsAppProvider).to receive(:new).and_return(provider)
+    allow(provider).to receive(:deliver).and_return(success)
 
     result = AccountInvitations::CreateAndSend.new(user:, actor: admin).call
 
+    expect(result.invitation.reload).to be_pending
+    expect(ActionMailer::Base.deliveries).to be_empty
+    callbacks.each(&:call)
     expect(result.invitation.reload).to be_sent
     expect(ActionMailer::Base.deliveries).not_to be_empty
-    expect(AccountSetupWhatsAppJob).not_to have_received(:perform_later)
-    callback.call
-    expect(AccountSetupWhatsAppJob).to have_received(:perform_later).with(
-      invitation: result.invitation, actor: admin, encrypted_token: kind_of(String)
-    )
+    expect(result.invitation.notifications.find_by(channel: "whatsapp")).to be_sent
   end
 
   it "builds the exact approved template payload with name, email, then suffix-only URL button" do

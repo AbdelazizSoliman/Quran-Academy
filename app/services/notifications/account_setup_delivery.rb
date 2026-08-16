@@ -112,9 +112,9 @@ module Notifications
     def academy_whatsapp_enabled? = AcademySetting.current.whatsapp_notifications_enabled?
     def academy_invitation_enabled? = AcademySetting.current.invitation_notifications_enabled?
 
-    # WhatsApp delivery runs in a background job, after the invitation-creating transaction has
-    # already committed, so this is the first point at which a real (not merely enqueued) success
-    # is known. Idempotent: a second successful attempt (retry, or the email channel finishing
+    # WhatsApp delivery runs after the invitation-creating transaction has committed, so this is
+    # the first point at which a real success is known. Idempotent: a second successful attempt
+    # (retry, or the email channel finishing
     # first) simply no-ops via AccountInvitations::MarkSent's own guard.
     def mark_invitation_sent(notification)
       return unless notification.sent? || notification.delivered?

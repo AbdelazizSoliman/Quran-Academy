@@ -2,10 +2,8 @@ module Notifications
   # Authoritative entry point for delivering an account invitation. Determines which channels
   # to attempt from the recipient's own stored preference (Notifications::InvitationChannels),
   # then attempts each requested channel independently — a failure or skip on one channel never
-  # prevents the other from being attempted. Email is delivered synchronously (unchanged,
-  # existing behavior); WhatsApp is handed off to a background job after commit, so returns a
-  # "succeeded" (successfully enqueued) or "skipped" (with a reason) outcome rather than a true
-  # delivery result, which is only known once the job runs. The authoritative, evolving truth for
+  # prevents the other from being attempted. Provider calls run synchronously after the current
+  # transaction commits. The authoritative, evolving truth for
   # both channels always lives on the per-channel Notification/NotificationAttempt records.
   class InvitationDelivery
     Result = Data.define(:requested, :succeeded, :failed, :skipped)
@@ -47,7 +45,7 @@ module Notifications
         )
         skipped << "whatsapp"
       else
-        enqueue_whatsapp
+        deliver_whatsapp_after_commit
         succeeded << "whatsapp"
       end
     end
@@ -57,8 +55,7 @@ module Notifications
       return false unless setting.email_notifications_enabled? && setting.invitation_notifications_enabled?
 
       Rails.logger.info("InvitationDelivery email dispatch started invitation_id=#{@invitation.public_id}")
-      encrypted_token = SecurePayload.encrypt(@token)
-      AccountSetupEmailJob.perform_later(invitation: @invitation, actor: @actor, encrypted_token:)
+      ActiveRecord.after_all_transactions_commit { deliver_email_now }
       Rails.logger.info("InvitationDelivery email dispatch finished success=true")
       true
     rescue StandardError => e
@@ -67,10 +64,16 @@ module Notifications
       false
     end
 
+    def deliver_email_now
+      delivered = InvitationEmailDelivery.new(invitation: @invitation, token: @token, actor: @actor).call
+      AccountInvitations::MarkSent.call(invitation: @invitation, actor: @actor) if delivered
+    rescue StandardError => e
+      Rails.logger.error("Synchronous invitation email delivery failed (#{e.class})")
+    end
+
     # Cheap, local, side-effect-free eligibility check so a skip can be decided and logged
-    # synchronously, without waiting on the background job. AccountSetupDelivery independently
-    # re-validates everything (defense in depth) when the job actually runs, since state (the
-    # token, configuration, the recipient's number) could change between enqueue and execution.
+    # synchronously. AccountSetupDelivery independently re-validates everything (defense in depth)
+    # after commit, since state could change between the eligibility check and delivery.
     def whatsapp_skip_reason
       return :disabled unless WhatsappConfiguration.enabled?
       return :not_configured unless WhatsappConfiguration.configured?
@@ -99,21 +102,20 @@ module Notifications
       AccountSetupUrlSuffix.call(invitation_url: url).present?
     end
 
-    def enqueue_whatsapp
+    def deliver_whatsapp_after_commit
       Rails.logger.info("InvitationDelivery whatsapp dispatch started invitation_id=#{@invitation.public_id}")
-      encrypted_token = SecurePayload.encrypt(@token)
-      ActiveRecord.after_all_transactions_commit { enqueue_job(encrypted_token) }
+      ActiveRecord.after_all_transactions_commit { deliver_whatsapp_now }
     rescue StandardError => e
       Rails.logger.error("WhatsApp invitation preparation failed (#{e.class})")
     end
 
-    def enqueue_job(encrypted_token)
-      AccountSetupWhatsAppJob.perform_later(invitation: @invitation, actor: @actor, encrypted_token:)
+    def deliver_whatsapp_now
+      AccountSetupDelivery.new(invitation: @invitation, actor: @actor, token: @token).call
       Rails.logger.info(
         "InvitationDelivery whatsapp dispatch finished success=true invitation_id=#{@invitation.public_id}"
       )
     rescue StandardError => e
-      Rails.logger.error("WhatsApp invitation enqueue failed (#{e.class})")
+      Rails.logger.error("Synchronous WhatsApp invitation delivery failed (#{e.class})")
       Rails.logger.info(
         "InvitationDelivery whatsapp dispatch finished success=false invitation_id=#{@invitation.public_id}"
       )

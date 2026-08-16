@@ -83,15 +83,15 @@ application, and the application only needs the resulting IDs and token above.
 
 ### Render production jobs and schedules
 
-Production uses Solid Queue in the primary PostgreSQL database. Set `SOLID_QUEUE_IN_PUMA=true` on the Render web
-service so its single Puma instance also runs the queue supervisor (`JOB_CONCURRENCY=1` is appropriate at the current
-scale). Run `bin/rails db:migrate` during deployment before accepting traffic.
+Production runs only the Puma web service and one Render Cron Job. Set `SOLID_QUEUE_IN_PUMA=false`; no permanent worker,
+Sidekiq, or Redis service is required. Run `bin/rails db:migrate` during deployment before accepting traffic.
 
-`config/recurring.yml` is the authoritative production schedule: both reminder sweeps run every minute and recurring
-lesson generation runs daily at 00:10 UTC. Set `NOTIFICATION_ACTOR_ID` and `SCHEDULING_ACTOR_ID` to active administrator
-user IDs. The jobs resolve these audit actors at execution time. Solid Queue's scheduler and unique recurring execution
-identity make overlapping scheduler processes duplicate-safe; the reminder and lesson-generation services retain their
-own domain idempotency as a second layer. No Render Cron Jobs are required.
+Configure one Render Cron Job with schedule `*/5 * * * *` and command `bin/rails cron:academy`. Set
+`NOTIFICATION_ACTOR_ID` and `SCHEDULING_ACTOR_ID` to active administrator user IDs on that service. The command uses a
+PostgreSQL advisory lock so overlaps exit, runs both reminder sweeps, and runs recurring lesson generation after 00:10
+UTC at most once per UTC day. User-triggered notification provider calls run synchronously after the application
+transaction commits and record their result in notification attempts; provider failures do not roll back the business
+operation.
 
 Lesson WhatsApp reminders use the approved Meta Utility template `quran_lesson_reminder`. Configure
 `WHATSAPP_LESSON_REMINDER_TEMPLATE=quran_lesson_reminder`, set `WHATSAPP_LESSON_REMINDER_LANGUAGE` to the exact
@@ -99,7 +99,7 @@ language code shown in Meta (for example, `en` or `en_US`), and configure
 `WHATSAPP_LESSON_JOIN_URL_PREFIX` to the Quran Academy origin/path prefix approved for the template's **Join lesson**
 button. The application sends only a validated student/teacher internal join-path suffix; that authenticated route
 records presence and then redirects to the lesson's external meeting URL. A missing or invalid external URL is skipped.
-The minute sweeps send one reminder per opted-in teacher/student 15 minutes before start and,
+The five-minute sweeps send one reminder per opted-in teacher/student while 10–15 minutes remain and,
 at 5 minutes after start, one additional reminder only for a teacher without `teacher_checked_in_at` or a student
 without authoritative present/late/arrival attendance.
 

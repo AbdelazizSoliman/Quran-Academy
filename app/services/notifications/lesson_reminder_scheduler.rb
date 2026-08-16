@@ -1,7 +1,7 @@
 module Notifications
   class LessonReminderScheduler
     MINUTES_BEFORE = 15
-    SWEEP_WINDOW = 1.minute
+    MIN_MINUTES_REMAINING = 10
 
     def initialize(actor:, now: Time.current, relation: ScheduledLesson.all)
       @actor = actor
@@ -24,9 +24,9 @@ module Notifications
     end
 
     def due_lessons
-      lower_bound = @now + MINUTES_BEFORE.minutes - SWEEP_WINDOW
+      lower_bound = @now + MIN_MINUTES_REMAINING.minutes
       upper_bound = @now + MINUTES_BEFORE.minutes
-      @relation.where(status: "scheduled").where("starts_at > ? AND starts_at <= ?", lower_bound, upper_bound)
+      @relation.where(status: "scheduled").where(starts_at: lower_bound..upper_bound)
                .includes(teacher_profile: :user,
                          scheduled_lesson_enrollments: [{ student_profile: :user },
                                                         { enrollment: { student_profile: :user } }])

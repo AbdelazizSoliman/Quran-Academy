@@ -86,9 +86,16 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     expect(lesson.course_offering_id).to be_nil
   end
 
-  it "does not send a pre-reminder outside the one-minute due window" do
+  it "does not send a pre-reminder with more than 15 minutes remaining" do
     lesson_with_student(starts_at: now + 15.minutes + 1.second)
     expect { pre_sweep }.not_to change(Notification, :count)
+  end
+
+  it "catches up while at least 10 minutes remain but never sends below that boundary" do
+    lesson_with_student(starts_at: now + 10.minutes)
+    lesson_with_student(starts_at: now + 10.minutes - 1.second)
+
+    expect { pre_sweep }.to change(Notification, :count).by(2)
   end
 
   it "does not duplicate pre-reminders on overlapping scheduler runs" do
