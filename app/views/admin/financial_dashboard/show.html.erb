@@ -1,0 +1,55 @@
+<%= render "shared/page_header", title: t("financial_dashboard.title"), description: t("financial_dashboard.description") %>
+
+<%= form_with url: admin_financial_dashboard_path, method: :get, class: "ds-card mb-6 flex flex-wrap items-end gap-4 p-4" do |form| %>
+  <div>
+    <%= form.label :month, t("financial_dashboard.month"), class: "ds-label" %>
+    <%= form.month_field :month, value: @dashboard.month.strftime("%Y-%m"), class: "ds-control mt-2" %>
+  </div>
+  <%= render "shared/components/button", label: t("reports.actions.filter"), type: :submit %>
+<% end %>
+
+<div class="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+  <strong><%= t("financial_dashboard.estimate_notice_title") %></strong>
+  <p class="mt-1"><%= t("financial_dashboard.estimate_notice") %></p>
+</div>
+
+<section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="<%= t("financial_dashboard.summary") %>">
+  <article class="ds-card p-5"><p class="ds-caption"><%= t("financial_dashboard.active_students") %></p><p class="mt-2 text-2xl font-bold"><%= @dashboard.active_students %></p></article>
+  <article class="ds-card p-5"><p class="ds-caption"><%= t("financial_dashboard.missing_pricing") %></p><p class="mt-2 text-2xl font-bold"><%= @dashboard.students_without_pricing %></p></article>
+  <article class="ds-card p-5"><p class="ds-caption"><%= t("financial_dashboard.approved_payrolls") %></p><p class="mt-2 text-2xl font-bold"><%= @dashboard.approved_payrolls %></p></article>
+  <article class="ds-card p-5"><p class="ds-caption"><%= t("financial_dashboard.period") %></p><p class="mt-2 text-xl font-bold" dir="ltr"><%= l(@dashboard.month, format: "%B %Y") %></p></article>
+</section>
+
+<section class="mt-8">
+  <h2 class="text-xl font-semibold"><%= t("financial_dashboard.by_currency") %></h2>
+  <% if @dashboard.profit_by_currency.any? %>
+    <div class="mt-4 grid gap-4 lg:grid-cols-3">
+      <% @dashboard.profit_by_currency.each do |currency, profit| %>
+        <article class="ds-card p-5">
+          <h3 class="font-bold"><%= currency %></h3>
+          <dl class="mt-4 space-y-3 text-sm">
+            <div class="flex justify-between gap-4"><dt><%= t("financial_dashboard.estimated_revenue") %></dt><dd dir="ltr"><%= number_to_currency(@dashboard.revenue_by_currency.fetch(currency, 0), unit: currency) %></dd></div>
+            <div class="flex justify-between gap-4"><dt><%= t("financial_dashboard.payroll_cost") %></dt><dd dir="ltr"><%= number_to_currency(@dashboard.payroll_by_currency.fetch(currency, 0), unit: currency) %></dd></div>
+            <div class="flex justify-between gap-4 border-t pt-3 font-bold"><dt><%= t("financial_dashboard.estimated_gross_profit") %></dt><dd dir="ltr"><%= number_to_currency(profit, unit: currency) %></dd></div>
+          </dl>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="ds-card mt-4 p-5 text-app-subtle"><%= t("financial_dashboard.no_data") %></div>
+  <% end %>
+</section>
+
+<section class="mt-8">
+  <h2 class="text-xl font-semibold"><%= t("financial_dashboard.plan_breakdown") %></h2>
+  <div class="ds-card mt-4 overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead><tr class="border-b text-start"><th class="p-4 text-start"><%= t("financial_dashboard.plan") %></th><th class="p-4 text-start"><%= t("financial_dashboard.students") %></th><th class="p-4 text-start"><%= t("financial_dashboard.currency") %></th><th class="p-4 text-start"><%= t("financial_dashboard.estimated_revenue") %></th></tr></thead>
+      <tbody>
+        <% @dashboard.fee_plan_breakdown.each do |row| %>
+          <tr class="border-b last:border-0"><td class="p-4"><%= row[:name] %></td><td class="p-4"><%= row[:students] %></td><td class="p-4"><%= row[:currency] %></td><td class="p-4" dir="ltr"><%= number_to_currency(row[:amount], unit: row[:currency]) %></td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

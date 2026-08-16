@@ -40,6 +40,7 @@ Rails.application.routes.draw do
     resources :certificates, only: %i[index show new create]
     resources :student_progresses, only: %i[index show update]
     get "academic_dashboard", to: "academic_dashboard#show"
+    get "financial_dashboard", to: "financial_dashboard#show"
     resources :account_invitations, only: %i[index show] do
       member do
         patch :resend
