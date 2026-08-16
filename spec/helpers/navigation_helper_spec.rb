@@ -29,6 +29,14 @@ RSpec.describe NavigationHelper do
     end
   end
 
+  it "limits the admin sidebar to the temporary navigation allowlist" do
+    admin = navigation_user(:admin)
+
+    expect(helper.navigation_items_for(admin).keys).to eq(
+      %i[dashboard students teachers schedule profits_analytics finance fee_plans financial_reports]
+    )
+  end
+
   def navigation_user(role)
     instance_double(User, role: role.to_s, student?: role == :student, teacher?: role == :teacher)
   end

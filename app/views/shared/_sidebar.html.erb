@@ -48,6 +48,9 @@
                     (key == :enrollments && controller_path == "admin/enrollments") ||
                     (key == :my_enrollments && controller_path == "student/enrollments") ||
                     (key == :schedule && controller_path.start_with?("admin/scheduled_lessons")) ||
+                    (key == :profits_analytics && controller_path == "admin/academic_dashboard") ||
+                    (key == :finance && controller_path == "admin/teacher_payrolls") ||
+                    (key == :financial_reports && controller_path == "admin/operational_reports") ||
                     (key == :teacher_availability && controller_path.start_with?("admin/teacher_availability")) ||
                     (key == :teacher_schedule && controller_path == "teacher/schedule") ||
                     (key == :teacher_availability_self && controller_path.start_with?("teacher/availabilities")) ||

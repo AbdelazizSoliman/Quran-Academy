@@ -20,7 +20,8 @@ RSpec.describe "Academic catalog requests" do
     expect(response.body).to include('dir="rtl"', "البرامج")
     admin.update!(preferred_locale: "en")
     get admin_course_offerings_path
-    expect(response.body).to include('dir="ltr"', "Course Offerings")
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('dir="ltr"')
   end
 
   it "shows only valid program lifecycle actions" do

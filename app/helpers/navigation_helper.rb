@@ -1,4 +1,8 @@
 module NavigationHelper
+  ADMIN_VISIBLE_NAVIGATION = %i[
+    dashboard students teachers schedule profits_analytics finance fee_plans financial_reports
+  ].freeze
+
   NAVIGATION_ITEMS = {
     dashboard: { icon: :home, roles: %i[admin staff teacher student guardian] },
     users: { icon: :users, roles: %i[admin], path: :admin_users_path },
@@ -24,6 +28,9 @@ module NavigationHelper
     teacher_availability_self: { icon: :calendar, roles: %i[teacher], path: :teacher_availabilities_path },
     student_schedule: { icon: :calendar, roles: %i[student], path: :student_schedule_index_path },
     schedule: { icon: :calendar, roles: %i[admin staff], path: :admin_scheduled_lessons_path },
+    profits_analytics: { icon: :reports, roles: %i[admin], path: :admin_academic_dashboard_path },
+    finance: { icon: :wallet, roles: %i[admin], path: :admin_teacher_payrolls_path },
+    financial_reports: { icon: :reports, roles: %i[admin], path: :admin_operational_reports_path },
     attendance: { icon: :check_circle, roles: %i[admin staff teacher student] },
     whatsapp: { icon: :message, roles: %i[admin staff teacher student] },
     payroll: { icon: :wallet, roles: %i[admin teacher], feature: :payroll },
@@ -48,11 +55,15 @@ module NavigationHelper
 
   def navigation_items_for(user)
     role = user&.role&.to_sym
-    NAVIGATION_ITEMS.select do |_key, item|
+    permitted_items = NAVIGATION_ITEMS.select do |_key, item|
       permitted_role = role.nil? || item[:roles].include?(role)
       enabled_feature = item[:feature].nil? || ReleaseFeatures.enabled?(item[:feature])
       permitted_role && enabled_feature
     end
+
+    return permitted_items unless role == :admin
+
+    ADMIN_VISIBLE_NAVIGATION.to_h { |key| [key, permitted_items.fetch(key)] }
   end
 
   def navigation_path(key, item)
