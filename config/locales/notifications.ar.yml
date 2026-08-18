@@ -52,6 +52,7 @@ ar:
       lesson_rescheduled: "إعادة جدولة الحلقة"
       lesson_report: "تقرير الحلقة"
       certificate: "إشعار شهادة"
+      invoice_overdue: "تذكير بفاتورة متأخرة"
     events: { created: "أُنشئ", attempted: "جرت المحاولة", sent: "أُرسل", delivered: "تم التسليم", failed: "فشل", retried: "أُعيدت المحاولة" }
     actions: { new: "إرسال إشعار", send: "إرسال الآن", retry: "إعادة محاولة الإرسال" }
     errors: { title: "تعذر إرسال الإشعار" }
@@ -88,3 +89,6 @@ ar:
       certificate:
         subject: "شهادة من %{academy}"
         body: "الأكاديمية: %{academy}\nالمعلم: %{teacher}\nالطالب: %{student}\nالشهادة: %{title}\nالتاريخ: %{date}\nالوقت: %{time}\nالبرنامج: %{program}\nالدورة: %{course}\n%{url}"
+      invoice_overdue:
+        subject: "تذكير بالدفع من %{academy}"
+        body: "الأكاديمية: %{academy}\nالطالب: %{student}\nالفاتورة: %{title}\nالمبلغ المستحق: %{amount}\nتاريخ الاستحقاق: %{date}\nيرجى سداد المبلغ في أقرب وقت ممكن."

@@ -295,6 +295,7 @@ ar:
         lesson_reminders_enabled: "تفضيل تذكيرات الحلقات"
         attendance_notifications_enabled: "تفضيل إشعارات الحضور"
         payment_notifications_enabled: "تفضيل إشعارات الدفع"
+        payment_whatsapp_enabled: "إرسال تذكيرات الدفع عبر واتساب"
         lesson_reminder_hours_before: "التذكير الأول (ساعات قبل)"
         second_lesson_reminder_minutes_before: "التذكير الثاني (دقائق قبل)"
         default_teacher_compensation_type: "نوع تعويض المعلم الافتراضي"

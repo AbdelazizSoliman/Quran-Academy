@@ -1,5 +1,8 @@
 module Notifications
   class Dispatch
+    LESSON_REMINDER_FAMILY = %w[lesson_pre_reminder lesson_late_reminder lesson_reminder late_reminder
+                                lesson_cancelled lesson_rescheduled].freeze
+
     def initialize(actor:, recipient:, source:, type:, channel:, primary_guardian: false,
                    idempotency_key: nil, scheduled_at: nil, queued_at: nil,
                    invitation_token: nil, persist_recipient_failure: false)
@@ -89,7 +92,7 @@ module Notifications
           "lesson_late_reminder" => ScheduledLesson, "lesson_reminder" => ScheduledLesson,
           "late_reminder" => ScheduledLesson, "lesson_cancelled" => ScheduledLesson,
           "lesson_rescheduled" => ScheduledLesson, "lesson_report" => LessonReport,
-          "certificate" => Certificate }[@type] === @source &&
+          "certificate" => Certificate, "invoice_overdue" => FinanceInvoice }[@type] === @source &&
         source_deliverable? && lesson_join_url_valid? && recipient_belongs_to_source?
     end
 
@@ -100,8 +103,13 @@ module Notifications
         @type == "lesson_cancelled" ? @source.cancelled? : @source.status.in?(%w[scheduled in_progress])
       when LessonReport then @source.status.in?(%w[reviewed locked])
       when Certificate then true
+      when FinanceInvoice then invoice_reminder_deliverable?
       else false
       end
+    end
+
+    def invoice_reminder_deliverable?
+      @source.status.in?(%w[issued partially_paid overdue]) && @source.due_on < Date.current
     end
 
     def recipient_belongs_to_source?
@@ -109,7 +117,7 @@ module Notifications
       when AccountInvitation then @source.user_id == @recipient.id
       when ScheduledLesson then recipient_in_lesson?
       when LessonReport then @source.lesson_student_reports.joins(student_profile: :user).exists?(users: { id: @recipient.id })
-      when Certificate then @source.student_profile.user_id == @recipient.id
+      when Certificate, FinanceInvoice then @source.student_profile.user_id == @recipient.id
       else false
       end
     end
@@ -123,15 +131,12 @@ module Notifications
 
     def notification_type_enabled?
       setting = AcademySetting.current
+      return setting.lesson_reminders_enabled? if @type.in?(LESSON_REMINDER_FAMILY)
+
       { "account_invitation" => setting.invitation_notifications_enabled?,
-        "lesson_pre_reminder" => setting.lesson_reminders_enabled?,
-        "lesson_late_reminder" => setting.lesson_reminders_enabled?,
-        "lesson_reminder" => setting.lesson_reminders_enabled?,
-        "late_reminder" => setting.lesson_reminders_enabled?,
-        "lesson_cancelled" => setting.lesson_reminders_enabled?,
-        "lesson_rescheduled" => setting.lesson_reminders_enabled?,
         "lesson_report" => setting.lesson_report_notifications_enabled? && setting.lesson_report_whatsapp_enabled?,
-        "certificate" => setting.certificate_notifications_enabled? }.fetch(@type, false)
+        "certificate" => setting.certificate_notifications_enabled?,
+        "invoice_overdue" => setting.payment_notifications_enabled? }.fetch(@type, false)
     end
 
     def channel_enabled?
@@ -143,14 +148,15 @@ module Notifications
 
     def channel_allowed_for_type?(setting)
       return invitation_channel_allowed?(setting) if @type == "account_invitation"
-      return @channel == "whatsapp" if @type.in?(%w[lesson_pre_reminder lesson_late_reminder lesson_reminder
-                                                    late_reminder lesson_cancelled
-                                                    lesson_rescheduled lesson_report])
-      if @type == "certificate"
-        return @channel == "email" || (@channel == "whatsapp" && setting.certificate_whatsapp_enabled?)
-      end
+      return @channel == "whatsapp" if @type.in?(LESSON_REMINDER_FAMILY + %w[lesson_report])
+      return optional_whatsapp_allowed?(setting.certificate_whatsapp_enabled?) if @type == "certificate"
+      return optional_whatsapp_allowed?(setting.payment_whatsapp_enabled?) if @type == "invoice_overdue"
 
       false
+    end
+
+    def optional_whatsapp_allowed?(whatsapp_enabled)
+      @channel == "email" || (@channel == "whatsapp" && whatsapp_enabled)
     end
 
     def invitation_channel_allowed?(setting)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_16_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_18_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_16_120000) do
     t.integer "minimum_booking_notice_hours", default: 2, null: false
     t.integer "minimum_lesson_duration_minutes", default: 15, null: false
     t.boolean "payment_notifications_enabled", default: false, null: false
+    t.boolean "payment_whatsapp_enabled", default: false, null: false
     t.string "payroll_currency", default: "EGP", null: false
     t.string "payroll_period", default: "monthly", null: false
     t.string "postal_code"

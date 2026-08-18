@@ -48,7 +48,8 @@ module Admin
         email_notifications_enabled whatsapp_notifications_enabled sms_notifications_enabled
         invitation_notifications_enabled lesson_reminders_enabled lesson_report_notifications_enabled
         certificate_notifications_enabled certificate_whatsapp_enabled lesson_report_whatsapp_enabled
-        attendance_notifications_enabled payment_notifications_enabled lesson_reminder_minutes_before
+        attendance_notifications_enabled payment_notifications_enabled payment_whatsapp_enabled
+        lesson_reminder_minutes_before
         first_late_reminder_minutes second_late_reminder_minutes lesson_reminder_hours_before
         second_lesson_reminder_minutes_before default_teacher_compensation_type
         default_teacher_rate payroll_currency payroll_period billing_currency default_lesson_price billing_cycle

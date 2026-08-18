@@ -23,13 +23,23 @@ module Notifications
       { academy: AcademySetting.current.academy_name, recipient: @recipient.full_name,
         teacher: lesson&.teacher_profile&.display_name.to_s, student: student_name,
         date: source_date, time: source_time, title: source_title, program: localized_program,
-        course: localized_course, url: source_url }
+        course: localized_course, url: source_url, amount: invoice_amount }
     end
 
     def source_date
-      value = lesson&.starts_at || @source.try(:issued_on)
+      value = lesson&.starts_at || invoice_due_date || @source.try(:issued_on)
       value = value.in_time_zone(lesson.academy_time_zone) if lesson && value.respond_to?(:in_time_zone)
       value ? I18n.l(value.to_date, format: :long) : ""
+    end
+
+    def invoice_due_date
+      @source.due_on if @source.is_a?(FinanceInvoice)
+    end
+
+    def invoice_amount
+      return "" unless @source.is_a?(FinanceInvoice)
+
+      "#{@source.balance_due} #{@source.currency}"
     end
 
     def source_time

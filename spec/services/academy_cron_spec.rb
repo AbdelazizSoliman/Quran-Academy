@@ -5,18 +5,24 @@ RSpec.describe AcademyCron do
   let(:connection) { instance_double(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter) }
   let(:notification_actor) { create(:user, :admin) }
   let(:scheduling_actor) { create(:user, :admin) }
+  let(:finance_actor) { create(:user, :admin) }
   let(:pre_sweep) { instance_double(Notifications::LessonReminderScheduler, call: []) }
   let(:late_sweep) { instance_double(Notifications::LateAttendanceReminderScheduler, call: []) }
   let(:generation) { instance_double(EnrollmentLessonSchedules::GenerationSweep, call: []) }
+  let(:invoice_generation) { instance_double(Finance::RecurringInvoiceGeneration, call: []) }
+  let(:invoice_reminders) { instance_double(Notifications::InvoiceOverdueReminderScheduler, call: []) }
 
   before do
     allow(connection).to receive(:select_value).and_return(true)
     allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with("NOTIFICATION_ACTOR_ID").and_return(notification_actor.id.to_s)
     allow(ENV).to receive(:fetch).with("SCHEDULING_ACTOR_ID").and_return(scheduling_actor.id.to_s)
+    allow(ENV).to receive(:fetch).with("FINANCE_ACTOR_ID").and_return(finance_actor.id.to_s)
     allow(Notifications::LessonReminderScheduler).to receive(:new).and_return(pre_sweep)
     allow(Notifications::LateAttendanceReminderScheduler).to receive(:new).and_return(late_sweep)
     allow(EnrollmentLessonSchedules::GenerationSweep).to receive(:new).and_return(generation)
+    allow(Finance::RecurringInvoiceGeneration).to receive(:new).and_return(invoice_generation)
+    allow(Notifications::InvoiceOverdueReminderScheduler).to receive(:new).and_return(invoice_reminders)
   end
 
   it "runs both sweeps and the daily generation once after its UTC due time" do
@@ -45,5 +51,53 @@ RSpec.describe AcademyCron do
     allow(generation).to receive(:call).and_raise("failed")
     described_class.new(now:, connection:).call
     expect(CronRun.where(task_name: "recurring_lesson_generation", run_on: now.to_date)).not_to exist
+  end
+
+  describe "recurring invoice generation" do
+    let(:due_now) { Time.zone.parse("2026-08-16 00:20:00 UTC") }
+
+    it "runs once after its UTC due time and not again the same day" do
+      expect(described_class.new(now: due_now, connection:).call).to be(true)
+      expect(invoice_generation).to have_received(:call).once
+      expect(CronRun.find_by!(task_name: "recurring_invoice_generation", run_on: due_now.to_date)).to be_completed_at
+
+      described_class.new(now: due_now + 5.minutes, connection:).call
+      expect(invoice_generation).to have_received(:call).once
+    end
+
+    it "does not run before 00:20 UTC" do
+      described_class.new(now: due_now - 1.minute, connection:).call
+      expect(invoice_generation).not_to have_received(:call)
+    end
+
+    it "removes the daily claim after failure so a later cron can retry" do
+      allow(invoice_generation).to receive(:call).and_raise("failed")
+      described_class.new(now: due_now, connection:).call
+      expect(CronRun.where(task_name: "recurring_invoice_generation", run_on: due_now.to_date)).not_to exist
+    end
+  end
+
+  describe "invoice overdue reminders" do
+    let(:due_now) { Time.zone.parse("2026-08-16 00:30:00 UTC") }
+
+    it "runs once after its UTC due time and not again the same day" do
+      expect(described_class.new(now: due_now, connection:).call).to be(true)
+      expect(invoice_reminders).to have_received(:call).once
+      expect(CronRun.find_by!(task_name: "invoice_overdue_reminders", run_on: due_now.to_date)).to be_completed_at
+
+      described_class.new(now: due_now + 5.minutes, connection:).call
+      expect(invoice_reminders).to have_received(:call).once
+    end
+
+    it "does not run before 00:30 UTC" do
+      described_class.new(now: due_now - 1.minute, connection:).call
+      expect(invoice_reminders).not_to have_received(:call)
+    end
+
+    it "removes the daily claim after failure so a later cron can retry" do
+      allow(invoice_reminders).to receive(:call).and_raise("failed")
+      described_class.new(now: due_now, connection:).call
+      expect(CronRun.where(task_name: "invoice_overdue_reminders", run_on: due_now.to_date)).not_to exist
+    end
   end
 end

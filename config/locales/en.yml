@@ -295,6 +295,7 @@ en:
         lesson_reminders_enabled: "Lesson reminder preference"
         attendance_notifications_enabled: "Attendance notification preference"
         payment_notifications_enabled: "Payment notification preference"
+        payment_whatsapp_enabled: "Send payment reminders by WhatsApp"
         lesson_reminder_hours_before: "First reminder (hours before)"
         second_lesson_reminder_minutes_before: "Second reminder (minutes before)"
         default_teacher_compensation_type: "Default compensation type"
