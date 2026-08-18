@@ -7,8 +7,22 @@
       <div><%= f.label :last_name, "اسم العائلة *", class: "ds-label" %><%= f.text_field :last_name, value: params.dig(:teacher_profile, :last_name), required: true, class: "ds-control mt-2" %></div>
       <div><%= f.label :display_name, "اسم المعلم داخل الأكاديمية", class: "ds-label" %><%= f.text_field :display_name, class: "ds-control mt-2" %></div>
       <div><%= f.label :email, "البريد الإلكتروني *", class: "ds-label" %><%= f.email_field :email, value: params.dig(:teacher_profile, :email), required: true, class: "ds-control mt-2", dir: "ltr" %></div>
-      <div><%= f.label :phone_number, "رقم الهاتف *", class: "ds-label" %><%= f.telephone_field :phone_number, required: true, class: "ds-control mt-2", dir: "ltr" %></div>
-      <div><%= f.label :whatsapp_number, "رقم واتساب", class: "ds-label" %><%= f.telephone_field :whatsapp_number, class: "ds-control mt-2", dir: "ltr" %></div>
+      <div class="md:col-span-2">
+        <%= f.label :phone_number, "رقم الهاتف ودولته *", class: "ds-label" %>
+        <div class="mt-2 grid grid-cols-[10rem_1fr] gap-2">
+          <%= f.select :phone_number_country_code, StudentProfile::PHONE_COUNTRY_CODES.map { |code, (name, dial)| ["#{name} +#{dial}", code] }, {}, class: "ds-control min-w-0" %>
+          <%= f.telephone_field :phone_number, required: true, class: "ds-control min-w-0", dir: "ltr", placeholder: "1001234567" %>
+        </div>
+        <p class="mt-1 ds-caption">اكتب الرقم من غير كود الدولة ومن غير الصفر — مثال: 1001234567.</p>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :whatsapp_number, "رقم واتساب (اختياري)", class: "ds-label" %>
+        <div class="mt-2 grid grid-cols-[10rem_1fr] gap-2">
+          <%= f.select :whatsapp_number_country_code, StudentProfile::PHONE_COUNTRY_CODES.map { |code, (name, dial)| ["#{name} +#{dial}", code] }, {}, class: "ds-control min-w-0" %>
+          <%= f.telephone_field :whatsapp_number, class: "ds-control min-w-0", dir: "ltr", placeholder: "1001234567" %>
+        </div>
+        <p class="mt-1 ds-caption">اتركه فارغًا لو نفس رقم الهاتف.</p>
+      </div>
       <div class="md:col-span-2"><%= f.label :online_meeting_url, t("teacher_profiles.fields.online_meeting_url"), class: "ds-label" %><%= f.url_field :online_meeting_url, class: "ds-control mt-2", dir: "ltr" %><p class="mt-2 ds-caption"><%= t("teacher_profiles.form.online_meeting_url_hint") %></p></div>
       <div><%= f.label :notification_method, "طريقة الإشعار", class: "ds-label" %><%= f.select :notification_method, [["واتساب (الأساسي)", "whatsapp"], ["البريد", "email"], ["كلاهما", "both"]], {}, class: "ds-control mt-2" %></div>
       <div><%= f.label :message_language, "لغة الرسائل", class: "ds-label" %><%= f.select :message_language, [["العربية", "ar"], ["English", "en"]], {}, class: "ds-control mt-2" %></div>

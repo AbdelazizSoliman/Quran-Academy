@@ -3,7 +3,8 @@ module Admin
     before_action :set_profile, except: %i[index import import_create export new create]
 
     ONBOARDING_KEYS = [
-      :first_name, :last_name, :email, :display_name, :phone_number, :whatsapp_number, :online_meeting_url,
+      :first_name, :last_name, :email, :display_name, :phone_number, :phone_number_country_code,
+      :whatsapp_number, :whatsapp_number_country_code, :online_meeting_url,
       :notification_method, :message_language, :time_zone, :employment_status, :workload_percentage, :on_leave,
       :work_start_time, :work_end_time, :compensation_unit, :default_lesson_rate, :monthly_salary,
       :compensation_currency, :mid_period_previous_dues, { work_days: [] }

@@ -46,8 +46,19 @@ module Admin
       def profile_attributes(user)
         @attributes.slice(*PROFILE_KEYS).merge(
           display_name: @attributes[:display_name].presence || user.full_name,
-          joined_on: @attributes[:joined_on].presence || Date.current
+          joined_on: @attributes[:joined_on].presence || Date.current,
+          phone_number: normalized_phone(:phone_number, :phone_number_country_code),
+          whatsapp_number: normalized_phone(:whatsapp_number, :whatsapp_number_country_code)
         )
+      end
+
+      def normalized_phone(number_key, country_code_key)
+        digits = @attributes[number_key].to_s.gsub(/\D/, "")
+        return @attributes[number_key] if digits.blank?
+
+        iso2 = @attributes[country_code_key].to_s.upcase
+        dial = StudentProfile::PHONE_COUNTRY_CODES.dig(iso2, 1)
+        dial ? "+#{dial}#{digits}" : @attributes[number_key]
       end
 
       def create_availabilities(profile)

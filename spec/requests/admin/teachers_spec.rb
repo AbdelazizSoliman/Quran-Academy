@@ -54,6 +54,20 @@ RSpec.describe "Admin teacher profiles" do
     expect(profile.events.pluck(:event_type)).to eq(%w[created])
   end
 
+  it "combines the isolated phone and WhatsApp country codes with the local number on onboarding" do
+    sign_in admin
+    post admin_teachers_path, params: {
+      teacher_profile: { first_name: "Coded", last_name: "Teacher", email: "coded.teacher@example.test",
+                         display_name: "Coded Teacher", employment_status: "active",
+                         phone_number_country_code: "EG", phone_number: "1001234567",
+                         whatsapp_number_country_code: "SA", whatsapp_number: "501234567" }
+    }
+
+    profile = TeacherProfile.find_by!(display_name: "Coded Teacher")
+    expect(profile.phone_number).to eq("+201001234567")
+    expect(profile.whatsapp_number).to eq("+966501234567")
+  end
+
   it "defaults onboarding and availability to the academy timezone and accepts a teacher override" do
     AcademySetting.current.update!(default_time_zone: "Riyadh")
     sign_in admin
