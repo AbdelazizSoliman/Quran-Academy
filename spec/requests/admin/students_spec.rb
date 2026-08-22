@@ -198,13 +198,13 @@ RSpec.describe "Admin students" do
       sign_in profile.user
       get student_schedule_index_path
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("16:00")
+      expect(response.body).to include("04:00 مساءًا")
 
       sign_out profile.user
       sign_in teacher.user
       get teacher_schedule_index_path
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("18:00")
+      expect(response.body).to include("06:00 مساءًا")
     end
   end
 
@@ -522,7 +522,9 @@ RSpec.describe "Admin students" do
     replacement = profile.direct_lesson_schedules.active.first
     expect(response).to redirect_to(admin_student_path(profile))
     expect(old_schedule.reload).to be_superseded
-    expect(old_future.reload).to be_cancelled
+    expect(old_future.reload).to be_scheduled
+    expect(old_future.scheduling_source).to eq("rescheduled")
+    expect(old_future.starts_at.in_time_zone("Cairo").strftime("%A %H:%M")).to eq("Tuesday 19:00")
     expect(replacement).to be_present
     expect(replacement.time_zone).to eq("Cairo")
     expect(replacement.lesson_duration_minutes).to eq(45)

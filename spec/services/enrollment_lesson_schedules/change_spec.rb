@@ -48,7 +48,7 @@ RSpec.describe "Recurring lesson one-off and version changes" do
     expect { generate(Date.new(2026, 8, 18)) }.not_to change(ScheduledLesson, :count)
   end
 
-  it "supersedes the old version, preserves history, cancels future occurrences, and generates replacements" do
+  it "supersedes the old version, preserves history, and reschedules matching future occurrences" do
     historical = generate(Date.new(2026, 8, 18))
     future = generate(Date.new(2026, 9, 15))
     historical.update!(status: "completed", completed_at: Time.current)
@@ -64,10 +64,12 @@ RSpec.describe "Recurring lesson one-off and version changes" do
     expect(schedule.reload).to be_superseded
     expect(schedule.ends_on).to eq(Date.new(2026, 8, 31))
     expect(historical.reload).to be_completed
-    expect(future.reload).to be_cancelled
+    expect(future.reload).to be_scheduled
+    expect(future.scheduling_source).to eq("rescheduled")
+    expect(future.starts_at.in_time_zone("Cairo").strftime("%A %H:%M")).to eq("Wednesday 19:00")
     expect(replacement).to be_active
     expect(replacement.slots.pick(:weekday, :starts_at_local).first).to eq("wednesday")
-    expect(replacement.slots.first.scheduled_lessons).not_to be_empty
+    expect(replacement.slots.first.scheduled_lessons).to include(future)
   end
 
   def generate(date)

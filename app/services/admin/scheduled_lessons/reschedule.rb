@@ -1,8 +1,8 @@
 module Admin
   module ScheduledLessons
     class Reschedule < Update
-      def initialize(actor:, lesson:, starts_at:, ends_at:)
-        super(actor:, lesson:, attributes: { starts_at:, ends_at:, scheduling_source: "rescheduled" })
+      def initialize(actor:, lesson:, starts_at:, ends_at:, attributes: {})
+        super(actor:, lesson:, attributes: attributes.merge(starts_at:, ends_at:, scheduling_source: "rescheduled"))
       end
 
       def call
