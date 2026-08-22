@@ -265,6 +265,7 @@ Rails.application.routes.draw do
         resources :communications, only: :create, controller: :communications
       end
     end
+    resources :attendances, only: :index
     resources :communication_logs, only: :show do
       member do
         patch :mark_opened

@@ -12,7 +12,9 @@ module Teacher
 
     def new
       @assessment = StudentAssessment.new(teacher_profile: current_user.teacher_profile,
-                                           assessment_date: Date.current)
+                                          assessment_date: Date.current,
+                                          enrollment: assessment_enrollment,
+                                          scheduled_lesson: assessment_lesson)
       @enrollments = available_enrollments
     end
 
@@ -37,7 +39,7 @@ module Teacher
 
     def submit
       @assessment = StudentAssessments::Transition.new(actor: current_user, assessment: @assessment,
-                                                      action: :submit).call
+                                                       action: :submit).call
       respond_to_save
     end
 
@@ -52,15 +54,34 @@ module Teacher
 
     def assessment_params
       params.expect(student_assessment: %i[enrollment_id scheduled_lesson_id assessment_template_id
-                                            assessment_date notes lock_version])
+                                           assessment_date notes lock_version])
     end
 
     def score_params = params.fetch(:scores, {}).to_unsafe_h
 
     def available_enrollments
       Enrollment.joins(:scheduled_lessons)
-                .where(status: %w[active approved], scheduled_lessons: { teacher_profile: current_user.teacher_profile })
+                .where(status: %w[active
+                                  approved], scheduled_lessons: { teacher_profile: current_user.teacher_profile })
                 .includes(student_profile: :user).distinct
+    end
+
+    def assessment_lesson
+      return if params[:scheduled_lesson_id].blank?
+
+      if defined?(@assessment_lesson)
+        @assessment_lesson
+      else
+        @assessment_lesson = current_user.teacher_profile.scheduled_lessons
+                                         .where(status: "completed")
+                                         .find_by(id: params[:scheduled_lesson_id])
+      end
+    end
+
+    def assessment_enrollment
+      return if params[:enrollment_id].blank? || assessment_lesson.blank?
+
+      assessment_lesson.enrollments.find_by(id: params[:enrollment_id])
     end
 
     def respond_to_save

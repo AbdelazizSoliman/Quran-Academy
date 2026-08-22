@@ -88,7 +88,7 @@ module NavigationHelper
 
   def attendance_navigation_path
     return student_attendances_path if current_user&.student?
-    return teacher_schedule_index_path if current_user&.teacher?
+    return teacher_attendances_path if current_user&.teacher?
 
     admin_lesson_attendances_path
   end

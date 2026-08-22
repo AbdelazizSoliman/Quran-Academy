@@ -93,6 +93,14 @@ ar:
     notifications: "الإشعارات"
     my_profile: "ملفي الشخصي"
     coming_soon: "قريباً"
+  attendance:
+    teacher:
+      report_title: "تقرير الحضور"
+      report_description: "سجل حضور طلابك في الحصص"
+      summary: "ملخص الحضور"
+      all_records: "كل السجلات"
+      empty_report: "لا توجد سجلات حضور"
+      empty_report_hint: "ستظهر سجلات الحضور هنا بعد إضافة الطلاب إلى حصصك."
   financial_dashboard:
     title: "الأرباح والتحليلات المالية"
     description: "نظرة شهرية على الإيرادات المتوقعة وتكاليف رواتب المعلمين والربح الإجمالي التقديري"

@@ -32,6 +32,15 @@ RSpec.describe "Lesson attendance requests" do
     expect(response).to have_http_status(:not_found)
   end
 
+  it "shows teachers their attendance report instead of redirecting them to the schedule" do
+    sign_in lesson.teacher_profile.user
+    get teacher_attendances_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(attendance.student_profile.display_name)
+    expect(response.body).to include(I18n.locale == :ar ? lesson.title_ar : lesson.title_en)
+  end
+
   it "shows students only their own attendance" do
     student = attendance.student_profile
     other_attendance = create(:lesson_attendance)

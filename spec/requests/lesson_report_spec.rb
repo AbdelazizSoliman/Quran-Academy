@@ -27,6 +27,19 @@ RSpec.describe "Lesson report requests" do
     expect(response).to have_http_status(:not_found)
   end
 
+  it "offers a student evaluation action after the lesson is completed" do
+    sign_in lesson.teacher_profile.user
+    get teacher_schedule_report_path(lesson)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(I18n.t("academic.actions.evaluate_student"))
+    evaluation_link = response.parsed_body.at_css("a[href^='/teacher/assessments/new']")
+    expect(evaluation_link&.attr("href")).to eq(new_teacher_assessment_path(
+                                                  enrollment_id: participant.enrollment_id,
+                                                  scheduled_lesson_id: lesson.id
+                                                ))
+  end
+
   it "lets administrators review, lock, and reopen" do
     report = submitted_report
     sign_in admin

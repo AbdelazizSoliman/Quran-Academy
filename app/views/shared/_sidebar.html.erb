@@ -55,6 +55,7 @@
                     (key == :teacher_schedule && controller_path == "teacher/schedule") ||
                     (key == :teacher_availability_self && controller_path.start_with?("teacher/availabilities")) ||
                     (key == :student_schedule && controller_path == "student/schedule") ||
+                    (key == :attendance && controller_path.end_with?("attendances")) ||
                     (key == :payroll && controller_path.end_with?("payrolls")) ||
                     (key == :reports && controller_path.end_with?("reports")) ||
                     (key == :settings && controller_path == "admin/academy_settings") %>

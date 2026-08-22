@@ -1,6 +1,7 @@
 <% if assessment.errors.any? %><%= render "shared/components/alert", variant: :error, title: t("academic.errors.title"), message: assessment.errors.full_messages.to_sentence %><% end %>
 <%= form_with model: form_model, url: local_assigns[:form_url], class: "space-y-6" do |form| %>
   <%= form.hidden_field :lock_version if assessment.persisted? %>
+  <%= form.hidden_field :scheduled_lesson_id if assessment.scheduled_lesson_id.present? %>
   <div class="ds-card grid gap-5 p-5 sm:grid-cols-2">
     <% unless assessment.persisted? %>
       <div><%= form.label :enrollment_id, t("academic.fields.enrollment"), class: "ds-label" %><%= form.collection_select :enrollment_id, enrollments, :id, ->(e) { "#{e.public_id} — #{e.student_profile.user.full_name}" }, {}, class: "ds-control mt-2" %></div>

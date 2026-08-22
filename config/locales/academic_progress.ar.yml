@@ -66,6 +66,7 @@ ar:
     errors: { title: "يرجى تصحيح الأخطاء الموضحة" }
     actions:
       new_assessment: "تقييم جديد"
+      evaluate_student: "تقييم الطالب"
       edit_assessment: "تعديل التقييم"
       new_template: "نموذج جديد"
       edit_template: "تعديل النموذج"

@@ -93,6 +93,14 @@ en:
     notifications: "Notifications"
     my_profile: "My Profile"
     coming_soon: "Coming Soon"
+  attendance:
+    teacher:
+      report_title: "Attendance report"
+      report_description: "Attendance history for your students and lessons"
+      summary: "Attendance summary"
+      all_records: "All records"
+      empty_report: "No attendance records"
+      empty_report_hint: "Attendance appears here after students are added to your lessons."
   financial_dashboard:
     title: "Financial Profit & Analytics"
     description: "A monthly view of expected revenue, teacher payroll costs, and estimated gross profit"

@@ -1,0 +1,33 @@
+<%= render "shared/page_header", title: t("attendance.teacher.report_title"), description: t("attendance.teacher.report_description") %>
+
+<section class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="<%= t("attendance.teacher.summary") %>">
+  <% LessonAttendance::STATUSES.each do |status| %>
+    <% next if @status_counts[status].blank? %>
+    <%= link_to teacher_attendances_path(status: status), class: "ds-card p-4" do %>
+      <p class="ds-caption"><%= t("attendance.statuses.#{status}") %></p>
+      <p class="mt-1 text-2xl font-bold"><%= @status_counts[status] %></p>
+    <% end %>
+  <% end %>
+</section>
+
+<div class="mb-4 flex flex-wrap gap-2">
+  <%= link_to t("attendance.teacher.all_records"), teacher_attendances_path, class: button_classes(size: :small, variant: :secondary) %>
+</div>
+
+<div class="space-y-3">
+  <% @attendances.each do |attendance| %>
+    <article class="ds-card grid gap-3 p-4 sm:grid-cols-4 sm:items-center">
+      <div>
+        <h2 class="font-semibold"><%= attendance.student_profile.display_name %></h2>
+        <p class="ds-caption"><%= attendance.public_id %></p>
+      </div>
+      <div><%= I18n.locale == :ar ? attendance.scheduled_lesson.title_ar : attendance.scheduled_lesson.title_en %></div>
+      <time dir="ltr"><%= l(attendance.scheduled_lesson.starts_at.in_time_zone(current_user.time_zone), format: :short) %></time>
+      <div class="sm:text-end"><span class="ds-badge"><%= t("attendance.statuses.#{attendance.status}") %></span></div>
+    </article>
+  <% end %>
+
+  <% if @attendances.empty? %>
+    <%= render "shared/components/empty_state", icon: :check_circle, title: t("attendance.teacher.empty_report"), description: t("attendance.teacher.empty_report_hint") %>
+  <% end %>
+</div>
