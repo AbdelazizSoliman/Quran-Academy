@@ -4,7 +4,7 @@ module Admin
 
     ONBOARDING_KEYS = %i[
       public_id full_name email date_of_birth gender student_type learning_status
-      nationality country_of_residence city phone_number whatsapp_number
+      nationality country_of_residence city phone_number whatsapp_number whatsapp_number_country_code
       preferred_interface_locale preferred_learning_language native_language current_quran_level
       reading_level tajweed_level memorization_level memorized_juz_count attendance_percentage
       assigned_teacher_profile_id course_offering_id fee_plan_id learning_goals

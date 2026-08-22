@@ -106,6 +106,7 @@ module Admin
           display_name: @attributes[:display_name].presence || user.full_name,
           joined_on: Date.current,
           preferred_contact_method: preferred_contact_method,
+          whatsapp_number: normalized_whatsapp_number,
           guardian_phone: normalized_guardian_phone,
           schedule_slots: slots,
           schedule_weekday: slots.first&.fetch("weekday", nil),
@@ -114,10 +115,19 @@ module Admin
       end
 
       def preferred_contact_method
-        return "whatsapp" if @attributes[:whatsapp_number].present? || @attributes[:phone_number].present?
+        return "whatsapp" if normalized_whatsapp_number.present? || @attributes[:phone_number].present?
         return "guardian" if normalized_guardian_phone.present?
 
         "email"
+      end
+
+      def normalized_whatsapp_number
+        digits = @attributes[:whatsapp_number].to_s.gsub(/\D/, "")
+        return @attributes[:whatsapp_number] if digits.blank?
+
+        iso2 = @attributes[:whatsapp_number_country_code].to_s.upcase
+        dial = StudentProfile::PHONE_COUNTRY_CODES.dig(iso2, 1)
+        dial ? "+#{dial}#{digits}" : @attributes[:whatsapp_number]
       end
 
       def normalized_guardian_phone

@@ -102,8 +102,14 @@
         <p class="mt-1 ds-caption">لغة رسائل الواتساب والبريد لهذه العائلة.</p></div>
       <div><%= f.label :guardian_email, "بريد ولي الأمر (اختياري)", class: "ds-label" %><%= f.email_field :guardian_email, class: "ds-control mt-2", dir: "ltr", placeholder: "parent@example.com" %></div>
       <div><%= f.label :email, "بريد الطالب (اختياري)", class: "ds-label" %><%= f.email_field :email, value: params.dig(:student_profile, :email), class: "ds-control mt-2", dir: "ltr", placeholder: "student@example.com" %></div>
-      <div><%= f.label :whatsapp_number, "واتساب الطالب (اختياري)", class: "ds-label" %><%= f.telephone_field :whatsapp_number, class: "ds-control mt-2", dir: "ltr", placeholder: "مثال: 201012345678" %>
-        <p class="mt-1 ds-caption">رقم الطالب نفسه — لو اتحط، رسائله تروح عليه بدل ولي الأمر. اكتب كود الدولة للأرقام الأجنبية.</p></div>
+      <div>
+        <%= f.label :whatsapp_number, "واتساب الطالب (اختياري)", class: "ds-label" %>
+        <div class="mt-2 grid grid-cols-[10rem_1fr] gap-2">
+          <%= f.select :whatsapp_number_country_code, StudentProfile::PHONE_COUNTRY_CODES.map { |code, (name, dial)| ["#{name} +#{dial}", code] }, {}, class: "ds-control min-w-0" %>
+          <%= f.telephone_field :whatsapp_number, class: "ds-control min-w-0", dir: "ltr", placeholder: "6143715244" %>
+        </div>
+        <p class="mt-1 ds-caption">رقم الطالب نفسه — اكتبه من غير كود الدولة ومن غير الصفر؛ لو اتحط، رسائله تروح عليه بدل ولي الأمر.</p>
+      </div>
     </div>
   </fieldset>
   <div class="flex gap-3"><%= render "shared/components/button", label: "حفظ الطالب", type: "submit" %><%= render "shared/components/button", label: "إلغاء", href: admin_students_path, variant: :secondary %></div>

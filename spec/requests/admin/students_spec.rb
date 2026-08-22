@@ -37,6 +37,9 @@ RSpec.describe "Admin students" do
     expect(field.css("option").map(&:text)).to include("الأحد", "الاثنين", "الثلاثاء")
     expect(field.css("option").map(&:text)).not_to include(*"Translation missing".chars)
     expect(document.at_css("[data-schedule-slots-target='hidden']")).to be_present
+    expect(document.at_css("select[name='student_profile[whatsapp_number_country_code]'] option[value='US']"))
+      .to be_present
+    expect(document.at_css("input[name='student_profile[whatsapp_number]']")).to be_present
   end
 
   it "creates, updates, verifies, archives, and restores with audits" do
@@ -101,6 +104,19 @@ RSpec.describe "Admin students" do
     }
     profile = StudentProfile.find_by!(display_name: "WhatsApp Learner")
     expect(profile.user.account_invitation).to be_present
+    expect(Notifications::InvitationChannels.call(user: profile.user)).to eq(%w[whatsapp])
+  end
+
+  it "combines the selected country dial code with the student's local WhatsApp number" do
+    post admin_students_path, params: {
+      student_profile: {
+        full_name: "US WhatsApp Learner", whatsapp_number_country_code: "US", whatsapp_number: "6143715244"
+      }
+    }
+
+    profile = StudentProfile.find_by!(display_name: "US WhatsApp Learner")
+    expect(profile.whatsapp_number).to eq("+16143715244")
+    expect(profile.preferred_contact_method).to eq("whatsapp")
     expect(Notifications::InvitationChannels.call(user: profile.user)).to eq(%w[whatsapp])
   end
 
