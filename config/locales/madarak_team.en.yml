@@ -9,6 +9,7 @@ en:
       admins: "Owners and managers"
       staff: "Operations staff"
       teachers: "Teachers"
+      students: "Students"
       active: "Active members"
     fields:
       member: "Member"

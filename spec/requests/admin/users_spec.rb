@@ -53,9 +53,10 @@ RSpec.describe "Admin user administration" do
     %i[member role status access last_activity invited_at actions].each do |field|
       expect(response.body).to include(I18n.t("madarak_team.fields.#{field}", locale: :ar))
     end
-    expect(response.body).to include(staff.full_name, teacher.full_name)
-    expect(response.body).not_to include(student.full_name)
+    expect(response.body).to include(staff.full_name, teacher.full_name, student.full_name)
+    expect(response.body).to include(I18n.t("madarak_team.counts.students", locale: :ar))
   end
+
   it "renders Arabic RTL and an empty state" do
     sign_in admin
     get admin_users_path, params: { query: "does-not-exist" }

@@ -4,14 +4,9 @@ module Admin
     rescue_from Users::Operation::Forbidden, with: :operation_forbidden
 
     def index
-      @team_scope = User.where(role: %w[admin staff teacher])
-      scope = params[:role].to_s.in?(%w[student guardian]) ? User.all : @team_scope
-      @team_counts = {
-        admins: @team_scope.admin.count,
-        staff: @team_scope.staff.count,
-        teachers: @team_scope.teacher.count,
-        active: @team_scope.active.count
-      }
+      @team_scope = User.where(role: %w[admin staff teacher student])
+      scope = params[:role].to_s == "guardian" ? User.all : @team_scope
+      @team_counts = team_counts(@team_scope)
       @pagy, @users = pagy(:offset, UsersQuery.new(scope:, params:).call, limit: 15)
     end
 
@@ -71,6 +66,11 @@ module Admin
     end
 
     private
+
+    def team_counts(scope)
+      { admins: scope.admin.count, staff: scope.staff.count, teachers: scope.teacher.count,
+        students: scope.student.count, active: scope.active.count }
+    end
 
     def set_user
       @user = User.find(params.expect(:id))

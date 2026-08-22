@@ -9,6 +9,7 @@ ar:
       admins: "المالكون والمديرون"
       staff: "فريق التشغيل"
       teachers: "المعلمون"
+      students: "الطلاب"
       active: "الأعضاء النشطون"
     fields:
       member: "العضو"
