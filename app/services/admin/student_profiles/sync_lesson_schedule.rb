@@ -56,7 +56,7 @@ module Admin
           teacher_profile: @profile.assigned_teacher_profile,
           starts_on:, ends_on: generation_ends_on(starts_on),
           lesson_duration_minutes: @profile.lesson_duration_minutes,
-          time_zone: EffectiveTimeZone.for(@profile.user), status: "active"
+          time_zone: EffectiveTimeZone.for, status: "active"
         }
       end
 

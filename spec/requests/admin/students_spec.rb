@@ -148,6 +148,50 @@ RSpec.describe "Admin students" do
     expect(profile.schedule_slots.size).to eq(2)
   end
 
+  it "creates recurring lessons in the academy timezone while each portal uses its user's timezone" do
+    travel_to(Time.find_zone!("Cairo").local(2026, 8, 22, 12, 0)) do
+      AcademySetting.current.update!(default_time_zone: "Cairo")
+      teacher_user = create(:user, :teacher, time_zone: "Riyadh")
+      teacher = create(:teacher_profile, :active, :verified, user: teacher_user,
+                                                             online_meeting_url: "https://meet.example.test/teacher")
+      create(:teacher_availability, teacher_profile: teacher, weekday: "sunday",
+                                    starts_at_local: "17:00", ends_at_local: "20:00",
+                                    time_zone: "Riyadh", effective_from: Date.new(2026, 8, 23))
+
+      post admin_students_path, params: {
+        student_profile: {
+          full_name: "Academy Zone Learner", email: "academy.zone@example.test", time_zone: "London",
+          assigned_teacher_profile_id: teacher.id, fee_plan_id: create(:fee_plan).id,
+          lesson_duration_minutes: 30, schedule_generation_weeks: 1,
+          slots_json: [{ weekday: "sunday", time: "18:00" }].to_json
+        }
+      }
+
+      profile = StudentProfile.find_by!(display_name: "Academy Zone Learner")
+      schedule = profile.direct_lesson_schedules.sole
+      lesson = profile.scheduled_lessons.sole
+      expect(schedule.time_zone).to eq("Cairo")
+      expect(lesson.starts_at.in_time_zone("Cairo").strftime("%A %H:%M")).to eq("Sunday 18:00")
+      expect(EffectiveTimeZone.local_time(lesson.starts_at, user: profile.user).strftime("%A %H:%M"))
+        .to eq("Sunday 16:00")
+      expect(EffectiveTimeZone.local_time(lesson.starts_at, user: teacher.user).strftime("%A %H:%M"))
+        .to eq("Sunday 18:00")
+
+      sign_out admin
+      profile.user.update!(status: "active")
+      sign_in profile.user
+      get student_schedule_index_path
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("16:00")
+
+      sign_out profile.user
+      sign_in teacher.user
+      get teacher_schedule_index_path
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("18:00")
+    end
+  end
+
   it "keeps onboarding committed when initial occurrence generation reports a conflict" do
     teacher = create(:teacher_profile, :active, :verified,
                      online_meeting_url: "https://meet.example.test/teacher")
@@ -429,6 +473,8 @@ RSpec.describe "Admin students" do
   end
 
   it "replaces the authoritative recurring schedule and regenerates future lessons after editing weekly slots" do
+    AcademySetting.current.update!(default_time_zone: "Cairo")
+    student_user.update!(time_zone: "London")
     teacher = create(:teacher_profile, :active, :verified,
                      online_meeting_url: "https://meet.example.test/teacher")
     %w[sunday tuesday].each do |weekday|
@@ -462,6 +508,7 @@ RSpec.describe "Admin students" do
     expect(old_schedule.reload).to be_superseded
     expect(old_future.reload).to be_cancelled
     expect(replacement).to be_present
+    expect(replacement.time_zone).to eq("Cairo")
     expect(replacement.lesson_duration_minutes).to eq(45)
     expect(replacement.slots.pluck(:weekday)).to eq(["tuesday"])
     expect(replacement.slots.first.starts_at_local.strftime("%H:%M")).to eq("19:00")

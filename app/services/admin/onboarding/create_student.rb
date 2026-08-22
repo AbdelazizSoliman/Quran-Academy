@@ -216,7 +216,7 @@ module Admin
         attributes = { teacher_profile: profile.assigned_teacher_profile, starts_on:,
                        ends_on: generation_ends_on(starts_on, offering_end),
                        lesson_duration_minutes: profile.lesson_duration_minutes,
-                       time_zone: profile.user.time_zone, status: "active" }
+                       time_zone: EffectiveTimeZone.for, status: "active" }
         @schedule = EnrollmentLessonSchedules::Create.new(actor: @actor, enrollment:, student_profile:,
                                                           attributes:, slots: complete_schedule_slots).call
         raise ActiveRecord::RecordInvalid, @schedule unless @schedule.persisted?
