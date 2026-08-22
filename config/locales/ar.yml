@@ -50,6 +50,8 @@ ar:
         phone_number: "رقم الهاتف"
         whatsapp_number: "رقم واتساب"
   time:
+    am: "صباحًا"
+    pm: "مساءً"
     formats:
       long: "%d/%m/%Y، %I:%M %p"
       short: "%d/%m/%Y، %I:%M %p"

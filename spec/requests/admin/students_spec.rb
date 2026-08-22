@@ -198,13 +198,13 @@ RSpec.describe "Admin students" do
       sign_in profile.user
       get student_schedule_index_path
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("04:00 مساءًا")
+      expect(response.body).to include("04:00 مساءً")
 
       sign_out profile.user
       sign_in teacher.user
       get teacher_schedule_index_path
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("06:00 مساءًا")
+      expect(response.body).to include("06:00 مساءً")
     end
   end
 
