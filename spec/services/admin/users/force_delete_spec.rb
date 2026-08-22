@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Admin::Users::ForceDelete do
-  let(:privileged_admin) { create(:user, :admin, email: "abdelaziz.soliman89@gmail.com") }
+  let(:privileged_admin) { create(:user, :admin) }
   let(:target) { create(:user, :student) }
 
   it "hard deletes a user along with notifications, attempts, events, invitations, and profile" do
@@ -25,12 +25,29 @@ RSpec.describe Admin::Users::ForceDelete do
     expect(StudentProfile.exists?(profile.id)).to be(false)
   end
 
-  it "refuses to delete when the actor is not the privileged administrator" do
-    other_admin = create(:user, :admin)
+  it "refuses to delete when the actor is not an administrator" do
+    other_admin = create(:user, :staff)
     expect do
       described_class.new(actor: other_admin, user: target).call
     end.to raise_error(Admin::Users::Operation::Forbidden)
     expect(User.exists?(target.id)).to be(true)
+  end
+
+  it "permanently deletes a student even when they have recurring scheduling records" do
+    profile = create(:student_profile, user: target, fee_plan: create(:fee_plan))
+    schedule = create(:enrollment_lesson_schedule, enrollment: nil, student_profile: profile,
+                                                   created_by: privileged_admin, updated_by: privileged_admin)
+    slot = create(:enrollment_lesson_schedule_slot, enrollment_lesson_schedule: schedule)
+    lesson = create(:scheduled_lesson, course_offering: nil,
+                                       enrollment_lesson_schedule_slot: slot,
+                                       recurrence_date: Date.current)
+    create(:scheduled_lesson_enrollment, scheduled_lesson: lesson, enrollment: nil, student_profile: profile)
+
+    described_class.new(actor: privileged_admin, user: target).call
+
+    expect(User.exists?(target.id)).to be(false)
+    expect(EnrollmentLessonSchedule.exists?(schedule.id)).to be(false)
+    expect(ScheduledLesson.exists?(lesson.id)).to be(false)
   end
 
   it "cascades through a teacher's full operational history, deleting only what belongs to them" do

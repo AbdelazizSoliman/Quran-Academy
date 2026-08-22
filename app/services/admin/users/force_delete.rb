@@ -1,8 +1,6 @@
 module Admin
   module Users
     class ForceDelete < Operation
-      PRIVILEGED_EMAIL = "abdelaziz.soliman89@gmail.com".freeze
-
       def initialize(actor:, user:)
         super(actor:)
         @user = user
@@ -23,7 +21,7 @@ module Admin
       private
 
       def authorized?
-        @actor.active? && @actor.admin? && @actor.email.to_s.casecmp?(PRIVILEGED_EMAIL)
+        @actor.active? && @actor.admin?
       end
     end
   end

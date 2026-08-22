@@ -440,7 +440,7 @@ en:
       confirmations:
         force_delete_title: "Permanently delete user"
         force_delete: "Permanently delete %{name}?"
-        force_delete_warning: "This temporary action cannot be undone. Users with retained operational history cannot be deleted."
+        force_delete_warning: "This testing action cannot be undone. The user and their related scheduling records will be permanently deleted."
         title: "Confirm account action"
         approve: "Approve %{name} and allow this account to sign in?"
         suspend: "Suspend %{name}? Existing sessions will end."
@@ -462,7 +462,7 @@ en:
         phone_number_invalid: "Phone number must use a valid international format."
         whatsapp_number_blank: "WhatsApp number is required when no phone fallback is available."
         whatsapp_number_invalid: "WhatsApp number must use a valid international format."
-        force_delete_forbidden: "Only the designated administrator may permanently delete users."
+        force_delete_forbidden: "Only an active administrator may permanently delete users."
         self_delete: "You cannot delete your own administrator account."
         operational_history: "This user has operational history and cannot be permanently deleted."
         self_demotion: "You cannot remove your own administrator role."

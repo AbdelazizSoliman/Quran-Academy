@@ -113,16 +113,31 @@ module Admin
       end
 
       def delete_layers(layers)
-        layers.reverse_each do |frontier|
-          frontier.each do |table, ids|
-            next if ids.empty?
+        ids_by_table = merge_layers(layers)
+        deletion_order(ids_by_table.keys).each do |table|
+          ids = ids_by_table[table]
+          next if ids.empty?
 
-            @connection.execute(<<~SQL.squish)
-              DELETE FROM #{@connection.quote_table_name(table)}
-              WHERE id IN (#{sql_id_list(ids)})
-            SQL
-          end
+          @connection.execute(<<~SQL.squish)
+            DELETE FROM #{@connection.quote_table_name(table)}
+            WHERE id IN (#{sql_id_list(ids)})
+          SQL
         end
+      end
+
+      def deletion_order(tables)
+        included = tables.to_set
+        visited = Set.new
+        ([@root_table] + tables).flat_map { |table| dependency_order(table, included, visited) }
+      end
+
+      def dependency_order(table, included, visited)
+        return [] unless visited.add?(table)
+
+        children = self.class.reverse_restrict_graph.fetch(table, []).filter_map do |edge|
+          edge[:table] if included.include?(edge[:table])
+        end
+        children.flat_map { |child| dependency_order(child, included, visited) } << table
       end
 
       def sql_id_list(ids)

@@ -127,8 +127,8 @@ RSpec.describe "Admin user administration" do
     expect(user.sign_in_count).to eq(0)
   end
 
-  it "allows only the designated administrator to force-delete another user" do
-    privileged = create(:user, :admin, email: Admin::Users::ForceDelete::PRIVILEGED_EMAIL)
+  it "allows an administrator to force-delete another user" do
+    privileged = create(:user, :admin)
     target = create(:user, :pending)
     sign_in privileged
 
@@ -136,12 +136,13 @@ RSpec.describe "Admin user administration" do
     expect(response).to redirect_to(admin_users_path)
   end
 
-  it "rejects force deletion by every other administrator" do
-    sign_in admin
+  it "rejects force deletion by a non-administrator" do
+    staff = create(:user, :staff)
+    sign_in staff
     target = create(:user, :pending)
 
     expect { delete admin_user_path(target) }.not_to change(User, :count)
-    expect(response).to redirect_to(admin_user_path(target))
+    expect(response).to have_http_status(:forbidden)
   end
 
   it "approves a pending user and shows audit history" do
