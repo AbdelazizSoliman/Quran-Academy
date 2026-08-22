@@ -17,7 +17,7 @@ module Admin
     end
 
     def setting_time(value)
-      value ? value.strftime("%H:%M") : t("admin.settings.not_configured")
+      value ? l(value, format: :time) : t("admin.settings.not_configured")
     end
 
     def audit_setting_description(event)

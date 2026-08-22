@@ -169,12 +169,12 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
     student_delivery = deliveries.find { |item| item[:recipient] == "201112223344" }
     teacher_delivery = deliveries.find { |item| item[:recipient] == "201223334455" }
     expect(student_delivery.dig(:template, :name)).to eq("quran_lesson_reminder")
-    expected_body = ["August 08, 2026 12:15", lesson.teacher_profile.display_name,
+    expected_body = ["August 08, 2026 12:15 PM", lesson.teacher_profile.display_name,
                      "Your lesson starts in 15 minutes."]
     expect(body_texts(student_delivery)).to eq(expected_body)
     expect(body_texts(student_delivery).size).to eq(3)
     expect(body_texts(teacher_delivery)).to eq(
-      ["08/08/2026 12:15", participation.enrollment.student_profile.display_name,
+      ["08/08/2026 12:15 مساءًا", participation.enrollment.student_profile.display_name,
        "Your lesson starts in 15 minutes."]
     )
     expect(button_parameters(student_delivery)).to contain_exactly(
@@ -203,7 +203,7 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
       notification = Notification.find_by!(source: lesson, recipient_user: student)
       delivery = deliveries.find { |item| item[:recipient] == "201001234568" }
       expect(notification.scheduled_at).to eq(now)
-      expect(body_texts(delivery).first).to end_with("11:15")
+      expect(body_texts(delivery).first).to end_with("11:15 AM")
       expect(lesson.starts_at).to eq(now + 15.minutes)
     end
 
@@ -219,7 +219,7 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
                                                 .provider_address
       delivery = deliveries.find { |item| item[:recipient] == address }
       expect(notification.scheduled_at).to eq(now)
-      expect(body_texts(delivery).first).to end_with("12:15")
+      expect(body_texts(delivery).first).to end_with("12:15 مساءًا")
       expect(lesson.starts_at).to eq(now + 15.minutes)
     end
 
@@ -235,7 +235,7 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
       pre_sweep
 
       delivery = deliveries.find { |item| item[:recipient] == "201001234570" }
-      expect(body_texts(delivery).first).to end_with("11:15")
+      expect(body_texts(delivery).first).to end_with("11:15 صباحًا")
       expect(Notification.find_by!(source: lesson, recipient_user: student.user).recipient_guardian).to eq(guardian)
     end
   end
@@ -362,8 +362,8 @@ RSpec.describe "Attendance-aware WhatsApp lesson reminders", type: :request do
 
     teacher_delivery = delivery_for(lesson.teacher_profile.user)
     student_delivery = delivery_for(participation.enrollment.student_profile.user)
-    expect(body_texts(teacher_delivery).first).to end_with("14:40")
-    expect(body_texts(student_delivery).first).to end_with("15:10")
+    expect(body_texts(teacher_delivery).first).to end_with("02:40 مساءًا")
+    expect(body_texts(student_delivery).first).to end_with("03:10 PM")
   end
 
   it "skips an invalid WhatsApp number without calling Meta" do

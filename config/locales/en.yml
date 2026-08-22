@@ -51,11 +51,11 @@ en:
         whatsapp_number: "WhatsApp number"
   time:
     formats:
-      long: "%B %d, %Y at %H:%M"
-      short: "%b %d, %Y at %H:%M"
+      long: "%B %d, %Y at %I:%M %p"
+      short: "%b %d, %Y at %I:%M %p"
       day: "%d"
       month: "%b"
-      time: "%H:%M"
+      time: "%I:%M %p"
   date:
     formats:
       default: "%B %d, %Y"

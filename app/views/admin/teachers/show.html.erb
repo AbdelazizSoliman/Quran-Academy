@@ -72,7 +72,7 @@
             <% @availabilities.each do |item| %>
               <tr>
                 <td class="px-3 py-3"><%= link_to t("scheduling.catalogs.weekdays.#{item.weekday}"), admin_teacher_availability_path(item), class: "font-semibold text-app-primary hover:underline" %></td>
-                <td class="px-3 py-3" dir="ltr"><%= item.starts_at_local.strftime("%H:%M") %>–<%= item.ends_at_local.strftime("%H:%M") %></td>
+                <td class="px-3 py-3" dir="ltr"><%= l(item.starts_at_local, format: :time) %>–<%= l(item.ends_at_local, format: :time) %></td>
                 <td class="px-3 py-3"><%= item.time_zone %></td>
                 <td class="px-3 py-3"><%= item.effective_from %></td>
                 <td class="px-3 py-3"><%= item.effective_until || t("scheduling.not_configured") %></td>

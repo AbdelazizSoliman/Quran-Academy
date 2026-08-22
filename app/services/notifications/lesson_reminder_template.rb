@@ -35,8 +35,9 @@ module Notifications
     end
 
     def self.localized_date_and_time(notification, local_start)
-      date = I18n.with_locale(notification.recipient_locale) { I18n.l(local_start.to_date, format: :long) }
-      "#{date} #{local_start.strftime('%H:%M')}"
+      I18n.with_locale(notification.recipient_locale) do
+        "#{I18n.l(local_start.to_date, format: :long)} #{I18n.l(local_start, format: :time)}"
+      end
     end
 
     private_class_method :body_values, :counterpart, :student_names, :localized_date_and_time

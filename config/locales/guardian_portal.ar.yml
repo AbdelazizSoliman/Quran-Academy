@@ -17,7 +17,7 @@ ar:
     guardian_profile: "ملفي الشخصي"
   time:
     formats:
-      time: "%H:%M"
+      time: "%I:%M %p"
   date:
     formats:
       day: "%d"

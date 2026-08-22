@@ -45,7 +45,7 @@ module Notifications
     def source_time
       return "" unless lesson
 
-      lesson.starts_at.in_time_zone(lesson.academy_time_zone).strftime("%H:%M")
+      I18n.l(lesson.starts_at.in_time_zone(lesson.academy_time_zone), format: :time)
     end
 
     def source_title

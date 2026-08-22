@@ -17,7 +17,7 @@ en:
     guardian_profile: "My profile"
   time:
     formats:
-      time: "%H:%M"
+      time: "%I:%M %p"
   date:
     formats:
       day: "%d"

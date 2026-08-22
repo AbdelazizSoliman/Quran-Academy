@@ -51,11 +51,11 @@ ar:
         whatsapp_number: "رقم واتساب"
   time:
     formats:
-      long: "%d/%m/%Y، %H:%M"
-      short: "%d/%m/%Y، %H:%M"
+      long: "%d/%m/%Y، %I:%M %p"
+      short: "%d/%m/%Y، %I:%M %p"
       day: "%d"
       month: "%m"
-      time: "%H:%M"
+      time: "%I:%M %p"
   date:
     formats:
       default: "%d/%m/%Y"
