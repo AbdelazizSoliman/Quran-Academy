@@ -39,7 +39,7 @@ en:
       lessons_title: "No scheduled lessons"
       lessons_description: "There are no lessons in the selected period."
     sections: { availability: "Recurring availability", exception: "Availability exception", lesson: "Lesson details", participants: "Participants", add_participant: "Add participant", audit: "Audit history" }
-    actions: { new_availability: "New availability", edit_availability: "Edit availability", new_exception: "New exception", edit_exception: "Edit exception", cancel_exception: "Cancel exception", new_lesson: "New lesson", edit_lesson: "Edit lesson", schedule: "Schedule", start: "Start", complete: "Complete", cancel: "Cancel lesson", archive: "Archive", reschedule: "Reschedule", join_online: "Join online", add_participant: "Add participant", save_and_add_participants: "Save and add participants" }
+    actions: { new_availability: "New availability", edit_availability: "Edit availability", new_exception: "New exception", edit_exception: "Edit exception", cancel_exception: "Cancel exception", new_lesson: "New lesson", edit_lesson: "Edit lesson", schedule: "Schedule", start: "Start", complete: "Complete", cancel: "Cancel lesson", archive: "Archive", reschedule: "Reschedule", join_online: "Join Lesson", add_participant: "Add participant", save_and_add_participants: "Save and add participants" }
     participants_creation_hint: "First save the lesson and its course offering. You will then choose participating students from approved, active, or paused enrollments in that offering."
     online_meeting_url_override_hint: "Meeting URL override: leave blank to use the assigned teacher's default meeting link."
     teacher_default_meeting_url: "Teacher default: %{url}"
