@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "webhooks/whatsapp", to: "webhooks/whatsapp#verify"
+  post "webhooks/whatsapp", to: "webhooks/whatsapp#receive"
   get "account/invitation/:token", to: "account_invitations#edit", as: :edit_account_invitation
   patch "account/invitation/:token", to: "account_invitations#update", as: :account_invitation
   get "account/invitation-success", to: "account_invitations#success", as: :account_invitation_success
@@ -7,6 +9,12 @@ Rails.application.routes.draw do
              path_names: { sign_in: "sign-in", sign_out: "sign-out", password: "password" },
              skip: :registrations
   namespace :admin do
+    resources :whatsapp_conversations, only: %i[index show] do
+      member do
+        patch :archive
+        patch :reopen
+      end
+    end
     resources :notifications, only: %i[index show new create] do
       member { patch :retry_delivery }
       collection do

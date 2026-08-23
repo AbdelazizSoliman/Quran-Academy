@@ -1,10 +1,12 @@
 module NavigationHelper
   ADMIN_VISIBLE_NAVIGATION = %i[
-    dashboard users invitations students teachers schedule profits_analytics fee_plans financial_reports settings
+    dashboard whatsapp_inbox users invitations students teachers schedule attendance assessments profits_analytics
+    fee_plans financial_reports settings
   ].freeze
 
   NAVIGATION_ITEMS = {
     dashboard: { icon: :home, roles: %i[admin staff teacher student guardian] },
+    whatsapp_inbox: { icon: :message, roles: %i[admin], path: :admin_whatsapp_conversations_path },
     users: { icon: :users, roles: %i[admin], path: :admin_users_path },
     invitations: { icon: :users, roles: %i[admin], path: :admin_account_invitations_path },
     students: { icon: :users, roles: %i[admin], path: :admin_students_path },

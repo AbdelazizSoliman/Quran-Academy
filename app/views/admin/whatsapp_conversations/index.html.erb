@@ -1,0 +1,26 @@
+<%= render "shared/page_header", title: t("whatsapp_inbox.index.title"), description: t("whatsapp_inbox.index.description") %>
+
+<%= form_with url: admin_whatsapp_conversations_path, method: :get, class: "ds-card mb-6 grid gap-4 p-4 sm:grid-cols-3" do |form| %>
+  <%= form.select :status, [[t("actions.all"), ""]] + WhatsappConversation::STATUSES.map { |status| [t("whatsapp_inbox.statuses.#{status}"), status] }, { selected: params[:status] }, class: "ds-control" %>
+  <label class="flex items-center gap-2"><%= form.check_box :unread, { checked: params[:unread] == "1" }, "1", "" %><%= t("whatsapp_inbox.filters.unread") %></label>
+  <%= render "shared/components/button", label: t("actions.filter"), type: :submit %>
+<% end %>
+
+<div class="space-y-3">
+  <% @conversations.each do |conversation| %>
+    <%= link_to admin_whatsapp_conversation_path(conversation), class: "ds-card grid gap-2 p-4 sm:grid-cols-[1fr_auto]" do %>
+      <div>
+        <div class="flex flex-wrap items-center gap-2">
+          <strong><%= conversation.display_name %></strong>
+          <% if conversation.unread_count.positive? %><span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-900"><%= conversation.unread_count %></span><% end %>
+        </div>
+        <p class="ds-caption mt-1" dir="ltr"><%= conversation.sender_phone %></p>
+        <p class="mt-2 line-clamp-2"><%= conversation.messages.chronological.last&.body.presence || t("whatsapp_inbox.media_message") %></p>
+      </div>
+      <div class="text-sm text-app-subtle"><%= l(conversation.last_message_at, format: :short) %></div>
+    <% end %>
+  <% end %>
+</div>
+
+<% if @conversations.empty? %><%= render "shared/components/empty_state", title: t("whatsapp_inbox.empty") %><% end %>
+<%== @pagy.series_nav if @pagy.pages > 1 %>

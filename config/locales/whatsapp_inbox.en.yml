@@ -1,0 +1,15 @@
+en:
+  whatsapp_inbox:
+    index:
+      title: "WhatsApp inbox"
+      description: "Incoming messages received by the academy WhatsApp number."
+    statuses: { open: "Open", archived: "Archived" }
+    filters: { unread: "Unread only" }
+    actions: { archive: "Archive conversation", reopen: "Reopen conversation" }
+    messages: { archived: "Conversation archived.", reopened: "Conversation reopened." }
+    contact_type: "Matched contact"
+    unmatched: "Unmatched phone number"
+    messages_label: "Conversation messages"
+    media_message: "Media or unsupported message"
+    message_types: { image: "Image", audio: "Audio", video: "Video", document: "Document", sticker: "Sticker", location: "Location", contacts: "Contact" }
+    empty: "No incoming WhatsApp conversations yet."

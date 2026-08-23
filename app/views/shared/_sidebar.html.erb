@@ -1,3 +1,4 @@
+<% whatsapp_unread_count = current_user&.admin? ? WhatsappConversation.unread.sum(:unread_count) : 0 %>
 <aside id="application-sidebar"
        data-sidebar-target="panel"
        class="fixed inset-y-0 start-0 z-40 flex w-72 flex-col border-e border-emerald-950/60 text-white shadow-xl lg:shadow-none"
@@ -32,6 +33,7 @@
         <% active = (key == :dashboard && current_page?(root_path)) ||
                     (key == :users && controller_path.start_with?("admin/users")) ||
                     (key == :invitations && controller_path.start_with?("admin/account_invitations")) ||
+                    (key == :whatsapp_inbox && controller_path == "admin/whatsapp_conversations") ||
                     (key == :students && controller_path.start_with?("admin/students")) ||
                     (key == :guardians && controller_path.start_with?("admin/guardians")) ||
                     (key == :teachers && controller_path.start_with?("admin/teachers")) ||
@@ -56,6 +58,7 @@
                     (key == :teacher_availability_self && controller_path.start_with?("teacher/availabilities")) ||
                     (key == :student_schedule && controller_path == "student/schedule") ||
                     (key == :attendance && controller_path.end_with?("attendances")) ||
+                    (key == :assessments && controller_path.end_with?("student_assessments")) ||
                     (key == :payroll && controller_path.end_with?("payrolls")) ||
                     (key == :reports && controller_path.end_with?("reports")) ||
                     (key == :settings && controller_path == "admin/academy_settings") %>
@@ -64,6 +67,9 @@
           <%= link_to path, class: nav_item_classes(active: active), aria: (active ? { current: "page" } : {}) do %>
             <span class="grid size-8 place-items-center rounded-lg bg-white/10 text-emerald-50 group-hover:bg-white/15"><%= icon item[:icon], size: 4 %></span>
             <span><%= t("navigation.#{key}") %></span>
+            <% if key == :whatsapp_inbox && whatsapp_unread_count.positive? %>
+              <span class="ms-auto rounded-full bg-white px-2 py-0.5 text-xs font-bold text-emerald-900"><%= whatsapp_unread_count %></span>
+            <% end %>
             <% if item.fetch(:coming_soon, false) && !active %>
               <span class="ms-auto text-[10px] font-normal text-app-subtle"><%= t("navigation.coming_soon") %></span>
             <% end %>

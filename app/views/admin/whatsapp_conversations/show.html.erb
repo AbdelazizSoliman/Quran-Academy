@@ -1,0 +1,24 @@
+<%= render "shared/page_header", title: @conversation.display_name, description: @conversation.sender_phone %>
+
+<section class="ds-card p-5">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <p><%= t("whatsapp_inbox.contact_type") %>: <%= @conversation.contact_type.presence || t("whatsapp_inbox.unmatched") %></p>
+      <p class="ds-caption"><%= t("whatsapp_inbox.statuses.#{@conversation.status}") %></p>
+    </div>
+    <% if @conversation.status == "open" %>
+      <%= button_to t("whatsapp_inbox.actions.archive"), archive_admin_whatsapp_conversation_path(@conversation), method: :patch, class: button_classes(variant: :secondary) %>
+    <% else %>
+      <%= button_to t("whatsapp_inbox.actions.reopen"), reopen_admin_whatsapp_conversation_path(@conversation), method: :patch, class: button_classes(variant: :secondary) %>
+    <% end %>
+  </div>
+</section>
+
+<section class="mt-6 space-y-3" aria-label="<%= t('whatsapp_inbox.messages_label') %>">
+  <% @messages.each do |message| %>
+    <article class="ds-card p-4">
+      <p class="whitespace-pre-wrap"><%= message.body.presence || t("whatsapp_inbox.message_types.#{message.message_type}", default: t("whatsapp_inbox.media_message")) %></p>
+      <p class="ds-caption mt-2"><%= l(message.received_at, format: :short) %> · <%= message.message_type %></p>
+    </article>
+  <% end %>
+</section>

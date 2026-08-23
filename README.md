@@ -406,6 +406,22 @@ All demo accounts use the password `DemoPass123!`. Useful accounts are:
 bundle exec rspec
 ```
 
+## Receiving WhatsApp messages
+
+The admin WhatsApp inbox receives Meta Cloud API webhook messages at
+`https://YOUR_APP_HOST/webhooks/whatsapp`. Configure the following production environment
+variables and restart the application:
+
+- `WHATSAPP_PHONE_NUMBER_ID`: the Cloud API phone number ID already used for outbound messages.
+- `WHATSAPP_WEBHOOK_VERIFY_TOKEN`: a long random secret chosen by the academy.
+- `WHATSAPP_APP_SECRET`: the Meta app secret from **App settings > Basic**.
+
+In Meta App Dashboard, open **WhatsApp > Configuration**, set the callback URL to the endpoint
+above, enter the same verify token, and subscribe the WhatsApp Business Account to the `messages`
+webhook field. The callback must be a publicly reachable HTTPS URL. Incoming messages are matched
+against normalized student, guardian, teacher, and staff WhatsApp/phone numbers. Unknown numbers
+remain visible as unmatched conversations in the admin inbox.
+
 ## Code quality and security
 
 ```bash

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_18_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_23_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1764,6 +1764,44 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_120000) do
     t.check_constraint "session_version >= 0", name: "users_session_version_nonnegative"
   end
 
+  create_table "whatsapp_conversations", force: :cascade do |t|
+    t.bigint "contact_id"
+    t.string "contact_type"
+    t.datetime "created_at", null: false
+    t.datetime "last_message_at", null: false
+    t.string "public_id", null: false
+    t.datetime "read_at"
+    t.string "sender_name"
+    t.string "sender_phone", null: false
+    t.string "status", default: "open", null: false
+    t.integer "unread_count", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["contact_type", "contact_id"], name: "index_whatsapp_conversations_on_contact"
+    t.index ["public_id"], name: "index_whatsapp_conversations_on_public_id", unique: true
+    t.index ["sender_phone"], name: "index_whatsapp_conversations_on_sender_phone", unique: true
+    t.index ["status", "last_message_at"], name: "index_whatsapp_conversations_on_status_and_last_message_at"
+    t.check_constraint "status::text = ANY (ARRAY['open'::character varying, 'archived'::character varying]::text[])", name: "whatsapp_conversations_status"
+    t.check_constraint "unread_count >= 0", name: "whatsapp_conversations_unread_count"
+  end
+
+  create_table "whatsapp_messages", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.string "direction", default: "inbound", null: false
+    t.string "message_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.string "provider_message_id", null: false
+    t.string "public_id", null: false
+    t.datetime "received_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "whatsapp_conversation_id", null: false
+    t.index ["provider_message_id"], name: "index_whatsapp_messages_on_provider_message_id", unique: true
+    t.index ["public_id"], name: "index_whatsapp_messages_on_public_id", unique: true
+    t.index ["whatsapp_conversation_id", "received_at"], name: "idx_whatsapp_messages_conversation_received"
+    t.index ["whatsapp_conversation_id"], name: "index_whatsapp_messages_on_whatsapp_conversation_id"
+    t.check_constraint "direction::text = ANY (ARRAY['inbound'::character varying, 'outbound'::character varying]::text[])", name: "whatsapp_messages_direction"
+  end
+
   add_foreign_key "academy_setting_events", "academy_settings", on_delete: :restrict
   add_foreign_key "academy_setting_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "academy_settings", "users", column: "updated_by_id", on_delete: :nullify
@@ -1960,4 +1998,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_120000) do
   add_foreign_key "user_account_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "user_account_events", "users", column: "target_user_id", on_delete: :restrict
   add_foreign_key "users", "users", column: "approved_by_id", on_delete: :nullify
+  add_foreign_key "whatsapp_messages", "whatsapp_conversations", on_delete: :restrict
 end

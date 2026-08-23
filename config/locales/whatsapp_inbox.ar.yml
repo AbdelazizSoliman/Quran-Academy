@@ -1,0 +1,15 @@
+ar:
+  whatsapp_inbox:
+    index:
+      title: "صندوق وارد واتساب"
+      description: "الرسائل الواردة إلى رقم واتساب الخاص بالأكاديمية."
+    statuses: { open: "مفتوحة", archived: "مؤرشفة" }
+    filters: { unread: "غير المقروءة فقط" }
+    actions: { archive: "أرشفة المحادثة", reopen: "إعادة فتح المحادثة" }
+    messages: { archived: "تمت أرشفة المحادثة.", reopened: "تمت إعادة فتح المحادثة." }
+    contact_type: "جهة الاتصال المطابقة"
+    unmatched: "رقم هاتف غير مطابق"
+    messages_label: "رسائل المحادثة"
+    media_message: "رسالة وسائط أو رسالة غير مدعومة"
+    message_types: { image: "صورة", audio: "صوت", video: "فيديو", document: "مستند", sticker: "ملصق", location: "موقع", contacts: "جهة اتصال" }
+    empty: "لا توجد محادثات واتساب واردة حتى الآن."
