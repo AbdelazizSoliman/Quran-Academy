@@ -54,6 +54,19 @@ RSpec.describe "Lesson report requests" do
     expect(response).to have_http_status(:ok)
     expect(response.body).to include("Reading practice", "Surah Al-Fatihah", "Repeat five times",
                                      "Start Al-Baqarah", "Clear pronunciation", "Review the lesson")
+    expect(response.body).not_to include(I18n.t("communications.actions.student_whatsapp", locale: :ar))
+  end
+
+  it "does not offer manual WhatsApp delivery from the admin lesson report" do
+    report = initialized_report
+    sign_in admin
+
+    get admin_lesson_report_path(report)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).not_to include(I18n.t("communications.actions.student_whatsapp", locale: :ar))
+    expect(response.body).not_to include(I18n.t("communications.actions.guardian_whatsapp", locale: :ar))
+    expect(response.body).to include(I18n.t("communications.actions.student_email", locale: :ar))
   end
 
   it "explains pending student reports in Arabic before submission" do

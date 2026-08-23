@@ -73,9 +73,6 @@
             </div>
           <% end %>
         </dl>
-        <div class="mt-3">
-          <%= button_to t("communications.actions.student_whatsapp"), teacher_schedule_report_communications_path(@lesson), method: :post, params: { entry_id: entry.id, channel: "whatsapp", template_type: "student_progress" }, class: button_classes(size: :small) %>
-        </div>
       <% end %>
     </article>
   <% end %>
