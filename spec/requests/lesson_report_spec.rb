@@ -40,6 +40,41 @@ RSpec.describe "Lesson report requests" do
                                                 ))
   end
 
+  it "shows the saved report details on the teacher report page" do
+    report = initialized_report
+    report.update!(lesson_summary: "Reading practice", topics_covered: "Surah Al-Fatihah",
+                   general_homework: "Repeat five times", next_lesson_plan: "Start Al-Baqarah",
+                   overall_engagement: "engaged", overall_progress: "meeting_expectations")
+    report.lesson_student_reports.first.update!(status: "completed", strengths: "Clear pronunciation",
+                                                homework: "Review the lesson")
+
+    sign_in lesson.teacher_profile.user
+    get teacher_schedule_report_path(lesson)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Reading practice", "Surah Al-Fatihah", "Repeat five times",
+                                     "Start Al-Baqarah", "Clear pronunciation", "Review the lesson")
+  end
+
+  it "explains pending student reports in Arabic before submission" do
+    report = initialized_report
+    report.update!(lesson_summary: "ملخص الدرس")
+    teacher = lesson.teacher_profile.user
+    teacher.update!(preferred_locale: "ar")
+    sign_in teacher
+
+    get teacher_schedule_report_path(lesson)
+    expect(response.body).to include(I18n.t("lesson_reports.messages.complete_students_before_submit", locale: :ar))
+    expect(response.body).not_to include(I18n.t("lesson_reports.actions.submit", locale: :ar))
+
+    patch submit_teacher_schedule_report_path(lesson)
+    expect(flash[:alert]).to include(I18n.t(
+                                       "activerecord.errors.models.lesson_report.attributes.base.unresolved_entries",
+                                       locale: :ar
+                                     ))
+    expect(flash[:alert]).not_to include("Translation missing")
+  end
+
   it "lets administrators review, lock, and reopen" do
     report = submitted_report
     sign_in admin

@@ -5,7 +5,7 @@ ar:
     student: { index_title: "تقارير دروسي", description: "تقارير تقدمك الأكاديمي النهائية." }
     statuses: { draft: "مسودة", submitted: "مقدم", reviewed: "تمت مراجعته", locked: "مقفل", reopened: "أعيد فتحه", archived: "مؤرشف" }
     student_statuses: { pending: "قيد الإكمال", completed: "مكتمل", not_applicable: "لا ينطبق", withheld: "محجوب" }
-    actions: { open: "فتح التقرير", edit: "تعديل", save: "حفظ التقرير", submit: "تقديم التقرير", review: "تأكيد المراجعة", lock: "قفل التقرير", reopen: "إعادة فتح التقرير", relock: "إعادة قفل التقرير" }
+    actions: { open: "فتح التقرير", edit: "تعديل", save: "حفظ التقرير", submit: "تقديم التقرير", complete_student_entry: "إكمال تقرير الطالب", review: "تأكيد المراجعة", lock: "قفل التقرير", reopen: "إعادة فتح التقرير", relock: "إعادة قفل التقرير" }
     sections: { students: "تقارير الطلاب", reading: "قراءة القرآن", memorization: "الحفظ", revision: "المراجعة", tajweed: "التجويد", progress: "التقدم الأكاديمي" }
     fields: { lesson_summary: "ملخص الدرس", topics_covered: "الموضوعات المغطاة", general_homework: "الواجب العام", next_lesson_plan: "خطة الدرس القادم", engagement: "التفاعل", progress: "التقدم", material: "المادة", strengths: "نقاط القوة", areas_for_improvement: "مجالات التحسين", homework: "الواجب", next_lesson_target: "هدف الدرس القادم", student_visible_notes: "ملاحظات ظاهرة للطالب", guardian_visible_notes: "ملاحظات موجهة لولي الأمر", private_teacher_notes: "ملاحظات المعلم الخاصة", status: "حالة التقرير" }
     engagement: { not_assessed: "لم يقيم", low: "منخفض", inconsistent: "متفاوت", engaged: "متفاعل", highly_engaged: "شديد التفاعل" }
@@ -14,8 +14,8 @@ ar:
     memorization: { not_assessed: "لم يقيم", new_assignment: "تكليف جديد", needs_revision: "يحتاج مراجعة", partially_memorized: "محفوظ جزئيًا", memorized_with_prompts: "محفوظ مع تلقين", memorized: "محفوظ", excellent: "ممتاز" }
     revision: { not_assessed: "لم تقيم", weak: "ضعيفة", needs_repetition: "تحتاج تكرارًا", acceptable: "مقبولة", good: "جيدة", very_good: "جيدة جدًا", excellent: "ممتازة" }
     tajweed: { makharij: "المخارج", sifat: "الصفات", madd: "المد", ghunnah: "الغنة", qalqalah: "القلقلة", noon_sakinah_tanween: "النون الساكنة والتنوين", meem_sakinah: "الميم الساكنة", waqf_ibtida: "الوقف والابتداء", general_recitation: "التلاوة العامة", other: "أخرى" }
-    messages: { updated: "تم تحديث تقرير الدرس." }
-    empty: { summary: "لم يضف ملخص بعد." }
+    messages: { updated: "تم تحديث تقرير الدرس.", complete_students_before_submit: "أكمل جميع تقارير الطلاب المعلقة قبل تقديم تقرير الدرس." }
+    empty: { summary: "لم يضف ملخص بعد.", not_provided: "لم تتم إضافته" }
     defaults: { reopening_reason: "طلب تصحيح من إدارة الأكاديمية" }
   communications:
     teacher: { show: { title: "معاينة التواصل" } }
@@ -37,3 +37,14 @@ ar:
       lateness_notice: "%{academy}\nسُجل تأخر %{student} عن %{lesson} بتاريخ %{date}."
       missed_lesson_follow_up: "%{academy}\nمتابعة %{student} بعد %{lesson}. الواجب: %{homework}"
       custom: "%{academy}\nتحديث درس %{student}: %{summary}"
+  activerecord:
+    errors:
+      models:
+        lesson_report:
+          attributes:
+            teacher_profile: { different_teacher: "يجب أن يكون معلم الدرس المعين" }
+            base: { ineligible_lesson: "تتوفر التقارير للدروس النشطة أو المكتملة فقط", initialization_failed: "تعذر إنشاء التقرير", forbidden: "لا يمكنك تعديل هذا التقرير", report_locked: "هذا التقرير غير قابل للتعديل", stale_record: "تم تغيير التقرير؛ أعد تحميل الصفحة وحاول مرة أخرى", lesson_not_completed: "يجب إكمال الدرس أولاً", attendance_not_locked: "يجب اعتماد الحضور أولاً", summary_required: "يجب إضافة ملخص واضح للدرس", unresolved_entries: "يجب إكمال تقارير جميع الطلاب المتوقعين", invalid_status: "التقرير ليس في الحالة المطلوبة", invalid_transition: "لا يمكن تغيير التقرير إلى هذه الحالة", reopening_reason_required: "يجب إضافة سبب لإعادة فتح التقرير" }
+        lesson_student_report:
+          attributes:
+            scheduled_lesson_enrollment: { different_lesson: "يجب أن ينتمي إلى الدرس الموجود في التقرير" }
+            base: { forbidden: "لا يمكنك تعديل تقرير هذا الطالب", report_locked: "هذا التقرير غير قابل للتعديل", stale_record: "تم تغيير تقرير الطالب؛ أعد تحميل الصفحة وحاول مرة أخرى" }

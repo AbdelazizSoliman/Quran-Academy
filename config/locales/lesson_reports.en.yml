@@ -5,7 +5,7 @@ en:
     student: { index_title: "My lesson reports", description: "Your finalized academic progress reports." }
     statuses: { draft: "Draft", submitted: "Submitted", reviewed: "Reviewed", locked: "Locked", reopened: "Reopened", archived: "Archived" }
     student_statuses: { pending: "Pending", completed: "Completed", not_applicable: "Not applicable", withheld: "Withheld" }
-    actions: { open: "Open report", edit: "Edit", save: "Save report", submit: "Submit report", review: "Mark reviewed", lock: "Lock report", reopen: "Reopen report", relock: "Relock report" }
+    actions: { open: "Open report", edit: "Edit", save: "Save report", submit: "Submit report", complete_student_entry: "Complete student report", review: "Mark reviewed", lock: "Lock report", reopen: "Reopen report", relock: "Relock report" }
     sections: { students: "Student entries", reading: "Quran reading", memorization: "Memorization", revision: "Revision", tajweed: "Tajweed", progress: "Academic progress" }
     fields: { lesson_summary: "Lesson summary", topics_covered: "Topics covered", general_homework: "General homework", next_lesson_plan: "Next lesson plan", engagement: "Engagement", progress: "Progress", material: "Material", strengths: "Strengths", areas_for_improvement: "Areas for improvement", homework: "Homework", next_lesson_target: "Next lesson target", student_visible_notes: "Student-visible notes", guardian_visible_notes: "Guardian-visible notes", private_teacher_notes: "Private teacher notes", status: "Entry status" }
     engagement: { not_assessed: "Not assessed", low: "Low", inconsistent: "Inconsistent", engaged: "Engaged", highly_engaged: "Highly engaged" }
@@ -14,8 +14,8 @@ en:
     memorization: { not_assessed: "Not assessed", new_assignment: "New assignment", needs_revision: "Needs revision", partially_memorized: "Partially memorized", memorized_with_prompts: "Memorized with prompts", memorized: "Memorized", excellent: "Excellent" }
     revision: { not_assessed: "Not assessed", weak: "Weak", needs_repetition: "Needs repetition", acceptable: "Acceptable", good: "Good", very_good: "Very good", excellent: "Excellent" }
     tajweed: { makharij: "Makharij", sifat: "Sifat", madd: "Madd", ghunnah: "Ghunnah", qalqalah: "Qalqalah", noon_sakinah_tanween: "Noon sakinah and tanween", meem_sakinah: "Meem sakinah", waqf_ibtida: "Waqf and ibtida", general_recitation: "General recitation", other: "Other" }
-    messages: { updated: "Lesson report updated." }
-    empty: { summary: "No summary has been added yet." }
+    messages: { updated: "Lesson report updated.", complete_students_before_submit: "Complete every pending student report before submitting the lesson report." }
+    empty: { summary: "No summary has been added yet.", not_provided: "Not provided" }
     defaults: { reopening_reason: "Correction requested by academy administration" }
   communications:
     admin: { index: { title: "Manual communication logs", description: "Prepared external communication actions without delivery claims." }, show: { title: "Communication preview" } }
