@@ -8,6 +8,7 @@ RSpec.describe AcademyCron do
   let(:finance_actor) { create(:user, :admin) }
   let(:pre_sweep) { instance_double(Notifications::LessonReminderScheduler, call: []) }
   let(:late_sweep) { instance_double(Notifications::LateAttendanceReminderScheduler, call: []) }
+  let(:attendance_sweep) { instance_double(LessonAttendances::AutomaticSweep, call: []) }
   let(:generation) { instance_double(EnrollmentLessonSchedules::GenerationSweep, call: []) }
   let(:invoice_generation) { instance_double(Finance::RecurringInvoiceGeneration, call: []) }
   let(:invoice_reminders) { instance_double(Notifications::InvoiceOverdueReminderScheduler, call: []) }
@@ -20,6 +21,7 @@ RSpec.describe AcademyCron do
     allow(ENV).to receive(:fetch).with("FINANCE_ACTOR_ID").and_return(finance_actor.id.to_s)
     allow(Notifications::LessonReminderScheduler).to receive(:new).and_return(pre_sweep)
     allow(Notifications::LateAttendanceReminderScheduler).to receive(:new).and_return(late_sweep)
+    allow(LessonAttendances::AutomaticSweep).to receive(:new).and_return(attendance_sweep)
     allow(EnrollmentLessonSchedules::GenerationSweep).to receive(:new).and_return(generation)
     allow(Finance::RecurringInvoiceGeneration).to receive(:new).and_return(invoice_generation)
     allow(Notifications::InvoiceOverdueReminderScheduler).to receive(:new).and_return(invoice_reminders)
@@ -29,6 +31,7 @@ RSpec.describe AcademyCron do
     expect(described_class.new(now:, connection:).call).to be(true)
     expect(pre_sweep).to have_received(:call)
     expect(late_sweep).to have_received(:call)
+    expect(attendance_sweep).to have_received(:call)
     expect(generation).to have_received(:call).once
     expect(CronRun.find_by!(task_name: "recurring_lesson_generation", run_on: now.to_date)).to be_completed_at
 

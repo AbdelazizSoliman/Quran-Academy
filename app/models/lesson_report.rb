@@ -5,7 +5,7 @@ class LessonReport < ApplicationRecord
   PROGRESS_LEVELS = %w[not_assessed needs_support developing meeting_expectations above_expectations excellent].freeze
 
   belongs_to :scheduled_lesson, inverse_of: :lesson_report
-  belongs_to :teacher_profile
+  belongs_to :teacher_profile, inverse_of: :lesson_reports
   belongs_to :created_by, class_name: "User"
   belongs_to :updated_by, class_name: "User"
   belongs_to :submitted_by, class_name: "User", optional: true

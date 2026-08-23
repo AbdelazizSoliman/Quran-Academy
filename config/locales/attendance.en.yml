@@ -3,14 +3,14 @@ en:
     admin:
       index: { title: "Attendance review", description: "Review operational lesson attendance in a finite date range." }
       show: { title: "Lesson attendance" }
-    teacher: { title: "Lesson attendance" }
+    teacher: { title: "Lesson attendance", automatic_hint: "Attendance is recorded automatically when students join. Students who do not join are marked absent after the configured threshold." }
     student: { index_title: "My attendance", description: "Your lesson attendance history.", outcome: "Attendance outcome" }
     sections: { participants: "Participants" }
     fields: { from: "From", to: "To", status: "Status", arrival: "Arrival", departure: "Departure", minutes_late: "Minutes late", teacher: "Teacher", reason: "Reason" }
     statuses: { pending: "Pending", present: "Present", late: "Late", absent: "Absent", excused_absence: "Excused absence", left_early: "Left early", lesson_cancelled: "Lesson cancelled", not_applicable: "Not applicable" }
     teacher_statuses: { not_checked_in: "Not checked in", on_time: "On time", late: "Late", absent: "Absent", administrator_override: "Administrator override" }
     workflow: { not_opened: "Attendance not opened", open: "Attendance open", locked: "Attendance locked", reopened: "Attendance reopened" }
-    actions: { filter: "Filter", manage: "Manage attendance", check_in: "Check in", check_in_override: "Check in teacher", start: "Start lesson", start_override: "Start with override", complete: "Complete lesson", lock: "Lock attendance", reopen: "Reopen attendance", arrival: "Record arrival", present: "Mark present", absent: "Mark absent", excuse: "Excuse absence", departure: "Record departure", adjust: "Adjust" }
+    actions: { filter: "Filter", manage: "View attendance", check_in: "Check in", check_in_override: "Check in teacher", start: "Start lesson", start_override: "Start with override", complete: "Complete lesson", complete_and_evaluate: "Complete and evaluate", lock: "Lock attendance", reopen: "Reopen attendance", arrival: "Record arrival", present: "Mark present", absent: "Mark absent", excuse: "Excuse absence", departure: "Record departure", adjust: "Adjust" }
     messages: { updated: "Lesson attendance updated.", locked: "Attendance is locked.", unresolved: "Resolve attendance before completing.", forbidden: "You are not allowed to perform this attendance action." }
     defaults: { admin_override: "Administrator operational override", completion_confirmation: "Confirmed unresolved students absent at completion", admin_adjustment: "Administrator attendance correction" }
     unresolved:

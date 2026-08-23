@@ -19,6 +19,7 @@ class AcademyCron
     return false unless acquire_lock
 
     run_reminder_sweeps
+    run_automatic_attendance
     run_recurring_generation_if_due
     run_invoice_generation_if_due
     run_invoice_reminders_if_due
@@ -46,6 +47,13 @@ class AcademyCron
     Notifications::LateAttendanceReminderScheduler.new(actor:, now: @now).call
   rescue StandardError => e
     Rails.logger.error("Academy cron reminder sweep failed exception=#{e.class}")
+  end
+
+  def run_automatic_attendance
+    actor = User.find(ENV.fetch("NOTIFICATION_ACTOR_ID"))
+    LessonAttendances::AutomaticSweep.new(actor:, now: @now).call
+  rescue StandardError => e
+    Rails.logger.error("Academy cron automatic attendance sweep failed exception=#{e.class}")
   end
 
   def run_recurring_generation_if_due

@@ -2,7 +2,11 @@ module Teacher
   class OperationalMetrics
     def initialize(teacher_profile:, date: Date.current)
       @teacher = teacher_profile
-      @lessons = teacher_profile.scheduled_lessons.where(starts_at: date.all_month)
+      @lessons = if teacher_profile
+                   teacher_profile.scheduled_lessons.where(starts_at: date.all_month)
+                 else
+                   ScheduledLesson.none
+                 end
     end
 
     def call
@@ -20,7 +24,8 @@ module Teacher
     end
 
     def report_metrics
-      { submitted_reports: @teacher.lesson_reports.where(status: %w[submitted reviewed locked]).count }
+      submitted = @teacher ? @teacher.lesson_reports.where(status: %w[submitted reviewed locked]).count : 0
+      { submitted_reports: submitted }
     end
   end
 end

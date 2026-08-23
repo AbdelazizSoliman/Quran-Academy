@@ -73,6 +73,26 @@ RSpec.describe "Lesson attendance services" do
     expect(attendance).to be_absent
   end
 
+  it "automatically starts overdue lessons and marks students who did not join absent" do
+    lesson.update!(starts_at: 20.minutes.ago, ends_at: 40.minutes.from_now)
+    AcademySetting.current.update!(absence_after_minutes: 15)
+
+    LessonAttendances::AutomaticSweep.new(actor: admin).call
+
+    expect(lesson.reload).to be_in_progress
+    expect(participant.reload.lesson_attendance).to be_absent
+  end
+
+  it "preserves automatic presence when a student joined before the absence sweep" do
+    lesson.update!(starts_at: 20.minutes.ago, ends_at: 40.minutes.from_now)
+    attendance = LessonAttendances::Join.new(actor: participant.student_profile.user, lesson:,
+                                             participation: participant, occurred_at: lesson.starts_at).call
+
+    LessonAttendances::AutomaticSweep.new(actor: admin).call
+
+    expect(attendance.reload).to be_present
+  end
+
   it "requires excuse reason and supports left-early departure" do
     attendance = opened_attendance
     expect(LessonAttendances::Excuse.new(actor: teacher, attendance:, reason: nil).call.errors).to be_present

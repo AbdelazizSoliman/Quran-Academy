@@ -88,7 +88,7 @@ RSpec.describe "Role-aware lesson join" do
   end
 
   describe "teacher join" do
-    it "checks in the assigned teacher and redirects to the meeting" do
+    it "checks in the assigned teacher, starts the lesson, and redirects to the meeting" do
       lesson = teacher_lesson
       sign_in lesson.teacher_profile.user
 
@@ -97,6 +97,8 @@ RSpec.describe "Role-aware lesson join" do
       expect(response).to redirect_to(lesson.online_meeting_join_url)
       expect(lesson.reload.teacher_checked_in_at).to be_within(1.second).of(lesson.starts_at)
       expect(lesson.teacher_attendance_status).to eq("on_time")
+      expect(lesson).to be_in_progress
+      expect(lesson.attendance_status).to eq("open")
       expect(lesson.events.where(event_type: "teacher_checked_in").count).to eq(1)
     end
 

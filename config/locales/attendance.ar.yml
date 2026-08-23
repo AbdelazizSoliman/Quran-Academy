@@ -3,14 +3,14 @@ ar:
     admin:
       index: { title: "مراجعة الحضور", description: "مراجعة حضور الدروس التشغيلي ضمن فترة زمنية محددة." }
       show: { title: "حضور الدرس" }
-    teacher: { title: "حضور الدرس" }
+    teacher: { title: "حضور الدرس", automatic_hint: "يُسجل الحضور تلقائياً عند انضمام الطالب، ويُسجل الغياب بعد المدة المحددة إذا لم ينضم." }
     student: { index_title: "حضوري", description: "سجل حضورك للدروس.", outcome: "نتيجة الحضور" }
     sections: { participants: "المشاركون" }
     fields: { from: "من", to: "إلى", status: "الحالة", arrival: "الوصول", departure: "المغادرة", minutes_late: "دقائق التأخر", teacher: "المعلم", reason: "السبب" }
     statuses: { pending: "قيد الانتظار", present: "حاضر", late: "متأخر", absent: "غائب", excused_absence: "غياب بعذر", left_early: "غادر مبكرًا", lesson_cancelled: "الدرس ملغي", not_applicable: "لا ينطبق" }
     teacher_statuses: { not_checked_in: "لم يسجل الحضور", on_time: "في الموعد", late: "متأخر", absent: "غائب", administrator_override: "تجاوز إداري" }
     workflow: { not_opened: "الحضور غير مفتوح", open: "الحضور مفتوح", locked: "الحضور مقفل", reopened: "أعيد فتح الحضور" }
-    actions: { filter: "تصفية", manage: "إدارة الحضور", check_in: "تسجيل الحضور", check_in_override: "تسجيل حضور المعلم", start: "بدء الدرس", start_override: "بدء بتجاوز إداري", complete: "إكمال الدرس", lock: "قفل الحضور", reopen: "إعادة فتح الحضور", arrival: "تسجيل الوصول", present: "تحديد حاضر", absent: "تحديد غائب", excuse: "تسجيل عذر", departure: "تسجيل المغادرة", adjust: "تعديل" }
+    actions: { filter: "تصفية", manage: "عرض الحضور", check_in: "تسجيل الحضور", check_in_override: "تسجيل حضور المعلم", start: "بدء الدرس", start_override: "بدء بتجاوز إداري", complete: "إكمال الدرس", complete_and_evaluate: "إكمال وتقييم الطلاب", lock: "قفل الحضور", reopen: "إعادة فتح الحضور", arrival: "تسجيل الوصول", present: "تحديد حاضر", absent: "تحديد غائب", excuse: "تسجيل عذر", departure: "تسجيل المغادرة", adjust: "تعديل" }
     messages: { updated: "تم تحديث حضور الدرس.", locked: "الحضور مقفل.", unresolved: "أكمل حالات الحضور قبل إنهاء الدرس.", forbidden: "لا يسمح لك بتنفيذ إجراء الحضور هذا." }
     defaults: { admin_override: "تجاوز تشغيلي بواسطة الإدارة", completion_confirmation: "تم تأكيد غياب الطلاب غير المحسومين عند الإكمال", admin_adjustment: "تصحيح حضور بواسطة الإدارة" }
     unresolved: { one: "حالة حضور واحدة غير محسومة", other: "%{count} حالات حضور غير محسومة" }

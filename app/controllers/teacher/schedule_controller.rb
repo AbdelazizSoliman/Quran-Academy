@@ -38,7 +38,8 @@ module Teacher
 
     def complete
       options = { mark_unresolved_absent: params[:mark_unresolved_absent], notes: params[:completion_notes] }
-      operate LessonOperations::Complete.new(actor: current_user, lesson: owned_lesson, options:)
+      operate LessonOperations::Complete.new(actor: current_user, lesson: owned_lesson, options:),
+              success_path: ->(lesson) { teacher_schedule_report_path(lesson) }
     end
 
     private
@@ -47,12 +48,19 @@ module Teacher
       destination = @lesson.safe_online_meeting_join_url
       return redirect_to(teacher_schedule_path(@lesson), alert: t("scheduling.join.invalid_url")) unless destination
 
-      @lesson = LessonOperations::CheckIn.new(actor: current_user, lesson: @lesson).call
+      @lesson = check_in_and_start(@lesson)
       if @lesson.errors.any?
         return redirect_to(teacher_schedule_path(@lesson), alert: @lesson.errors.full_messages.to_sentence)
       end
 
       redirect_to destination, allow_other_host: true
+    end
+
+    def check_in_and_start(lesson)
+      lesson = LessonOperations::CheckIn.new(actor: current_user, lesson:).call
+      return lesson if lesson.errors.any? || !lesson.scheduled?
+
+      LessonOperations::Start.new(actor: current_user, lesson:).call
     end
 
     def set_lesson
@@ -63,9 +71,9 @@ module Teacher
       current_user.teacher_profile.scheduled_lessons.includes(:course_offering).find(params.expect(:id))
     end
 
-    def operate(operation)
+    def operate(operation, success_path: ->(lesson) { attendance_teacher_schedule_path(lesson) })
       @lesson = operation.call
-      destination = @lesson.errors.empty? ? attendance_teacher_schedule_path(@lesson) : teacher_schedule_path(@lesson)
+      destination = @lesson.errors.empty? ? success_path.call(@lesson) : teacher_schedule_path(@lesson)
       options = if @lesson.errors.empty?
                   { notice: t("attendance.messages.updated") }
                 else
