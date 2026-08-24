@@ -11,11 +11,13 @@ module Teacher
     end
 
     def new
+      template = Assessments::MadarakTemplate.ensure!(actor: current_user)
       @assessment = StudentAssessment.new(teacher_profile: current_user.teacher_profile,
                                           assessment_date: Date.current,
                                           enrollment: assessment_enrollment,
                                           student_profile: assessment_student,
-                                          scheduled_lesson: assessment_lesson)
+                                          scheduled_lesson: assessment_lesson,
+                                          assessment_template: template)
       @enrollments = available_enrollments
     end
 

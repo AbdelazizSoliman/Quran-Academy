@@ -14,6 +14,9 @@ RSpec.describe "Teacher assessments" do
     expect(response).to have_http_status(:ok)
     document = response.parsed_body
     expect(document.at_css("form")&.attr("action")).to eq(teacher_assessments_path)
+    template = AssessmentTemplate.find_by!(name_en: Assessments::MadarakTemplate::NAME_EN)
+    selected = document.at_css("select[name='student_assessment[assessment_template_id]'] option[selected]")
+    expect(selected&.attr("value")).to eq(template.id.to_s)
   end
 
   it "prefills the student and lesson when evaluating after a completed lesson" do
