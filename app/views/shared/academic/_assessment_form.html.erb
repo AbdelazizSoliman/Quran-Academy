@@ -20,7 +20,7 @@
       <div class="grid gap-5 sm:grid-cols-2">
         <% scores.each do |score| %><% rubric = score.assessment_rubric_item %>
           <div><%= hidden_field_tag "scores[#{score.id}][lock_version]", score.lock_version %><label class="ds-label" for="score_<%= score.id %>"><%= rubric.localized_name %> (<%= rubric.weight %>%)</label>
-            <% if rubric.numeric? %><%= number_field_tag "scores[#{score.id}][numeric_score]", score.numeric_score, id: "score_#{score.id}", min: 0, max: rubric.maximum_score, step: 0.01, class: "ds-control mt-2" %>
+            <% if rubric.numeric? || score.numeric_score.present? %><%= number_field_tag "scores[#{score.id}][numeric_score]", score.numeric_score, id: "score_#{score.id}", min: 0, max: rubric.maximum_score, step: 0.01, class: "ds-control mt-2" %>
             <% else %><%= select_tag "scores[#{score.id}][rating]", options_for_select(AssessmentRubricItem::RATINGS.map { |rating| [t("academic.ratings.#{rating}"), rating] }, score.rating), id: "score_#{score.id}", class: "ds-control mt-2" %><% end %>
             <%= text_area_tag "scores[#{score.id}][comments]", score.comments, class: "ds-control mt-2", rows: 2, aria: { label: t("academic.fields.comments") } %></div>
         <% end %>

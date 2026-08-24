@@ -1,0 +1,56 @@
+<div class="space-y-5" dir="<%= I18n.locale == :ar ? 'rtl' : 'ltr' %>">
+  <%= render "shared/page_header", title: (@assessment.student_profile.present? ? t("academic.actions.evaluate_student") : t("academic.assessments.index")),
+      description: @assessment.student_profile&.display_name,
+      primary_action: render("shared/components/button", label: t("academic.actions.new_assessment"), href: "#new-evaluation", icon: :plus) %>
+
+  <section id="new-evaluation" class="ds-card overflow-hidden">
+    <header class="flex items-center gap-3 border-b border-app-border px-5 py-4">
+      <span class="flex size-10 items-center justify-center rounded-xl bg-app-primary-soft text-app-primary"><%= icon :plus, decorative: true %></span>
+      <h2 class="ds-section-title"><%= t("academic.actions.new_assessment") %></h2>
+    </header>
+    <div class="p-5">
+      <%= render "quick_form", assessment: @assessment, enrollments: @enrollments,
+                               students: @students, quick_scores: @quick_scores %>
+    </div>
+  </section>
+
+  <section class="overflow-hidden rounded-[var(--radius-card)] border border-app-border bg-app-surface">
+    <header class="border-b border-app-border px-5 py-4">
+      <h2 class="ds-card-title"><%= t("academic.assessments.recent", default: "آخر تقييمات الحصص") %></h2>
+    </header>
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[680px] border-collapse text-sm">
+        <thead class="bg-app-muted text-app-subtle">
+          <tr>
+            <th class="px-5 py-3 text-start text-xs font-bold"><%= t("academic.fields.student") %></th>
+            <% Assessments::MadarakTemplate::CATEGORIES.keys.first(3).each do |code| %>
+              <th class="px-3 py-3 text-start text-xs font-bold"><%= t("madarak_evaluations.fields.#{code}") %></th>
+            <% end %>
+            <th class="px-3 py-3 text-start text-xs font-bold"><%= t("academic.fields.score") %></th>
+            <th class="px-5 py-3 text-end text-xs font-bold"><%= t("academic.fields.date") %></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-app-border">
+          <% @assessments.each do |assessment| %>
+            <% values = assessment.scores.index_by { |score| score.assessment_rubric_item.assessment_category.code } %>
+            <tr class="transition hover:bg-app-muted/60">
+              <td class="px-5 py-4">
+                <%= link_to assessment.student_profile.display_name, teacher_assessment_path(assessment), class: "font-semibold text-app-primary hover:underline" %>
+                <div class="mt-1 text-xs text-app-subtle"><%= assessment.public_id %></div>
+              </td>
+              <% Assessments::MadarakTemplate::CATEGORIES.keys.first(3).each do |code| %>
+                <% score = values[code] %>
+                <td class="px-3 py-4"><%= score&.percentage&.round || "—" %></td>
+              <% end %>
+              <td class="px-3 py-4 font-bold"><%= assessment.overall_score&.round || "—" %></td>
+              <td class="px-5 py-4 text-end text-app-secondary"><%= l assessment.assessment_date %></td>
+            </tr>
+          <% end %>
+          <% if @assessments.empty? %>
+            <tr><td colspan="6" class="px-5 py-10 text-center text-app-secondary"><%= t("academic.empty") %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

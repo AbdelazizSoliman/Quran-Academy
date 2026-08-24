@@ -18,8 +18,37 @@ RSpec.describe "Teacher assessments" do
     template_field = document.at_css("input[name='student_assessment[assessment_template_id]']")
     expect(template_field&.attr("value")).to eq(template.id.to_s)
     Assessments::MadarakTemplate::CATEGORIES.each_key do |code|
-      expect(document.at_css("select[name='quick_scores[#{code}]']")).to be_present
+      expect(document.at_css("input[type='number'][name='quick_scores[#{code}]']")).to be_present
     end
+  end
+
+  it "shows the evaluation form and recent lesson evaluations in one workspace" do
+    assessment = create(:student_assessment, teacher_profile: teacher, overall_score: 85)
+
+    get teacher_assessments_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body.at_css("#new-evaluation form")).to be_present
+    expect(response.body).to include(assessment.student_profile.display_name)
+  end
+
+  it "accepts exact numeric scores in the teacher evaluation form" do
+    lesson = create(:scheduled_lesson, teacher_profile: teacher, status: "completed",
+                                       completed_at: Time.current, attendance_status: "locked")
+    participant = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+    template = Assessments::MadarakTemplate.ensure!(actor: teacher.user)
+
+    post teacher_assessments_path, params: {
+      student_assessment: { student_profile_id: participant.student_profile.id,
+                            scheduled_lesson_id: lesson.id, assessment_template_id: template.id,
+                            assessment_date: Date.current },
+      quick_scores: { memorization: 90, tajweed: 80, attendance: 70, behavior: 60 }
+    }
+
+    assessment = StudentAssessment.last
+    expect(response).to redirect_to(teacher_assessment_path(assessment))
+    expect(assessment.overall_score).to eq(75)
+    expect(assessment.scores.pluck(:numeric_score)).to contain_exactly(90, 80, 70, 60)
   end
 
   it "prefills the student and lesson when evaluating after a completed lesson" do

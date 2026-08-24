@@ -63,7 +63,7 @@ module StudentAssessments
 
       expected = Assessments::MadarakTemplate::CATEGORIES.keys
       valid = expected.all? do |code|
-        AssessmentRubricItem::RATINGS.include?(@category_scores[code])
+        valid_category_score?(@category_scores[code])
       end
       assessment.errors.add(:base, I18n.t("madarak_evaluations.errors.incomplete_scores")) unless valid
       valid
@@ -72,8 +72,25 @@ module StudentAssessments
     def apply_category_scores!(assessment)
       assessment.scores.includes(assessment_rubric_item: :assessment_category).find_each do |score|
         code = score.assessment_rubric_item.assessment_category.code
-        score.update!(rating: @category_scores.fetch(code)) if @category_scores.key?(code)
+        next unless @category_scores.key?(code)
+
+        value = @category_scores.fetch(code)
+        if numeric_score?(value)
+          score.update!(numeric_score: value)
+        else
+          score.update!(rating: value)
+        end
       end
+    end
+
+    def valid_category_score?(value)
+      AssessmentRubricItem::RATINGS.include?(value) || numeric_score?(value)
+    end
+
+    def numeric_score?(value)
+      Float(value).between?(0, 100)
+    rescue ArgumentError, TypeError
+      false
     end
 
     def recalculate!(assessment)

@@ -10,14 +10,18 @@ class AssessmentScore < ApplicationRecord
   validate :score_matches_type
 
   def percentage
+    return numeric_percentage if numeric_score.present?
     return if assessment_rubric_item.numeric? && numeric_score.nil?
     return if assessment_rubric_item.rating? && rating.blank?
-    return numeric_score.to_d / assessment_rubric_item.maximum_score * 100 if assessment_rubric_item.numeric?
 
     AssessmentRubricItem::RATING_PERCENTAGES[rating].to_d
   end
 
   private
+
+  def numeric_percentage
+    numeric_score.to_d / assessment_rubric_item.maximum_score * 100
+  end
 
   def rubric_consistency
     return if assessment_rubric_item&.assessment_template_id == student_assessment&.assessment_template_id
@@ -29,6 +33,6 @@ class AssessmentScore < ApplicationRecord
     item = assessment_rubric_item
     return unless item
 
-    errors.add(:numeric_score, :too_high) if item.numeric? && numeric_score.to_d > item.maximum_score
+    errors.add(:numeric_score, :too_high) if numeric_score.present? && numeric_score.to_d > item.maximum_score
   end
 end

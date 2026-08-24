@@ -37,7 +37,7 @@ RSpec.describe "Lesson attendance requests" do
     patch complete_teacher_schedule_path(lesson), params: { mark_unresolved_absent: true }
 
     expect(lesson.reload).to be_completed
-    expect(response).to redirect_to(teacher_schedule_report_path(lesson))
+    expect(response).to redirect_to(new_teacher_assessment_path(scheduled_lesson_id: lesson.id))
   end
 
   it "shows teachers their attendance report instead of redirecting them to the schedule" do
