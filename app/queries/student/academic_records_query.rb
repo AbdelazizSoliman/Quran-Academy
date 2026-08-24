@@ -5,7 +5,7 @@ module Student
     end
 
     def assessments
-      StudentAssessment.where(student_profile: @student_profile, status: "published")
+      StudentAssessment.where(student_profile: @student_profile, status: %w[submitted reviewed published])
                        .includes(:assessment_template, :teacher_profile).recent_first
     end
 

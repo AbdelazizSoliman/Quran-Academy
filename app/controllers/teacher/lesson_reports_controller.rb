@@ -11,9 +11,7 @@ module Teacher
                            alert: @report.errors.full_messages.to_sentence
       end
 
-      @entries = @report.lesson_student_reports.includes(
-        scheduled_lesson_enrollment: [:student_profile, { enrollment: :student_profile }]
-      )
+      load_student_records
     end
 
     def edit; end
@@ -29,6 +27,15 @@ module Teacher
     end
 
     private
+
+    def load_student_records
+      @entries = @report.lesson_student_reports.includes(
+        scheduled_lesson_enrollment: [:student_profile, { enrollment: :student_profile }]
+      )
+      @assessments_by_student_id = StudentAssessment.where(teacher_profile: current_user.teacher_profile,
+                                                           scheduled_lesson: @lesson)
+                                                    .index_by(&:student_profile_id)
+    end
 
     def set_lesson
       @lesson = current_user.teacher_profile.scheduled_lessons.find(params.expect(:schedule_id))

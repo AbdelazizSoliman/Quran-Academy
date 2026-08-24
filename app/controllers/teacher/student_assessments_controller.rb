@@ -14,6 +14,7 @@ module Teacher
       @assessment = StudentAssessment.new(teacher_profile: current_user.teacher_profile,
                                           assessment_date: Date.current,
                                           enrollment: assessment_enrollment,
+                                          student_profile: assessment_student,
                                           scheduled_lesson: assessment_lesson)
       @enrollments = available_enrollments
     end
@@ -27,6 +28,7 @@ module Teacher
 
     def create
       attributes = assessment_params.merge(teacher_profile_id: current_user.teacher_profile.id)
+      attributes[:student_profile_id] = direct_assessment_student&.id if attributes[:enrollment_id].blank?
       @assessment = StudentAssessments::Create.new(actor: current_user, attributes:).call
       respond_to_save
     end
@@ -53,7 +55,7 @@ module Teacher
     end
 
     def assessment_params
-      params.expect(student_assessment: %i[enrollment_id scheduled_lesson_id assessment_template_id
+      params.expect(student_assessment: %i[enrollment_id student_profile_id scheduled_lesson_id assessment_template_id
                                            assessment_date notes lock_version])
     end
 
@@ -67,21 +69,37 @@ module Teacher
     end
 
     def assessment_lesson
-      return if params[:scheduled_lesson_id].blank?
+      lesson_id = params[:scheduled_lesson_id] || params.dig(:student_assessment, :scheduled_lesson_id)
+      return if lesson_id.blank?
 
       if defined?(@assessment_lesson)
         @assessment_lesson
       else
         @assessment_lesson = current_user.teacher_profile.scheduled_lessons
                                          .where(status: "completed")
-                                         .find_by(id: params[:scheduled_lesson_id])
+                                         .find_by(id: lesson_id)
       end
     end
 
     def assessment_enrollment
-      return if params[:enrollment_id].blank? || assessment_lesson.blank?
+      enrollment_id = params[:enrollment_id] || params.dig(:student_assessment, :enrollment_id)
+      return if enrollment_id.blank? || assessment_lesson.blank?
 
-      assessment_lesson.enrollments.find_by(id: params[:enrollment_id])
+      assessment_lesson.enrollments.find_by(id: enrollment_id)
+    end
+
+    def assessment_student
+      assessment_enrollment&.student_profile || direct_assessment_student
+    end
+
+    def direct_assessment_student
+      return if assessment_lesson.blank?
+
+      student_id = params[:student_profile_id] || params.dig(:student_assessment, :student_profile_id)
+      return if student_id.blank?
+
+      assessment_lesson.scheduled_lesson_enrollments.expected
+                       .for_student_profile_ids([student_id]).first&.student_profile
     end
 
     def respond_to_save

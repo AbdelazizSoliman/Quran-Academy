@@ -90,18 +90,22 @@ RSpec.describe "Teacher academic progress access" do
 end
 
 RSpec.describe "Student academic records" do
-  it "shows only the student's published records and hides drafts" do
+  it "shows submitted and published records to the student while hiding drafts" do
     student = create(:student_profile)
     published = create(:student_assessment, student_profile: student,
                                             enrollment: create(:enrollment, student_profile: student), status: "published")
     draft = create(:student_assessment, student_profile: student,
                                         enrollment: create(:enrollment, student_profile: student), status: "draft")
+    submitted = create(:student_assessment, student_profile: student,
+                                            enrollment: create(:enrollment, student_profile: student),
+                                            status: "submitted")
     student.user.update!(preferred_locale: "ar")
     sign_in student.user
 
     get student_assessments_path
     expect(response).to have_http_status(:ok)
     expect(response.body).to include(published.public_id)
+    expect(response.body).to include(submitted.public_id)
     expect(response.body).to include(I18n.l(published.assessment_date, locale: :ar))
     expect(response.body).not_to include(draft.public_id)
     get student_assessment_path(draft)

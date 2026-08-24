@@ -4,7 +4,11 @@
   <%= form.hidden_field :scheduled_lesson_id if assessment.scheduled_lesson_id.present? %>
   <div class="ds-card grid gap-5 p-5 sm:grid-cols-2">
     <% unless assessment.persisted? %>
-      <div><%= form.label :enrollment_id, t("academic.fields.enrollment"), class: "ds-label" %><%= form.collection_select :enrollment_id, enrollments, :id, ->(e) { "#{e.public_id} — #{e.student_profile.user.full_name}" }, {}, class: "ds-control mt-2" %></div>
+      <% if assessment.enrollment.nil? && assessment.student_profile.present? && assessment.scheduled_lesson.present? %>
+        <div><span class="ds-label"><%= t("academic.fields.student") %></span><p class="mt-2"><%= assessment.student_profile.display_name %></p><%= form.hidden_field :student_profile_id %></div>
+      <% else %>
+        <div><%= form.label :enrollment_id, t("academic.fields.enrollment"), class: "ds-label" %><%= form.collection_select :enrollment_id, enrollments, :id, ->(e) { "#{e.public_id} — #{e.student_profile.user.full_name}" }, {}, class: "ds-control mt-2" %></div>
+      <% end %>
       <% if admin %><div><%= form.label :teacher_profile_id, t("academic.fields.teacher"), class: "ds-label" %><%= form.collection_select :teacher_profile_id, TeacherProfile.includes(:user), :id, ->(p) { p.user.full_name }, {}, class: "ds-control mt-2" %></div><% end %>
       <div><%= form.label :assessment_template_id, t("academic.fields.template"), class: "ds-label" %><%= form.collection_select :assessment_template_id, AssessmentTemplate.where(status: "active").ordered, :id, ->(template) { template.localized_name }, {}, class: "ds-control mt-2" %></div>
     <% end %>

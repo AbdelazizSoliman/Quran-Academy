@@ -7,19 +7,11 @@ module StudentAssessments
     end
 
     def call
-      assessment = StudentAssessment.new(@attributes)
-      assessment.student_profile = assessment.enrollment&.student_profile
-      assessment.created_by = assessment.updated_by = @actor
+      assessment = build_assessment
       return forbidden(assessment) unless authorized?(assessment)
       return assessment unless valid_category_scores?(assessment)
 
-      StudentAssessment.transaction do
-        assessment.save!
-        initialize_scores!(assessment)
-        apply_category_scores!(assessment)
-        recalculate!(assessment) if @category_scores.any?
-        event!(assessment, "created", after_data: snapshot(assessment))
-      end
+      StudentAssessment.transaction { persist!(assessment) }
       assessment
     rescue ActiveRecord::RecordInvalid
       assessment
@@ -27,14 +19,35 @@ module StudentAssessments
 
     private
 
+    def build_assessment
+      StudentAssessment.new(@attributes).tap do |assessment|
+        assessment.student_profile ||= assessment.enrollment&.student_profile
+        assessment.created_by = assessment.updated_by = @actor
+      end
+    end
+
+    def persist!(assessment)
+      assessment.save!
+      initialize_scores!(assessment)
+      apply_category_scores!(assessment)
+      recalculate!(assessment) if @category_scores.any?
+      event!(assessment, "created", after_data: snapshot(assessment))
+    end
+
     def authorized?(assessment)
       return false unless @actor.active?
       return true if @actor.admin?
 
-      @actor.teacher? && assessment.teacher_profile&.user_id == @actor.id && assigned_enrollment?(assessment)
+      @actor.teacher? && assessment.teacher_profile&.user_id == @actor.id && assigned_student?(assessment)
     end
 
-    def assigned_enrollment?(assessment)
+    def assigned_student?(assessment)
+      if assessment.scheduled_lesson
+        return assessment.scheduled_lesson.teacher_profile_id == assessment.teacher_profile_id &&
+               assessment.scheduled_lesson.scheduled_lesson_enrollments.expected
+                         .for_student_profile_ids([assessment.student_profile_id]).exists?
+      end
+
       ScheduledLesson.exists?(teacher_profile: assessment.teacher_profile,
                               course_offering_id: assessment.enrollment&.course_offering_id)
     end

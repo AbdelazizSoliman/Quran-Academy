@@ -67,6 +67,7 @@ ar:
     actions:
       new_assessment: "تقييم جديد"
       evaluate_student: "تقييم الطالب"
+      view_assessment: "عرض التقييم"
       edit_assessment: "تعديل التقييم"
       new_template: "نموذج جديد"
       edit_template: "تعديل النموذج"

@@ -36,8 +36,49 @@ RSpec.describe "Lesson report requests" do
     evaluation_link = response.parsed_body.at_css("a[href^='/teacher/assessments/new']")
     expect(evaluation_link&.attr("href")).to eq(new_teacher_assessment_path(
                                                   enrollment_id: participant.enrollment_id,
+                                                  student_profile_id: participant.student_profile.id,
                                                   scheduled_lesson_id: lesson.id
                                                 ))
+  end
+
+  it "offers evaluation from a completed direct-student report" do
+    student = create(:student_profile, :complete)
+    direct_lesson = create(:scheduled_lesson, teacher_profile: lesson.teacher_profile, course_offering: nil,
+                                              status: "completed", started_at: 1.hour.ago,
+                                              ended_at: Time.current, completed_at: Time.current,
+                                              attendance_status: "locked")
+    participation = create(:scheduled_lesson_enrollment, scheduled_lesson: direct_lesson, enrollment: nil,
+                                                          student_profile: student)
+    create(:lesson_attendance, scheduled_lesson: direct_lesson, scheduled_lesson_enrollment: participation,
+                               status: "present")
+    report = LessonReports::Initialize.new(actor: direct_lesson.teacher_profile.user, lesson: direct_lesson).call
+    report.lesson_student_reports.sole.update!(status: "completed")
+    sign_in direct_lesson.teacher_profile.user
+
+    get teacher_schedule_report_path(direct_lesson)
+
+    expect(response).to have_http_status(:ok)
+    link = response.parsed_body.at_css("a[href^='/teacher/assessments/new']")
+    expect(link&.attr("href")).to eq(new_teacher_assessment_path(
+                                      enrollment_id: nil, student_profile_id: student.id,
+                                      scheduled_lesson_id: direct_lesson.id
+                                    ))
+  end
+
+  it "links an existing lesson evaluation instead of offering a duplicate" do
+    report = initialized_report
+    assessment = create(:student_assessment, teacher_profile: lesson.teacher_profile,
+                                             enrollment: participant.enrollment,
+                                             student_profile: participant.student_profile,
+                                             scheduled_lesson: lesson)
+    sign_in lesson.teacher_profile.user
+
+    get teacher_schedule_report_path(lesson)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(I18n.t("academic.actions.view_assessment", locale: :ar))
+    expect(response.parsed_body.at_css("a[href='#{teacher_assessment_path(assessment)}']")).to be_present
+    expect(report).to be_persisted
   end
 
   it "shows the saved report details on the teacher report page" do

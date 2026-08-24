@@ -57,8 +57,12 @@
           <% if @report.teacher_editable? %>
             <%= render "shared/components/button", label: t("lesson_reports.actions.complete_student_entry"), href: edit_teacher_schedule_report_student_path(@lesson, entry), size: :small, variant: :secondary %>
           <% end %>
-          <% if @lesson.completed? && entry.scheduled_lesson_enrollment.enrollment_id.present? %>
-            <%= render "shared/components/button", label: t("academic.actions.evaluate_student"), href: new_teacher_assessment_path(enrollment_id: entry.scheduled_lesson_enrollment.enrollment_id, scheduled_lesson_id: @lesson.id), size: :small %>
+          <% if @lesson.completed? %>
+            <% if (assessment = @assessments_by_student_id[entry.student_profile.id]) %>
+              <%= render "shared/components/button", label: t("academic.actions.view_assessment"), href: teacher_assessment_path(assessment), size: :small %>
+            <% else %>
+              <%= render "shared/components/button", label: t("academic.actions.evaluate_student"), href: new_teacher_assessment_path(enrollment_id: entry.scheduled_lesson_enrollment.enrollment_id, student_profile_id: entry.student_profile.id, scheduled_lesson_id: @lesson.id), size: :small %>
+            <% end %>
           <% end %>
         </div>
       </div>
