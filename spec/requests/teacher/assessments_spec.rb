@@ -33,6 +33,27 @@ RSpec.describe "Teacher assessments" do
       .to eq(participant.enrollment_id.to_s)
     expect(document.at_css("input[name='student_assessment[scheduled_lesson_id]']")&.attr("value"))
       .to eq(lesson.id.to_s)
+    expect(response.body).to include(I18n.t("academic.actions.evaluate_student", locale: :ar))
+    expect(response.body).not_to include(I18n.t("academic.actions.edit_assessment", locale: :ar))
+  end
+
+  it "opens an owned draft directly in the continue-evaluation form" do
+    assessment = create(:student_assessment, teacher_profile: teacher)
+
+    get evaluate_teacher_assessment_path(assessment)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(I18n.t("academic.actions.continue_student_assessment", locale: :ar))
+    expect(response.body).not_to include(I18n.t("academic.actions.edit_assessment", locale: :ar))
+    expect(response.parsed_body.at_css("form")&.attr("action")).to eq(teacher_assessment_path(assessment))
+  end
+
+  it "does not let a teacher evaluate another teacher's assessment" do
+    other_assessment = create(:student_assessment)
+
+    get evaluate_teacher_assessment_path(other_assessment)
+
+    expect(response).to have_http_status(:not_found)
   end
 
   it "creates and lists an assessment for a direct private-lesson student" do

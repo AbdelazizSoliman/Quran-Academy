@@ -67,6 +67,7 @@ en:
     actions:
       new_assessment: "New assessment"
       evaluate_student: "Evaluate student"
+      continue_student_assessment: "Continue student evaluation"
       view_assessment: "View evaluation"
       edit_assessment: "Edit assessment"
       new_template: "New template"

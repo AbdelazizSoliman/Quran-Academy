@@ -59,7 +59,11 @@
           <% end %>
           <% if @lesson.completed? %>
             <% if (assessment = @assessments_by_student_id[entry.student_profile.id]) %>
-              <%= render "shared/components/button", label: t("academic.actions.view_assessment"), href: teacher_assessment_path(assessment), size: :small %>
+              <% if assessment.editable? %>
+                <%= render "shared/components/button", label: t("academic.actions.continue_student_assessment"), href: evaluate_teacher_assessment_path(assessment), size: :small %>
+              <% else %>
+                <%= render "shared/components/button", label: t("academic.actions.view_assessment"), href: teacher_assessment_path(assessment), size: :small %>
+              <% end %>
             <% else %>
               <%= render "shared/components/button", label: t("academic.actions.evaluate_student"), href: new_teacher_assessment_path(enrollment_id: entry.scheduled_lesson_enrollment.enrollment_id, student_profile_id: entry.student_profile.id, scheduled_lesson_id: @lesson.id), size: :small %>
             <% end %>

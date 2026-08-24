@@ -22,10 +22,14 @@ module Teacher
     end
 
     def edit
-      return head :forbidden unless @assessment.editable?
+      prepare_evaluation_form?
+      nil
+    end
 
-      @scores = @assessment.scores.includes(:assessment_rubric_item)
-      @enrollments = available_enrollments
+    def evaluate
+      return unless prepare_evaluation_form?
+
+      render :edit
     end
 
     def create
@@ -48,6 +52,17 @@ module Teacher
     end
 
     private
+
+    def prepare_evaluation_form?
+      unless @assessment.editable?
+        head :forbidden
+        return false
+      end
+
+      @scores = @assessment.scores.includes(:assessment_rubric_item)
+      @enrollments = available_enrollments
+      true
+    end
 
     def set_assessment
       @assessment = StudentAssessment.where(teacher_profile: current_user.teacher_profile)

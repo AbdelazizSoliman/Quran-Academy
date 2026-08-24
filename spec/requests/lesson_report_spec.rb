@@ -65,7 +65,7 @@ RSpec.describe "Lesson report requests" do
                                     ))
   end
 
-  it "links an existing lesson evaluation instead of offering a duplicate" do
+  it "continues an existing draft lesson evaluation instead of offering a duplicate" do
     report = initialized_report
     assessment = create(:student_assessment, teacher_profile: lesson.teacher_profile,
                                              enrollment: participant.enrollment,
@@ -76,8 +76,8 @@ RSpec.describe "Lesson report requests" do
     get teacher_schedule_report_path(lesson)
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include(I18n.t("academic.actions.view_assessment", locale: :ar))
-    expect(response.parsed_body.at_css("a[href='#{teacher_assessment_path(assessment)}']")).to be_present
+    expect(response.body).to include(I18n.t("academic.actions.continue_student_assessment", locale: :ar))
+    expect(response.parsed_body.at_css("a[href='#{evaluate_teacher_assessment_path(assessment)}']")).to be_present
     expect(report).to be_persisted
   end
 

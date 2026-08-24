@@ -241,7 +241,10 @@ Rails.application.routes.draw do
   namespace :teacher do
     resources :notifications, only: %i[index show create]
     resources :assessments, controller: :student_assessments, except: :destroy do
-      patch :submit, on: :member
+      member do
+        get :evaluate
+        patch :submit
+      end
     end
     resources :exams, controller: :exam_sessions, only: %i[index show] do
       patch :complete, on: :member
