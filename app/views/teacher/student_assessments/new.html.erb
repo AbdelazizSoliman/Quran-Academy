@@ -1,1 +1,2 @@
-<%= render "shared/page_header", title: t("academic.actions.evaluate_student"), description: @assessment.student_profile&.display_name %><%= render "shared/academic/assessment_form", assessment: @assessment, form_model: [:teacher, @assessment], form_url: teacher_assessments_path, scores: [], admin: false, enrollments: @enrollments %>
+<%= render "shared/page_header", title: t("academic.actions.evaluate_student"), description: @assessment.student_profile&.display_name || t("madarak_evaluations.description") %>
+<%= render "quick_form", assessment: @assessment, enrollments: @enrollments, quick_scores: @quick_scores %>

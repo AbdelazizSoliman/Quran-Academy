@@ -1,0 +1,58 @@
+<% ratings = AssessmentRubricItem::RATINGS.map { |rating| [t("academic.ratings.#{rating}"), rating] } %>
+
+<% if assessment.errors.any? %>
+  <%= render "shared/components/alert", variant: :error, title: t("academic.errors.title"),
+                                         message: assessment.errors.full_messages.to_sentence %>
+<% end %>
+
+<%= form_with model: [:teacher, assessment], url: teacher_assessments_path, class: "space-y-6" do |form| %>
+  <%= form.hidden_field :assessment_template_id %>
+  <%= form.hidden_field :scheduled_lesson_id if assessment.scheduled_lesson_id.present? %>
+
+  <section class="ds-card p-5">
+    <h2 class="ds-section-title"><%= t("madarak_evaluations.sections.student") %></h2>
+    <div class="mt-4 grid gap-5 md:grid-cols-2">
+      <% if assessment.student_profile.present? && assessment.scheduled_lesson.present? %>
+        <div>
+          <span class="ds-label"><%= t("madarak_evaluations.fields.student") %></span>
+          <p class="mt-2"><%= assessment.student_profile.display_name %></p>
+          <%= form.hidden_field :student_profile_id %>
+          <%= form.hidden_field :enrollment_id if assessment.enrollment_id.present? %>
+        </div>
+      <% else %>
+        <div>
+          <%= form.label :enrollment_id, t("madarak_evaluations.fields.student"), class: "ds-label" %>
+          <%= form.collection_select :enrollment_id, enrollments, :id,
+                                     ->(enrollment) { enrollment.student_profile.display_name },
+                                     { include_blank: true }, class: "ds-control mt-2", required: true %>
+        </div>
+      <% end %>
+      <div>
+        <%= form.label :assessment_date, t("academic.fields.date"), class: "ds-label" %>
+        <%= form.date_field :assessment_date, class: "ds-control mt-2", required: true %>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-card p-5">
+    <h2 class="ds-section-title"><%= t("madarak_evaluations.sections.scores") %></h2>
+    <div class="mt-4 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <% Assessments::MadarakTemplate::CATEGORIES.each_key do |code| %>
+        <div>
+          <%= label_tag "quick_scores_#{code}", t("madarak_evaluations.fields.#{code}"), class: "ds-label" %>
+          <%= select_tag "quick_scores[#{code}]", options_for_select(ratings, quick_scores[code]),
+                         include_blank: true, id: "quick_scores_#{code}", class: "ds-control mt-2", required: true %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="ds-card p-5">
+    <%= form.label :notes, t("academic.fields.notes"), class: "ds-label" %>
+    <%= form.text_area :notes, class: "ds-control mt-2", rows: 4 %>
+  </section>
+
+  <div class="flex justify-end">
+    <%= render "shared/components/button", label: t("madarak_evaluations.actions.save_draft"), type: :submit %>
+  </div>
+<% end %>

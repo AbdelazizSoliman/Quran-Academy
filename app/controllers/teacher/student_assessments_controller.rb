@@ -19,6 +19,7 @@ module Teacher
                                           scheduled_lesson: assessment_lesson,
                                           assessment_template: template)
       @enrollments = available_enrollments
+      @quick_scores = {}
     end
 
     def edit
@@ -35,7 +36,9 @@ module Teacher
     def create
       attributes = assessment_params.merge(teacher_profile_id: current_user.teacher_profile.id)
       attributes[:student_profile_id] = direct_assessment_student&.id if attributes[:enrollment_id].blank?
-      @assessment = StudentAssessments::Create.new(actor: current_user, attributes:).call
+      @quick_scores = quick_score_params
+      @assessment = StudentAssessments::Create.new(actor: current_user, attributes:,
+                                                   category_scores: @quick_scores).call
       respond_to_save
     end
 
@@ -77,6 +80,10 @@ module Teacher
     end
 
     def score_params = params.fetch(:scores, {}).to_unsafe_h
+
+    def quick_score_params
+      params.fetch(:quick_scores, {}).permit(*Assessments::MadarakTemplate::CATEGORIES.keys).to_h
+    end
 
     def available_enrollments
       Enrollment.joins(:scheduled_lessons)
