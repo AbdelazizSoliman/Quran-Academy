@@ -40,6 +40,8 @@ class FinanceInvoice < ApplicationRecord
     status
   end
 
+  def deliverable? = status.in?(%w[issued partially_paid paid overdue])
+
   private
 
   def generate_public_id = self.public_id ||= "INV-#{SecureRandom.alphanumeric(10).upcase}"

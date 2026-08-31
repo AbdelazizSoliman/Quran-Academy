@@ -1,0 +1,16 @@
+<section class="ds-card p-6">
+  <dl class="grid gap-4 sm:grid-cols-2">
+    <div><dt class="ds-caption"><%= t("finance.fields.invoice") %></dt><dd dir="ltr"><%= invoice.public_id %></dd></div>
+    <div><dt class="ds-caption"><%= t("finance.fields.student") %></dt><dd><%= invoice.student_profile.user.full_name %></dd></div>
+    <div><dt class="ds-caption"><%= t("finance.fields.period_start") %></dt><dd><%= l(invoice.billing_period_starts_on) %></dd></div>
+    <div><dt class="ds-caption"><%= t("finance.fields.period_end") %></dt><dd><%= l(invoice.billing_period_ends_on) %></dd></div>
+    <div><dt class="ds-caption"><%= t("finance.fields.due_on") %></dt><dd><%= l(invoice.due_on) %></dd></div>
+    <div><dt class="ds-caption"><%= t("finance.fields.status") %></dt><dd><%= t("finance.invoice_statuses.#{invoice.effective_status}") %></dd></div>
+  </dl>
+  <table class="mt-6 w-full"><tbody>
+    <% %i[subtotal discount_amount tax_amount total_amount].each do |field| %><tr><th><%= t("finance.fields.#{field.to_s.sub('_amount', '')}") %></th><td dir="ltr"><%= number_to_currency(invoice.public_send(field), unit: invoice.currency) %></td></tr><% end %>
+    <tr><th><%= t("finance.fields.paid") %></th><td dir="ltr"><%= number_to_currency(invoice.paid_amount, unit: invoice.currency) %></td></tr>
+    <tr><th><%= t("finance.fields.balance") %></th><td dir="ltr"><strong><%= number_to_currency(invoice.balance_due, unit: invoice.currency) %></strong></td></tr>
+  </tbody></table>
+  <% if invoice.notes.present? %><p class="mt-6 whitespace-pre-wrap"><%= invoice.notes %></p><% end %>
+</section>

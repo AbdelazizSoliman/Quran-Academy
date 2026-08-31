@@ -24,9 +24,18 @@ module Finance
       return invalid(:amount_required) unless @invoice.total_amount.positive?
 
       FinanceInvoice.transaction { issue! }
+      Notifications::InvoiceDelivery.new(actor: @actor, invoice: @invoice).call
       @invoice
     rescue ActiveRecord::RecordInvalid
       invalid(:transition_failed)
+    end
+
+    def update
+      return invalid(:forbidden) && false unless authorized?
+      return invalid(:invalid_transition) && false unless @invoice.draft?
+
+      @invoice.assign_attributes(@attributes.merge(updated_by: @actor))
+      @invoice.save
     end
 
     def cancel

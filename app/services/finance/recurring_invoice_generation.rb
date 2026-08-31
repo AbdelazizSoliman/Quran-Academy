@@ -26,14 +26,17 @@ module Finance
     end
 
     def generate_invoice(fee_plan, student)
-      return if invoice_exists?(student)
+      return if invoice_exists?(fee_plan, student)
 
       Finance::InvoiceOperation.new(actor: @actor, attributes: invoice_attributes(fee_plan, student)).create
+    rescue ActiveRecord::RecordNotUnique
+      nil
     end
 
-    def invoice_exists?(student)
-      FinanceInvoice.exists?(student_profile_id: student.id, billing_period_starts_on: period_starts_on,
-                             billing_period_ends_on: period_ends_on)
+    def invoice_exists?(fee_plan, student)
+      FinanceInvoice.where.not(status: "cancelled").exists?(student_profile_id: student.id, fee_plan_id: fee_plan.id,
+                                                            billing_period_starts_on: period_starts_on,
+                                                            billing_period_ends_on: period_ends_on)
     end
 
     def period_starts_on = @today.beginning_of_month

@@ -13,6 +13,7 @@ en:
       title: "Invoices"
       description: "Issue invoices and track payments and outstanding balances"
       new: "New Invoice"
+      edit: "Edit Invoice"
     payments:
       title: "Payments"
       record: "Record Payment"
@@ -52,12 +53,15 @@ en:
       account: "Account"
       direction: "Direction"
       source: "Source"
+      invoice: "Invoice"
     actions:
       issue: "Issue Invoice"
       cancel: "Cancel"
       approve: "Approve"
       pay: "Record Payment"
       refund: "Refund"
+      print: "Print / Save PDF"
+      deliver: "Send Invoice"
     trends:
       title: "Revenue versus costs over 12 months"
       description: "Actual cash movement from recorded payments, payroll, and expenses"
@@ -67,6 +71,9 @@ en:
       updated: "The financial record was updated."
       payment_recorded: "The payment was recorded."
       payment_refunded: "The payment refund was recorded."
+      delivered: "The invoice delivery was queued."
+      delivery_failed: "The invoice could not be delivered. Check notification settings and recipient contact details."
+      draft_only: "Only draft invoices can be edited."
     invoice_statuses:
       draft: "Draft"
       issued: "Issued"

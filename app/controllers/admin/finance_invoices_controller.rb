@@ -1,6 +1,6 @@
 module Admin
   class FinanceInvoicesController < BaseController
-    before_action :set_invoice, only: %i[show issue cancel]
+    before_action :set_invoice, only: %i[show edit update issue cancel deliver print]
 
     def index
       scope = FinanceInvoice.includes(student_profile: :user).recent_first
@@ -18,6 +18,14 @@ module Admin
       @students = student_options
     end
 
+    def edit
+      unless @invoice.draft?
+        return redirect_to(admin_finance_invoice_path(@invoice), alert: t("finance.messages.draft_only"))
+      end
+
+      @students = student_options
+    end
+
     def create
       @invoice = Finance::InvoiceOperation.new(actor: current_user, attributes: invoice_params).create
       if @invoice.persisted?
@@ -29,8 +37,35 @@ module Admin
       render :new, status: :unprocessable_content
     end
 
+    def update
+      unless @invoice.draft?
+        return redirect_to(admin_finance_invoice_path(@invoice), alert: t("finance.messages.draft_only"))
+      end
+
+      if Finance::InvoiceOperation.new(actor: current_user, invoice: @invoice, attributes: invoice_params).update
+        redirect_to admin_finance_invoice_path(@invoice), notice: t("finance.messages.updated")
+      else
+        @students = student_options
+        render :edit, status: :unprocessable_content
+      end
+    end
+
     def issue = transition(:issue)
     def cancel = transition(:cancel)
+
+    def deliver
+      notifications = Notifications::InvoiceDelivery.new(actor: current_user, invoice: @invoice).call
+      if notifications.any?(&:persisted?)
+        redirect_to admin_finance_invoice_path(@invoice), notice: t("finance.messages.delivered"), status: :see_other
+      else
+        redirect_to admin_finance_invoice_path(@invoice), alert: t("finance.messages.delivery_failed"),
+                                                          status: :see_other
+      end
+    end
+
+    def print
+      render "shared/invoices/print", layout: "print"
+    end
 
     private
 

@@ -1,0 +1,2 @@
+<%= render "shared/page_header", title: @invoice.public_id, primary_action: { label: t("finance.actions.print"), href: print_invoice_access_path(@invoice.signed_id(purpose: :invoice_access)) } %>
+<%= render "shared/invoices/details", invoice: @invoice %>

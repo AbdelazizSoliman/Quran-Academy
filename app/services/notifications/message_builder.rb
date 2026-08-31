@@ -57,6 +57,7 @@ module Notifications
         return @locale == "ar" ? lesson.title_ar : lesson.title_en
       end
 
+
       @source.try(:public_id).to_s
     end
 
@@ -71,6 +72,8 @@ module Notifications
         entry ? helpers.student_report_url(entry, **options) : ""
       when Certificate
         helpers.student_certificate_url(@source, **options)
+      when FinanceInvoice
+        helpers.invoice_access_url(@source.signed_id(purpose: :invoice_access), **options)
       else
         ""
       end

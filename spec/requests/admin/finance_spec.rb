@@ -15,6 +15,18 @@ RSpec.describe "Admin finance" do
     expect(invoice.reload).to be_issued
   end
 
+  it "edits drafts and keeps issued invoices immutable" do
+    draft = create(:finance_invoice, created_by: admin, updated_by: admin)
+    issued = create(:finance_invoice, :issued, created_by: admin, updated_by: admin)
+    sign_in admin
+
+    patch admin_finance_invoice_path(draft), params: { finance_invoice: { subtotal: 650 } }
+    expect(draft.reload.total_amount).to eq(650)
+
+    patch admin_finance_invoice_path(issued), params: { finance_invoice: { subtotal: 900 } }
+    expect(issued.reload.total_amount).to eq(500)
+  end
+
   it "renders financial reports and exports CSV" do
     sign_in admin
 

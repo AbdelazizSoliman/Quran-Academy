@@ -8,6 +8,8 @@ Rails.application.routes.draw do
              path: "account",
              path_names: { sign_in: "sign-in", sign_out: "sign-out", password: "password" },
              skip: :registrations
+  get "invoices/:token", to: "invoice_access#show", as: :invoice_access
+  get "invoices/:token/print", to: "invoice_access#print", as: :print_invoice_access
   namespace :admin do
     resources :whatsapp_conversations, only: %i[index show] do
       member do
@@ -49,10 +51,12 @@ Rails.application.routes.draw do
     resources :student_progresses, only: %i[index show update]
     get "academic_dashboard", to: "academic_dashboard#show"
     get "financial_dashboard", to: "financial_dashboard#show"
-    resources :finance_invoices, path: "finance/invoices", only: %i[index show new create] do
+    resources :finance_invoices, path: "finance/invoices", only: %i[index show new create edit update] do
       member do
         patch :issue
         patch :cancel
+        post :deliver
+        get :print
       end
       resources :payments, controller: :finance_payments, only: :create do
         patch :refund, on: :member
@@ -288,6 +292,9 @@ Rails.application.routes.draw do
     resource :reports, only: :show, controller: :reports
   end
   namespace :student do
+    resources :invoices, only: %i[index show] do
+      get :print, on: :member
+    end
     resources :notifications, only: %i[index show]
     resources :assessments, only: %i[index show]
     resources :certificates, only: %i[index show]
@@ -302,6 +309,9 @@ Rails.application.routes.draw do
     resources :reports, only: %i[index show]
   end
   namespace :parent, path: "guardian", as: "guardian" do
+    resources :invoices, only: %i[index show] do
+      get :print, on: :member
+    end
     resource :profile, only: :show, controller: :profiles
     resources :students, only: %i[index show]
     resources :schedule, only: %i[index show]

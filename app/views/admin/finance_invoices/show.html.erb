@@ -7,8 +7,11 @@
   <article class="ds-card p-5"><p class="ds-caption"><%= t("finance.fields.status") %></p><p class="mt-2 text-xl font-bold"><%= t("finance.invoice_statuses.#{@invoice.effective_status}") %></p></article>
 </section>
 <div class="mt-6 flex flex-wrap gap-3">
+  <%= link_to t("actions.edit"), edit_admin_finance_invoice_path(@invoice), class: button_classes(variant: :secondary) if @invoice.draft? %>
   <%= button_to t("finance.actions.issue"), issue_admin_finance_invoice_path(@invoice), method: :patch, class: button_classes if @invoice.draft? %>
   <%= button_to t("finance.actions.cancel"), cancel_admin_finance_invoice_path(@invoice), method: :patch, class: button_classes(variant: :secondary) if @invoice.status.in?(%w[draft issued overdue]) %>
+  <%= link_to t("finance.actions.print"), print_admin_finance_invoice_path(@invoice), class: button_classes(variant: :secondary) %>
+  <%= button_to t("finance.actions.deliver"), deliver_admin_finance_invoice_path(@invoice), class: button_classes(variant: :secondary) if @invoice.deliverable? %>
 </div>
 <% if @invoice.status.in?(%w[issued partially_paid overdue]) %>
   <section class="ds-card mt-8 p-6"><h2 class="text-lg font-bold"><%= t("finance.payments.record") %></h2>

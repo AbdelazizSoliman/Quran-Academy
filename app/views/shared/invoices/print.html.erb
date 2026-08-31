@@ -1,0 +1,3 @@
+<header><h1><%= AcademySetting.current.academy_name %></h1><p><%= t("finance.fields.invoice") %> <span dir="ltr"><%= @invoice.public_id %></span></p></header>
+<%= render "shared/invoices/details", invoice: @invoice %>
+<script>window.addEventListener("load", () => window.print())</script>

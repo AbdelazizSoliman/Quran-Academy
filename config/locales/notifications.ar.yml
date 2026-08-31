@@ -53,6 +53,7 @@ ar:
       lesson_report: "تقرير الحلقة"
       certificate: "إشعار شهادة"
       invoice_overdue: "تذكير بفاتورة متأخرة"
+      invoice_issued: "إصدار فاتورة"
     events: { created: "أُنشئ", attempted: "جرت المحاولة", sent: "أُرسل", delivered: "تم التسليم", failed: "فشل", retried: "أُعيدت المحاولة" }
     actions: { new: "إرسال إشعار", send: "إرسال الآن", retry: "إعادة محاولة الإرسال" }
     errors: { title: "تعذر إرسال الإشعار" }
@@ -92,3 +93,6 @@ ar:
       invoice_overdue:
         subject: "تذكير بالدفع من %{academy}"
         body: "الأكاديمية: %{academy}\nالطالب: %{student}\nالفاتورة: %{title}\nالمبلغ المستحق: %{amount}\nتاريخ الاستحقاق: %{date}\nيرجى سداد المبلغ في أقرب وقت ممكن."
+      invoice_issued:
+        subject: "فاتورة من %{academy}"
+        body: "الأكاديمية: %{academy}\nالطالب: %{student}\nالفاتورة: %{title}\nالمبلغ المستحق: %{amount}\nتاريخ الاستحقاق: %{date}\nعرض الفاتورة: %{url}"

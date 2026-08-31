@@ -53,6 +53,7 @@ en:
       lesson_report: "Lesson report"
       certificate: "Certificate notification"
       invoice_overdue: "Overdue invoice reminder"
+      invoice_issued: "Invoice issued"
     events: { created: "Created", attempted: "Attempted", sent: "Sent", delivered: "Delivered", failed: "Failed", retried: "Retried" }
     actions: { new: "Send notification", send: "Send now", retry: "Retry delivery" }
     errors: { title: "Notification could not be sent" }
@@ -92,3 +93,6 @@ en:
       invoice_overdue:
         subject: "%{academy} payment reminder"
         body: "Academy: %{academy}\nStudent: %{student}\nInvoice: %{title}\nAmount due: %{amount}\nWas due on: %{date}\nPlease arrange payment as soon as possible."
+      invoice_issued:
+        subject: "Invoice from %{academy}"
+        body: "Academy: %{academy}\nStudent: %{student}\nInvoice: %{title}\nAmount due: %{amount}\nDue on: %{date}\nView invoice: %{url}"

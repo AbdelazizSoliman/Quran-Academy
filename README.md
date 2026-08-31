@@ -253,10 +253,9 @@ User locale and time-zone preferences remain the first authenticated fallback. A
 defaults are used when no user preference is available, followed by the Rails Arabic/Cairo
 defaults. Time-only operating hours are stored without time-zone conversion.
 
-Communication channel flags indicate readiness preferences only. No email, WhatsApp, or SMS
-provider is configured and no messages or jobs are created. Payroll rates and lesson prices
-are decimal defaults only; no payroll, invoice, subscription, charge, or payment calculation
-exists.
+Communication channel flags control provider-backed email and WhatsApp delivery when those
+providers are configured. Academy financial defaults feed the implemented payroll, recurring
+invoice, payment, expense, ledger, and reporting workflows.
 
 Meaningful updates atomically record the acting administrator and an `AcademySettingEvent`
 containing only changed safe fields. No-op and failed updates create no event. Multi-tenancy,
@@ -279,8 +278,7 @@ until the profile lifecycle is deliberately resolved.
 
 Teaching languages use stable codes constrained by the academy configuration. Student age
 groups and teaching specializations use controlled, extensible catalogs. Compensation rate,
-currency, and unit are future defaults only—no payroll calculation, payment, invoice, or
-financial transaction is implemented. New profiles copy the current academy defaults;
+currency, and unit feed the payroll and finance workflows. New profiles copy the current academy defaults;
 existing stored profile values do not change when academy defaults later change.
 
 Active administrators manage profiles, lifecycle actions, compensation, internal notes, and
