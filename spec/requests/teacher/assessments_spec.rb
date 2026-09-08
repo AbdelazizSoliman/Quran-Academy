@@ -45,7 +45,8 @@ RSpec.describe "Teacher assessments" do
       quick_scores: { memorization: 90, tajweed: 80, attendance: 70, behavior: 60 }
     }
 
-    assessment = StudentAssessment.last
+    assessment = StudentAssessment.find_by!(scheduled_lesson: lesson)
+    expect(assessment.scores.where.not(numeric_score: nil).count).to eq(4)
     expect(response).to redirect_to(teacher_assessment_path(assessment))
     expect(assessment.overall_score).to eq(75)
     expect(assessment.scores.pluck(:numeric_score)).to contain_exactly(90, 80, 70, 60)
@@ -78,6 +79,10 @@ RSpec.describe "Teacher assessments" do
     expect(response.body).to include(I18n.t("academic.actions.continue_student_assessment", locale: :ar))
     expect(response.body).not_to include(I18n.t("academic.actions.edit_assessment", locale: :ar))
     expect(response.parsed_body.at_css("form")&.attr("action")).to eq(teacher_assessment_path(assessment))
+    assessment.scores.each do |score|
+      field = response.parsed_body.at_css("input[name='scores[#{score.id}][lock_version]']")
+      expect(field&.attr("value")).to eq(score.lock_version.to_s)
+    end
   end
 
   it "does not let a teacher evaluate another teacher's assessment" do
@@ -114,5 +119,80 @@ RSpec.describe "Teacher assessments" do
     expect(assessment.overall_score).to eq(80)
     get teacher_assessments_path
     expect(response.body).to include(assessment.public_id)
+  end
+
+  it "moves through the eligible lesson students without evaluating absences" do
+    lesson = create(:scheduled_lesson, teacher_profile: teacher, status: "completed",
+                                       completed_at: Time.current, attendance_status: "locked")
+    first = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+    second = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+    absent = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+    create(:lesson_attendance, scheduled_lesson: lesson, scheduled_lesson_enrollment: first, status: "present")
+    create(:lesson_attendance, scheduled_lesson: lesson, scheduled_lesson_enrollment: second, status: "late")
+    create(:lesson_attendance, scheduled_lesson: lesson, scheduled_lesson_enrollment: absent, status: "absent")
+    template = Assessments::MadarakTemplate.ensure!(actor: teacher.user)
+
+    get evaluations_teacher_schedule_path(lesson)
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(I18n.t("academic.lesson_evaluations.progress", completed: 0, total: 2))
+
+    post teacher_assessments_path, params: {
+      lesson_queue: 1, flow_action: "next",
+      student_assessment: { student_profile_id: first.student_profile.id,
+                            scheduled_lesson_id: lesson.id, assessment_template_id: template.id,
+                            assessment_date: Date.current },
+      quick_scores: { memorization: 90, tajweed: 80, attendance: 70, behavior: 60 }
+    }
+
+    expect(response).to redirect_to(new_teacher_assessment_path(
+                                      scheduled_lesson_id: lesson.id,
+                                      student_profile_id: second.student_profile.id,
+                                      lesson_queue: 1
+                                    ))
+  end
+
+  it "resumes an existing lesson draft instead of creating a duplicate" do
+    lesson = create(:scheduled_lesson, teacher_profile: teacher, status: "completed",
+                                       completed_at: Time.current, attendance_status: "locked")
+    participant = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+    template = Assessments::MadarakTemplate.ensure!(actor: teacher.user)
+    assessment = create(:student_assessment, teacher_profile: teacher, enrollment: participant.enrollment,
+                                             student_profile: participant.student_profile,
+                                             scheduled_lesson: lesson, assessment_template: template)
+
+    expect do
+      post teacher_assessments_path, params: {
+        student_assessment: { student_profile_id: participant.student_profile.id,
+                              scheduled_lesson_id: lesson.id, assessment_template_id: template.id,
+                              assessment_date: Date.current },
+        quick_scores: { memorization: 90, tajweed: 80, attendance: 70, behavior: 60 }
+      }
+    end.not_to change(StudentAssessment, :count)
+
+    expect(response).to redirect_to(evaluate_teacher_assessment_path(assessment, lesson_queue: 1))
+  end
+
+  it "submits all complete lesson drafts together" do
+    lesson = create(:scheduled_lesson, teacher_profile: teacher, status: "completed",
+                                       completed_at: Time.current, attendance_status: "locked")
+    participant = create(:scheduled_lesson_enrollment, scheduled_lesson: lesson)
+    create(:lesson_attendance, scheduled_lesson: lesson, scheduled_lesson_enrollment: participant,
+                               status: "present")
+    template = Assessments::MadarakTemplate.ensure!(actor: teacher.user)
+    post teacher_assessments_path, params: {
+      lesson_queue: 1,
+      student_assessment: { student_profile_id: participant.student_profile.id,
+                            scheduled_lesson_id: lesson.id, assessment_template_id: template.id,
+                            assessment_date: Date.current },
+      quick_scores: { memorization: 90, tajweed: 80, attendance: 70, behavior: 60 }
+    }
+    assessment = StudentAssessment.find_by!(scheduled_lesson: lesson)
+    expect(assessment.scores.where.not(numeric_score: nil).count).to eq(4)
+
+    patch submit_evaluations_teacher_schedule_path(lesson)
+
+    expect(response).to redirect_to(evaluations_teacher_schedule_path(lesson))
+    expect(flash[:alert]).to be_nil
+    expect(assessment.reload).to be_submitted
   end
 end

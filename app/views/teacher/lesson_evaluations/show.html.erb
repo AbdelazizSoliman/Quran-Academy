@@ -1,0 +1,43 @@
+<%= render "shared/page_header", title: t("academic.lesson_evaluations.title"), description: (I18n.locale == :ar ? @lesson.title_ar : @lesson.title_en) %>
+
+<section class="ds-card p-5" aria-labelledby="evaluation-progress">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 id="evaluation-progress" class="ds-card-title"><%= t("academic.lesson_evaluations.progress", completed: @completed_count, total: @eligible_participants.size) %></h2>
+      <p class="mt-1 ds-caption"><%= t("academic.lesson_evaluations.visibility_hint") %></p>
+    </div>
+    <% if @eligible_participants.any? && @completed_count == @eligible_participants.size %>
+      <%= button_to t("academic.lesson_evaluations.submit_all"), submit_evaluations_teacher_schedule_path(@lesson), method: :patch,
+                    form: { data: { turbo_confirm: t("academic.lesson_evaluations.submit_confirmation") } }, class: button_classes %>
+    <% end %>
+  </div>
+  <div class="mt-4 h-2 overflow-hidden rounded-full bg-app-muted" role="progressbar" aria-valuenow="<%= @completed_count %>" aria-valuemin="0" aria-valuemax="<%= @eligible_participants.size %>">
+    <div class="h-full bg-app-primary" style="width: <%= @eligible_participants.empty? ? 0 : (@completed_count * 100.0 / @eligible_participants.size).round %>%"></div>
+  </div>
+</section>
+
+<section class="mt-5 space-y-3" aria-label="<%= t('academic.lesson_evaluations.students') %>">
+  <% @participants.each do |participant| %>
+    <% student = participant.student_profile %>
+    <% attendance = participant.lesson_attendance %>
+    <% assessment = @assessments_by_student[student.id] %>
+    <% skipped = attendance&.status.in?(%w[absent excused_absence lesson_cancelled not_applicable]) %>
+    <article class="ds-card flex flex-wrap items-center justify-between gap-4 p-4">
+      <div>
+        <h3 class="font-semibold"><%= student.display_name %></h3>
+        <p class="mt-1 ds-caption"><%= attendance ? t("attendance.statuses.#{attendance.status}") : t("academic.lesson_evaluations.no_attendance") %> · <%= assessment ? t("academic.statuses.#{assessment.status}") : (skipped ? t("academic.lesson_evaluations.not_required") : t("academic.lesson_evaluations.pending")) %></p>
+      </div>
+      <% unless skipped %>
+        <% if assessment %>
+          <% if assessment.draft? %>
+            <%= render "shared/components/button", label: t("academic.actions.continue_student_assessment"), href: evaluate_teacher_assessment_path(assessment, lesson_queue: 1), variant: :secondary %>
+          <% else %>
+            <%= render "shared/components/button", label: t("academic.actions.view_assessment"), href: teacher_assessment_path(assessment), variant: :secondary %>
+          <% end %>
+        <% else %>
+          <%= render "shared/components/button", label: t("academic.actions.evaluate_student"), href: new_teacher_assessment_path(scheduled_lesson_id: @lesson.id, student_profile_id: student.id, lesson_queue: 1) %>
+        <% end %>
+      <% end %>
+    </article>
+  <% end %>
+</section>

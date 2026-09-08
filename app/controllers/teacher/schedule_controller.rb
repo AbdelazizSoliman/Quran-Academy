@@ -39,7 +39,7 @@ module Teacher
     def complete
       options = { mark_unresolved_absent: params[:mark_unresolved_absent], notes: params[:completion_notes] }
       operate LessonOperations::Complete.new(actor: current_user, lesson: owned_lesson, options:),
-              success_path: ->(lesson) { new_teacher_assessment_path(scheduled_lesson_id: lesson.id) }
+              success_path: ->(lesson) { evaluations_teacher_schedule_path(lesson) }
     end
 
     private

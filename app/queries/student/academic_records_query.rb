@@ -1,11 +1,13 @@
 module Student
   class AcademicRecordsQuery
+    VISIBLE_ASSESSMENT_STATUSES = %w[submitted reviewed published].freeze
+
     def initialize(student_profile:)
       @student_profile = student_profile
     end
 
     def assessments
-      StudentAssessment.where(student_profile: @student_profile, status: %w[submitted reviewed published])
+      StudentAssessment.where(student_profile: @student_profile, status: VISIBLE_ASSESSMENT_STATUSES)
                        .includes(:assessment_template, :teacher_profile).recent_first
     end
 

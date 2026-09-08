@@ -53,6 +53,11 @@ class ScheduledLesson < ApplicationRecord
   def attendance_locked? = attendance_status == "locked"
   def unresolved_attendance_count = lesson_attendances.unresolved.count
 
+  def completion_confirmation_key
+    unresolved_attendance_count.zero? ? "attendance.messages.complete_confirmation_clear" :
+                                        "attendance.messages.complete_confirmation"
+  end
+
   def online_meeting_join_url
     OnlineMeetingUrl.normalize(effective_online_meeting_url)
   end

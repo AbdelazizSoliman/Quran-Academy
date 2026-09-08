@@ -11,7 +11,7 @@ en:
     teacher_statuses: { not_checked_in: "Not checked in", on_time: "On time", late: "Late", absent: "Absent", administrator_override: "Administrator override" }
     workflow: { not_opened: "Attendance not opened", open: "Attendance open", locked: "Attendance locked", reopened: "Attendance reopened" }
     actions: { filter: "Filter", manage: "View attendance", check_in: "Check in", check_in_override: "Check in teacher", start: "Start lesson", start_override: "Start with override", complete: "Complete lesson", complete_and_evaluate: "Complete and evaluate", lock: "Lock attendance", reopen: "Reopen attendance", arrival: "Record arrival", present: "Mark present", absent: "Mark absent", excuse: "Excuse absence", departure: "Record departure", adjust: "Adjust" }
-    messages: { updated: "Lesson attendance updated.", locked: "Attendance is locked.", unresolved: "Resolve attendance before completing.", forbidden: "You are not allowed to perform this attendance action." }
+    messages: { updated: "Lesson attendance updated.", locked: "Attendance is locked.", unresolved: "Resolve attendance before completing.", forbidden: "You are not allowed to perform this attendance action.", complete_confirmation: "This will complete the lesson, lock attendance, and mark %{count} unresolved attendances absent. Continue?", complete_confirmation_clear: "This will complete the lesson and lock attendance. Continue?" }
     defaults: { admin_override: "Administrator operational override", completion_confirmation: "Confirmed unresolved students absent at completion", admin_adjustment: "Administrator attendance correction" }
     unresolved:
       one: "1 unresolved attendance"

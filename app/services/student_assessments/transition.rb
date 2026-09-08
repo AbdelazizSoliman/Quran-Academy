@@ -38,7 +38,7 @@ module StudentAssessments
     def incomplete_scores?
       @assessment.assessment_template.rubric_items.where(required: true).any? do |rubric|
         score = @assessment.scores.find { |entry| entry.assessment_rubric_item_id == rubric.id }
-        score.nil? || (rubric.numeric? ? score.numeric_score.nil? : score.rating.blank?)
+        score.nil? || (score.numeric_score.nil? && score.rating.blank?)
       end
     end
 

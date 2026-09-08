@@ -32,6 +32,7 @@ en:
     actions:
       open_schedule: "Open schedule"
       open_lesson: "Open lesson"
+      lesson_details: "View lesson details"
       join_next: "View next lesson"
       assessments: "Student assessments"
       lesson_reports: "Lesson reports"

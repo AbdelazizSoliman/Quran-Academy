@@ -85,6 +85,23 @@ ar:
       schedule: "جدولة"
       complete: "إكمال"
     assessments: { index: "تقييمات الطلاب", teacher: "تقييماتي", student: "نتائج تقييماتي", description: "مراجعة الدرجات والتقديرات وحالة دورة الحياة." }
+    lesson_evaluations:
+      title: "تقييم طلاب الدرس"
+      open: "فتح تقييمات الطلاب"
+      students: "طلاب الدرس"
+      progress: "تم تقييم %{completed} من %{total}"
+      pending: "بانتظار التقييم"
+      not_required: "لا يتطلب تقييمًا"
+      no_attendance: "الحضور غير متاح"
+      visibility_hint: "لا تظهر النتائج للطالب إلا بعد مراجعتها ونشرها."
+      save_next: "حفظ والطالب التالي"
+      save_submit: "حفظ وإرسال"
+      submit_all: "إرسال جميع المسودات"
+      submit_confirmation: "سيتم إرسال جميع تقييمات هذا الدرس للمراجعة. هل تريد المتابعة؟"
+      complete_first: "أكمل تقييم %{count} طلاب قبل الإرسال."
+      submitted: "تم إرسال %{count} تقييمات للمراجعة."
+      resuming_draft: "يوجد تقييم مسودة لهذا الطالب؛ تم فتحه للمتابعة."
+      already_exists: "يوجد تقييم مرسل بالفعل لهذا الطالب في هذا الدرس."
     templates: { index: "نماذج التقييم", description: "معايير ثنائية اللغة قابلة لإعادة الاستخدام." }
     rubrics: { title: "بنود التقييم", add: "إضافة بند تقييم" }
     scores: { title: "درجات الفئات والبنود" }

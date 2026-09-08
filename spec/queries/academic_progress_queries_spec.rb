@@ -15,12 +15,17 @@ RSpec.describe "Academic progress queries" do
     expect(Teacher::StudentAssessmentsQuery.new(teacher_profile: teacher, params: {}).call).to contain_exactly(own)
   end
 
-  it "shows students only published personal academic records" do
+  it "shows students completed personal academic records while keeping drafts private" do
     student = create(:student_profile)
     published = create(:student_assessment, student_profile: student,
                                             enrollment: create(:enrollment, student_profile: student), status: "published")
+    submitted = create(:student_assessment, student_profile: student,
+                                            enrollment: create(:enrollment, student_profile: student), status: "submitted")
+    reviewed = create(:student_assessment, student_profile: student,
+                                           enrollment: create(:enrollment, student_profile: student), status: "reviewed")
     create(:student_assessment, student_profile: student,
                                 enrollment: create(:enrollment, student_profile: student), status: "draft")
-    expect(Student::AcademicRecordsQuery.new(student_profile: student).assessments).to contain_exactly(published)
+    expect(Student::AcademicRecordsQuery.new(student_profile: student).assessments)
+      .to contain_exactly(published, submitted, reviewed)
   end
 end

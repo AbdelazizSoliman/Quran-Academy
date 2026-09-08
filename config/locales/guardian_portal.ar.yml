@@ -32,6 +32,7 @@ ar:
     actions:
       open_schedule: "فتح الجدول"
       open_lesson: "فتح الحصة"
+      lesson_details: "عرض تفاصيل الحصة"
       join_next: "عرض الحصة القادمة"
       assessments: "تقييمات الطلاب"
       lesson_reports: "تقارير الحصص"

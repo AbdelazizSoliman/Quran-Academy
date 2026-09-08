@@ -1,5 +1,6 @@
 <% if assessment.errors.any? %><%= render "shared/components/alert", variant: :error, title: t("academic.errors.title"), message: assessment.errors.full_messages.to_sentence %><% end %>
 <%= form_with model: form_model, url: local_assigns[:form_url], class: "space-y-6" do |form| %>
+  <%= hidden_field_tag :lesson_queue, params[:lesson_queue] if params[:lesson_queue].present? %>
   <%= form.hidden_field :lock_version if assessment.persisted? %>
   <%= form.hidden_field :scheduled_lesson_id if assessment.scheduled_lesson_id.present? %>
   <div class="ds-card grid gap-5 p-5 sm:grid-cols-2">
@@ -27,5 +28,5 @@
       </div>
     </fieldset>
   <% end %>
-  <div class="flex justify-end"><%= render "shared/components/button", label: t("actions.save"), type: "submit" %></div>
+  <div class="flex flex-wrap justify-end gap-2"><%= render "shared/components/button", label: t("actions.save"), type: "submit", variant: :secondary %><% if assessment.scheduled_lesson_id.present? %><%= render "shared/components/button", label: t("academic.lesson_evaluations.save_next"), type: :submit, name: :flow_action, value: :next %><%= render "shared/components/button", label: t("academic.lesson_evaluations.save_submit"), type: :submit, name: :flow_action, value: :submit, variant: :secondary %><% end %></div>
 <% end %>

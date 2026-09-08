@@ -193,6 +193,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
     t.bigint "assessment_rubric_item_id", null: false
     t.text "comments"
     t.datetime "created_at", null: false
+    t.integer "lock_version", default: 0, null: false
     t.decimal "numeric_score", precision: 7, scale: 2
     t.string "rating"
     t.bigint "student_assessment_id", null: false
@@ -1331,6 +1332,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
     t.index ["enrollment_id"], name: "index_student_assessments_on_enrollment_id"
     t.index ["public_id"], name: "index_student_assessments_on_public_id", unique: true
     t.index ["reviewer_id"], name: "index_student_assessments_on_reviewer_id"
+    t.index ["scheduled_lesson_id", "student_profile_id", "assessment_template_id"], name: "idx_unique_lesson_student_assessment", unique: true, where: "(scheduled_lesson_id IS NOT NULL)"
     t.index ["scheduled_lesson_id"], name: "index_student_assessments_on_scheduled_lesson_id"
     t.index ["student_profile_id", "assessment_date"], name: "idx_on_student_profile_id_assessment_date_45182c2b2a"
     t.index ["student_profile_id"], name: "index_student_assessments_on_student_profile_id"

@@ -11,7 +11,7 @@ ar:
     teacher_statuses: { not_checked_in: "لم يسجل الحضور", on_time: "في الموعد", late: "متأخر", absent: "غائب", administrator_override: "تجاوز إداري" }
     workflow: { not_opened: "الحضور غير مفتوح", open: "الحضور مفتوح", locked: "الحضور مقفل", reopened: "أعيد فتح الحضور" }
     actions: { filter: "تصفية", manage: "عرض الحضور", check_in: "تسجيل الحضور", check_in_override: "تسجيل حضور المعلم", start: "بدء الدرس", start_override: "بدء بتجاوز إداري", complete: "إكمال الدرس", complete_and_evaluate: "إكمال وتقييم الطلاب", lock: "قفل الحضور", reopen: "إعادة فتح الحضور", arrival: "تسجيل الوصول", present: "تحديد حاضر", absent: "تحديد غائب", excuse: "تسجيل عذر", departure: "تسجيل المغادرة", adjust: "تعديل" }
-    messages: { updated: "تم تحديث حضور الدرس.", locked: "الحضور مقفل.", unresolved: "أكمل حالات الحضور قبل إنهاء الدرس.", forbidden: "لا يسمح لك بتنفيذ إجراء الحضور هذا." }
+    messages: { updated: "تم تحديث حضور الدرس.", locked: "الحضور مقفل.", unresolved: "أكمل حالات الحضور قبل إنهاء الدرس.", forbidden: "لا يسمح لك بتنفيذ إجراء الحضور هذا.", complete_confirmation: "سيتم إكمال الدرس وقفل الحضور وتسجيل %{count} حالات غير محسومة كغياب. هل تريد المتابعة؟", complete_confirmation_clear: "سيتم إكمال الدرس وقفل الحضور. هل تريد المتابعة؟" }
     defaults: { admin_override: "تجاوز تشغيلي بواسطة الإدارة", completion_confirmation: "تم تأكيد غياب الطلاب غير المحسومين عند الإكمال", admin_adjustment: "تصحيح حضور بواسطة الإدارة" }
     unresolved: { one: "حالة حضور واحدة غير محسومة", other: "%{count} حالات حضور غير محسومة" }
     minutes_late: { one: "دقيقة تأخر واحدة", other: "%{count} دقائق تأخر" }

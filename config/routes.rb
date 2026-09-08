@@ -265,6 +265,8 @@ Rails.application.routes.draw do
         patch :start
         patch :complete
         get :attendance
+        get :evaluations, to: "lesson_evaluations#show"
+        patch :submit_evaluations, to: "lesson_evaluations#submit"
       end
       resources :lesson_attendances, only: [], controller: :lesson_attendances do
         member do

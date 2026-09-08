@@ -37,7 +37,8 @@
             <div><h3><%= dashboard_lesson_title(lesson) %></h3>
               <p><%= dashboard_lesson_location(lesson) %></p></div>
             <%= scheduling_status_badge(lesson) %>
-            <%= link_to t("portal.actions.open_lesson"), teacher_schedule_path(lesson), class: "button-secondary" %>
+            <%= link_to t(lesson.completed? ? "portal.actions.lesson_details" : "portal.actions.open_lesson"),
+                        teacher_schedule_path(lesson), class: "button-secondary" %>
           </article>
         <% end %>
       </div>

@@ -6,6 +6,7 @@
 <%= form_with model: [:teacher, assessment], url: teacher_assessments_path, class: "space-y-4" do |form| %>
   <%= form.hidden_field :assessment_template_id %>
   <%= form.hidden_field :scheduled_lesson_id if assessment.scheduled_lesson_id.present? %>
+  <%= hidden_field_tag :lesson_queue, params[:lesson_queue] if params[:lesson_queue].present? %>
 
   <div class="grid gap-4 md:grid-cols-2">
       <% if assessment.student_profile.present? && assessment.scheduled_lesson.present? %>
@@ -45,7 +46,11 @@
   <%= form.text_area :notes, class: "ds-control bg-app-muted", rows: 3,
                              placeholder: "#{t('academic.fields.notes')} (#{I18n.locale == :ar ? 'اختياري' : 'optional'})" %>
 
-  <div>
-    <%= render "shared/components/button", label: t("madarak_evaluations.actions.save_draft"), type: :submit, icon: :check %>
+  <div class="flex flex-wrap gap-2">
+    <%= render "shared/components/button", label: t("madarak_evaluations.actions.save_draft"), type: :submit, icon: :check, variant: :secondary %>
+    <% if assessment.scheduled_lesson_id.present? %>
+      <%= render "shared/components/button", label: t("academic.lesson_evaluations.save_next"), type: :submit, name: :flow_action, value: :next %>
+      <%= render "shared/components/button", label: t("academic.lesson_evaluations.save_submit"), type: :submit, name: :flow_action, value: :submit, variant: :secondary %>
+    <% end %>
   </div>
 <% end %>

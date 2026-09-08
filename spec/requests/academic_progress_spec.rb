@@ -90,7 +90,7 @@ RSpec.describe "Teacher academic progress access" do
 end
 
 RSpec.describe "Student academic records" do
-  it "shows submitted and published records to the student while hiding drafts" do
+  it "shows completed records to the student while keeping drafts private" do
     student = create(:student_profile)
     published = create(:student_assessment, student_profile: student,
                                             enrollment: create(:enrollment, student_profile: student), status: "published")
@@ -110,6 +110,8 @@ RSpec.describe "Student academic records" do
     expect(response.body).not_to include(draft.public_id)
     get student_assessment_path(draft)
     expect(response).to have_http_status(:not_found)
+    get student_assessment_path(submitted)
+    expect(response).to have_http_status(:ok)
   end
 
   it "provides a personal transcript and progress page" do

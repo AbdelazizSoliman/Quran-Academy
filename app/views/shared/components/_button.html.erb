@@ -19,6 +19,7 @@
   <% end %>
 <% else %>
   <%= button_tag type: local_assigns.fetch(:type, "button"),
+                 name: local_assigns[:name], value: local_assigns[:value],
                  class: classes,
                  disabled: disabled,
                  aria: { label: (icon_only ? local_assigns.fetch(:aria_label, local_assigns[:label]) : nil), busy: loading },

@@ -37,7 +37,17 @@ RSpec.describe "Lesson attendance requests" do
     patch complete_teacher_schedule_path(lesson), params: { mark_unresolved_absent: true }
 
     expect(lesson.reload).to be_completed
-    expect(response).to redirect_to(new_teacher_assessment_path(scheduled_lesson_id: lesson.id))
+    expect(response).to redirect_to(evaluations_teacher_schedule_path(lesson))
+  end
+
+  it "does not warn about absent students when all attendance is resolved" do
+    attendance.update!(status: "present", arrival_at: Time.current, recorded_by: lesson.teacher_profile.user)
+    sign_in lesson.teacher_profile.user
+
+    get teacher_schedule_path(lesson)
+
+    expect(response.body).to include(I18n.t("attendance.messages.complete_confirmation_clear"))
+    expect(response.body).not_to include(I18n.t("attendance.messages.complete_confirmation", count: 0))
   end
 
   it "shows teachers their attendance report instead of redirecting them to the schedule" do

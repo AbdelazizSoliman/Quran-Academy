@@ -23,6 +23,8 @@ class StudentAssessment < ApplicationRecord
   validates :letter_grade, inclusion: { in: LETTER_GRADES }, allow_blank: true
   validates :notes, length: { maximum: 5_000 }, allow_blank: true
   validate :ownership_consistency
+  validates :student_profile_id, uniqueness: { scope: %i[scheduled_lesson_id assessment_template_id] },
+                                 if: :scheduled_lesson_id?
 
   scope :recent_first, -> { order(assessment_date: :desc, id: :desc) }
   STATUSES.each { |value| define_method(:"#{value}?") { status == value } }

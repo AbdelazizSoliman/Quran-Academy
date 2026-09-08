@@ -85,6 +85,23 @@ en:
       schedule: "Schedule"
       complete: "Complete"
     assessments: { index: "Student assessments", teacher: "My assessments", student: "My assessment results", description: "Review scores, grades, and lifecycle status." }
+    lesson_evaluations:
+      title: "Lesson student evaluations"
+      open: "Open student evaluations"
+      students: "Lesson students"
+      progress: "%{completed} of %{total} evaluated"
+      pending: "Awaiting evaluation"
+      not_required: "Evaluation not required"
+      no_attendance: "Attendance unavailable"
+      visibility_hint: "Students only see results after review and publication."
+      save_next: "Save and next student"
+      save_submit: "Save and submit"
+      submit_all: "Submit all drafts"
+      submit_confirmation: "All lesson evaluations will be submitted for review. Continue?"
+      complete_first: "Complete %{count} student evaluations before submitting."
+      submitted: "%{count} evaluations submitted for review."
+      resuming_draft: "A draft already exists for this student; it has been opened."
+      already_exists: "A submitted evaluation already exists for this student in this lesson."
     templates: { index: "Assessment templates", description: "Reusable bilingual rubrics for academic evaluation." }
     rubrics: { title: "Rubric items", add: "Add rubric item" }
     scores: { title: "Category and rubric scores" }

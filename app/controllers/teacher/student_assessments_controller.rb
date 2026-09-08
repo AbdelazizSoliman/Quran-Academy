@@ -28,6 +28,9 @@ module Teacher
     def create
       attributes = assessment_params.merge(teacher_profile_id: current_user.teacher_profile.id)
       normalize_assessment_target!(attributes)
+      existing = existing_lesson_assessment(attributes)
+      return redirect_to_existing(existing) if existing
+
       @quick_scores = quick_score_params
       @assessment = StudentAssessments::Create.new(actor: current_user, attributes:,
                                                    category_scores: @quick_scores).call
@@ -130,11 +133,68 @@ module Teacher
 
     def respond_to_save
       if @assessment.errors.empty?
-        redirect_to teacher_assessment_path(@assessment), notice: t("academic.messages.saved")
+        transition_after_save if params[:flow_action] == "submit"
+        return prepare_failed_save_and_render if @assessment.errors.any?
+
+        redirect_after_save
       else
-        prepare_failed_save
-        render(@assessment.persisted? ? :edit : :new, status: :unprocessable_content)
+        prepare_failed_save_and_render
       end
+    end
+
+    def redirect_after_save
+      lesson = @assessment.scheduled_lesson
+      if lesson && params[:flow_action] == "next"
+        redirect_to next_evaluation_path(lesson), notice: t("academic.messages.saved")
+      elsif lesson && params[:lesson_queue].present?
+        redirect_to evaluations_teacher_schedule_path(lesson), notice: t("academic.messages.saved")
+      else
+        redirect_to teacher_assessment_path(@assessment), notice: t("academic.messages.saved")
+      end
+    end
+
+    def transition_after_save
+      @assessment = StudentAssessments::Transition.new(actor: current_user, assessment: @assessment,
+                                                       action: :submit).call
+    end
+
+    def prepare_failed_save_and_render
+      prepare_failed_save
+      render(@assessment.persisted? ? :edit : :new, status: :unprocessable_content)
+    end
+
+    def existing_lesson_assessment(attributes)
+      return if attributes[:scheduled_lesson_id].blank? || attributes[:student_profile_id].blank?
+
+      StudentAssessment.find_by(scheduled_lesson_id: attributes[:scheduled_lesson_id],
+                                student_profile_id: attributes[:student_profile_id],
+                                assessment_template_id: attributes[:assessment_template_id])
+    end
+
+    def redirect_to_existing(assessment)
+      if assessment.draft?
+        redirect_to evaluate_teacher_assessment_path(assessment, lesson_queue: 1),
+                    alert: t("academic.lesson_evaluations.resuming_draft")
+      else
+        redirect_to evaluations_teacher_schedule_path(assessment.scheduled_lesson),
+                    alert: t("academic.lesson_evaluations.already_exists")
+      end
+    end
+
+    def next_evaluation_path(lesson)
+      student = next_unevaluated_student(lesson)
+      return evaluations_teacher_schedule_path(lesson) unless student
+
+      new_teacher_assessment_path(scheduled_lesson_id: lesson.id,
+                                  student_profile_id: student.id,
+                                  lesson_queue: 1)
+    end
+
+    def next_unevaluated_student(lesson)
+      assessed_ids = StudentAssessment.where(scheduled_lesson: lesson).pluck(:student_profile_id).to_set
+      lesson.scheduled_lesson_enrollments.expected.includes(:lesson_attendance, enrollment: :student_profile)
+            .reject { |p| p.lesson_attendance&.status.in?(%w[absent excused_absence lesson_cancelled not_applicable]) }
+            .map(&:student_profile).find { |student| assessed_ids.exclude?(student.id) }
     end
 
     def prepare_workspace
