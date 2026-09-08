@@ -190,11 +190,11 @@ RSpec.describe "Admin user administration" do
   it "invalidates an existing target session after suspension" do
     target = create(:user)
     sign_in target
-    get root_path
+    get dashboard_path
     original_version = target.session_version
     Admin::Users::TransitionStatus.new(actor: admin, user: target, action: :suspend).call
 
-    get root_path
+    get dashboard_path
 
     expect(target.reload.session_version).to eq(original_version + 1)
     expect(response).to redirect_to(new_user_session_path)

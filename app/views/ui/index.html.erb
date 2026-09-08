@@ -7,7 +7,7 @@
 <%= render "shared/page_header",
            title: t("ui.title"),
            description: t("ui.description"),
-           breadcrumbs: [{ label: t("navigation.dashboard"), href: root_path }, { label: t("ui.title") }],
+           breadcrumbs: [{ label: t("navigation.dashboard"), href: dashboard_path }, { label: t("ui.title") }],
            badge: render("shared/components/badge", label: t("ui.development_only"), variant: :warning),
            primary_action: locale_action %>
 

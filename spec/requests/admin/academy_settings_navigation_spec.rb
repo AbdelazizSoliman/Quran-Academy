@@ -10,7 +10,7 @@ RSpec.describe "Academy settings navigation" do
 
     sign_out admin
     sign_in create(:user, :staff)
-    get root_path
+    get dashboard_path
     expect(response.body).not_to include(admin_settings_path)
   end
 end

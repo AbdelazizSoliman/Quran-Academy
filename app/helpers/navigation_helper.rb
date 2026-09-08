@@ -1,7 +1,7 @@
 module NavigationHelper
   ADMIN_VISIBLE_NAVIGATION = %i[
     dashboard whatsapp_inbox users invitations students teachers schedule attendance assessments profits_analytics
-    fee_plans financial_reports settings
+    fee_plans financial_reports public_website settings
   ].freeze
 
   NAVIGATION_ITEMS = {
@@ -41,7 +41,8 @@ module NavigationHelper
     certificates: { icon: :check_circle, roles: %i[admin staff student], feature: :certificates },
     academic_progress: { icon: :reports, roles: %i[admin staff teacher student] },
     notifications: { icon: :message, roles: %i[admin staff teacher student] },
-    settings: { icon: :settings, roles: %i[admin], path: :admin_settings_path }
+    settings: { icon: :settings, roles: %i[admin], path: :admin_settings_path },
+    public_website: { icon: :reports, roles: %i[admin], path: :edit_admin_public_website_path }
   }.freeze
 
   def nav_item_classes(active: false)
@@ -69,7 +70,7 @@ module NavigationHelper
 
   def navigation_path(key, item)
     return public_send(item[:path]) if item[:path]
-    return root_path if key == :dashboard
+    return dashboard_path if key == :dashboard
 
     role_specific_navigation_path(key)
   end

@@ -28,7 +28,7 @@ RSpec.describe "Authentication request context", type: :request do
     user = create(:user, :teacher, :english_locale, time_zone: "London", password:, password_confirmation: password)
     post user_session_path, params: { user: { email: user.email, password: } }
 
-    get root_path
+    get dashboard_path
 
     expect(response.body).to include('<html lang="en" dir="ltr">')
     expect(response.body).to include('data-time-zone="London"')
