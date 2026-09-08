@@ -17,7 +17,7 @@ RSpec.describe "Dashboard portal lesson actions" do
                                        attendance_status: "open")
     sign_in teacher.user
 
-    get root_path
+    get dashboard_path
 
     document = response.parsed_body
     expect(document.at_css("a[href='#{teacher_schedule_path(completed)}']")&.text&.strip)
