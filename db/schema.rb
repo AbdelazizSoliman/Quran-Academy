@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_24_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -638,6 +638,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_120000) do
     t.index ["fee_plan_id"], name: "index_finance_invoices_on_fee_plan_id"
     t.index ["public_id"], name: "index_finance_invoices_on_public_id", unique: true
     t.index ["status", "due_on"], name: "index_finance_invoices_on_status_and_due_on"
+    t.index ["student_profile_id", "fee_plan_id", "billing_period_starts_on", "billing_period_ends_on"], name: "unique_active_recurring_invoice_period", unique: true, where: "((fee_plan_id IS NOT NULL) AND ((status)::text <> 'cancelled'::text))"
     t.index ["student_profile_id"], name: "index_finance_invoices_on_student_profile_id"
     t.index ["updated_by_id"], name: "index_finance_invoices_on_updated_by_id"
     t.check_constraint "billing_period_ends_on >= billing_period_starts_on", name: "finance_invoices_period_order"
@@ -1037,6 +1038,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_120000) do
     t.check_constraint "default_lesson_duration_minutes > 0", name: "programs_duration_positive"
     t.check_constraint "estimated_duration_weeks IS NULL OR estimated_duration_weeks >= 0", name: "programs_duration_weeks_nonnegative"
     t.check_constraint "recommended_lessons_per_week > 0", name: "programs_frequency_positive"
+  end
+
+  create_table "public_website_settings", force: :cascade do |t|
+    t.text "about_text_ar"
+    t.text "about_text_en"
+    t.string "academy_name_ar", default: "أكاديمية خديجه", null: false
+    t.string "academy_name_en", default: "Khadijah Academy", null: false
+    t.bigint "academy_setting_id", null: false
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: false, null: false
+    t.text "hero_subtitle_ar"
+    t.text "hero_subtitle_en"
+    t.string "hero_title_ar", default: "تعلّمي القرآن والعربية بثقة", null: false
+    t.string "hero_title_en", default: "Learn Quran and Arabic with confidence", null: false
+    t.string "primary_cta_label_ar", default: "ابدئي رحلتك", null: false
+    t.string "primary_cta_label_en", default: "Start your journey", null: false
+    t.string "primary_cta_url", default: "/account/sign-in", null: false
+    t.boolean "public_email_enabled", default: false, null: false
+    t.boolean "public_phone_enabled", default: false, null: false
+    t.boolean "public_whatsapp_enabled", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.boolean "whatsapp_cta_enabled", default: false, null: false
+    t.index ["academy_setting_id"], name: "index_public_website_settings_on_academy_setting_id", unique: true
   end
 
   create_table "scheduled_lesson_enrollments", force: :cascade do |t|
@@ -1917,6 +1941,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_120000) do
   add_foreign_key "program_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "programs", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "programs", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "public_website_settings", "academy_settings"
   add_foreign_key "scheduled_lesson_enrollments", "enrollments", on_delete: :restrict
   add_foreign_key "scheduled_lesson_enrollments", "scheduled_lessons", on_delete: :restrict
   add_foreign_key "scheduled_lesson_enrollments", "student_profiles", on_delete: :restrict

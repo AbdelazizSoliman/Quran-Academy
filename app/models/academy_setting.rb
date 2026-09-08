@@ -15,6 +15,7 @@ class AcademySetting < ApplicationRecord
 
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_academy_settings
   has_many :events, class_name: "AcademySettingEvent", dependent: :restrict_with_exception
+  has_one :public_website_setting, dependent: :destroy
 
   validates :singleton_key, inclusion: { in: [SINGLETON_KEY] }, uniqueness: true
   validates :academy_name, presence: true, length: { maximum: 150 }

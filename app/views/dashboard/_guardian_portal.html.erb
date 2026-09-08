@@ -3,7 +3,7 @@
            description: t("portal.guardian.subtitle") %>
 
 <% if @portal[:children].many? %>
-  <%= form_with url: root_path, method: :get, class: "mb-5 flex flex-wrap items-end gap-3" do |form| %>
+  <%= form_with url: dashboard_path, method: :get, class: "mb-5 flex flex-wrap items-end gap-3" do |form| %>
     <div class="min-w-64"><%= form.label :child_id, t("portal.guardian.choose_child"), class: "ds-label" %>
       <%= form.select :child_id, @portal[:children].map { |child| [child.display_name, child.id] },
                       { selected: @portal[:selected_child]&.id }, class: "ds-control mt-2" %></div>

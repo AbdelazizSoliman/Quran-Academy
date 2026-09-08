@@ -5,7 +5,7 @@ RSpec.describe "Dashboard" do
     sign_in create(:user, :arabic_locale)
 
     I18n.with_locale(:ar) do
-      get root_path
+      get dashboard_path
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('<html lang="ar" dir="rtl">')
@@ -18,7 +18,7 @@ RSpec.describe "Dashboard" do
     sign_in create(:user, :english_locale)
 
     I18n.with_locale(:en) do
-      get root_path
+      get dashboard_path
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('<html lang="en" dir="ltr">')

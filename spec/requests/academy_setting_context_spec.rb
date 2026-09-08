@@ -16,7 +16,7 @@ RSpec.describe "Academy setting request context" do
     user = create(:user, preferred_locale: "ar", time_zone: "Cairo")
     sign_in user
 
-    get root_path
+    get dashboard_path
 
     expect(response.body).to include('lang="ar"', 'dir="rtl"', 'data-time-zone="Cairo"')
   end

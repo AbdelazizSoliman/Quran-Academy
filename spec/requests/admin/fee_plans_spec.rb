@@ -6,7 +6,7 @@ RSpec.describe "Admin fee plans" do
   before { sign_in admin }
 
   it "is reachable from the admin sidebar" do
-    get root_path
+    get dashboard_path
     expect(response.body).to include(admin_fee_plans_path)
   end
 

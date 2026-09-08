@@ -6,7 +6,7 @@
        hidden
        aria-label="<%= t("navigation.main") %>">
   <div class="flex h-20 items-center justify-between border-b border-white/10 px-5">
-    <%= link_to root_path, class: "flex items-center gap-3 rounded-lg" do %>
+    <%= link_to dashboard_path, class: "flex items-center gap-3 rounded-lg" do %>
       <% if academy_setting&.logo_url.present? %>
         <%= image_tag academy_setting.logo_url, alt: academy_brand_name,
                                                 class: "size-10 rounded-xl bg-white object-contain p-1 shadow-sm" %>
@@ -30,7 +30,7 @@
     <p class="mb-3 px-3 text-xs font-semibold text-emerald-100/55"><%= t("navigation.main") %></p>
     <ul class="space-y-1">
       <% navigation_items_for(current_user).each do |key, item| %>
-        <% active = (key == :dashboard && current_page?(root_path)) ||
+        <% active = (key == :dashboard && current_page?(dashboard_path)) ||
                     (key == :users && controller_path.start_with?("admin/users")) ||
                     (key == :invitations && controller_path.start_with?("admin/account_invitations")) ||
                     (key == :whatsapp_inbox && controller_path == "admin/whatsapp_conversations") ||

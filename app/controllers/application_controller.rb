@@ -16,6 +16,10 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def after_sign_in_path_for(resource)
+    stored_location_for(resource) || dashboard_path
+  end
+
   def require_release_feature!(feature)
     head :not_found unless ReleaseFeatures.enabled?(feature)
   end
@@ -27,7 +31,7 @@ class ApplicationController < ActionController::Base
   end
 
   def use_locale(&)
-    requested_locale = request.query_parameters["locale"] if public_locale_selection?
+    requested_locale = params[:locale] if public_locale_selection?
     locale = supported_locale(requested_locale) ||
              supported_locale(current_user&.preferred_locale) ||
              supported_locale(academy_setting&.default_locale) ||

@@ -4,7 +4,7 @@ RSpec.describe "Authentication" do
   let(:password) { "SecurePass123!" }
 
   it "redirects unauthenticated dashboard requests to sign in" do
-    get root_path
+    get dashboard_path
 
     expect(response).to redirect_to(new_user_session_path)
   end
@@ -13,7 +13,7 @@ RSpec.describe "Authentication" do
     user = create(:user, password:, password_confirmation: password)
 
     post user_session_path, params: { user: { email: user.email, password: } }
-    expect(response).to redirect_to(root_path)
+    expect(response).to redirect_to(dashboard_path)
 
     delete destroy_user_session_path
     expect(response).to redirect_to(root_path)

@@ -1,0 +1,74 @@
+en:
+  navigation:
+    public_website: "Website"
+  public:
+    meta_description: "Thoughtful Quran, Arabic, and Islamic education in a supportive learning environment."
+    navigation:
+      label: "Public navigation"
+      locale_switch: "العربية"
+      login: "Log in"
+    footer:
+      summary: "A calm, supportive place to grow in Quran, Arabic, and Islamic learning."
+      whatsapp: "Contact us on WhatsApp"
+    home:
+      page_title: "%{academy} | Quran and Arabic education"
+      eyebrow: "QURAN · ARABIC · ISLAMIC EDUCATION"
+      values:
+        - "Personal, respectful learning"
+        - "Clear guidance at every step"
+        - "A trusted environment for steady progress"
+      whatsapp_cta: "Talk to us on WhatsApp"
+      about:
+        eyebrow: "ABOUT THE ACADEMY"
+        title: "Learning rooted in care and purpose"
+        fallback: "Khadijah Academy supports learners as they build a lasting relationship with the Quran and Arabic language through clear instruction, encouragement, and consistent practice."
+      how_it_works:
+        eyebrow: "A SIMPLE START"
+        title: "How learning with us works"
+        steps:
+          - title: "Begin the conversation"
+            description: "Tell us about the learner, their goals, and the support they need."
+          - title: "Find the right path"
+            description: "We help identify a suitable learning direction and next step."
+          - title: "Learn with consistency"
+            description: "Build confidence through guided learning and regular practice."
+      final_cta:
+        title: "Ready to take the next step?"
+        description: "Begin a thoughtful learning journey with Khadijah Academy."
+    unavailable:
+      page_title: "%{academy} | Coming soon"
+      title: "Our public website is coming soon"
+      description: "We are preparing a thoughtful experience for our learners and families. Existing members can still access their accounts."
+  admin:
+    public_website:
+      title: "Website / Public Profile"
+      description: "Manage the essential public identity and homepage content."
+      sections:
+        general: "General"
+        homepage: "Homepage"
+        about: "About"
+        contact_visibility: "Contact visibility"
+      fields:
+        enabled: "Publish public website"
+        academy_name_ar: "Academy name (Arabic)"
+        academy_name_en: "Academy name (English)"
+        hero_title_ar: "Hero title (Arabic)"
+        hero_title_en: "Hero title (English)"
+        hero_subtitle_ar: "Hero subtitle (Arabic)"
+        hero_subtitle_en: "Hero subtitle (English)"
+        about_text_ar: "About text (Arabic)"
+        about_text_en: "About text (English)"
+        primary_cta_label_ar: "Primary action label (Arabic)"
+        primary_cta_label_en: "Primary action label (English)"
+        primary_cta_url: "Primary action URL"
+        whatsapp_cta_enabled: "Show WhatsApp action"
+        public_email_enabled: "Show public email"
+        public_phone_enabled: "Show public phone"
+        public_whatsapp_enabled: "Show public WhatsApp number"
+      hints:
+        enabled: "When off, visitors see a controlled unavailable page while account access remains available."
+        contact_visibility: "Contact details come from academy settings and appear publicly only when enabled here."
+      errors:
+        title: "Please review the website settings"
+      messages:
+        updated: "Public website settings were updated."

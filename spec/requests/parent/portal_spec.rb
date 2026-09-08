@@ -12,7 +12,7 @@ RSpec.describe "Parent portal" do
   end
 
   it "renders the guardian dashboard and navigation" do
-    get root_path
+    get dashboard_path
 
     expect(response).to have_http_status(:ok)
     expect(response.body).to include("Linked Student", guardian_students_path, guardian_reports_path)

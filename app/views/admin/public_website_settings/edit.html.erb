@@ -1,0 +1,60 @@
+<%= render "shared/page_header",
+           title: t("admin.public_website.title"),
+           description: t("admin.public_website.description") %>
+
+<% if @public_website_setting.errors.any? %>
+  <%= render "shared/components/alert", variant: :danger,
+             title: t("admin.public_website.errors.title"),
+             message: @public_website_setting.errors.full_messages.to_sentence %>
+<% end %>
+
+<%= form_with model: @public_website_setting, url: admin_public_website_path, method: :patch, class: "space-y-6" do |form| %>
+  <% general = capture do %>
+    <label class="flex items-start gap-3 rounded-xl border border-app-border bg-app-muted p-4">
+      <%= form.check_box :enabled, class: "ds-checkbox mt-1" %>
+      <span><span class="block font-semibold"><%= t("admin.public_website.fields.enabled") %></span><span class="ds-supporting"><%= t("admin.public_website.hints.enabled") %></span></span>
+    </label>
+    <div class="mt-5 grid gap-5 sm:grid-cols-2">
+      <% %i[academy_name_ar academy_name_en].each do |field| %>
+        <div><%= form.label field, t("admin.public_website.fields.#{field}"), class: "ds-label" %><%= form.text_field field, class: "ds-control mt-2", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr" %></div>
+      <% end %>
+    </div>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.public_website.sections.general"), body: general %>
+
+  <% homepage = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <% %i[hero_title_ar hero_title_en hero_subtitle_ar hero_subtitle_en primary_cta_label_ar primary_cta_label_en].each do |field| %>
+        <div class="<%= "sm:col-span-2" if field.to_s.start_with?("hero_subtitle") %>">
+          <%= form.label field, t("admin.public_website.fields.#{field}"), class: "ds-label" %>
+          <%= field.to_s.start_with?("hero_subtitle") ? form.text_area(field, rows: 3, class: "ds-control mt-2 h-auto", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr") : form.text_field(field, class: "ds-control mt-2", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr") %>
+        </div>
+      <% end %>
+      <div class="sm:col-span-2"><%= form.label :primary_cta_url, t("admin.public_website.fields.primary_cta_url"), class: "ds-label" %><%= form.text_field :primary_cta_url, class: "ds-control mt-2", dir: "ltr" %></div>
+    </div>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.public_website.sections.homepage"), body: homepage %>
+
+  <% about = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <% %i[about_text_ar about_text_en].each do |field| %>
+        <div><%= form.label field, t("admin.public_website.fields.#{field}"), class: "ds-label" %><%= form.text_area field, rows: 7, class: "ds-control mt-2 h-auto", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr" %></div>
+      <% end %>
+    </div>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.public_website.sections.about"), body: about %>
+
+  <% visibility = capture do %>
+    <div class="grid gap-3 sm:grid-cols-2">
+      <% %i[whatsapp_cta_enabled public_email_enabled public_phone_enabled public_whatsapp_enabled].each do |field| %>
+        <label class="flex items-center gap-3 rounded-xl border border-app-border p-4"><%= form.check_box field, class: "ds-checkbox" %><span class="text-sm font-medium"><%= t("admin.public_website.fields.#{field}") %></span></label>
+      <% end %>
+    </div>
+    <p class="mt-4 ds-supporting"><%= t("admin.public_website.hints.contact_visibility") %></p>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.public_website.sections.contact_visibility"), body: visibility %>
+
+  <div class="sticky bottom-4 flex justify-end rounded-xl border border-app-border bg-app-surface/95 p-4 shadow-lg">
+    <%= render "shared/components/button", label: t("actions.save"), type: "submit" %>
+  </div>
+<% end %>
