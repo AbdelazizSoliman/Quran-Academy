@@ -1,0 +1,9 @@
+<% content_for :title, t("public.programs.not_found.page_title", academy: @public_site.academy_name) %>
+<section class="grid min-h-[60vh] place-items-center px-4 py-20 text-center">
+  <div class="max-w-xl">
+    <h1 class="text-3xl font-bold text-emerald-950"><%= t("public.programs.not_found.title") %></h1>
+    <p class="mt-4 leading-7 text-slate-600"><%= t("public.programs.not_found.description") %></p>
+    <%= link_to t("public.programs.not_found.back"), public_programs_path(locale: public_locale),
+                class: "mt-7 inline-flex rounded-xl bg-[var(--public-primary)] px-5 py-3 font-bold text-white hover:opacity-90" %>
+  </div>
+</section>

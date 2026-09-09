@@ -28,6 +28,41 @@ RSpec.describe FeePlan do
     end
   end
 
+  describe "public website publication" do
+    it "is public only when it is both active and published" do
+      published = create(:fee_plan, :published)
+      inactive = create(:fee_plan, :published, :inactive)
+      unpublished = create(:fee_plan)
+
+      expect(described_class.publicly_visible).to contain_exactly(published)
+      expect(inactive).not_to be_publicly_visible
+      expect(unpublished).not_to be_publicly_visible
+    end
+
+    it "requires a public name in both locales before publishing" do
+      fee_plan = build(:fee_plan, published: true, name_ar: "خطة", name_en: nil)
+
+      expect(fee_plan).not_to be_valid
+      expect(fee_plan.errors[:name_en]).to be_present
+    end
+
+    it "splits newline separated public features per locale and bounds them" do
+      fee_plan = build(:fee_plan, :published, public_features_en: (1..12).map { |i| "Feature #{i}" }.join("\n"))
+
+      expect(fee_plan.public_features("en").size).to eq(described_class::MAX_PUBLIC_FEATURES)
+      expect(fee_plan.public_features("ar")).to eq(["حصص منتظمة", "متابعة أسبوعية"])
+    end
+
+    it "stamps published_at once and keeps it through an unpublish cycle" do
+      fee_plan = create(:fee_plan, :published)
+      first_published_at = fee_plan.published_at
+      expect(first_published_at).to be_present
+
+      fee_plan.update!(published: false)
+      expect(fee_plan.reload.published_at).to eq(first_published_at)
+    end
+  end
+
   it "nullifies the student's fee_plan_id when the fee plan is deleted" do
     fee_plan = create(:fee_plan)
     student = create(:student_profile, fee_plan:)

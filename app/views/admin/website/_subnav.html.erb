@@ -1,0 +1,10 @@
+<nav aria-label="<%= t("admin.public_website.title") %>" class="mb-6 flex flex-wrap gap-2">
+  <% [
+       [t("admin.public_website.title"), edit_admin_public_website_path],
+       [t("admin.website.programs.title"), admin_website_programs_path],
+       [t("admin.website.fee_plans.title"), admin_website_fee_plans_path]
+     ].each do |label, path| %>
+    <%= link_to label, path,
+                class: current_page?(path) ? button_classes(variant: :primary, size: :small) : button_classes(variant: :secondary, size: :small) %>
+  <% end %>
+</nav>

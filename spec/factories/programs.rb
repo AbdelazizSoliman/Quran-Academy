@@ -3,6 +3,8 @@ FactoryBot.define do
     sequence(:code) { |number| "PRG_#{number}" }
     name_ar { "برنامج القرآن" }
     name_en { "Quran Program" }
+    short_description_ar { "برنامج لتعلّم القرآن خطوة بخطوة." }
+    short_description_en { "A step by step Quran learning program." }
     category { "quran_reading" }
     status { "draft" }
     default_learning_language { "en" }
@@ -20,5 +22,14 @@ FactoryBot.define do
 
     trait(:active) { status { "active" } }
     trait(:placement_required) { requires_placement { true } }
+
+    trait :published do
+      status { "active" }
+      published { true }
+      sequence(:slug_ar) { |number| "برنامج-القرآن-#{number}" }
+      sequence(:slug_en) { |number| "quran-program-#{number}" }
+    end
+
+    trait(:featured) { public_featured { true } }
   end
 end

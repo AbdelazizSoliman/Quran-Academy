@@ -11,5 +11,15 @@ FactoryBot.define do
     updated_by { created_by }
 
     trait(:inactive) { active { false } }
+
+    trait :published do
+      published { true }
+      sequence(:name_ar) { |number| "خطة الرسوم #{number}" }
+      sequence(:name_en) { |number| "Public Fee Plan #{number}" }
+      description_ar { "خطة شهرية للمتعلمات." }
+      description_en { "A monthly plan for learners." }
+      public_features_ar { "حصص منتظمة\nمتابعة أسبوعية" }
+      public_features_en { "Regular lessons\nWeekly follow-up" }
+    end
   end
 end

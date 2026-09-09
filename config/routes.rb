@@ -12,6 +12,10 @@ Rails.application.routes.draw do
   get "invoices/:token/print", to: "invoice_access#print", as: :print_invoice_access
   namespace :admin do
     resource :public_website, only: %i[edit update], controller: :public_website_settings
+    namespace :website do
+      resources :programs, only: %i[index edit update]
+      resources :fee_plans, path: "fees", only: %i[index edit update]
+    end
     resources :whatsapp_conversations, only: %i[index show] do
       member do
         patch :archive
@@ -326,6 +330,11 @@ Rails.application.routes.draw do
   root "public/home#show"
   get ":locale", to: "public/home#show", as: :localized_public_home,
                  constraints: { locale: /ar|en/ }
+  scope ":locale", module: "public", as: :public, constraints: { locale: /ar|en/ } do
+    get "programs", to: "programs#index", as: :programs
+    get "programs/:slug", to: "programs#show", as: :program
+    get "fees", to: "fees#index", as: :fees
+  end
   constraints LocalEnvironmentConstraint.new do
     get "ui", to: "ui#index", as: :ui
   end

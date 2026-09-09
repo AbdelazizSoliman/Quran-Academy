@@ -1,0 +1,83 @@
+<%= render "shared/page_header",
+           title: t("admin.website.fee_plans.edit.title", fee_plan: @fee_plan.name),
+           description: t("admin.website.fee_plans.hints.published"),
+           badge: public_fee_plan_state_badge(@fee_plan) %>
+<%= render "admin/website/subnav" %>
+
+<% if @fee_plan.errors.any? %>
+  <%= render "shared/components/alert", variant: :error,
+             title: t("admin.website.fee_plans.errors.title"),
+             message: @fee_plan.errors.full_messages.to_sentence %>
+<% end %>
+
+<%= form_with model: @fee_plan, url: admin_website_fee_plan_path(@fee_plan), method: :patch, class: "space-y-6" do |form| %>
+  <% publication = capture do %>
+    <label class="flex items-start gap-3 rounded-xl border border-app-border bg-app-muted p-4">
+      <%= form.check_box :published, class: "ds-checkbox mt-1" %>
+      <span>
+        <span class="block font-semibold"><%= t("admin.website.fee_plans.fields.published") %></span>
+        <span class="ds-supporting"><%= t("admin.website.fee_plans.hints.published") %></span>
+      </span>
+    </label>
+    <dl class="mt-5 grid gap-4 sm:grid-cols-2">
+      <div>
+        <dt class="ds-caption"><%= t("fee_plans.fields.active") %></dt>
+        <dd class="mt-1"><%= setting_boolean_badge(@fee_plan.active?) %></dd>
+      </div>
+      <div>
+        <dt class="ds-caption"><%= t("admin.website.fee_plans.fields.price") %></dt>
+        <dd class="mt-1">
+          <%= number_to_currency(@fee_plan.amount, unit: @fee_plan.currency_symbol, format: "%n %u", precision: 2) %>
+          · <%= t("fee_plans.billing_cycles.#{@fee_plan.billing_cycle}") %>
+        </dd>
+      </div>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.website.fee_plans.sections.publication"), body: publication %>
+
+  <% content = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <% %i[name_ar name_en].each do |field| %>
+        <div>
+          <%= form.label field, t("admin.website.fee_plans.fields.#{field}"), class: "ds-label" %>
+          <%= form.text_field field, class: "ds-control mt-2", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr" %>
+        </div>
+      <% end %>
+      <% %i[description_ar description_en].each do |field| %>
+        <div>
+          <%= form.label field, t("admin.website.fee_plans.fields.#{field}"), class: "ds-label" %>
+          <%= form.text_area field, rows: 4, class: "ds-control mt-2 h-auto", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr" %>
+        </div>
+      <% end %>
+      <% %i[public_features_ar public_features_en].each do |field| %>
+        <div>
+          <%= form.label field, t("admin.website.fee_plans.fields.#{field}"), class: "ds-label" %>
+          <%= form.text_area field, rows: 6, class: "ds-control mt-2 h-auto", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr" %>
+        </div>
+      <% end %>
+    </div>
+    <p class="mt-4 ds-supporting"><%= t("admin.website.fee_plans.hints.features") %></p>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.website.fee_plans.sections.content"), body: content %>
+
+  <% presentation = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <% %i[price_note_ar price_note_en public_cta_label_ar public_cta_label_en].each do |field| %>
+        <div>
+          <%= form.label field, t("admin.website.fee_plans.fields.#{field}"), class: "ds-label" %>
+          <%= form.text_field field, class: "ds-control mt-2", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr" %>
+        </div>
+      <% end %>
+      <div>
+        <%= form.label :public_display_order, t("admin.website.fee_plans.fields.public_display_order"), class: "ds-label" %>
+        <%= form.number_field :public_display_order, min: 0, class: "ds-control mt-2" %>
+      </div>
+    </div>
+    <p class="mt-4 ds-supporting"><%= t("admin.website.fee_plans.hints.price_note") %></p>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.website.fee_plans.sections.presentation"), body: presentation %>
+
+  <div class="sticky bottom-4 flex flex-wrap justify-end gap-2 rounded-xl border border-app-border bg-app-surface/95 p-4 shadow-lg">
+    <%= render "shared/components/button", label: t("actions.save"), type: "submit" %>
+  </div>
+<% end %>

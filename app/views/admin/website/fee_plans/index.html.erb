@@ -1,0 +1,46 @@
+<%= render "shared/page_header",
+           title: t("admin.website.fee_plans.title"),
+           description: t("admin.website.fee_plans.description") %>
+<%= render "admin/website/subnav" %>
+
+<% if @fee_plans.any? %>
+  <div class="overflow-x-auto rounded-2xl border border-app-border">
+    <table class="min-w-full text-sm">
+      <thead class="bg-app-muted">
+        <tr>
+          <th class="px-4 py-3 text-start"><%= t("admin.website.fee_plans.fields.plan") %></th>
+          <th class="px-4 py-3 text-start"><%= t("fee_plans.fields.active") %></th>
+          <th class="px-4 py-3 text-start"><%= t("admin.website.fee_plans.fields.published") %></th>
+          <th class="px-4 py-3 text-start"><%= t("admin.website.fee_plans.fields.name_ar") %></th>
+          <th class="px-4 py-3 text-start"><%= t("admin.website.fee_plans.fields.name_en") %></th>
+          <th class="px-4 py-3 text-start"><%= t("admin.website.fee_plans.fields.public_display_order") %></th>
+          <th class="px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-app-border">
+        <% @fee_plans.each do |fee_plan| %>
+          <tr>
+            <td class="px-4 py-3 font-semibold"><%= fee_plan.name %></td>
+            <td class="px-4 py-3"><%= setting_boolean_badge(fee_plan.active?) %></td>
+            <td class="px-4 py-3"><%= public_fee_plan_state_badge(fee_plan) %></td>
+            <td class="px-4 py-3" dir="rtl"><%= fee_plan.name_ar.presence || "—" %></td>
+            <td class="px-4 py-3" dir="ltr"><%= fee_plan.name_en.presence || "—" %></td>
+            <td class="px-4 py-3"><%= fee_plan.public_display_order %></td>
+            <td class="px-4 py-3 text-end">
+              <%= link_to t("admin.website.fee_plans.actions.edit"), edit_admin_website_fee_plan_path(fee_plan),
+                          class: button_classes(variant: :secondary, size: :small) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-4">
+    <%= link_to t("admin.website.fee_plans.actions.view_public"), public_fees_path(locale: I18n.locale),
+                class: button_classes(variant: :ghost, size: :small), rel: "noopener" %>
+  </div>
+<% else %>
+  <%= render "shared/components/empty_state", icon: :wallet,
+             title: t("admin.website.fee_plans.empty.title"),
+             description: t("admin.website.fee_plans.empty.description") %>
+<% end %>
