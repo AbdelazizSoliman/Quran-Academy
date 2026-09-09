@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Recurring lesson one-off and version changes" do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:admin) { create(:user, :admin) }
   let(:teacher) do
     create(:teacher_profile, :active, :verified, online_meeting_url: "https://meet.example.test/default")
@@ -15,6 +17,8 @@ RSpec.describe "Recurring lesson one-off and version changes" do
     create(:enrollment_lesson_schedule_slot, enrollment_lesson_schedule: schedule,
                                              weekday: "tuesday", starts_at_local: "18:00")
   end
+
+  around { |example| travel_to(Time.find_zone!("Cairo").local(2026, 8, 25, 12, 0)) { example.run } }
 
   before do
     create(:teacher_availability, teacher_profile: teacher, weekday: "tuesday",
@@ -49,12 +53,13 @@ RSpec.describe "Recurring lesson one-off and version changes" do
   end
 
   it "supersedes the old version, preserves history, and reschedules matching future occurrences" do
+    effective_on = Date.current + 1.week
     historical = generate(Date.new(2026, 8, 18))
     future = generate(Date.new(2026, 9, 15))
     historical.update!(status: "completed", completed_at: Time.current)
 
     replacement = EnrollmentLessonSchedules::Change.new(
-      actor: admin, schedule:, effective_on: Date.new(2026, 9, 1),
+      actor: admin, schedule:, effective_on:,
       attributes: {
         teacher_profile: teacher, lesson_duration_minutes: 45, time_zone: "Cairo", ends_on: nil
       },
@@ -62,7 +67,7 @@ RSpec.describe "Recurring lesson one-off and version changes" do
     ).call
 
     expect(schedule.reload).to be_superseded
-    expect(schedule.ends_on).to eq(Date.new(2026, 8, 31))
+    expect(schedule.ends_on).to eq(effective_on - 1.day)
     expect(historical.reload).to be_completed
     expect(future.reload).to be_scheduled
     expect(future.scheduling_source).to eq("rescheduled")
