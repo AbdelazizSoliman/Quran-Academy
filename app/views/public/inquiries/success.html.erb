@@ -1,0 +1,10 @@
+<% content_for :title, t("public.inquiries.success.page_title", academy: @public_site.academy_name) %>
+<section class="px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+  <div class="mx-auto max-w-2xl rounded-2xl border border-emerald-900/10 bg-white p-8 text-center shadow-sm sm:p-12">
+    <div class="mx-auto grid size-14 place-items-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-800" aria-hidden="true">✓</div>
+    <h1 class="mt-6 text-3xl font-bold text-emerald-950"><%= t("public.inquiries.success.title") %></h1>
+    <p class="mt-4 leading-7 text-slate-600"><%= t("public.inquiries.success.description") %></p>
+    <%= link_to t("public.inquiries.success.home"), localized_public_home_path(locale: public_locale),
+                class: "mt-7 inline-flex rounded-xl bg-[var(--public-primary)] px-6 py-3 font-bold text-white hover:opacity-90" %>
+  </div>
+</section>

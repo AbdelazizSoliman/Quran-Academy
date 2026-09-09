@@ -5,6 +5,51 @@ RSpec.describe "Public homepage catalog sections" do
 
   before { create(:public_website_setting, academy_setting:) }
 
+  def programs_navigation_count
+    response.parsed_body.css("a[href='#{public_programs_path(locale: :en)}']").count
+  end
+
+  it "hides Programs navigation and homepage content when no public programs exist" do
+    get localized_public_home_path(locale: :en)
+
+    expect(programs_navigation_count).to eq(0)
+    expect(response.body).not_to include(I18n.t("public.home.programs.title", locale: :en))
+  end
+
+  it "hides Programs navigation from an authenticated non-admin when the catalog is empty" do
+    sign_in create(:user, :student)
+
+    get localized_public_home_path(locale: :en)
+
+    expect(programs_navigation_count).to eq(0)
+    expect(response.body).not_to include(admin_website_programs_path)
+  end
+
+  it "shows admins a direct publishing path when the public catalog is empty" do
+    sign_in create(:user, :admin)
+
+    get localized_public_home_path(locale: :en)
+
+    expect(response.parsed_body.css("a[href='#{admin_website_programs_path}']").count).to eq(2)
+  end
+
+  it "shows Programs navigation in the header and footer when a public program exists" do
+    create(:program, :published)
+
+    get localized_public_home_path(locale: :en)
+
+    expect(programs_navigation_count).to eq(2)
+  end
+
+  it "does not treat inactive-only or unpublished-only programs as publicly available" do
+    create(:program, :active, published: false)
+    create(:program, :published, status: "inactive")
+
+    get localized_public_home_path(locale: :en)
+
+    expect(programs_navigation_count).to eq(0)
+  end
+
   it "hides both featured sections cleanly when nothing is published" do
     create(:program, :active, name_en: "Unpublished Program")
     create(:fee_plan, name_en: "Unpublished Plan")

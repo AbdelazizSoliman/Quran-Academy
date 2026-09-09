@@ -48,7 +48,8 @@ RSpec.describe "Admin public website settings" do
   it "links the website programs and fees subsections" do
     get edit_admin_public_website_path
 
-    expect(response.body).to include(admin_website_programs_path, admin_website_fee_plans_path)
+    expect(response.body).to include(admin_website_leads_path, admin_website_programs_path,
+                                     admin_website_fee_plans_path)
   end
 
   it "rejects non-admin users" do

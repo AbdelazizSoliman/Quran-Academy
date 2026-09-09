@@ -23,6 +23,8 @@ module PublicCatalog
       base.limit(limit)
     end
 
+    def available? = Program.publicly_visible.exists?
+
     def featured(limit: FEATURED_LIMIT)
       base.where(public_featured: true).limit(limit)
     end

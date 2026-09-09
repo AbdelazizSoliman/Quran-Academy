@@ -30,6 +30,20 @@ RSpec.describe "Public homepage" do
     expect(response.body).to include("Khadijah Academy")
   end
 
+  it "uses localized lead-generation navigation and preserves custom CTA URLs" do
+    setting = create(:public_website_setting, academy_setting:)
+
+    get localized_public_home_path(locale: :en)
+    expect(response.body).to include(public_trial_path(locale: :en), public_contact_path(locale: :en))
+
+    get localized_public_home_path(locale: :ar)
+    expect(response.body).to include(public_trial_path(locale: :ar), public_contact_path(locale: :ar))
+
+    setting.update!(primary_cta_url: "https://example.test/custom")
+    get localized_public_home_path(locale: :en)
+    expect(response.body).to include("https://example.test/custom")
+  end
+
   it "returns a controlled unavailable response when disabled" do
     create(:public_website_setting, academy_setting:, enabled: false)
 

@@ -19,10 +19,20 @@ RSpec.describe "Public website routing", type: :routing do
     expect(get: "/en/fees").to route_to(controller: "public/fees", action: "index", locale: "en")
   end
 
+  it "routes localized trial and contact submissions" do
+    expect(get: "/ar/trial").to route_to(controller: "public/trial_requests", action: "new", locale: "ar")
+    expect(post: "/en/trial").to route_to(controller: "public/trial_requests", action: "create", locale: "en")
+    expect(get: "/ar/contact").to route_to(controller: "public/contact_requests", action: "new", locale: "ar")
+    expect(post: "/en/contact").to route_to(controller: "public/contact_requests", action: "create", locale: "en")
+  end
+
   it "does not expose public catalog pages outside the supported locales" do
     expect(get: "/fr/programs").not_to be_routable
     expect(get: "/programs").not_to be_routable
     expect(get: "/fees").not_to be_routable
+    expect(get: "/trial").not_to be_routable
+    expect(get: "/contact").not_to be_routable
+    expect(get: "/en/leads/1").not_to be_routable
     expect(get: "/en/course_offerings").not_to be_routable
   end
 

@@ -1,0 +1,99 @@
+en:
+  activerecord:
+    models:
+      public_inquiry: "Inquiry"
+    attributes:
+      public_inquiry:
+        name: "Name"
+        phone: "Phone"
+        whatsapp_number: "WhatsApp number"
+        email: "Email"
+        student_age: "Student age"
+        preferred_schedule_notes: "Preferred schedule"
+        subject: "Subject"
+        message: "Message"
+        status: "Status"
+        internal_notes: "Internal notes"
+    errors:
+      models:
+        public_inquiry:
+          attributes:
+            base:
+              contact_method_required: "Enter a phone or email address so we can contact you"
+  public:
+    navigation:
+      trial: "Request a trial"
+      contact: "Contact"
+    inquiries:
+      fields:
+        name: "Your name"
+        phone: "Phone number"
+        whatsapp_number: "WhatsApp number (optional)"
+        email: "Email (optional)"
+        student_age: "Student age (optional)"
+        preferred_schedule_notes: "Preferred days or schedule notes (optional)"
+        subject: "Subject (optional)"
+        message: "How can we help?"
+        website: "Website"
+      errors:
+        title: "Please review the form"
+      privacy: "We will use these details only to respond to your request. Submitting this form does not create an account or enrollment."
+      success:
+        page_title: "%{academy} | Request received"
+        title: "We received your request"
+        description: "We received your request and will contact you soon."
+        home: "Return to the homepage"
+    trial:
+      page_title: "%{academy} | Request a trial"
+      eyebrow: "START LEARNING"
+      title: "Request a trial conversation"
+      description: "Tell us how to contact you and a little about the learner. No account is required."
+      submit: "Send trial request"
+    contact:
+      page_title: "%{academy} | Contact us"
+      eyebrow: "CONTACT"
+      title: "How can we help?"
+      description: "Send a message to the academy. We will use your contact details only to reply."
+      submit: "Send message"
+  admin:
+    website:
+      leads:
+        title: "Website / Leads"
+        description: "Review and handle trial and contact requests from the public website."
+        types:
+          trial: "Trial request"
+          contact: "Contact request"
+        statuses:
+          new: "New"
+          contacted: "Contacted"
+          qualified: "Qualified"
+          closed: "Closed"
+          spam: "Spam"
+        fields:
+          type: "Type"
+          status: "Status"
+          name: "Name"
+          contact: "Contact"
+          phone: "Phone"
+          whatsapp_number: "WhatsApp"
+          email: "Email"
+          locale: "Language"
+          preferred_locale: "Preferred language"
+          student_age: "Student age"
+          preferred_schedule_notes: "Preferred schedule"
+          subject: "Subject"
+          message: "Message"
+          submitted_at: "Submitted"
+          source: "Source"
+          internal_notes: "Internal notes"
+        sections:
+          submission: "Submission"
+          handling: "Lead handling"
+        handled: "First handled %{at} by %{by}"
+        empty:
+          title: "No leads match these filters"
+          description: "New trial and contact requests will appear here."
+        errors:
+          title: "Please review the lead"
+        messages:
+          updated: "Lead was updated."

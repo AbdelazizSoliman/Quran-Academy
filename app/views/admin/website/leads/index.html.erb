@@ -1,0 +1,44 @@
+<%= render "shared/page_header", title: t("admin.website.leads.title"), description: t("admin.website.leads.description") %>
+<%= render "admin/website/subnav" %>
+
+<%= form_with url: admin_website_leads_path, method: :get, class: "ds-card mb-6 grid gap-4 p-4 sm:grid-cols-3" do |form| %>
+  <div>
+    <%= form.label :type, t("admin.website.leads.fields.type"), class: "ds-label" %>
+    <%= form.select :type, [[t("actions.all"), ""]] + PublicInquiry::TYPES.map { |value| [t("admin.website.leads.types.#{value}"), value] }, { selected: params[:type] }, class: "ds-control mt-2" %>
+  </div>
+  <div>
+    <%= form.label :status, t("admin.website.leads.fields.status"), class: "ds-label" %>
+    <%= form.select :status, [[t("actions.all"), ""]] + PublicInquiry::STATUSES.map { |value| [t("admin.website.leads.statuses.#{value}"), value] }, { selected: params[:status] }, class: "ds-control mt-2" %>
+  </div>
+  <div class="flex items-end"><%= render "shared/components/button", label: t("actions.filter"), type: :submit %></div>
+<% end %>
+
+<% if @leads.any? %>
+  <div class="overflow-x-auto rounded-2xl border border-app-border">
+    <table class="min-w-full text-sm">
+      <thead class="bg-app-muted"><tr>
+        <th class="px-4 py-3 text-start"><%= t("admin.website.leads.fields.submitted_at") %></th>
+        <th class="px-4 py-3 text-start"><%= t("admin.website.leads.fields.type") %></th>
+        <th class="px-4 py-3 text-start"><%= t("admin.website.leads.fields.name") %></th>
+        <th class="px-4 py-3 text-start"><%= t("admin.website.leads.fields.contact") %></th>
+        <th class="px-4 py-3 text-start"><%= t("admin.website.leads.fields.locale") %></th>
+        <th class="px-4 py-3 text-start"><%= t("admin.website.leads.fields.status") %></th>
+        <th class="px-4 py-3"></th>
+      </tr></thead>
+      <tbody class="divide-y divide-app-border">
+        <% @leads.each do |lead| %><tr>
+          <td class="px-4 py-3"><%= l(lead.submitted_at, format: :short) %></td>
+          <td class="px-4 py-3"><%= t("admin.website.leads.types.#{lead.inquiry_type}") %></td>
+          <td class="px-4 py-3 font-semibold"><%= lead.name %></td>
+          <td class="px-4 py-3" dir="ltr"><%= lead.whatsapp_number.presence || lead.phone.presence || lead.email %></td>
+          <td class="px-4 py-3"><%= lead.preferred_locale.upcase %></td>
+          <td class="px-4 py-3"><span class="<%= badge_classes(lead.status == 'new' ? :information : :neutral) %>"><%= t("admin.website.leads.statuses.#{lead.status}") %></span></td>
+          <td class="px-4 py-3 text-end"><%= link_to t("actions.view"), admin_website_lead_path(lead), class: button_classes(variant: :secondary, size: :small) %></td>
+        </tr><% end %>
+      </tbody>
+    </table>
+  </div>
+  <% if @pagy.pages > 1 %><div class="mt-6"><%== @pagy.series_nav %></div><% end %>
+<% else %>
+  <%= render "shared/components/empty_state", icon: :message, title: t("admin.website.leads.empty.title"), description: t("admin.website.leads.empty.description") %>
+<% end %>

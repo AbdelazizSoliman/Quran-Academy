@@ -1,0 +1,67 @@
+<%= form_with model: inquiry, url:, class: "grid gap-6", data: { turbo: false } do |form| %>
+  <% if inquiry.errors.any? %>
+    <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-900" role="alert">
+      <p class="font-bold"><%= t("public.inquiries.errors.title") %></p>
+      <ul class="mt-2 list-disc space-y-1 ps-5 text-sm">
+        <% inquiry.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <%= form.label :name, t("public.inquiries.fields.name"), class: "block text-sm font-bold text-emerald-950" %>
+      <%= form.text_field :name, required: true, maxlength: 150, autocomplete: "name",
+                          class: "mt-2 min-h-12 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
+    </div>
+    <div>
+      <%= form.label :phone, t("public.inquiries.fields.phone"), class: "block text-sm font-bold text-emerald-950" %>
+      <%= form.telephone_field :phone, maxlength: 30, autocomplete: "tel", dir: "ltr",
+                               class: "mt-2 min-h-12 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
+    </div>
+    <div>
+      <%= form.label :whatsapp_number, t("public.inquiries.fields.whatsapp_number"), class: "block text-sm font-bold text-emerald-950" %>
+      <%= form.telephone_field :whatsapp_number, maxlength: 30, autocomplete: "tel", dir: "ltr",
+                               class: "mt-2 min-h-12 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
+    </div>
+    <div class="sm:col-span-2">
+      <%= form.label :email, t("public.inquiries.fields.email"), class: "block text-sm font-bold text-emerald-950" %>
+      <%= form.email_field :email, maxlength: 254, autocomplete: "email",
+                           class: "mt-2 min-h-12 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
+    </div>
+
+    <% if inquiry.trial? %>
+      <div>
+        <%= form.label :student_age, t("public.inquiries.fields.student_age"), class: "block text-sm font-bold text-emerald-950" %>
+        <%= form.number_field :student_age, min: 1, max: 120,
+                              class: "mt-2 min-h-12 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
+      </div>
+      <div class="sm:col-span-2">
+        <%= form.label :preferred_schedule_notes, t("public.inquiries.fields.preferred_schedule_notes"), class: "block text-sm font-bold text-emerald-950" %>
+        <%= form.text_area :preferred_schedule_notes, rows: 3, maxlength: 2_000,
+                           class: "mt-2 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
+      </div>
+    <% else %>
+      <div class="sm:col-span-2">
+        <%= form.label :subject, t("public.inquiries.fields.subject"), class: "block text-sm font-bold text-emerald-950" %>
+        <%= form.text_field :subject, maxlength: 200,
+                            class: "mt-2 min-h-12 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
+      </div>
+    <% end %>
+
+    <div class="sm:col-span-2">
+      <%= form.label :message, t("public.inquiries.fields.message"), class: "block text-sm font-bold text-emerald-950" %>
+      <%= form.text_area :message, rows: 5, maxlength: 2_000, required: inquiry.contact?,
+                         class: "mt-2 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
+    </div>
+  </div>
+
+  <div class="absolute -start-[10000px] top-auto size-px overflow-hidden" aria-hidden="true">
+    <%= form.label :website, t("public.inquiries.fields.website") %>
+    <%= form.text_field :website, tabindex: -1, autocomplete: "off" %>
+  </div>
+
+  <p class="text-sm leading-6 text-slate-500"><%= t("public.inquiries.privacy") %></p>
+  <%= form.submit t("public.#{inquiry.inquiry_type}.submit"),
+                  class: "min-h-12 w-fit cursor-pointer rounded-xl bg-[var(--public-primary)] px-6 py-3 font-bold text-white shadow-sm hover:opacity-90" %>
+<% end %>

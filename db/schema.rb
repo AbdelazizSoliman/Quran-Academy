@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_091000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1066,6 +1066,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_091000) do
     t.check_constraint "recommended_lessons_per_week > 0", name: "programs_frequency_positive"
   end
 
+  create_table "public_inquiries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.datetime "handled_at"
+    t.bigint "handled_by_id"
+    t.string "inquiry_type", null: false
+    t.text "internal_notes"
+    t.text "message"
+    t.string "name", null: false
+    t.string "phone"
+    t.string "preferred_locale", null: false
+    t.text "preferred_schedule_notes"
+    t.string "public_id", null: false
+    t.string "source", default: "public_website", null: false
+    t.string "status", default: "new", null: false
+    t.integer "student_age"
+    t.string "subject"
+    t.datetime "submitted_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "whatsapp_number"
+    t.index ["handled_by_id"], name: "index_public_inquiries_on_handled_by_id"
+    t.index ["inquiry_type", "status", "submitted_at"], name: "idx_on_inquiry_type_status_submitted_at_d810a58180"
+    t.index ["public_id"], name: "index_public_inquiries_on_public_id", unique: true
+    t.index ["submitted_at"], name: "index_public_inquiries_on_submitted_at"
+  end
+
   create_table "public_website_settings", force: :cascade do |t|
     t.text "about_text_ar"
     t.text "about_text_en"
@@ -1968,6 +1994,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_091000) do
   add_foreign_key "program_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "programs", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "programs", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "public_inquiries", "users", column: "handled_by_id"
   add_foreign_key "public_website_settings", "academy_settings"
   add_foreign_key "scheduled_lesson_enrollments", "enrollments", on_delete: :restrict
   add_foreign_key "scheduled_lesson_enrollments", "scheduled_lessons", on_delete: :restrict

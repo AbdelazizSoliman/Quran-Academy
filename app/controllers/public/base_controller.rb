@@ -15,6 +15,7 @@ module Public
       @public_site = PublicWebsitePresenter.new(
         setting:, academy_setting: setting&.academy_setting, locale: I18n.locale
       )
+      @public_programs_available = PublicCatalog::ProgramsQuery.new(locale: public_locale).available?
     end
 
     # Every public page follows the same controlled unavailable behaviour as the Phase 1 homepage.
@@ -25,6 +26,9 @@ module Public
     end
 
     def public_locale = @public_site.locale
-    helper_method :public_locale
+    def public_programs_available? = @public_programs_available
+    def public_programs_admin? = current_user&.active? && current_user.admin?
+
+    helper_method :public_locale, :public_programs_available?, :public_programs_admin?
   end
 end

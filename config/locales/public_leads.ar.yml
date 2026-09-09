@@ -1,0 +1,99 @@
+ar:
+  activerecord:
+    models:
+      public_inquiry: "طلب تواصل"
+    attributes:
+      public_inquiry:
+        name: "الاسم"
+        phone: "الهاتف"
+        whatsapp_number: "رقم واتساب"
+        email: "البريد الإلكتروني"
+        student_age: "عمر المتعلّمة"
+        preferred_schedule_notes: "المواعيد المفضلة"
+        subject: "الموضوع"
+        message: "الرسالة"
+        status: "الحالة"
+        internal_notes: "الملاحظات الداخلية"
+    errors:
+      models:
+        public_inquiry:
+          attributes:
+            base:
+              contact_method_required: "أدخلي رقم هاتف أو بريدًا إلكترونيًا لنتمكن من التواصل معك"
+  public:
+    navigation:
+      trial: "اطلبي حصة تجريبية"
+      contact: "تواصلي معنا"
+    inquiries:
+      fields:
+        name: "الاسم"
+        phone: "رقم الهاتف"
+        whatsapp_number: "رقم واتساب (اختياري)"
+        email: "البريد الإلكتروني (اختياري)"
+        student_age: "عمر المتعلّمة (اختياري)"
+        preferred_schedule_notes: "الأيام أو المواعيد المفضلة (اختياري)"
+        subject: "الموضوع (اختياري)"
+        message: "كيف يمكننا مساعدتك؟"
+        website: "الموقع الإلكتروني"
+      errors:
+        title: "يرجى مراجعة النموذج"
+      privacy: "سنستخدم هذه البيانات للرد على طلبك فقط. إرسال النموذج لا ينشئ حسابًا أو تسجيلًا في برنامج."
+      success:
+        page_title: "%{academy} | تم استلام الطلب"
+        title: "تم استلام طلبك"
+        description: "تم استلام طلبك وسنتواصل معك قريبًا."
+        home: "العودة إلى الصفحة الرئيسية"
+    trial:
+      page_title: "%{academy} | طلب حصة تجريبية"
+      eyebrow: "ابدئي التعلّم"
+      title: "اطلبي حصة تجريبية"
+      description: "أخبرينا بطريقة التواصل المناسبة وبعض المعلومات عن المتعلّمة. لا يلزم إنشاء حساب."
+      submit: "إرسال طلب الحصة التجريبية"
+    contact:
+      page_title: "%{academy} | تواصلي معنا"
+      eyebrow: "تواصلي معنا"
+      title: "كيف يمكننا مساعدتك؟"
+      description: "أرسلي رسالتك إلى الأكاديمية، وسنستخدم بيانات التواصل للرد عليك فقط."
+      submit: "إرسال الرسالة"
+  admin:
+    website:
+      leads:
+        title: "الموقع الإلكتروني / الطلبات"
+        description: "مراجعة طلبات الحصص التجريبية ورسائل التواصل الواردة من الموقع العام."
+        types:
+          trial: "طلب حصة تجريبية"
+          contact: "طلب تواصل"
+        statuses:
+          new: "جديد"
+          contacted: "تم التواصل"
+          qualified: "مؤهل"
+          closed: "مغلق"
+          spam: "مزعج"
+        fields:
+          type: "النوع"
+          status: "الحالة"
+          name: "الاسم"
+          contact: "التواصل"
+          phone: "الهاتف"
+          whatsapp_number: "واتساب"
+          email: "البريد الإلكتروني"
+          locale: "اللغة"
+          preferred_locale: "اللغة المفضلة"
+          student_age: "عمر المتعلّمة"
+          preferred_schedule_notes: "المواعيد المفضلة"
+          subject: "الموضوع"
+          message: "الرسالة"
+          submitted_at: "وقت الإرسال"
+          source: "المصدر"
+          internal_notes: "الملاحظات الداخلية"
+        sections:
+          submission: "بيانات الطلب"
+          handling: "متابعة الطلب"
+        handled: "تمت أول متابعة في %{at} بواسطة %{by}"
+        empty:
+          title: "لا توجد طلبات مطابقة"
+          description: "ستظهر طلبات الحصص التجريبية ورسائل التواصل الجديدة هنا."
+        errors:
+          title: "يرجى مراجعة الطلب"
+        messages:
+          updated: "تم تحديث الطلب."
