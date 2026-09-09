@@ -2,6 +2,7 @@ en:
   errors:
     messages:
       not_supported: "must be included in the supported languages"
+      public_content_required: "is required before this record can be published publicly"
       after_start: "must be later than the start time; overnight hours are not supported"
       outside_range: "must be between the minimum and maximum"
       misaligned: "must align the default duration with the configured step"

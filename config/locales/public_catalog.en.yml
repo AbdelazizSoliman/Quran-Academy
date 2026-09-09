@@ -1,0 +1,143 @@
+en:
+  public:
+    navigation:
+      programs: "Programs"
+      fees: "Fees"
+    programs:
+      index:
+        page_title: "%{academy} | Programs"
+        eyebrow: "OUR PROGRAMS"
+        title: "Programs built around steady progress"
+        description: "Every program below is published by the academy with its own focus, pace, and entry level."
+      empty:
+        title: "Programs are being prepared"
+        description: "Our published programs will appear here soon. You are welcome to contact us in the meantime."
+      not_found:
+        page_title: "%{academy} | Program not found"
+        title: "This program is not available"
+        description: "The program you are looking for is not published, or the link has changed."
+        back: "Browse published programs"
+      detail:
+        page_title: "%{academy} | %{program}"
+        overview: "About this program"
+        summary: "At a glance"
+      fields:
+        category: "Focus"
+        age_groups: "Suitable for"
+        languages: "Teaching languages"
+        lesson_duration: "Lesson length"
+        lessons_per_week: "Recommended pace"
+        estimated_duration: "Estimated duration"
+        entry_level: "Starting level"
+        completion_level: "Completion level"
+        placement: "Placement"
+      values:
+        lesson_duration: "%{count} minutes"
+        lessons_per_week: "%{count} lessons per week"
+        estimated_duration: "About %{count} weeks"
+        placement_required: "A short placement step comes first"
+        placement_not_required: "No placement step needed"
+      languages:
+        ar: "Arabic"
+        en: "English"
+        fr: "French"
+        de: "German"
+        tr: "Turkish"
+        ur: "Urdu"
+      view: "View program"
+    fees:
+      index:
+        page_title: "%{academy} | Fees"
+        eyebrow: "FEES"
+        title: "Clear, published pricing"
+        description: "These are the fee plans the academy has published. Contact us if you would like help choosing one."
+      empty:
+        title: "Fee plans are being prepared"
+        description: "Published fee plans will appear here soon. Please contact us for current pricing."
+      features: "What is included"
+      default_cta: "Get started"
+    home:
+      programs:
+        eyebrow: "FEATURED PROGRAMS"
+        title: "Where learners usually begin"
+        all: "See all programs"
+      fees:
+        eyebrow: "FEES"
+        title: "Published fee plans"
+        all: "See all fees"
+  admin:
+    website:
+      programs:
+        title: "Website / Programs"
+        description: "Control which academic programs appear on the public website and how they are ordered."
+        edit: { title: "Public settings for %{program}" }
+        sections:
+          publication: "Publication"
+          slugs: "Public addresses"
+          presentation: "Presentation"
+        fields:
+          published: "Published on the public website"
+          slug_ar: "Arabic address (slug)"
+          slug_en: "English address (slug)"
+          public_featured: "Feature on the homepage"
+          public_display_order: "Public display order"
+          published_at: "First published"
+          status: "Operational status"
+        hints:
+          published: "A program appears publicly only when it is operationally active and published here."
+          slugs: "Public pages use these addresses instead of internal identifiers. Arabic pages use the Arabic slug and English pages use the English slug."
+          public_content: "Publishing requires an Arabic and English name, short description, and slug."
+        states:
+          public: "Public"
+          published_not_active: "Published, not active"
+          hidden: "Hidden"
+        actions:
+          edit: "Edit public settings"
+          view_public: "Open public page"
+        empty: { title: "No programs yet", description: "Create an academic program before publishing it to the website." }
+        errors: { title: "Please review the public settings" }
+        messages: { updated: "Public program settings were updated." }
+      fee_plans:
+        title: "Website / Fees"
+        description: "Control which fee plans appear on the public fees page and how they are presented."
+        edit: { title: "Public settings for %{fee_plan}" }
+        sections:
+          publication: "Publication"
+          content: "Public content"
+          presentation: "Presentation"
+        fields:
+          published: "Published on the public website"
+          name_ar: "Public name (Arabic)"
+          name_en: "Public name (English)"
+          description_ar: "Public description (Arabic)"
+          description_en: "Public description (English)"
+          public_features_ar: "Included features (Arabic)"
+          public_features_en: "Included features (English)"
+          price_note_ar: "Price note (Arabic)"
+          price_note_en: "Price note (English)"
+          public_cta_label_ar: "Action label (Arabic)"
+          public_cta_label_en: "Action label (English)"
+          public_display_order: "Public display order"
+          plan: "Operational plan"
+          price: "Price"
+        hints:
+          published: "A fee plan appears publicly only when it is active and published here."
+          features: "One feature per line. The first eight lines are shown."
+          price_note: "Use this for any pricing note you want visitors to see. Tax settings are never published automatically."
+        states:
+          public: "Public"
+          published_not_active: "Published, not active"
+          hidden: "Hidden"
+        actions: { edit: "Edit public settings", view_public: "Open public fees page" }
+        empty: { title: "No fee plans yet", description: "Create a fee plan before publishing it to the website." }
+        errors: { title: "Please review the public settings" }
+        messages: { updated: "Public fee plan settings were updated." }
+  programs:
+    fields:
+      published: "Published"
+      slug_ar: "Arabic slug"
+      slug_en: "English slug"
+      public_featured: "Featured"
+      public_display_order: "Public display order"
+    audit: { public_profile_updated: "Public website settings updated by %{actor}" }
+    sections: { public_website: "Public website" }

@@ -1,7 +1,7 @@
 class ProgramEvent < ApplicationRecord
   include SafeAuditMetadata
 
-  EVENT_TYPES = %w[created updated activated deactivated archived restored].freeze
+  EVENT_TYPES = %w[created updated activated deactivated archived restored public_profile_updated].freeze
   belongs_to :program, inverse_of: :events
   belongs_to :actor, class_name: "User"
   validates :event_type, inclusion: { in: EVENT_TYPES }

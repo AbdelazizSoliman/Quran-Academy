@@ -1,0 +1,71 @@
+<%= render "shared/page_header",
+           title: t("admin.website.programs.edit.title", program: localized_program_name(@program)),
+           description: t("admin.website.programs.hints.published"),
+           badge: public_program_state_badge(@program) %>
+<%= render "admin/website/subnav" %>
+
+<% if @program.errors.any? %>
+  <%= render "shared/components/alert", variant: :error,
+             title: t("admin.website.programs.errors.title"),
+             message: @program.errors.full_messages.to_sentence %>
+<% end %>
+
+<%= form_with model: @program, url: admin_website_program_path(@program), method: :patch, class: "space-y-6" do |form| %>
+  <% publication = capture do %>
+    <label class="flex items-start gap-3 rounded-xl border border-app-border bg-app-muted p-4">
+      <%= form.check_box :published, class: "ds-checkbox mt-1" %>
+      <span>
+        <span class="block font-semibold"><%= t("admin.website.programs.fields.published") %></span>
+        <span class="ds-supporting"><%= t("admin.website.programs.hints.public_content") %></span>
+      </span>
+    </label>
+    <dl class="mt-5 grid gap-4 sm:grid-cols-2">
+      <div>
+        <dt class="ds-caption"><%= t("admin.website.programs.fields.status") %></dt>
+        <dd class="mt-1"><%= program_status_badge(@program) %></dd>
+      </div>
+      <div>
+        <dt class="ds-caption"><%= t("admin.website.programs.fields.published_at") %></dt>
+        <dd class="mt-1"><%= @program.published_at ? l(@program.published_at, format: :long) : t("academic.not_configured") %></dd>
+      </div>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.website.programs.sections.publication"), body: publication %>
+
+  <% slugs = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <%= form.label :slug_ar, t("admin.website.programs.fields.slug_ar"), class: "ds-label" %>
+        <%= form.text_field :slug_ar, class: "ds-control mt-2", dir: "rtl" %>
+      </div>
+      <div>
+        <%= form.label :slug_en, t("admin.website.programs.fields.slug_en"), class: "ds-label" %>
+        <%= form.text_field :slug_en, class: "ds-control mt-2", dir: "ltr" %>
+      </div>
+    </div>
+    <p class="mt-4 ds-supporting"><%= t("admin.website.programs.hints.slugs") %></p>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.website.programs.sections.slugs"), body: slugs %>
+
+  <% presentation = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <label class="flex items-center gap-3 rounded-xl border border-app-border p-4">
+        <%= form.check_box :public_featured, class: "ds-checkbox" %>
+        <span class="text-sm font-medium"><%= t("admin.website.programs.fields.public_featured") %></span>
+      </label>
+      <div>
+        <%= form.label :public_display_order, t("admin.website.programs.fields.public_display_order"), class: "ds-label" %>
+        <%= form.number_field :public_display_order, min: 0, class: "ds-control mt-2" %>
+      </div>
+    </div>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.website.programs.sections.presentation"), body: presentation %>
+
+  <div class="sticky bottom-4 flex flex-wrap justify-end gap-2 rounded-xl border border-app-border bg-app-surface/95 p-4 shadow-lg">
+    <% if @program.publicly_visible? %>
+      <%= render "shared/components/button", label: t("admin.website.programs.actions.view_public"), variant: :secondary,
+                 href: public_program_path(locale: I18n.locale, slug: (I18n.locale == :ar ? @program.slug_ar : @program.slug_en)) %>
+    <% end %>
+    <%= render "shared/components/button", label: t("actions.save"), type: "submit" %>
+  </div>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_091000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -572,18 +572,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
     t.datetime "created_at", null: false
     t.bigint "created_by_id", null: false
     t.string "currency", default: "EGP", null: false
+    t.text "description_ar"
+    t.text "description_en"
     t.integer "invoice_day", default: 7, null: false
     t.string "name", null: false
+    t.string "name_ar"
+    t.string "name_en"
+    t.string "price_note_ar"
+    t.string "price_note_en"
+    t.string "public_cta_label_ar"
+    t.string "public_cta_label_en"
+    t.integer "public_display_order", default: 0, null: false
+    t.text "public_features_ar"
+    t.text "public_features_en"
     t.string "public_id", null: false
+    t.boolean "published", default: false, null: false
+    t.datetime "published_at"
     t.decimal "tax_percentage", precision: 5, scale: 2, default: "0.0", null: false
     t.datetime "updated_at", null: false
     t.bigint "updated_by_id", null: false
     t.index ["active"], name: "index_fee_plans_on_active"
     t.index ["created_by_id"], name: "index_fee_plans_on_created_by_id"
     t.index ["public_id"], name: "index_fee_plans_on_public_id", unique: true
+    t.index ["published", "public_display_order"], name: "index_fee_plans_on_publication_order"
     t.index ["updated_by_id"], name: "index_fee_plans_on_updated_by_id"
     t.check_constraint "billing_cycle::text = ANY (ARRAY['per_lesson'::character varying, 'weekly'::character varying, 'monthly'::character varying, 'package'::character varying]::text[])", name: "fee_plan_billing_cycle"
     t.check_constraint "invoice_day >= 1 AND invoice_day <= 31", name: "fee_plan_invoice_day_range"
+    t.check_constraint "public_display_order >= 0", name: "fee_plans_public_display_order_nonnegative"
     t.check_constraint "tax_percentage >= 0::numeric AND tax_percentage <= 100::numeric", name: "fee_plan_tax_percentage_range"
   end
 
@@ -1017,11 +1032,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
     t.text "internal_notes"
     t.string "name_ar", null: false
     t.string "name_en", null: false
+    t.integer "public_display_order", default: 0, null: false
+    t.boolean "public_featured", default: false, null: false
     t.string "public_id", null: false
+    t.boolean "published", default: false, null: false
+    t.datetime "published_at"
     t.integer "recommended_lessons_per_week", default: 2, null: false
     t.boolean "requires_placement", default: false, null: false
     t.text "short_description_ar"
     t.text "short_description_en"
+    t.string "slug_ar"
+    t.string "slug_en"
     t.string "status", default: "draft", null: false
     t.string "supported_learning_languages", default: [], null: false, array: true
     t.string "target_age_groups", default: [], null: false, array: true
@@ -1032,12 +1053,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
     t.index ["created_by_id"], name: "index_programs_on_created_by_id"
     t.index ["display_order"], name: "index_programs_on_display_order"
     t.index ["public_id"], name: "index_programs_on_public_id", unique: true
+    t.index ["published", "public_display_order"], name: "index_programs_on_publication_order"
+    t.index ["slug_ar"], name: "index_programs_on_slug_ar", unique: true
+    t.index ["slug_en"], name: "index_programs_on_slug_en", unique: true
     t.index ["status"], name: "index_programs_on_status"
     t.index ["supported_learning_languages"], name: "index_programs_on_supported_learning_languages", using: :gin
     t.index ["target_age_groups"], name: "index_programs_on_target_age_groups", using: :gin
     t.index ["updated_by_id"], name: "index_programs_on_updated_by_id"
     t.check_constraint "default_lesson_duration_minutes > 0", name: "programs_duration_positive"
     t.check_constraint "estimated_duration_weeks IS NULL OR estimated_duration_weeks >= 0", name: "programs_duration_weeks_nonnegative"
+    t.check_constraint "public_display_order >= 0", name: "programs_public_display_order_nonnegative"
     t.check_constraint "recommended_lessons_per_week > 0", name: "programs_frequency_positive"
   end
 

@@ -36,6 +36,21 @@ RSpec.describe "Admin public website settings" do
     )
   end
 
+  it "re-renders the editor with the validation errors when input is invalid" do
+    patch admin_public_website_path, params: {
+      public_website_setting: valid_attributes.merge(primary_cta_url: "javascript:alert(1)")
+    }
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.body).to include(I18n.t("admin.public_website.errors.title"))
+  end
+
+  it "links the website programs and fees subsections" do
+    get edit_admin_public_website_path
+
+    expect(response.body).to include(admin_website_programs_path, admin_website_fee_plans_path)
+  end
+
   it "rejects non-admin users" do
     sign_out admin
     sign_in create(:user, :staff)

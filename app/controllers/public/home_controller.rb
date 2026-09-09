@@ -1,12 +1,12 @@
 module Public
   class HomeController < BaseController
     def show
-      setting = PublicWebsiteSetting.includes(:academy_setting).first
-      @public_site = PublicWebsitePresenter.new(
-        setting:, academy_setting: setting&.academy_setting, locale: I18n.locale
+      @featured_programs = PublicCatalog::ProgramPresenter.wrap(
+        PublicCatalog::ProgramsQuery.new(locale: public_locale).featured, locale: public_locale
       )
-
-      render :unavailable, status: :service_unavailable unless @public_site.enabled?
+      @featured_fee_plans = PublicCatalog::FeePlanPresenter.wrap(
+        PublicCatalog::FeePlansQuery.new(locale: public_locale).featured, locale: public_locale
+      )
     end
   end
 end

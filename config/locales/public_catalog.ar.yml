@@ -1,0 +1,143 @@
+ar:
+  public:
+    navigation:
+      programs: "البرامج"
+      fees: "الرسوم"
+    programs:
+      index:
+        page_title: "%{academy} | البرامج"
+        eyebrow: "برامجنا"
+        title: "برامج مبنية على التقدّم المستمر"
+        description: "كل برنامج معروض هنا منشور من الأكاديمية بمجاله ووتيرته ومستوى البداية الخاص به."
+      empty:
+        title: "يجري إعداد البرامج"
+        description: "ستظهر البرامج المنشورة هنا قريباً، ويسعدنا تواصلك معنا في هذه الأثناء."
+      not_found:
+        page_title: "%{academy} | البرنامج غير متاح"
+        title: "هذا البرنامج غير متاح"
+        description: "البرنامج الذي تبحثين عنه غير منشور، أو تغيّر الرابط."
+        back: "تصفّحي البرامج المنشورة"
+      detail:
+        page_title: "%{academy} | %{program}"
+        overview: "عن هذا البرنامج"
+        summary: "نظرة سريعة"
+      fields:
+        category: "المجال"
+        age_groups: "مناسب لـ"
+        languages: "لغات التدريس"
+        lesson_duration: "مدة الحصة"
+        lessons_per_week: "الوتيرة المقترحة"
+        estimated_duration: "المدة التقديرية"
+        entry_level: "مستوى البداية"
+        completion_level: "مستوى الإتمام"
+        placement: "تحديد المستوى"
+      values:
+        lesson_duration: "%{count} دقيقة"
+        lessons_per_week: "%{count} حصص أسبوعياً"
+        estimated_duration: "نحو %{count} أسبوعاً"
+        placement_required: "يسبق البدء خطوة قصيرة لتحديد المستوى"
+        placement_not_required: "لا تلزم خطوة لتحديد المستوى"
+      languages:
+        ar: "العربية"
+        en: "الإنجليزية"
+        fr: "الفرنسية"
+        de: "الألمانية"
+        tr: "التركية"
+        ur: "الأردية"
+      view: "عرض البرنامج"
+    fees:
+      index:
+        page_title: "%{academy} | الرسوم"
+        eyebrow: "الرسوم"
+        title: "أسعار واضحة ومنشورة"
+        description: "هذه خطط الرسوم التي نشرتها الأكاديمية، ويسعدنا مساعدتك في اختيار الأنسب."
+      empty:
+        title: "يجري إعداد خطط الرسوم"
+        description: "ستظهر خطط الرسوم المنشورة هنا قريباً، ويمكنك التواصل معنا لمعرفة الأسعار الحالية."
+      features: "ما تشمله الخطة"
+      default_cta: "ابدئي الآن"
+    home:
+      programs:
+        eyebrow: "برامج مختارة"
+        title: "من أين تبدأ المتعلمات عادةً"
+        all: "عرض كل البرامج"
+      fees:
+        eyebrow: "الرسوم"
+        title: "خطط الرسوم المنشورة"
+        all: "عرض كل الرسوم"
+  admin:
+    website:
+      programs:
+        title: "الموقع الإلكتروني / البرامج"
+        description: "تحكّم في البرامج التي تظهر على الموقع العام وترتيبها."
+        edit: { title: "الإعدادات العامة لبرنامج %{program}" }
+        sections:
+          publication: "النشر"
+          slugs: "العناوين العامة"
+          presentation: "العرض"
+        fields:
+          published: "منشور على الموقع العام"
+          slug_ar: "العنوان العربي (slug)"
+          slug_en: "العنوان الإنجليزي (slug)"
+          public_featured: "إبراز في الصفحة الرئيسية"
+          public_display_order: "ترتيب العرض العام"
+          published_at: "أول نشر"
+          status: "الحالة التشغيلية"
+        hints:
+          published: "لا يظهر البرنامج للعامة إلا إذا كان نشطاً تشغيلياً ومنشوراً من هنا."
+          slugs: "تستخدم الصفحات العامة هذه العناوين بدلاً من المعرفات الداخلية. الصفحات العربية تستخدم العنوان العربي والإنجليزية تستخدم العنوان الإنجليزي."
+          public_content: "يتطلب النشر اسماً ووصفاً مختصراً وعنواناً بالعربية والإنجليزية."
+        states:
+          public: "ظاهر للعامة"
+          published_not_active: "منشور وغير نشط"
+          hidden: "مخفي"
+        actions:
+          edit: "تعديل الإعدادات العامة"
+          view_public: "فتح الصفحة العامة"
+        empty: { title: "لا توجد برامج بعد", description: "أنشئ برنامجاً أكاديمياً قبل نشره على الموقع." }
+        errors: { title: "يرجى مراجعة الإعدادات العامة" }
+        messages: { updated: "تم تحديث الإعدادات العامة للبرنامج." }
+      fee_plans:
+        title: "الموقع الإلكتروني / الرسوم"
+        description: "تحكّم في خطط الرسوم التي تظهر في صفحة الرسوم العامة وطريقة عرضها."
+        edit: { title: "الإعدادات العامة لخطة %{fee_plan}" }
+        sections:
+          publication: "النشر"
+          content: "المحتوى العام"
+          presentation: "العرض"
+        fields:
+          published: "منشورة على الموقع العام"
+          name_ar: "الاسم العام بالعربية"
+          name_en: "الاسم العام بالإنجليزية"
+          description_ar: "الوصف العام بالعربية"
+          description_en: "الوصف العام بالإنجليزية"
+          public_features_ar: "المزايا المشمولة بالعربية"
+          public_features_en: "المزايا المشمولة بالإنجليزية"
+          price_note_ar: "ملاحظة السعر بالعربية"
+          price_note_en: "ملاحظة السعر بالإنجليزية"
+          public_cta_label_ar: "نص الإجراء بالعربية"
+          public_cta_label_en: "نص الإجراء بالإنجليزية"
+          public_display_order: "ترتيب العرض العام"
+          plan: "الخطة التشغيلية"
+          price: "السعر"
+        hints:
+          published: "لا تظهر خطة الرسوم للعامة إلا إذا كانت نشطة ومنشورة من هنا."
+          features: "ميزة واحدة في كل سطر، وتُعرض أول ثمانية أسطر."
+          price_note: "استخدمي هذا الحقل لأي ملاحظة سعرية تريدين إظهارها. لا تُنشر إعدادات الضريبة تلقائياً."
+        states:
+          public: "ظاهرة للعامة"
+          published_not_active: "منشورة وغير نشطة"
+          hidden: "مخفية"
+        actions: { edit: "تعديل الإعدادات العامة", view_public: "فتح صفحة الرسوم العامة" }
+        empty: { title: "لا توجد خطط رسوم بعد", description: "أنشئ خطة رسوم قبل نشرها على الموقع." }
+        errors: { title: "يرجى مراجعة الإعدادات العامة" }
+        messages: { updated: "تم تحديث الإعدادات العامة لخطة الرسوم." }
+  programs:
+    fields:
+      published: "منشور"
+      slug_ar: "العنوان العربي"
+      slug_en: "العنوان الإنجليزي"
+      public_featured: "مُبرَز"
+      public_display_order: "ترتيب العرض العام"
+    audit: { public_profile_updated: "حدّث %{actor} إعدادات الموقع العام" }
+    sections: { public_website: "الموقع العام" }

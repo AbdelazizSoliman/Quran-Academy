@@ -1,4 +1,7 @@
 class Program < ApplicationRecord
+  include PubliclyPublishable
+  include PublicWebsiteSlug
+
   CATEGORIES = %w[
     quran_reading quran_memorization tajweed qaida_noorania arabic_language
     islamic_studies recitation revision new_muslim_foundations other
@@ -7,6 +10,11 @@ class Program < ApplicationRecord
   AGE_GROUPS = %w[children teenagers adults seniors].freeze
   LEVELS = %w[not_started foundation beginner elementary intermediate advanced memorization revision qualified].freeze
   CODE_PATTERN = /\A[A-Z0-9][A-Z0-9_-]*\z/
+  # Public pages never fall back to the other language, so both locales must be complete
+  # before a program can be published.
+  PUBLIC_REQUIRED_FIELDS = %i[
+    slug_ar slug_en name_ar name_en short_description_ar short_description_en
+  ].freeze
 
   belongs_to :created_by, class_name: "User", optional: true, inverse_of: :created_programs
   belongs_to :updated_by, class_name: "User", optional: true, inverse_of: :updated_programs
@@ -16,6 +24,7 @@ class Program < ApplicationRecord
 
   attr_readonly :public_id
   before_validation :normalize_values
+  before_validation :normalize_public_slugs
   before_validation :apply_defaults, on: :create
   before_validation :generate_public_id, on: :create
 
@@ -29,16 +38,26 @@ class Program < ApplicationRecord
   validates :estimated_duration_weeks, numericality: { only_integer: true, in: 0..520 }, allow_nil: true
   validates :display_order, numericality: { only_integer: true, in: 0..100_000 }
   validates :internal_notes, length: { maximum: 5_000 }, allow_blank: true
+  validates :public_display_order, numericality: { only_integer: true, in: 0..100_000 }
+  validates :slug_ar, :slug_en, uniqueness: { case_sensitive: false },
+                                format: { with: PublicWebsiteSlug::FORMAT },
+                                length: { maximum: PublicWebsiteSlug::MAX_LENGTH }, allow_nil: true
+  validate :public_content_rules, if: :published?
   validate :language_rules
   validate :age_group_rules
   validate :lesson_duration_rules
   validate :protect_code, if: :will_save_change_to_code?
 
   scope :recent_first, -> { order(created_at: :desc, id: :desc) }
+  # Publication requires both an operational `active` status and an explicit `published` flag,
+  # so activating a program never makes it public on its own.
+  scope :publicly_visible, -> { where(status: "active", published: true) }
 
   def archived? = status == "archived"
   def active? = status == "active"
   STATUSES.each { |value| define_method(:"#{value}?") { status == value } }
+
+  def publicly_visible? = active? && published?
 
   private
 
@@ -60,6 +79,17 @@ class Program < ApplicationRecord
     self.supported_learning_languages = setting.teaching_languages if supported_learning_languages.empty?
     self.default_learning_language = supported_learning_languages.first if default_learning_language.blank?
     self.default_lesson_duration_minutes ||= setting.default_lesson_duration_minutes
+  end
+
+  def normalize_public_slugs
+    self.slug_ar = self.class.normalize_public_slug(slug_ar)
+    self.slug_en = self.class.normalize_public_slug(slug_en)
+  end
+
+  def public_content_rules
+    PUBLIC_REQUIRED_FIELDS.each do |field|
+      errors.add(field, :public_content_required) if public_send(field).blank?
+    end
   end
 
   def generate_public_id

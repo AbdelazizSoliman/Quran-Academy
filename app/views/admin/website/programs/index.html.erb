@@ -1,0 +1,51 @@
+<%= render "shared/page_header",
+           title: t("admin.website.programs.title"),
+           description: t("admin.website.programs.description") %>
+<%= render "admin/website/subnav" %>
+
+<% if @programs.any? %>
+  <div class="overflow-x-auto rounded-2xl border border-app-border">
+    <table class="min-w-full text-sm">
+      <thead class="bg-app-muted">
+        <tr>
+          <th class="px-4 py-3 text-start"><%= t("programs.fields.name_en") %></th>
+          <th class="px-4 py-3 text-start"><%= t("admin.website.programs.fields.status") %></th>
+          <th class="px-4 py-3 text-start"><%= t("admin.website.programs.fields.published") %></th>
+          <th class="px-4 py-3 text-start"><%= t("programs.fields.slug_ar") %></th>
+          <th class="px-4 py-3 text-start"><%= t("programs.fields.slug_en") %></th>
+          <th class="px-4 py-3 text-start"><%= t("programs.fields.public_featured") %></th>
+          <th class="px-4 py-3 text-start"><%= t("programs.fields.public_display_order") %></th>
+          <th class="px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-app-border">
+        <% @programs.each do |program| %>
+          <tr>
+            <td class="px-4 py-3 font-semibold"><%= localized_program_name(program) %></td>
+            <td class="px-4 py-3"><%= program_status_badge(program) %></td>
+            <td class="px-4 py-3"><%= public_program_state_badge(program) %></td>
+            <td class="px-4 py-3" dir="rtl"><%= program.slug_ar.presence || "—" %></td>
+            <td class="px-4 py-3" dir="ltr"><%= program.slug_en.presence || "—" %></td>
+            <td class="px-4 py-3"><%= setting_boolean_badge(program.public_featured?) %></td>
+            <td class="px-4 py-3"><%= program.public_display_order %></td>
+            <td class="px-4 py-3 text-end">
+              <div class="flex flex-wrap justify-end gap-2">
+                <% if program.publicly_visible? %>
+                  <%= link_to t("admin.website.programs.actions.view_public"),
+                              public_program_path(locale: I18n.locale, slug: (I18n.locale == :ar ? program.slug_ar : program.slug_en)),
+                              class: button_classes(variant: :ghost, size: :small), rel: "noopener" %>
+                <% end %>
+                <%= link_to t("admin.website.programs.actions.edit"), edit_admin_website_program_path(program),
+                            class: button_classes(variant: :secondary, size: :small) %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <%= render "shared/components/empty_state", icon: :reports,
+             title: t("admin.website.programs.empty.title"),
+             description: t("admin.website.programs.empty.description") %>
+<% end %>

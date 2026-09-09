@@ -25,6 +25,10 @@
           <span class="truncate text-base font-bold text-emerald-950 sm:text-lg"><%= @public_site.academy_name %></span>
         <% end %>
         <nav aria-label="<%= t("public.navigation.label") %>" class="flex items-center gap-2 sm:gap-3">
+          <%= link_to t("public.navigation.programs"), public_programs_path(locale: @public_site.locale),
+                      class: "hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 sm:inline-flex" %>
+          <%= link_to t("public.navigation.fees"), public_fees_path(locale: @public_site.locale),
+                      class: "hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 sm:inline-flex" %>
           <%= link_to t("public.navigation.locale_switch"),
                       localized_public_home_path(locale: @public_site.locale == "ar" ? "en" : "ar"),
                       hreflang: (@public_site.locale == "ar" ? "en" : "ar"),
@@ -49,7 +53,9 @@
           <%= mail_to @public_site.email, @public_site.email, class: "hover:text-white" if @public_site.email.present? %>
           <%= link_to @public_site.phone, "tel:#{@public_site.phone}", class: "hover:text-white", dir: "ltr" if @public_site.phone.present? %>
           <%= link_to t("public.footer.whatsapp"), @public_site.whatsapp_url, class: "hover:text-white", rel: "noopener" if @public_site.whatsapp.present? %>
-          <%= link_to t("public.navigation.login"), new_user_session_path(locale: @public_site.locale), class: "mt-2 hover:text-white" %>
+          <%= link_to t("public.navigation.programs"), public_programs_path(locale: @public_site.locale), class: "mt-2 hover:text-white" %>
+          <%= link_to t("public.navigation.fees"), public_fees_path(locale: @public_site.locale), class: "hover:text-white" %>
+          <%= link_to t("public.navigation.login"), new_user_session_path(locale: @public_site.locale), class: "hover:text-white" %>
         </div>
       </div>
     </footer>

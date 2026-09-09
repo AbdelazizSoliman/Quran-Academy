@@ -1,9 +1,10 @@
 <%= render "shared/page_header",
            title: t("admin.public_website.title"),
            description: t("admin.public_website.description") %>
+<%= render "admin/website/subnav" %>
 
 <% if @public_website_setting.errors.any? %>
-  <%= render "shared/components/alert", variant: :danger,
+  <%= render "shared/components/alert", variant: :error,
              title: t("admin.public_website.errors.title"),
              message: @public_website_setting.errors.full_messages.to_sentence %>
 <% end %>
