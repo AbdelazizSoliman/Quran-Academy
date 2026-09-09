@@ -45,11 +45,26 @@ RSpec.describe "Public programs" do
     expect(response.body).not_to include("Hidden Draft Program", "Deactivated Program")
   end
 
-  it "shows an honest empty state instead of placeholder programs" do
+  it "does not expose an empty program index to an anonymous visitor" do
     get public_programs_path(locale: :en)
 
-    expect(response).to have_http_status(:ok)
-    expect(response.body).to include(I18n.t("public.programs.empty.title", locale: :en))
+    expect(response).to have_http_status(:not_found)
+  end
+
+  it "does not expose an empty program index to an authenticated non-admin" do
+    sign_in create(:user, :student)
+
+    get public_programs_path(locale: :en)
+
+    expect(response).to have_http_status(:not_found)
+  end
+
+  it "redirects an admin from an empty public index to program publishing" do
+    sign_in create(:user, :admin)
+
+    get public_programs_path(locale: :en)
+
+    expect(response).to redirect_to(admin_website_programs_path)
   end
 
   it "serves a program detail page through its locale slug" do
