@@ -11,6 +11,7 @@ RSpec.describe "Public and private boundary" do
     program_publishing: -> { admin_website_programs_path },
     fee_plan_admin: -> { admin_fee_plans_path },
     fee_plan_publishing: -> { admin_website_fee_plans_path },
+    public_leads: -> { admin_website_leads_path },
     public_website_settings: -> { edit_admin_public_website_path },
     course_offerings: -> { admin_course_offerings_path },
     enrollments: -> { admin_enrollments_path },

@@ -1,0 +1,29 @@
+<%= render "shared/page_header", title: @lead.public_id, description: t("admin.website.leads.types.#{@lead.inquiry_type}") %>
+<%= render "admin/website/subnav" %>
+
+<div class="grid gap-6 lg:grid-cols-2">
+  <% details = capture do %>
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <% %i[name phone whatsapp_number email preferred_locale student_age preferred_schedule_notes subject message submitted_at source].each do |field| %>
+        <% value = @lead.public_send(field) %>
+        <% next if value.blank? %>
+        <div class="<%= "sm:col-span-2" if field.in?(%i[preferred_schedule_notes message]) %>">
+          <dt class="ds-caption"><%= t("admin.website.leads.fields.#{field}") %></dt>
+          <dd class="mt-1 whitespace-pre-line break-words"><%= field == :submitted_at ? l(value, format: :long) : value %></dd>
+        </div>
+      <% end %>
+    </dl>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.website.leads.sections.submission"), body: details %>
+
+  <% handling = capture do %>
+    <% if @lead.errors.any? %><%= render "shared/components/alert", variant: :error, title: t("admin.website.leads.errors.title"), message: @lead.errors.full_messages.to_sentence %><% end %>
+    <%= form_with model: @lead, url: admin_website_lead_path(@lead), method: :patch, class: "grid gap-5" do |form| %>
+      <div><%= form.label :status, t("admin.website.leads.fields.status"), class: "ds-label" %><%= form.select :status, PublicInquiry::STATUSES.map { |value| [t("admin.website.leads.statuses.#{value}"), value] }, {}, class: "ds-control mt-2" %></div>
+      <div><%= form.label :internal_notes, t("admin.website.leads.fields.internal_notes"), class: "ds-label" %><%= form.text_area :internal_notes, rows: 7, maxlength: 2_000, class: "ds-control mt-2 h-auto" %></div>
+      <% if @lead.handled_at %><p class="ds-supporting"><%= t("admin.website.leads.handled", at: l(@lead.handled_at, format: :long), by: @lead.handled_by&.full_name || "—") %></p><% end %>
+      <%= render "shared/components/button", label: t("actions.save"), type: :submit %>
+    <% end %>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.website.leads.sections.handling"), body: handling %>
+</div>

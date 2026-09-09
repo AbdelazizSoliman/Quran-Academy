@@ -14,7 +14,12 @@ class PublicWebsitePresenter
   def hero_subtitle = localized(:hero_subtitle)
   def about_text = localized(:about_text)
   def primary_cta_label = localized(:primary_cta_label)
-  def primary_cta_url = setting&.primary_cta_url.presence || "/account/sign-in"
+
+  def primary_cta_url
+    configured = setting&.primary_cta_url.presence
+    configured.in?([nil, "/account/sign-in"]) ? "/#{locale}/trial" : configured
+  end
+
   def whatsapp_cta_enabled? = setting&.whatsapp_cta_enabled? && whatsapp.present?
   def email = setting&.public_email_enabled? ? academy_setting&.contact_email : nil
   def phone = setting&.public_phone_enabled? ? academy_setting&.contact_phone : nil

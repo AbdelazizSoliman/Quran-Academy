@@ -31,6 +31,7 @@ RSpec.describe "Public fees" do
     expect(response.body).to include('<html lang="en" dir="ltr">')
     expect(response.body).to include("Monthly Plan", "Billed monthly", "Regular lessons")
     expect(response.body).not_to include("الخطة الشهرية")
+    expect(response.body).to include(public_trial_path(locale: :en))
   end
 
   it "omits an unpublished fee plan from the public page" do

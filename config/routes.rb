@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   namespace :admin do
     resource :public_website, only: %i[edit update], controller: :public_website_settings
     namespace :website do
+      resources :leads, only: %i[index show update]
       resources :programs, only: %i[index edit update]
       resources :fee_plans, path: "fees", only: %i[index edit update]
     end
@@ -334,6 +335,10 @@ Rails.application.routes.draw do
     get "programs", to: "programs#index", as: :programs
     get "programs/:slug", to: "programs#show", as: :program
     get "fees", to: "fees#index", as: :fees
+    get "trial", to: "trial_requests#new", as: :trial
+    post "trial", to: "trial_requests#create"
+    get "contact", to: "contact_requests#new", as: :contact
+    post "contact", to: "contact_requests#create"
   end
   constraints LocalEnvironmentConstraint.new do
     get "ui", to: "ui#index", as: :ui
