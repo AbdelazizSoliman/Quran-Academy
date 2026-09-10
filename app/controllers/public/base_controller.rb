@@ -5,6 +5,8 @@ module Public
     layout "public"
     before_action :load_public_site
     before_action :require_public_website!
+    before_action :capture_public_analytics_utm
+    after_action :track_public_page_view
 
     private
 
@@ -27,6 +29,25 @@ module Public
       return if @public_site.enabled?
 
       render "public/home/unavailable", status: :service_unavailable
+    end
+
+    def capture_public_analytics_utm
+      PublicAnalytics::Tracker.capture_utm!(request:, session:)
+    end
+
+    def track_public_page_view
+      return unless request.get? && response.successful? && response.media_type == "text/html"
+
+      PublicAnalytics::Tracker.call(event_type: "page_view", request:, session:,
+                                    locale: public_locale, source_path: analytics_source_path)
+    end
+
+    def analytics_source_path
+      {
+        "home" => "home", "fees" => "fees", "faqs" => "faq",
+        "trial_requests" => "trial", "contact_requests" => "contact",
+        "legal_pages" => "legal", "programs" => "program"
+      }.fetch(controller_name, controller_name)
     end
 
     def public_locale = @public_site.locale

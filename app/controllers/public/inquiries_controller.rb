@@ -6,16 +6,24 @@ module Public
       @inquiry = PublicInquiry.new(inquiry_type: type, preferred_locale: public_locale)
     end
 
+    # rubocop:disable Metrics/MethodLength
     def submit_inquiry(type)
       @inquiry = PublicInquiry.new(inquiry_params.merge(
                                      inquiry_type: type, preferred_locale: public_locale,
                                      source: PublicInquiry::SOURCE
                                    ))
       return render("public/inquiries/success", status: :accepted) if @inquiry.website.present?
-      return render("public/inquiries/success", status: :created) if @inquiry.save
+
+      if @inquiry.save
+        PublicAnalytics::Tracker.call(event_type: "#{type}_submitted", request:, session:,
+                                      locale: public_locale, source_path: analytics_source_path,
+                                      inquiry_type: type, public_inquiry: @inquiry)
+        return render("public/inquiries/success", status: :created)
+      end
 
       render :new, status: :unprocessable_content
     end
+    # rubocop:enable Metrics/MethodLength
 
     def inquiry_params
       params.expect(public_inquiry: %i[

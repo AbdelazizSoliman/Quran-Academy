@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       resources :faqs, except: :show, controller: :faqs
       resources :testimonials, except: :show, controller: :testimonials
       resources :legal_pages, only: %i[index edit update], param: :id
+      get "analytics", to: "analytics#show", as: :analytics
       resources :leads, only: %i[index show update]
       resources :programs, only: %i[index edit update]
       resources :fee_plans, path: "fees", only: %i[index edit update]
@@ -333,6 +334,7 @@ Rails.application.routes.draw do
   get "dashboard", to: "dashboard#index", as: :dashboard
   get "robots.txt", to: "robots#show", as: :robots
   get "sitemap.xml", to: "sitemap#show", as: :sitemap
+  post "analytics/events", to: "analytics/events#create", as: :analytics_events
   root "public/home#show"
   get ":locale", to: "public/home#show", as: :localized_public_home,
                  constraints: { locale: /ar|en/ }
