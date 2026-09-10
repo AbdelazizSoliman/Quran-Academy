@@ -9,6 +9,8 @@ class PublicWebsiteSetting < ApplicationRecord
             :primary_cta_label_ar, :primary_cta_label_en, presence: true, length: { maximum: 200 }
   validates :hero_subtitle_ar, :hero_subtitle_en, :about_text_ar, :about_text_en,
             length: { maximum: 2_000 }, allow_blank: true
+  validates :seo_title_ar, :seo_title_en, length: { maximum: 300 }, allow_blank: true
+  validates :seo_description_ar, :seo_description_en, length: { maximum: 320 }, allow_blank: true
   validates :primary_cta_url, presence: true, length: { maximum: 500 },
                               format: { with: %r{\A(?:/[^/]?|https?://)[^\s]*\z} }
 

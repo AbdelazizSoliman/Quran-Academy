@@ -8,6 +8,9 @@ en:
       locale_switch: "العربية"
       login: "Log in"
       faq: "FAQ"
+      privacy: "Privacy"
+      terms: "Terms"
+      refund: "Refund policy"
     footer:
       summary: "A calm, supportive place to grow in Quran, Arabic, and Islamic learning."
       whatsapp: "Contact us on WhatsApp"
@@ -48,6 +51,12 @@ en:
       eyebrow: "FREQUENTLY ASKED QUESTIONS"
       title: "How can we help?"
       description: "Find clear answers about learning with Khadijah Academy."
+    legal:
+      eyebrow: "LEGAL INFORMATION"
+      meta_description: "Public information about Khadijah Academy's policies."
+      effective_date: "Effective %{date}"
+      not_found_title: "%{academy} | Page unavailable"
+      not_found_description: "This policy page is not currently published."
     unavailable:
       page_title: "%{academy} | Coming soon"
       title: "Our public website is coming soon"
@@ -94,6 +103,24 @@ en:
           created: "Testimonial was created."
           updated: "Testimonial was updated."
           destroyed: "Testimonial was deleted."
+      legal_pages:
+        title: "Website / Legal pages"
+        description: "Review and publish bilingual public policy pages. Draft content requires administrator review."
+        review_hint: "Confirm the wording is appropriate before publishing. The academy is responsible for final legal content."
+        edit_title: "Edit %{page}"
+        fields:
+          page_type: "Policy"
+          title_ar: "Title (Arabic)"
+          title_en: "Title (English)"
+          body_ar: "Body (Arabic)"
+          body_en: "Body (English)"
+          effective_date: "Effective date"
+        types:
+          privacy: "Privacy Policy"
+          terms: "Terms & Conditions"
+          refund: "Cancellation / Refund Policy"
+        messages:
+          updated: "Legal page was updated."
     public_website:
       title: "Website / Public Profile"
       description: "Manage the essential public identity and homepage content."
@@ -102,6 +129,7 @@ en:
         homepage: "Homepage"
         about: "About"
         contact_visibility: "Contact visibility"
+        seo: "Search appearance"
       fields:
         enabled: "Publish public website"
         academy_name_ar: "Academy name (Arabic)"
@@ -119,9 +147,14 @@ en:
         public_email_enabled: "Show public email"
         public_phone_enabled: "Show public phone"
         public_whatsapp_enabled: "Show public WhatsApp number"
+        seo_title_ar: "Homepage SEO title (Arabic)"
+        seo_title_en: "Homepage SEO title (English)"
+        seo_description_ar: "Homepage meta description (Arabic)"
+        seo_description_en: "Homepage meta description (English)"
       hints:
         enabled: "When off, visitors see a controlled unavailable page while account access remains available."
         contact_visibility: "Contact details come from academy settings and appear publicly only when enabled here."
+        seo: "Optional homepage metadata. Leave blank to use safe academy defaults."
       errors:
         title: "Please review the website settings"
       messages:

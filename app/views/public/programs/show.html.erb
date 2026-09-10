@@ -1,4 +1,5 @@
 <% content_for :title, t("public.programs.detail.page_title", academy: @public_site.academy_name, program: @program.name) %>
+<% content_for :meta_description, @program.short_description if @program.short_description.present? %>
 
 <section class="bg-gradient-to-b from-emerald-50 to-[#fbfcfa] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
   <div class="mx-auto max-w-4xl">

@@ -1,4 +1,5 @@
 <% content_for :title, t("public.home.page_title", academy: @public_site.academy_name) %>
+<% content_for :meta_description, @public_site.hero_subtitle if @public_site.hero_subtitle.present? %>
 
 <section class="relative overflow-hidden bg-gradient-to-b from-emerald-50 to-[#fbfcfa]">
   <div class="absolute inset-x-0 top-0 h-1 bg-[var(--public-accent)]" aria-hidden="true"></div>

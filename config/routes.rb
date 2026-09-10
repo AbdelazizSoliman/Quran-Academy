@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     namespace :website do
       resources :faqs, except: :show, controller: :faqs
       resources :testimonials, except: :show, controller: :testimonials
+      resources :legal_pages, only: %i[index edit update], param: :id
       resources :leads, only: %i[index show update]
       resources :programs, only: %i[index edit update]
       resources :fee_plans, path: "fees", only: %i[index edit update]
@@ -330,11 +331,16 @@ Rails.application.routes.draw do
     resources :notifications, only: :index
   end
   get "dashboard", to: "dashboard#index", as: :dashboard
+  get "robots.txt", to: "robots#show", as: :robots
+  get "sitemap.xml", to: "sitemap#show", as: :sitemap
   root "public/home#show"
   get ":locale", to: "public/home#show", as: :localized_public_home,
                  constraints: { locale: /ar|en/ }
   scope ":locale", module: "public", as: :public, constraints: { locale: /ar|en/ } do
     get "faq", to: "faqs#index", as: :faqs
+    get "privacy", to: "legal_pages#show", defaults: { page: "privacy" }, as: :privacy
+    get "terms", to: "legal_pages#show", defaults: { page: "terms" }, as: :terms
+    get "refund-policy", to: "legal_pages#show", defaults: { page: "refund-policy" }, as: :refund_policy
     get "programs", to: "programs#index", as: :programs
     get "programs/:slug", to: "programs#show", as: :program
     get "fees", to: "fees#index", as: :fees

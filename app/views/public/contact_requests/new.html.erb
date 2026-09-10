@@ -1,2 +1,3 @@
 <% content_for :title, t("public.contact.page_title", academy: @public_site.academy_name) %>
 <%= render "public/inquiries/page", inquiry: @inquiry, url: public_contact_path(locale: public_locale), type: :contact %>
+<% content_for :meta_description, t("public.contact.description") if I18n.exists?("public.contact.description") %>

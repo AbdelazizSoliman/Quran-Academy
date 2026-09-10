@@ -1,0 +1,8 @@
+<% content_for :title, @legal_page.title.presence || @legal_page.fallback_title %>
+<% content_for :meta_description, t("public.legal.meta_description") %>
+<section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8"><article class="mx-auto max-w-4xl">
+  <p class="text-sm font-bold text-[var(--public-primary)]"><%= t("public.legal.eyebrow") %></p>
+  <h1 class="mt-3 text-4xl font-bold text-emerald-950"><%= @legal_page.title.presence || @legal_page.fallback_title %></h1>
+  <% if @legal_page.effective_date.present? %><p class="mt-3 text-sm text-slate-500"><%= t("public.legal.effective_date", date: l(@legal_page.effective_date)) %></p><% end %>
+  <div class="mt-10 whitespace-pre-line leading-8 text-slate-700"><%= @legal_page.body %></div>
+</article></section>

@@ -26,6 +26,7 @@ module Admin
                       hero_subtitle_ar hero_subtitle_en about_text_ar about_text_en
                       primary_cta_label_ar primary_cta_label_en primary_cta_url
                       whatsapp_cta_enabled public_email_enabled public_phone_enabled public_whatsapp_enabled
+                      seo_title_ar seo_title_en seo_description_ar seo_description_en
                     ])
     end
   end

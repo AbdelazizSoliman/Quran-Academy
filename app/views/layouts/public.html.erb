@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="<%= @public_site.locale %>" dir="<%= @public_site.rtl? ? "rtl" : "ltr" %>">
   <head>
-    <title><%= content_for(:title) || @public_site.academy_name %></title>
+    <title><%= public_page_title %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="<%= @public_site.hero_subtitle.presence || t("public.meta_description") %>">
+    <meta name="description" content="<%= public_meta_description %>">
+    <meta name="robots" content="<%= content_for(:robots).presence || "index,follow" %>">
+    <link rel="canonical" href="<%= public_canonical_url %>">
+    <% public_alternate_urls.each do |locale, url| %><link rel="alternate" hreflang="<%= locale %>" href="<%= url %>"><% end %>
+    <meta property="og:title" content="<%= public_page_title %>">
+    <meta property="og:description" content="<%= public_meta_description %>">
+    <meta property="og:url" content="<%= public_canonical_url %>">
+    <meta property="og:type" content="<%= controller_name == "home" ? "website" : "article" %>">
+    <meta property="og:locale" content="<%= public_og_locale %>">
+    <% if public_structured_data.present? %><script type="application/ld+json"><%= public_structured_data.html_safe %></script><% end %>
     <meta name="theme-color" content="<%= @public_site.primary_color %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -70,6 +79,9 @@
           <%= link_to t("public.navigation.fees"), public_fees_path(locale: @public_site.locale), class: "hover:text-white" %>
           <% if public_faqs_available? || public_faqs_admin? %>
             <%= link_to t("public.navigation.faq"), public_faqs_available? ? public_faqs_path(locale: @public_site.locale) : admin_website_faqs_path, class: "hover:text-white" %>
+          <% end %>
+          <% { "privacy" => public_privacy_path(locale: @public_site.locale), "terms" => public_terms_path(locale: @public_site.locale), "refund" => public_refund_policy_path(locale: @public_site.locale) }.each do |type, path| %>
+            <%= link_to t("public.navigation.#{type}"), path, class: "hover:text-white" if public_legal_page_available?(type) %>
           <% end %>
           <%= link_to t("public.navigation.trial"), public_trial_path(locale: @public_site.locale), class: "hover:text-white" %>
           <%= link_to t("public.navigation.contact"), public_contact_path(locale: @public_site.locale), class: "hover:text-white" %>

@@ -1,0 +1,3 @@
+<% content_for :title, t("public.legal.not_found_title", academy: @public_site.academy_name) %>
+<% content_for :robots, "noindex,nofollow" %>
+<section class="px-4 py-20 text-center"><h1 class="text-3xl font-bold text-emerald-950"><%= t("public.legal.not_found_title", academy: @public_site.academy_name) %></h1><p class="mt-4 text-slate-600"><%= t("public.legal.not_found_description") %></p></section>

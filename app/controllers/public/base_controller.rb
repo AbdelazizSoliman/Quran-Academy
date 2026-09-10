@@ -17,6 +17,9 @@ module Public
       )
       @public_programs_available = PublicCatalog::ProgramsQuery.new(locale: public_locale).available?
       @public_faqs_available = PublicContent::FaqsQuery.new.available?
+      @public_legal_pages_available = PublicLegalPage::PAGE_TYPES.index_with do |type|
+        PublicContent::LegalPagesQuery.new.available?(type)
+      end
     end
 
     # Every public page follows the same controlled unavailable behaviour as the Phase 1 homepage.
@@ -31,8 +34,10 @@ module Public
     def public_programs_admin? = current_user&.active? && current_user.admin?
     def public_faqs_available? = @public_faqs_available
     def public_faqs_admin? = current_user&.active? && current_user.admin?
+    def public_legal_page_available?(type) = @public_legal_pages_available[type.to_s]
 
     helper_method :public_locale, :public_programs_available?, :public_programs_admin?,
                   :public_faqs_available?, :public_faqs_admin?
+    helper_method :public_legal_page_available?
   end
 end

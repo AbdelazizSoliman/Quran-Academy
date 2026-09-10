@@ -4,6 +4,7 @@
     <title><%= content_for(:title) || t("authentication.title", app: academy_brand_name) %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="<%= t("app.description") %>">
+    <meta name="robots" content="noindex,nofollow">
     <meta name="application-name" content="<%= academy_brand_name %>">
     <meta name="theme-color" content="<%= academy_setting&.primary_color || "#0B654F" %>">
     <%= csrf_meta_tags %>
