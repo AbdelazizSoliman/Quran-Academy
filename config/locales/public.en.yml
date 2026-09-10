@@ -7,6 +7,7 @@ en:
       label: "Public navigation"
       locale_switch: "العربية"
       login: "Log in"
+      faq: "FAQ"
     footer:
       summary: "A calm, supportive place to grow in Quran, Arabic, and Islamic learning."
       whatsapp: "Contact us on WhatsApp"
@@ -14,9 +15,9 @@ en:
       page_title: "%{academy} | Quran and Arabic education"
       eyebrow: "QURAN · ARABIC · ISLAMIC EDUCATION"
       values:
-        - "Personal, respectful learning"
-        - "Clear guidance at every step"
-        - "A trusted environment for steady progress"
+        - "Focused Quran and Arabic learning"
+        - "Flexible online learning with structured follow-up"
+        - "Clear fee plans and easy communication"
       whatsapp_cta: "Talk to us on WhatsApp"
       about:
         eyebrow: "ABOUT THE ACADEMY"
@@ -35,11 +36,64 @@ en:
       final_cta:
         title: "Ready to take the next step?"
         description: "Begin a thoughtful learning journey with Khadijah Academy."
+      testimonials:
+        eyebrow: "LEARNER EXPERIENCES"
+        title: "What families and learners share"
+      faq:
+        eyebrow: "COMMON QUESTIONS"
+        title: "Helpful answers before you begin"
+        all: "View all questions"
+    faq:
+      page_title: "%{academy} | Frequently asked questions"
+      eyebrow: "FREQUENTLY ASKED QUESTIONS"
+      title: "How can we help?"
+      description: "Find clear answers about learning with Khadijah Academy."
     unavailable:
       page_title: "%{academy} | Coming soon"
       title: "Our public website is coming soon"
       description: "We are preparing a thoughtful experience for our learners and families. Existing members can still access their accounts."
   admin:
+    website:
+      shared:
+        published: "Published"
+        order: "Display order"
+        content: "Bilingual content"
+        publication: "Publication and order"
+        errors: "Please review this content"
+        confirm_delete: "Delete this public content item?"
+      faqs:
+        title: "Website / FAQs"
+        description: "Manage bilingual questions shown on the public website."
+        empty: "No FAQs yet"
+        fields:
+          question_ar: "Question (Arabic)"
+          question_en: "Question (English)"
+          answer_ar: "Answer (Arabic)"
+          answer_en: "Answer (English)"
+        actions:
+          new: "New FAQ"
+          edit: "Edit FAQ"
+        messages:
+          created: "FAQ was created."
+          updated: "FAQ was updated."
+          destroyed: "FAQ was deleted."
+      testimonials:
+        title: "Website / Testimonials"
+        description: "Manage manually approved bilingual testimonials."
+        empty: "No testimonials yet"
+        privacy_hint: "Enter only the public name or generic label approved for display. Never include contact or account details."
+        fields:
+          author_name: "Public author name (optional)"
+          relationship: "Relationship / fallback label"
+          quote_ar: "Quote (Arabic)"
+          quote_en: "Quote (English)"
+        actions:
+          new: "New testimonial"
+          edit: "Edit testimonial"
+        messages:
+          created: "Testimonial was created."
+          updated: "Testimonial was updated."
+          destroyed: "Testimonial was deleted."
     public_website:
       title: "Website / Public Profile"
       description: "Manage the essential public identity and homepage content."

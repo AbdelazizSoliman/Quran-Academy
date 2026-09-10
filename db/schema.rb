@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_110000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1066,6 +1066,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_100000) do
     t.check_constraint "recommended_lessons_per_week > 0", name: "programs_frequency_positive"
   end
 
+  create_table "public_faqs", force: :cascade do |t|
+    t.text "answer_ar"
+    t.text "answer_en"
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.integer "public_display_order", default: 0, null: false
+    t.boolean "published", default: false, null: false
+    t.datetime "published_at"
+    t.string "question_ar"
+    t.string "question_en"
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["created_by_id"], name: "index_public_faqs_on_created_by_id"
+    t.index ["published", "public_display_order"], name: "index_public_faqs_on_published_and_public_display_order"
+    t.index ["updated_by_id"], name: "index_public_faqs_on_updated_by_id"
+    t.check_constraint "public_display_order >= 0", name: "public_faqs_nonnegative_order"
+  end
+
   create_table "public_inquiries", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email"
@@ -1090,6 +1108,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_100000) do
     t.index ["inquiry_type", "status", "submitted_at"], name: "idx_on_inquiry_type_status_submitted_at_d810a58180"
     t.index ["public_id"], name: "index_public_inquiries_on_public_id", unique: true
     t.index ["submitted_at"], name: "index_public_inquiries_on_submitted_at"
+  end
+
+  create_table "public_testimonials", force: :cascade do |t|
+    t.string "author_name"
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.integer "public_display_order", default: 0, null: false
+    t.boolean "published", default: false, null: false
+    t.datetime "published_at"
+    t.text "quote_ar"
+    t.text "quote_en"
+    t.string "relationship", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["created_by_id"], name: "index_public_testimonials_on_created_by_id"
+    t.index ["published", "public_display_order"], name: "idx_on_published_public_display_order_d47b42fb1a"
+    t.index ["updated_by_id"], name: "index_public_testimonials_on_updated_by_id"
+    t.check_constraint "public_display_order >= 0", name: "public_testimonials_nonnegative_order"
   end
 
   create_table "public_website_settings", force: :cascade do |t|
@@ -1994,7 +2030,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_100000) do
   add_foreign_key "program_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "programs", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "programs", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "public_faqs", "users", column: "created_by_id"
+  add_foreign_key "public_faqs", "users", column: "updated_by_id"
   add_foreign_key "public_inquiries", "users", column: "handled_by_id"
+  add_foreign_key "public_testimonials", "users", column: "created_by_id"
+  add_foreign_key "public_testimonials", "users", column: "updated_by_id"
   add_foreign_key "public_website_settings", "academy_settings"
   add_foreign_key "scheduled_lesson_enrollments", "enrollments", on_delete: :restrict
   add_foreign_key "scheduled_lesson_enrollments", "scheduled_lessons", on_delete: :restrict

@@ -5,6 +5,10 @@ module Public
       @featured_fee_plans = PublicCatalog::FeePlanPresenter.wrap(
         PublicCatalog::FeePlansQuery.new(locale: public_locale).featured, locale: public_locale
       )
+      @faqs = PublicContent::FaqPresenter.wrap(PublicContent::FaqsQuery.new.homepage, locale: public_locale)
+      @testimonials = PublicContent::TestimonialPresenter.wrap(
+        PublicContent::TestimonialsQuery.new.homepage, locale: public_locale
+      )
     end
 
     private

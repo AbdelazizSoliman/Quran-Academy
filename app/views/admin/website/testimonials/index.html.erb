@@ -1,0 +1,9 @@
+<%= render "shared/page_header", title: t("admin.website.testimonials.title"), description: t("admin.website.testimonials.description") %>
+<%= render "admin/website/subnav" %>
+<div class="mb-5"><%= link_to t("admin.website.testimonials.actions.new"), new_admin_website_testimonial_path, class: button_classes(variant: :primary, size: :small) %></div>
+<% if @testimonials.any? %>
+  <div class="overflow-x-auto rounded-2xl border border-app-border"><table class="min-w-full text-sm">
+    <thead class="bg-app-muted"><tr><th class="px-4 py-3 text-start"><%= t("admin.website.testimonials.fields.author_name") %></th><th class="px-4 py-3"><%= t("admin.website.shared.published") %></th><th class="px-4 py-3"><%= t("admin.website.shared.order") %></th><th></th></tr></thead>
+    <tbody class="divide-y divide-app-border"><% @testimonials.each do |testimonial| %><tr><td class="px-4 py-3"><%= testimonial.author_name.presence || testimonial.relationship %></td><td class="px-4 py-3 text-center"><%= setting_boolean_badge(testimonial.published?) %></td><td class="px-4 py-3 text-center"><%= testimonial.public_display_order %></td><td class="px-4 py-3 text-end"><%= link_to t("actions.edit"), edit_admin_website_testimonial_path(testimonial), class: button_classes(variant: :secondary, size: :small) %></td></tr><% end %></tbody>
+  </table></div>
+<% else %><%= render "shared/components/empty_state", icon: :users, title: t("admin.website.testimonials.empty"), description: t("admin.website.testimonials.description") %><% end %>

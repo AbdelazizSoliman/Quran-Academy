@@ -1,0 +1,9 @@
+<%= render "shared/page_header", title: t("admin.website.faqs.title"), description: t("admin.website.faqs.description") %>
+<%= render "admin/website/subnav" %>
+<div class="mb-5"><%= link_to t("admin.website.faqs.actions.new"), new_admin_website_faq_path, class: button_classes(variant: :primary, size: :small) %></div>
+<% if @faqs.any? %>
+  <div class="overflow-x-auto rounded-2xl border border-app-border"><table class="min-w-full text-sm">
+    <thead class="bg-app-muted"><tr><th class="px-4 py-3 text-start"><%= t("admin.website.faqs.fields.question_en") %></th><th class="px-4 py-3"><%= t("admin.website.shared.published") %></th><th class="px-4 py-3"><%= t("admin.website.shared.order") %></th><th></th></tr></thead>
+    <tbody class="divide-y divide-app-border"><% @faqs.each do |faq| %><tr><td class="px-4 py-3"><%= faq.question_en.presence || faq.question_ar %></td><td class="px-4 py-3 text-center"><%= setting_boolean_badge(faq.published?) %></td><td class="px-4 py-3 text-center"><%= faq.public_display_order %></td><td class="px-4 py-3 text-end"><%= link_to t("actions.edit"), edit_admin_website_faq_path(faq), class: button_classes(variant: :secondary, size: :small) %></td></tr><% end %></tbody>
+  </table></div>
+<% else %><%= render "shared/components/empty_state", icon: :message, title: t("admin.website.faqs.empty"), description: t("admin.website.faqs.description") %><% end %>
