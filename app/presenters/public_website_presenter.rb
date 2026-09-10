@@ -14,6 +14,8 @@ class PublicWebsitePresenter
   def hero_subtitle = localized(:hero_subtitle)
   def about_text = localized(:about_text)
   def primary_cta_label = localized(:primary_cta_label)
+  def seo_title = localized(:seo_title).presence || default_seo_title
+  def seo_description = localized(:seo_description).presence || default_seo_description
 
   def primary_cta_url
     configured = setting&.primary_cta_url.presence
@@ -32,6 +34,14 @@ class PublicWebsitePresenter
   def logo_url = academy_setting&.logo_url
   def primary_color = valid_color(academy_setting&.primary_color, "#0B654F")
   def secondary_color = valid_color(academy_setting&.secondary_color, "#A85D09")
+
+  def default_seo_title
+    locale == "ar" ? "#{academy_name} | تعليم القرآن والعربية" : "#{academy_name} | Online Quran & Arabic Learning"
+  end
+
+  def default_seo_description
+    I18n.t("public.meta_description", locale: locale)
+  end
 
   private
 

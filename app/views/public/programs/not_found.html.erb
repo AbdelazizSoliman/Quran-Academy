@@ -1,4 +1,5 @@
 <% content_for :title, t("public.programs.not_found.page_title", academy: @public_site.academy_name) %>
+<% content_for :robots, "noindex,nofollow" %>
 <section class="grid min-h-[60vh] place-items-center px-4 py-20 text-center">
   <div class="max-w-xl">
     <h1 class="text-3xl font-bold text-emerald-950"><%= t("public.programs.not_found.title") %></h1>

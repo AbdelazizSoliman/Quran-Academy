@@ -1,0 +1,5 @@
+<%= render "shared/page_header", title: t("admin.website.legal_pages.title"), description: t("admin.website.legal_pages.description") %>
+<%= render "admin/website/subnav" %>
+<div class="overflow-x-auto rounded-2xl border border-app-border"><table class="min-w-full text-sm"><thead class="bg-app-muted"><tr><th class="px-4 py-3 text-start"><%= t("admin.website.legal_pages.fields.page_type") %></th><th class="px-4 py-3"><%= t("admin.website.shared.published") %></th><th></th></tr></thead><tbody class="divide-y divide-app-border">
+<% PublicLegalPage::PAGE_TYPES.each do |type| %><% page = @legal_pages.find { |item| item.page_type == type } %><tr><td class="px-4 py-3 font-semibold"><%= t("admin.website.legal_pages.types.#{type}") %></td><td class="px-4 py-3 text-center"><%= setting_boolean_badge(page&.published? || false) %></td><td class="px-4 py-3 text-end"><%= link_to t("actions.edit"), edit_admin_website_legal_page_path(type), class: button_classes(variant: :secondary, size: :small) %></td></tr><% end %>
+</tbody></table></div>

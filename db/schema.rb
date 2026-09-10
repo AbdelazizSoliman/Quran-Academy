@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_10_101000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1110,6 +1110,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_110000) do
     t.index ["submitted_at"], name: "index_public_inquiries_on_submitted_at"
   end
 
+  create_table "public_legal_pages", force: :cascade do |t|
+    t.text "body_ar"
+    t.text "body_en"
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.date "effective_date"
+    t.string "page_type", null: false
+    t.boolean "published", default: false, null: false
+    t.datetime "published_at"
+    t.string "title_ar"
+    t.string "title_en"
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.index ["created_by_id"], name: "index_public_legal_pages_on_created_by_id"
+    t.index ["page_type"], name: "index_public_legal_pages_on_page_type", unique: true
+    t.index ["updated_by_id"], name: "index_public_legal_pages_on_updated_by_id"
+  end
+
   create_table "public_testimonials", force: :cascade do |t|
     t.string "author_name"
     t.datetime "created_at", null: false
@@ -1146,6 +1164,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_110000) do
     t.boolean "public_email_enabled", default: false, null: false
     t.boolean "public_phone_enabled", default: false, null: false
     t.boolean "public_whatsapp_enabled", default: false, null: false
+    t.text "seo_description_ar"
+    t.text "seo_description_en"
+    t.string "seo_title_ar"
+    t.string "seo_title_en"
     t.datetime "updated_at", null: false
     t.boolean "whatsapp_cta_enabled", default: false, null: false
     t.index ["academy_setting_id"], name: "index_public_website_settings_on_academy_setting_id", unique: true
@@ -2033,6 +2055,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_110000) do
   add_foreign_key "public_faqs", "users", column: "created_by_id"
   add_foreign_key "public_faqs", "users", column: "updated_by_id"
   add_foreign_key "public_inquiries", "users", column: "handled_by_id"
+  add_foreign_key "public_legal_pages", "users", column: "created_by_id"
+  add_foreign_key "public_legal_pages", "users", column: "updated_by_id"
   add_foreign_key "public_testimonials", "users", column: "created_by_id"
   add_foreign_key "public_testimonials", "users", column: "updated_by_id"
   add_foreign_key "public_website_settings", "academy_settings"

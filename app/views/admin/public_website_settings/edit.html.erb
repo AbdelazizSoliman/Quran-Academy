@@ -55,6 +55,19 @@
   <% end %>
   <%= render "shared/components/card", title: t("admin.public_website.sections.contact_visibility"), body: visibility %>
 
+  <% seo = capture do %>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <% %i[seo_title_ar seo_title_en seo_description_ar seo_description_en].each do |field| %>
+        <div class="<%= "sm:col-span-2" if field.to_s.start_with?("seo_description") %>">
+          <%= form.label field, t("admin.public_website.fields.#{field}"), class: "ds-label" %>
+          <%= field.to_s.start_with?("seo_description") ? form.text_area(field, rows: 3, class: "ds-control mt-2 h-auto", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr") : form.text_field(field, class: "ds-control mt-2", dir: field.to_s.end_with?("_ar") ? "rtl" : "ltr") %>
+        </div>
+      <% end %>
+    </div>
+    <p class="mt-4 ds-supporting"><%= t("admin.public_website.hints.seo") %></p>
+  <% end %>
+  <%= render "shared/components/card", title: t("admin.public_website.sections.seo"), body: seo %>
+
   <div class="sticky bottom-4 flex justify-end rounded-xl border border-app-border bg-app-surface/95 p-4 shadow-lg">
     <%= render "shared/components/button", label: t("actions.save"), type: "submit" %>
   </div>
