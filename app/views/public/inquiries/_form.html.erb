@@ -1,6 +1,7 @@
-<%= form_with model: inquiry, url:, class: "grid gap-6", data: { turbo: false } do |form| %>
+<%= form_with model: inquiry, url:, class: "grid gap-6", html: { "aria-describedby": "inquiry-errors" },
+              data: { turbo: false } do |form| %>
   <% if inquiry.errors.any? %>
-    <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-900" role="alert">
+    <div id="inquiry-errors" class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-900" role="alert" aria-live="polite">
       <p class="font-bold"><%= t("public.inquiries.errors.title") %></p>
       <ul class="mt-2 list-disc space-y-1 ps-5 text-sm">
         <% inquiry.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
@@ -16,12 +17,12 @@
     </div>
     <div>
       <%= form.label :phone, t("public.inquiries.fields.phone"), class: "block text-sm font-bold text-emerald-950" %>
-      <%= form.telephone_field :phone, maxlength: 30, autocomplete: "tel", dir: "ltr",
+      <%= form.telephone_field :phone, maxlength: 30, autocomplete: "tel", inputmode: "tel", dir: "ltr",
                                class: "mt-2 min-h-12 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
     </div>
     <div>
       <%= form.label :whatsapp_number, t("public.inquiries.fields.whatsapp_number"), class: "block text-sm font-bold text-emerald-950" %>
-      <%= form.telephone_field :whatsapp_number, maxlength: 30, autocomplete: "tel", dir: "ltr",
+      <%= form.telephone_field :whatsapp_number, maxlength: 30, autocomplete: "tel", inputmode: "tel", dir: "ltr",
                                class: "mt-2 min-h-12 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/20" %>
     </div>
     <div class="sm:col-span-2">

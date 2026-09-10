@@ -7,7 +7,7 @@
       <% if @public_site.whatsapp_cta_enabled? %>
         <%= link_to t("public.home.whatsapp_cta"), @public_site.whatsapp_url,
                     class: "mt-6 inline-flex rounded-xl border border-emerald-900/20 bg-white px-5 py-3 font-bold text-emerald-950 hover:bg-emerald-50",
-                    rel: "noopener" %>
+                    rel: "noopener", data: { analytics_event: "whatsapp_click", analytics_target: "whatsapp" } %>
       <% end %>
     </div>
     <div class="rounded-2xl border border-emerald-900/10 bg-white p-6 shadow-sm sm:p-8">

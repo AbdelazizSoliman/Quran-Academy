@@ -12,10 +12,12 @@
       <% end %>
       <div class="mt-8 flex flex-wrap gap-3">
         <%= link_to @public_site.primary_cta_label, @public_site.primary_cta_url,
-                    class: "inline-flex rounded-xl bg-[var(--public-primary)] px-6 py-3.5 font-bold text-white shadow-lg shadow-emerald-900/10 hover:opacity-90" %>
+                    class: "inline-flex rounded-xl bg-[var(--public-primary)] px-6 py-3.5 font-bold text-white shadow-lg shadow-emerald-900/10 hover:opacity-90",
+                    data: { analytics_event: "trial_cta_click", analytics_target: "trial" } %>
         <% if @public_site.whatsapp_cta_enabled? %>
           <%= link_to t("public.home.whatsapp_cta"), @public_site.whatsapp_url,
-                      class: "inline-flex rounded-xl border border-emerald-900/20 bg-white px-6 py-3.5 font-bold text-emerald-950 hover:bg-emerald-50", rel: "noopener" %>
+                      class: "inline-flex rounded-xl border border-emerald-900/20 bg-white px-6 py-3.5 font-bold text-emerald-950 hover:bg-emerald-50", rel: "noopener",
+                      data: { analytics_event: "whatsapp_click", analytics_target: "whatsapp" } %>
         <% end %>
       </div>
     </div>
@@ -131,6 +133,7 @@
     <h2 class="text-3xl font-bold text-emerald-950"><%= t("public.home.final_cta.title") %></h2>
     <p class="mx-auto mt-4 max-w-2xl leading-7 text-slate-600"><%= t("public.home.final_cta.description") %></p>
     <%= link_to @public_site.primary_cta_label, @public_site.primary_cta_url,
-                class: "mt-7 inline-flex rounded-xl bg-[var(--public-primary)] px-6 py-3.5 font-bold text-white hover:opacity-90" %>
+                class: "mt-7 inline-flex rounded-xl bg-[var(--public-primary)] px-6 py-3.5 font-bold text-white hover:opacity-90",
+                data: { analytics_event: "trial_cta_click", analytics_target: "trial" } %>
   </div>
 </section>

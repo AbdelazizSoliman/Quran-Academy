@@ -33,6 +33,15 @@
         const element = event.target.closest("[data-analytics-event]");
         if (element) sendAnalyticsEvent(element);
       });
+      const setupMobileMenus = () => {
+        document.querySelectorAll("details[data-mobile-menu]").forEach((menu) => {
+          menu.addEventListener("toggle", () => {
+            menu.querySelector("summary").setAttribute("aria-expanded", menu.open);
+          });
+        });
+      };
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupMobileMenus);
+      else setupMobileMenus();
     <% end %>
   </head>
   <body class="min-h-screen bg-[#fbfcfa] text-slate-900 antialiased"
@@ -74,6 +83,29 @@
           <%= link_to @public_site.primary_cta_label, @public_site.primary_cta_url,
                       class: "inline-flex rounded-lg bg-[var(--public-primary)] px-3.5 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-90",
                       data: { analytics_event: "trial_cta_click", analytics_target: "trial" } %>
+          <details class="relative sm:hidden" data-mobile-menu>
+            <summary aria-controls="mobile-navigation" aria-expanded="false" class="list-none rounded-lg border border-emerald-900/15 px-3 py-2 text-sm font-semibold text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-700/40">
+              <span class="sr-only"><%= t("public.navigation.mobile_menu") %></span>
+              <span aria-hidden="true" class="text-lg leading-none">☰</span>
+            </summary>
+            <div id="mobile-navigation" class="absolute end-0 top-full z-20 mt-2 grid min-w-48 gap-1 rounded-xl border border-emerald-900/10 bg-white p-2 text-sm shadow-lg">
+              <% if public_programs_available? %>
+                <%= link_to t("public.navigation.programs"),
+                            if public_programs_available? && controller_name == "home"
+                              "#programs"
+                            elsif public_programs_available?
+                              public_programs_path(locale: @public_site.locale)
+                            end,
+                            class: "rounded-lg px-3 py-2.5 font-semibold text-emerald-900 hover:bg-emerald-50" %>
+              <% end %>
+              <%= link_to t("public.navigation.fees"), public_fees_path(locale: @public_site.locale), class: "rounded-lg px-3 py-2.5 font-semibold text-emerald-900 hover:bg-emerald-50" %>
+              <% if public_faqs_available? %>
+                <%= link_to t("public.navigation.faq"), public_faqs_path(locale: @public_site.locale), class: "rounded-lg px-3 py-2.5 font-semibold text-emerald-900 hover:bg-emerald-50" %>
+              <% end %>
+              <%= link_to t("public.navigation.contact"), public_contact_path(locale: @public_site.locale), class: "rounded-lg px-3 py-2.5 font-semibold text-emerald-900 hover:bg-emerald-50" %>
+              <%= link_to t("public.navigation.login"), new_user_session_path(locale: @public_site.locale), class: "rounded-lg px-3 py-2.5 font-semibold text-emerald-900 hover:bg-emerald-50" %>
+            </div>
+          </details>
         </nav>
       </div>
     </header>
@@ -90,12 +122,12 @@
           <%= mail_to @public_site.email, @public_site.email, class: "hover:text-white" if @public_site.email.present? %>
           <%= link_to @public_site.phone, "tel:#{@public_site.phone}", class: "hover:text-white", dir: "ltr" if @public_site.phone.present? %>
           <%= link_to t("public.footer.whatsapp"), @public_site.whatsapp_url, class: "hover:text-white", rel: "noopener", data: { analytics_event: "whatsapp_click", analytics_target: "whatsapp" } if @public_site.whatsapp.present? %>
+          <%= link_to t("public.navigation.fees"), public_fees_path(locale: @public_site.locale), class: "hover:text-white" %>
           <% if public_programs_available? || public_programs_admin? %>
             <%= link_to t("public.navigation.programs"),
                         public_programs_available? ? public_programs_path(locale: @public_site.locale) : admin_website_programs_path,
                         class: "mt-2 hover:text-white" %>
           <% end %>
-          <%= link_to t("public.navigation.fees"), public_fees_path(locale: @public_site.locale), class: "hover:text-white" %>
           <% if public_faqs_available? || public_faqs_admin? %>
             <%= link_to t("public.navigation.faq"), public_faqs_available? ? public_faqs_path(locale: @public_site.locale) : admin_website_faqs_path, class: "hover:text-white" %>
           <% end %>
