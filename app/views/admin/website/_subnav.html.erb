@@ -6,7 +6,8 @@
        [t("admin.website.fee_plans.title"), admin_website_fee_plans_path],
        [t("admin.website.faqs.title"), admin_website_faqs_path],
        [t("admin.website.testimonials.title"), admin_website_testimonials_path],
-       [t("admin.website.legal_pages.title"), admin_website_legal_pages_path]
+       [t("admin.website.legal_pages.title"), admin_website_legal_pages_path],
+       [t("admin.website.analytics.title"), admin_website_analytics_path]
      ].each do |label, path| %>
     <%= link_to label, path,
                 class: current_page?(path) ? button_classes(variant: :primary, size: :small) : button_classes(variant: :secondary, size: :small) %>

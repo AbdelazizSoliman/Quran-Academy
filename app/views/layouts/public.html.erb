@@ -17,6 +17,23 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_tag nonce: true do %>
+      const sendAnalyticsEvent = (element) => {
+        const payload = JSON.stringify({ event: {
+          event_type: element.dataset.analyticsEvent,
+          locale: document.documentElement.lang,
+          source_path: window.location.pathname,
+          target: element.dataset.analyticsTarget || element.getAttribute("href")
+        }});
+        const blob = new Blob([payload], { type: "application/json" });
+        if (navigator.sendBeacon) navigator.sendBeacon("<%= analytics_events_path %>", blob);
+        else fetch("<%= analytics_events_path %>", { method: "POST", body: payload, headers: { "Content-Type": "application/json" }, credentials: "same-origin", keepalive: true });
+      };
+      document.addEventListener("click", (event) => {
+        const element = event.target.closest("[data-analytics-event]");
+        if (element) sendAnalyticsEvent(element);
+      });
+    <% end %>
   </head>
   <body class="min-h-screen bg-[#fbfcfa] text-slate-900 antialiased"
         style="--public-primary: <%= @public_site.primary_color %>; --public-accent: <%= @public_site.secondary_color %>">
@@ -46,7 +63,8 @@
                         class: "hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 md:inline-flex" %>
           <% end %>
           <%= link_to t("public.navigation.contact"), public_contact_path(locale: @public_site.locale),
-                      class: "hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 md:inline-flex" %>
+                      class: "hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 md:inline-flex",
+                      data: { analytics_event: "contact_click", analytics_target: "contact" } %>
           <%= link_to t("public.navigation.locale_switch"),
                       localized_public_home_path(locale: @public_site.locale == "ar" ? "en" : "ar"),
                       hreflang: (@public_site.locale == "ar" ? "en" : "ar"),
@@ -54,7 +72,8 @@
           <%= link_to t("public.navigation.login"), new_user_session_path(locale: @public_site.locale),
                       class: "hidden rounded-lg px-3 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 sm:inline-flex" %>
           <%= link_to @public_site.primary_cta_label, @public_site.primary_cta_url,
-                      class: "inline-flex rounded-lg bg-[var(--public-primary)] px-3.5 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-90" %>
+                      class: "inline-flex rounded-lg bg-[var(--public-primary)] px-3.5 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-90",
+                      data: { analytics_event: "trial_cta_click", analytics_target: "trial" } %>
         </nav>
       </div>
     </header>
@@ -70,7 +89,7 @@
         <div class="flex flex-col items-start gap-2 text-sm sm:items-end">
           <%= mail_to @public_site.email, @public_site.email, class: "hover:text-white" if @public_site.email.present? %>
           <%= link_to @public_site.phone, "tel:#{@public_site.phone}", class: "hover:text-white", dir: "ltr" if @public_site.phone.present? %>
-          <%= link_to t("public.footer.whatsapp"), @public_site.whatsapp_url, class: "hover:text-white", rel: "noopener" if @public_site.whatsapp.present? %>
+          <%= link_to t("public.footer.whatsapp"), @public_site.whatsapp_url, class: "hover:text-white", rel: "noopener", data: { analytics_event: "whatsapp_click", analytics_target: "whatsapp" } if @public_site.whatsapp.present? %>
           <% if public_programs_available? || public_programs_admin? %>
             <%= link_to t("public.navigation.programs"),
                         public_programs_available? ? public_programs_path(locale: @public_site.locale) : admin_website_programs_path,
@@ -83,8 +102,8 @@
           <% { "privacy" => public_privacy_path(locale: @public_site.locale), "terms" => public_terms_path(locale: @public_site.locale), "refund" => public_refund_policy_path(locale: @public_site.locale) }.each do |type, path| %>
             <%= link_to t("public.navigation.#{type}"), path, class: "hover:text-white" if public_legal_page_available?(type) %>
           <% end %>
-          <%= link_to t("public.navigation.trial"), public_trial_path(locale: @public_site.locale), class: "hover:text-white" %>
-          <%= link_to t("public.navigation.contact"), public_contact_path(locale: @public_site.locale), class: "hover:text-white" %>
+          <%= link_to t("public.navigation.trial"), public_trial_path(locale: @public_site.locale), class: "hover:text-white", data: { analytics_event: "trial_cta_click", analytics_target: "trial" } %>
+          <%= link_to t("public.navigation.contact"), public_contact_path(locale: @public_site.locale), class: "hover:text-white", data: { analytics_event: "contact_click", analytics_target: "contact" } %>
           <%= link_to t("public.navigation.login"), new_user_session_path(locale: @public_site.locale), class: "hover:text-white" %>
         </div>
       </div>

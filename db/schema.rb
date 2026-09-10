@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_10_101000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_10_110000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1066,6 +1066,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_101000) do
     t.check_constraint "recommended_lessons_per_week > 0", name: "programs_frequency_positive"
   end
 
+  create_table "public_analytics_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.bigint "fee_plan_id"
+    t.string "inquiry_type"
+    t.string "locale", null: false
+    t.datetime "occurred_at", null: false
+    t.string "path", null: false
+    t.bigint "public_inquiry_id"
+    t.string "referrer"
+    t.string "source_path"
+    t.string "target"
+    t.datetime "updated_at", null: false
+    t.string "utm_campaign"
+    t.string "utm_content"
+    t.string "utm_medium"
+    t.string "utm_source"
+    t.string "utm_term"
+    t.string "visitor_token", null: false
+    t.index ["event_type", "occurred_at"], name: "index_public_analytics_events_on_event_type_and_occurred_at"
+    t.index ["fee_plan_id"], name: "index_public_analytics_events_on_fee_plan_id"
+    t.index ["occurred_at"], name: "index_public_analytics_events_on_occurred_at"
+    t.index ["public_inquiry_id"], name: "index_public_analytics_events_on_public_inquiry_id"
+    t.index ["utm_source", "occurred_at"], name: "index_public_analytics_events_on_utm_source_and_occurred_at"
+    t.index ["visitor_token"], name: "index_public_analytics_events_on_visitor_token"
+  end
+
   create_table "public_faqs", force: :cascade do |t|
     t.text "answer_ar"
     t.text "answer_en"
@@ -2052,6 +2079,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_101000) do
   add_foreign_key "program_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "programs", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "programs", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "public_analytics_events", "fee_plans"
+  add_foreign_key "public_analytics_events", "public_inquiries"
   add_foreign_key "public_faqs", "users", column: "created_by_id"
   add_foreign_key "public_faqs", "users", column: "updated_by_id"
   add_foreign_key "public_inquiries", "users", column: "handled_by_id"

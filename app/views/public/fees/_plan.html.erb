@@ -23,5 +23,6 @@
   <% end %>
   <div class="mt-6 flex-1"></div>
   <%= link_to fee_plan.cta_label, @public_site.primary_cta_url,
-              class: "inline-flex w-fit rounded-xl bg-[var(--public-primary)] px-5 py-3 text-sm font-bold text-white hover:opacity-90" %>
+              class: "inline-flex w-fit rounded-xl bg-[var(--public-primary)] px-5 py-3 text-sm font-bold text-white hover:opacity-90",
+              data: { analytics_event: "fee_plan_cta_click", analytics_target: "fee_plan" } %>
 </article>

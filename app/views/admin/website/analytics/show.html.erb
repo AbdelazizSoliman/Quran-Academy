@@ -1,0 +1,25 @@
+<%= render "shared/page_header", title: t("admin.website.analytics.title"), description: t("admin.website.analytics.description") %>
+<%= render "admin/website/subnav" %>
+<div class="mb-6 flex gap-2">
+  <% [7, 30].each do |days| %>
+    <%= link_to t("admin.website.analytics.range", days: days), admin_website_analytics_path(days: days),
+                class: button_classes(variant: @days == days ? :primary : :secondary, size: :small) %>
+  <% end %>
+</div>
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <% [["page_view", :page_views], ["trial_cta_click", :trial_cta_clicks], ["trial_submitted", :trial_submissions], ["contact_click", :contact_clicks], ["contact_submitted", :contact_submissions], ["whatsapp_click", :whatsapp_clicks], ["fee_plan_cta_click", :fee_plan_clicks]].each do |event, label| %>
+    <div class="ds-card p-5"><p class="ds-caption"><%= t("admin.website.analytics.cards.#{label}") %></p><p class="mt-2 text-3xl font-bold"><%= @summary.fetch(event) %></p></div>
+  <% end %>
+</div>
+<div class="mt-6 grid gap-6 lg:grid-cols-2">
+  <section class="ds-card p-5"><h2 class="text-lg font-bold"><%= t("admin.website.analytics.conversion") %></h2>
+    <p class="mt-3"><%= t("admin.website.analytics.trial_conversion") %>: <strong><%= @trial_conversion ? number_to_percentage(@trial_conversion, precision: 1) : "—" %></strong></p>
+    <p class="mt-2"><%= t("admin.website.analytics.contact_conversion") %>: <strong><%= @contact_conversion ? number_to_percentage(@contact_conversion, precision: 1) : "—" %></strong></p>
+  </section>
+  <section class="ds-card p-5"><h2 class="text-lg font-bold"><%= t("admin.website.analytics.top_pages") %></h2>
+    <% if @top_pages.any? %><ul class="mt-3 space-y-2"><% @top_pages.each do |path, count| %><li class="flex justify-between gap-4"><span class="truncate"><%= path %></span><strong><%= count %></strong></li><% end %></ul><% else %><p class="mt-3 ds-supporting"><%= t("admin.website.analytics.no_data") %></p><% end %>
+  </section>
+</div>
+<section class="ds-card mt-6 overflow-x-auto p-5"><h2 class="text-lg font-bold"><%= t("admin.website.analytics.sources") %></h2>
+  <% if @traffic_sources.any? %><table class="mt-3 min-w-full text-sm"><thead><tr><th class="px-2 py-2 text-start"><%= t("admin.website.analytics.source") %></th><th class="px-2 py-2 text-start"><%= t("admin.website.analytics.campaign") %></th><th class="px-2 py-2 text-end"><%= t("admin.website.analytics.visits") %></th><th class="px-2 py-2 text-end"><%= t("admin.website.analytics.trial_submissions") %></th><th class="px-2 py-2 text-end"><%= t("admin.website.analytics.contact_submissions") %></th></tr></thead><tbody><% @traffic_sources.each do |source, campaign, visits, trials, contacts| %><tr><td class="px-2 py-2"><%= source %></td><td class="px-2 py-2"><%= campaign.presence || "—" %></td><td class="px-2 py-2 text-end"><%= visits %></td><td class="px-2 py-2 text-end"><%= trials %></td><td class="px-2 py-2 text-end"><%= contacts %></td></tr><% end %></tbody></table><% else %><p class="mt-3 ds-supporting"><%= t("admin.website.analytics.no_data") %></p><% end %>
+</section>
