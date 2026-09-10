@@ -3,7 +3,9 @@
        [t("admin.public_website.title"), edit_admin_public_website_path],
        [t("admin.website.leads.title"), admin_website_leads_path],
        [t("admin.website.programs.title"), admin_website_programs_path],
-       [t("admin.website.fee_plans.title"), admin_website_fee_plans_path]
+       [t("admin.website.fee_plans.title"), admin_website_fee_plans_path],
+       [t("admin.website.faqs.title"), admin_website_faqs_path],
+       [t("admin.website.testimonials.title"), admin_website_testimonials_path]
      ].each do |label, path| %>
     <%= link_to label, path,
                 class: current_page?(path) ? button_classes(variant: :primary, size: :small) : button_classes(variant: :secondary, size: :small) %>

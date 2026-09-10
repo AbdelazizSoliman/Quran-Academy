@@ -13,6 +13,8 @@ Rails.application.routes.draw do
   namespace :admin do
     resource :public_website, only: %i[edit update], controller: :public_website_settings
     namespace :website do
+      resources :faqs, except: :show, controller: :faqs
+      resources :testimonials, except: :show, controller: :testimonials
       resources :leads, only: %i[index show update]
       resources :programs, only: %i[index edit update]
       resources :fee_plans, path: "fees", only: %i[index edit update]
@@ -332,6 +334,7 @@ Rails.application.routes.draw do
   get ":locale", to: "public/home#show", as: :localized_public_home,
                  constraints: { locale: /ar|en/ }
   scope ":locale", module: "public", as: :public, constraints: { locale: /ar|en/ } do
+    get "faq", to: "faqs#index", as: :faqs
     get "programs", to: "programs#index", as: :programs
     get "programs/:slug", to: "programs#show", as: :program
     get "fees", to: "fees#index", as: :fees

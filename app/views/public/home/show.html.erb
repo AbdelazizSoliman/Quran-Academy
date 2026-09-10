@@ -18,7 +18,7 @@
         <% end %>
       </div>
     </div>
-    <div class="rounded-[2rem] border border-emerald-900/10 bg-white p-6 shadow-xl shadow-emerald-950/5 sm:p-8">
+    <div class="rounded-[2rem] border border-emerald-900/10 bg-white p-6 shadow-xl shadow-emerald-950/5 sm:p-8" id="trust-values">
       <div class="grid gap-4">
         <% t("public.home.values").each do |value| %>
           <div class="flex gap-4 rounded-2xl bg-emerald-50/70 p-4">
@@ -95,6 +95,32 @@
           <%= render "public/fees/plan", fee_plan: fee_plan %>
         <% end %>
       </div>
+    </div>
+  </section>
+<% end %>
+
+<% if @testimonials.any? %>
+  <section class="bg-emerald-950 px-4 py-16 text-white sm:px-6 sm:py-24 lg:px-8" id="testimonials">
+    <div class="mx-auto max-w-7xl">
+      <p class="text-sm font-bold text-amber-300"><%= t("public.home.testimonials.eyebrow") %></p>
+      <h2 class="mt-3 text-3xl font-bold"><%= t("public.home.testimonials.title") %></h2>
+      <div class="mt-10 grid gap-6 md:grid-cols-3">
+        <% @testimonials.each do |testimonial| %>
+          <figure class="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <blockquote class="whitespace-pre-line text-lg leading-8 text-emerald-50">“<%= testimonial.quote %>”</blockquote>
+            <figcaption class="mt-5 border-t border-white/10 pt-4"><span class="font-bold"><%= testimonial.author_label %></span><% if testimonial.relationship != testimonial.author_label %><span class="block text-sm text-emerald-100/70"><%= testimonial.relationship %></span><% end %></figcaption>
+          </figure>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>
+
+<% if @faqs.any? %>
+  <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8" id="faq">
+    <div class="mx-auto max-w-4xl">
+      <div class="flex flex-wrap items-end justify-between gap-4"><div><p class="text-sm font-bold text-[var(--public-primary)]"><%= t("public.home.faq.eyebrow") %></p><h2 class="mt-3 text-3xl font-bold text-emerald-950"><%= t("public.home.faq.title") %></h2></div><%= link_to t("public.home.faq.all"), public_faqs_path(locale: public_locale), class: "text-sm font-bold text-[var(--public-primary)] hover:underline" %></div>
+      <div class="mt-8 space-y-4"><%= render partial: "public/faqs/faq", collection: @faqs %></div>
     </div>
   </section>
 <% end %>

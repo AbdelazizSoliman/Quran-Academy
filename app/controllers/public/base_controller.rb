@@ -16,6 +16,7 @@ module Public
         setting:, academy_setting: setting&.academy_setting, locale: I18n.locale
       )
       @public_programs_available = PublicCatalog::ProgramsQuery.new(locale: public_locale).available?
+      @public_faqs_available = PublicContent::FaqsQuery.new.available?
     end
 
     # Every public page follows the same controlled unavailable behaviour as the Phase 1 homepage.
@@ -28,7 +29,10 @@ module Public
     def public_locale = @public_site.locale
     def public_programs_available? = @public_programs_available
     def public_programs_admin? = current_user&.active? && current_user.admin?
+    def public_faqs_available? = @public_faqs_available
+    def public_faqs_admin? = current_user&.active? && current_user.admin?
 
-    helper_method :public_locale, :public_programs_available?, :public_programs_admin?
+    helper_method :public_locale, :public_programs_available?, :public_programs_admin?,
+                  :public_faqs_available?, :public_faqs_admin?
   end
 end

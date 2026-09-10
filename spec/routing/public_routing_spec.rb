@@ -17,6 +17,8 @@ RSpec.describe "Public website routing", type: :routing do
       .to route_to(controller: "public/programs", action: "show", locale: "en", slug: "quran-foundations")
     expect(get: "/ar/fees").to route_to(controller: "public/fees", action: "index", locale: "ar")
     expect(get: "/en/fees").to route_to(controller: "public/fees", action: "index", locale: "en")
+    expect(get: "/ar/faq").to route_to(controller: "public/faqs", action: "index", locale: "ar")
+    expect(get: "/en/faq").to route_to(controller: "public/faqs", action: "index", locale: "en")
   end
 
   it "routes localized trial and contact submissions" do
@@ -32,6 +34,7 @@ RSpec.describe "Public website routing", type: :routing do
     expect(get: "/fees").not_to be_routable
     expect(get: "/trial").not_to be_routable
     expect(get: "/contact").not_to be_routable
+    expect(get: "/faq").not_to be_routable
     expect(get: "/en/leads/1").not_to be_routable
     expect(get: "/en/course_offerings").not_to be_routable
   end

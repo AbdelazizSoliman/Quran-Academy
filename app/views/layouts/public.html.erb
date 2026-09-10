@@ -32,6 +32,10 @@
           <% end %>
           <%= link_to t("public.navigation.fees"), public_fees_path(locale: @public_site.locale),
                       class: "hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 sm:inline-flex" %>
+          <% if public_faqs_available? || public_faqs_admin? %>
+            <%= link_to t("public.navigation.faq"), public_faqs_available? ? public_faqs_path(locale: @public_site.locale) : admin_website_faqs_path,
+                        class: "hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 md:inline-flex" %>
+          <% end %>
           <%= link_to t("public.navigation.contact"), public_contact_path(locale: @public_site.locale),
                       class: "hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 md:inline-flex" %>
           <%= link_to t("public.navigation.locale_switch"),
@@ -64,6 +68,9 @@
                         class: "mt-2 hover:text-white" %>
           <% end %>
           <%= link_to t("public.navigation.fees"), public_fees_path(locale: @public_site.locale), class: "hover:text-white" %>
+          <% if public_faqs_available? || public_faqs_admin? %>
+            <%= link_to t("public.navigation.faq"), public_faqs_available? ? public_faqs_path(locale: @public_site.locale) : admin_website_faqs_path, class: "hover:text-white" %>
+          <% end %>
           <%= link_to t("public.navigation.trial"), public_trial_path(locale: @public_site.locale), class: "hover:text-white" %>
           <%= link_to t("public.navigation.contact"), public_contact_path(locale: @public_site.locale), class: "hover:text-white" %>
           <%= link_to t("public.navigation.login"), new_user_session_path(locale: @public_site.locale), class: "hover:text-white" %>
