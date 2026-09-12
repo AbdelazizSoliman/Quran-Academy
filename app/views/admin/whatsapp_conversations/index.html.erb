@@ -22,5 +22,5 @@
   <% end %>
 </div>
 
-<% if @conversations.empty? %><%= render "shared/components/empty_state", title: t("whatsapp_inbox.empty") %><% end %>
+<% if @conversations.empty? %><%= render "shared/components/empty_state", title: t("whatsapp_inbox.empty"), description: t("whatsapp_inbox.empty_description") %><% end %>
 <%== @pagy.series_nav if @pagy.pages > 1 %>
