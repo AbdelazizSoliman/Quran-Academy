@@ -13,3 +13,4 @@ ar:
     media_message: "رسالة وسائط أو رسالة غير مدعومة"
     message_types: { image: "صورة", audio: "صوت", video: "فيديو", document: "مستند", sticker: "ملصق", location: "موقع", contacts: "جهة اتصال" }
     empty: "لا توجد محادثات واتساب واردة حتى الآن."
+    empty_description: "ستظهر الرسائل الواردة هنا بعد استلامها عبر الويب هوك."

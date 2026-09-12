@@ -13,3 +13,4 @@ en:
     media_message: "Media or unsupported message"
     message_types: { image: "Image", audio: "Audio", video: "Video", document: "Document", sticker: "Sticker", location: "Location", contacts: "Contact" }
     empty: "No incoming WhatsApp conversations yet."
+    empty_description: "Incoming messages will appear here after the webhook receives them."

@@ -115,6 +115,16 @@ RSpec.describe "WhatsApp inbound webhook" do
     expect(conversation.reload.unread_count).to be_zero
   end
 
+  it "renders the empty inbox for an admin" do
+    sign_in create(:user, :admin)
+
+    get admin_whatsapp_conversations_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(I18n.t("whatsapp_inbox.empty", locale: :ar),
+                                     I18n.t("whatsapp_inbox.empty_description", locale: :ar))
+  end
+
   it "rejects non-admin access to the inbox and conversation URL" do
     conversation = receive_payload
     sign_in create(:user, :staff)
