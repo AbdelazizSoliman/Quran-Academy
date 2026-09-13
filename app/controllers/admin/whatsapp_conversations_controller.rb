@@ -3,7 +3,7 @@ module Admin
     before_action :set_conversation, only: %i[show archive reopen]
 
     def index
-      scope = WhatsappConversation.includes(:contact).recent_first
+      scope = WhatsappConversation.includes(:contact, :latest_message).recent_first
       status = params.fetch(:status, nil)
       scope = scope.where(status:) if status.in?(WhatsappConversation::STATUSES)
       scope = scope.unread if params[:unread] == "1"
@@ -12,7 +12,7 @@ module Admin
 
     def show
       @conversation.mark_read!
-      @messages = @conversation.messages.chronological
+      @message_pagy, @messages = pagy(:offset, @conversation.messages.chronological, limit: 100)
     end
 
     def archive

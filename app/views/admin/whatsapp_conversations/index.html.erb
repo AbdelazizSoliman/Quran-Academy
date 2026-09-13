@@ -12,10 +12,11 @@
       <div>
         <div class="flex flex-wrap items-center gap-2">
           <strong><%= conversation.display_name %></strong>
+          <span class="ds-caption"><%= t("whatsapp_inbox.statuses.#{conversation.status}") %></span>
           <% if conversation.unread_count.positive? %><span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-900"><%= conversation.unread_count %></span><% end %>
         </div>
         <p class="ds-caption mt-1" dir="ltr"><%= conversation.sender_phone %></p>
-        <p class="mt-2 line-clamp-2"><%= conversation.messages.chronological.last&.body.presence || t("whatsapp_inbox.media_message") %></p>
+        <p class="mt-2 line-clamp-2"><%= conversation.latest_message&.body.presence || t("whatsapp_inbox.media_message") %></p>
       </div>
       <div class="text-sm text-app-subtle"><%= l(conversation.last_message_at, format: :short) %></div>
     <% end %>

@@ -4,6 +4,7 @@ en:
       title: "WhatsApp inbox"
       description: "Incoming messages received by the academy WhatsApp number."
     statuses: { open: "Open", archived: "Archived" }
+    directions: { inbound: "Incoming", outbound: "Outgoing" }
     filters: { unread: "Unread only" }
     actions: { archive: "Archive conversation", reopen: "Reopen conversation" }
     messages: { archived: "Conversation archived.", reopened: "Conversation reopened." }
