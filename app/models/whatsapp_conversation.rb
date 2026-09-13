@@ -3,6 +3,11 @@ class WhatsappConversation < ApplicationRecord
 
   belongs_to :contact, polymorphic: true, optional: true
   has_many :messages, class_name: "WhatsappMessage", dependent: :restrict_with_exception
+  has_one :latest_message,
+          -> { order(received_at: :desc, id: :desc) },
+          class_name: "WhatsappMessage",
+          dependent: :restrict_with_exception,
+          inverse_of: :whatsapp_conversation
 
   before_validation :generate_public_id, on: :create
 

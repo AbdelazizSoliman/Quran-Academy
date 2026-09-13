@@ -16,9 +16,11 @@
 
 <section class="mt-6 space-y-3" aria-label="<%= t('whatsapp_inbox.messages_label') %>">
   <% @messages.each do |message| %>
-    <article class="ds-card p-4">
+    <article class="ds-card p-4 <%= message.direction == "outbound" ? "border-sky-200" : "border-app-border" %>">
       <p class="whitespace-pre-wrap"><%= message.body.presence || t("whatsapp_inbox.message_types.#{message.message_type}", default: t("whatsapp_inbox.media_message")) %></p>
-      <p class="ds-caption mt-2"><%= l(message.received_at, format: :short) %> · <%= message.message_type %></p>
+      <p class="ds-caption mt-2"><%= t("whatsapp_inbox.directions.#{message.direction}") %> · <%= l(message.received_at, format: :short) %> · <%= message.message_type %></p>
     </article>
   <% end %>
 </section>
+
+<%== @message_pagy.series_nav if @message_pagy.pages > 1 %>

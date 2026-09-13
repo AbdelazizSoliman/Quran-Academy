@@ -4,6 +4,7 @@ ar:
       title: "صندوق وارد واتساب"
       description: "الرسائل الواردة إلى رقم واتساب الخاص بالأكاديمية."
     statuses: { open: "مفتوحة", archived: "مؤرشفة" }
+    directions: { inbound: "واردة", outbound: "صادرة" }
     filters: { unread: "غير المقروءة فقط" }
     actions: { archive: "أرشفة المحادثة", reopen: "إعادة فتح المحادثة" }
     messages: { archived: "تمت أرشفة المحادثة.", reopened: "تمت إعادة فتح المحادثة." }

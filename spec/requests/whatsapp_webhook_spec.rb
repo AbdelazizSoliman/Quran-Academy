@@ -108,7 +108,8 @@ RSpec.describe "WhatsApp inbound webhook" do
     sign_in create(:user, :admin)
 
     get admin_whatsapp_conversations_path
-    expect(response.body).to include("Student Sender", "I need help with my lesson")
+    expect(response.body).to include("Student Sender", "I need help with my lesson",
+                                     I18n.t("whatsapp_inbox.directions.inbound", locale: :ar))
 
     get admin_whatsapp_conversation_path(conversation)
     expect(response).to have_http_status(:ok)
@@ -123,6 +124,24 @@ RSpec.describe "WhatsApp inbound webhook" do
     expect(response).to have_http_status(:ok)
     expect(response.body).to include(I18n.t("whatsapp_inbox.empty", locale: :ar),
                                      I18n.t("whatsapp_inbox.empty_description", locale: :ar))
+  end
+
+  it "keeps unread and archive filters consistent" do
+    conversation = receive_payload
+    sign_in create(:user, :admin)
+
+    get admin_whatsapp_conversations_path, params: { unread: "1" }
+    expect(response.body).to include(conversation.display_name)
+
+    get admin_whatsapp_conversation_path(conversation)
+    expect(conversation.reload.unread_count).to eq(0)
+
+    get admin_whatsapp_conversations_path, params: { unread: "1" }
+    expect(response.body).not_to include(conversation.display_name)
+
+    patch archive_admin_whatsapp_conversation_path(conversation)
+    get admin_whatsapp_conversations_path, params: { status: "archived" }
+    expect(response.body).to include(conversation.display_name, I18n.t("whatsapp_inbox.statuses.archived", locale: :ar))
   end
 
   it "rejects non-admin access to the inbox and conversation URL" do
