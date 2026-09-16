@@ -36,6 +36,14 @@ class User < ApplicationRecord
                                       inverse_of: :updated_by, dependent: :nullify
   has_many :student_profile_events, foreign_key: :actor_id, inverse_of: :actor,
                                     dependent: :restrict_with_exception
+  has_many :created_student_learning_profiles, class_name: "StudentLearningProfile", foreign_key: :created_by_id,
+                                                inverse_of: :created_by, dependent: :restrict_with_exception
+  has_many :updated_student_learning_profiles, class_name: "StudentLearningProfile", foreign_key: :updated_by_id,
+                                                inverse_of: :updated_by, dependent: :restrict_with_exception
+  has_many :student_learning_profile_events, foreign_key: :actor_id, inverse_of: :actor,
+                                             dependent: :restrict_with_exception
+  has_many :created_student_observations, class_name: "StudentObservation", foreign_key: :created_by_id,
+                                           inverse_of: :created_by, dependent: :restrict_with_exception
   has_many :created_guardians, class_name: "Guardian", foreign_key: :created_by_id,
                                inverse_of: :created_by, dependent: :nullify
   has_many :updated_guardians, class_name: "Guardian", foreign_key: :updated_by_id,

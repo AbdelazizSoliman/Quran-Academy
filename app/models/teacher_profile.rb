@@ -22,6 +22,7 @@ class TeacherProfile < ApplicationRecord
                                      inverse_of: :teacher_profile, dependent: :restrict_with_exception
   has_many :scheduled_lessons, dependent: :restrict_with_exception
   has_many :lesson_reports, inverse_of: :teacher_profile, dependent: :restrict_with_exception
+  has_many :student_observations, inverse_of: :teacher_profile, dependent: :restrict_with_exception
   has_many :course_offering_teachers, inverse_of: :teacher_profile, dependent: :restrict_with_exception
   has_many :course_offerings, through: :course_offering_teachers
   has_many :enrollment_lesson_schedules, dependent: :restrict_with_exception

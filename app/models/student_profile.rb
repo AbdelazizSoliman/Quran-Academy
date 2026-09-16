@@ -60,6 +60,8 @@ class StudentProfile < ApplicationRecord
   has_many :events, class_name: "StudentProfileEvent", inverse_of: :student_profile,
                     dependent: :restrict_with_exception
   has_many :student_assessments, dependent: :restrict_with_exception
+  has_one :student_learning_profile, inverse_of: :student_profile, dependent: :restrict_with_exception
+  has_many :student_observations, inverse_of: :student_profile, dependent: :restrict_with_exception
   has_one :student_progress, dependent: :restrict_with_exception
   has_many :certificates, dependent: :restrict_with_exception
   has_many :finance_invoices, dependent: :restrict_with_exception

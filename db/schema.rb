@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_10_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_16_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1523,6 +1523,107 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_110000) do
     t.check_constraint "ends_on IS NULL OR starts_on IS NULL OR ends_on >= starts_on", name: "student_guardianships_date_order"
   end
 
+  create_table "student_learning_profile_events", force: :cascade do |t|
+    t.string "action", null: false
+    t.bigint "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.string "field_key"
+    t.jsonb "metadata", default: {}, null: false
+    t.jsonb "new_value"
+    t.jsonb "previous_value"
+    t.string "source", null: false
+    t.bigint "student_learning_profile_id", null: false
+    t.bigint "student_learning_profile_item_id"
+    t.bigint "student_learning_profile_section_id"
+    t.index ["actor_id"], name: "index_student_learning_profile_events_on_actor_id"
+    t.index ["student_learning_profile_id", "created_at"], name: "idx_learning_profile_events_history"
+    t.index ["student_learning_profile_item_id"], name: "idx_on_student_learning_profile_item_id_6f75e1814c"
+    t.index ["student_learning_profile_section_id"], name: "idx_on_student_learning_profile_section_id_43a49703be"
+    t.check_constraint "action::text = ANY (ARRAY['profile_created'::character varying, 'section_created'::character varying, 'section_updated'::character varying, 'item_created'::character varying, 'item_updated'::character varying]::text[])", name: "learning_profile_events_action"
+    t.check_constraint "source::text = ANY (ARRAY['teacher_entry'::character varying, 'admin_entry'::character varying, 'observation'::character varying]::text[])", name: "learning_profile_events_source"
+  end
+
+  create_table "student_learning_profile_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "field_key", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "sensitivity", null: false
+    t.string "source", null: false
+    t.bigint "student_learning_profile_section_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.jsonb "value", null: false
+    t.string "value_type", null: false
+    t.string "visibility", null: false
+    t.index ["created_by_id"], name: "index_student_learning_profile_items_on_created_by_id"
+    t.index ["student_learning_profile_section_id", "field_key"], name: "idx_learning_profile_items_unique", unique: true
+    t.index ["updated_by_id"], name: "index_student_learning_profile_items_on_updated_by_id"
+    t.check_constraint "sensitivity::text = ANY (ARRAY['standard'::character varying, 'sensitive'::character varying, 'highly_sensitive'::character varying]::text[])", name: "learning_profile_items_sensitivity"
+    t.check_constraint "source::text = ANY (ARRAY['teacher_entry'::character varying, 'admin_entry'::character varying, 'observation'::character varying]::text[])", name: "learning_profile_items_source"
+    t.check_constraint "value_type::text = ANY (ARRAY['text'::character varying, 'number'::character varying, 'boolean'::character varying, 'list'::character varying, 'date'::character varying]::text[])", name: "learning_profile_items_value_type"
+    t.check_constraint "visibility::text = ANY (ARRAY['internal'::character varying, 'guardian_safe'::character varying, 'student_safe'::character varying]::text[])", name: "learning_profile_items_visibility"
+  end
+
+  create_table "student_learning_profile_sections", force: :cascade do |t|
+    t.string "completion_state", default: "not_started", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "review_state", default: "unreviewed", null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.string "section_key", null: false
+    t.bigint "student_learning_profile_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["created_by_id"], name: "index_student_learning_profile_sections_on_created_by_id"
+    t.index ["reviewed_by_id"], name: "index_student_learning_profile_sections_on_reviewed_by_id"
+    t.index ["student_learning_profile_id", "section_key"], name: "idx_learning_profile_sections_unique", unique: true
+    t.index ["updated_by_id"], name: "index_student_learning_profile_sections_on_updated_by_id"
+    t.check_constraint "completion_state::text = ANY (ARRAY['not_started'::character varying, 'in_progress'::character varying, 'complete'::character varying]::text[])", name: "learning_profile_sections_completion"
+    t.check_constraint "review_state::text = 'reviewed'::text AND reviewed_at IS NOT NULL AND reviewed_by_id IS NOT NULL OR review_state::text = 'unreviewed'::text AND reviewed_at IS NULL AND reviewed_by_id IS NULL", name: "learning_profile_sections_review_metadata"
+    t.check_constraint "review_state::text = ANY (ARRAY['unreviewed'::character varying, 'reviewed'::character varying]::text[])", name: "learning_profile_sections_review"
+    t.check_constraint "section_key::text = ANY (ARRAY['basic_information'::character varying, 'educational_quranic_background'::character varying, 'language_cultural_background'::character varying, 'faith_spiritual_context'::character varying, 'cognitive_traits_learning_preferences'::character varying, 'psychological_emotional_state'::character varying, 'self_regulation_behaviour'::character varying, 'personality_motivation'::character varying, 'interests_personal_culture'::character varying, 'family_social_context'::character varying, 'achievements_aspirations'::character varying, 'challenges_support_needs'::character varying]::text[])", name: "learning_profile_sections_key"
+  end
+
+  create_table "student_learning_profiles", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "public_id", null: false
+    t.bigint "student_profile_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id", null: false
+    t.index ["created_by_id"], name: "index_student_learning_profiles_on_created_by_id"
+    t.index ["public_id"], name: "index_student_learning_profiles_on_public_id", unique: true
+    t.index ["student_profile_id"], name: "index_student_learning_profiles_on_student_profile_id", unique: true
+    t.index ["updated_by_id"], name: "index_student_learning_profiles_on_updated_by_id"
+  end
+
+  create_table "student_observations", force: :cascade do |t|
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.text "observation", null: false
+    t.datetime "observed_at", null: false
+    t.bigint "scheduled_lesson_id"
+    t.string "sensitivity", default: "standard", null: false
+    t.string "source", default: "teacher_entry", null: false
+    t.bigint "student_profile_id", null: false
+    t.bigint "teacher_profile_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "visibility", default: "internal", null: false
+    t.index ["created_by_id"], name: "index_student_observations_on_created_by_id"
+    t.index ["scheduled_lesson_id"], name: "index_student_observations_on_scheduled_lesson_id"
+    t.index ["student_profile_id", "observed_at"], name: "idx_student_observations_timeline"
+    t.index ["teacher_profile_id", "observed_at"], name: "idx_teacher_observations_timeline"
+    t.check_constraint "category::text = ANY (ARRAY['quran_reading'::character varying, 'memorization'::character varying, 'pronunciation'::character varying, 'tajweed'::character varying, 'attention'::character varying, 'engagement'::character varying, 'behaviour'::character varying, 'motivation'::character varying, 'teaching_strategy'::character varying, 'other'::character varying]::text[])", name: "student_observations_category"
+    t.check_constraint "sensitivity::text = ANY (ARRAY['standard'::character varying, 'sensitive'::character varying, 'highly_sensitive'::character varying]::text[])", name: "student_observations_sensitivity"
+    t.check_constraint "source::text = ANY (ARRAY['teacher_entry'::character varying, 'admin_entry'::character varying, 'lesson'::character varying]::text[])", name: "student_observations_source"
+    t.check_constraint "visibility::text = ANY (ARRAY['internal'::character varying, 'guardian_safe'::character varying, 'student_safe'::character varying]::text[])", name: "student_observations_visibility"
+  end
+
   create_table "student_profile_events", force: :cascade do |t|
     t.bigint "actor_id", null: false
     t.datetime "created_at", null: false
@@ -2128,6 +2229,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_110000) do
   add_foreign_key "student_guardianships", "student_profiles", on_delete: :restrict
   add_foreign_key "student_guardianships", "users", column: "created_by_id", on_delete: :nullify
   add_foreign_key "student_guardianships", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "student_learning_profile_events", "student_learning_profile_items"
+  add_foreign_key "student_learning_profile_events", "student_learning_profile_sections"
+  add_foreign_key "student_learning_profile_events", "student_learning_profiles"
+  add_foreign_key "student_learning_profile_events", "users", column: "actor_id"
+  add_foreign_key "student_learning_profile_items", "student_learning_profile_sections"
+  add_foreign_key "student_learning_profile_items", "users", column: "created_by_id"
+  add_foreign_key "student_learning_profile_items", "users", column: "updated_by_id"
+  add_foreign_key "student_learning_profile_sections", "student_learning_profiles"
+  add_foreign_key "student_learning_profile_sections", "users", column: "created_by_id"
+  add_foreign_key "student_learning_profile_sections", "users", column: "reviewed_by_id"
+  add_foreign_key "student_learning_profile_sections", "users", column: "updated_by_id"
+  add_foreign_key "student_learning_profiles", "student_profiles"
+  add_foreign_key "student_learning_profiles", "users", column: "created_by_id"
+  add_foreign_key "student_learning_profiles", "users", column: "updated_by_id"
+  add_foreign_key "student_observations", "scheduled_lessons"
+  add_foreign_key "student_observations", "student_profiles"
+  add_foreign_key "student_observations", "teacher_profiles"
+  add_foreign_key "student_observations", "users", column: "created_by_id"
   add_foreign_key "student_profile_events", "student_profiles", on_delete: :restrict
   add_foreign_key "student_profile_events", "users", column: "actor_id", on_delete: :restrict
   add_foreign_key "student_profiles", "fee_plans", on_delete: :nullify
