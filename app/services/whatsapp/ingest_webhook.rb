@@ -24,9 +24,18 @@ module Whatsapp
     end
 
     def ingest_value(value)
+      unless ingestible_value?(value)
+        Rails.logger.info("Ignoring unsupported WhatsApp webhook value with no messages or statuses")
+        return
+      end
+
       validate_phone_number_id!(value)
       contacts = Array(value["contacts"]).index_by { |contact| contact["wa_id"] }
       Array(value["messages"]).each { |message| ingest_message(message, contacts[message["from"]]) }
+    end
+
+    def ingestible_value?(value)
+      value.is_a?(Hash) && (Array(value["messages"]).any? || Array(value["statuses"]).any?)
     end
 
     def validate_phone_number_id!(value)

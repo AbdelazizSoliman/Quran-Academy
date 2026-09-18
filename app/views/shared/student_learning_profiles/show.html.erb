@@ -1,0 +1,99 @@
+<%= render "shared/page_header", title: t("learning_profile.title"), description: @student.display_name.presence || @student.user.full_name,
+           breadcrumbs: [{ label: t("students.index.title"), href: admin_mode ? admin_students_path : teacher_student_path(@student) }, { label: @student.public_id }],
+           primary_action: render("shared/components/button", label: t("learning_profile.back_to_student"), href: admin_mode ? admin_student_path(@student) : teacher_student_path(@student), variant: :secondary) %>
+
+<div class="grid gap-5 lg:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[15rem_minmax(0,1fr)]" dir="<%= I18n.locale == :ar ? "rtl" : "ltr" %>">
+  <aside class="space-y-3 lg:sticky lg:top-4 lg:self-start">
+    <div class="ds-card p-4">
+      <p class="text-sm text-app-muted-foreground"><%= t("learning_profile.progress") %></p>
+      <p class="mt-1 text-2xl font-bold text-app-primary"><%= @completion[:started] %>/<%= @completion[:total] %></p>
+      <p class="text-xs text-app-muted-foreground"><%= t("learning_profile.started") %></p>
+      <p class="mt-2 text-xs font-medium text-app-primary"><%= t("learning_profile.required_progress", completed: @completion[:required_completed], total: @completion[:required]) %></p>
+    </div>
+    <nav class="grid gap-1" aria-label="<%= t("learning_profile.navigation") %>">
+      <% StudentLearningProfileSectionRegistry.each do |key, definition| %>
+        <% section = @profile&.sections&.find_by(section_key: key) %>
+        <%= link_to (content_tag(:span, definition[:position], class: "text-xs text-app-muted-foreground") + " " + learning_profile_section_title(key) + " " + content_tag(:span, t("learning_profile.importance.#{definition[:importance]}"), class: "ms-auto text-[10px] uppercase text-app-muted-foreground")).html_safe,
+                    (admin_mode ? admin_student_learning_profile_path(@student, section: key) : teacher_student_learning_profile_path(@student, section: key)),
+                    class: "flex items-center gap-2 rounded-lg px-3 py-2 text-sm #{key == @section_key ? 'bg-app-primary-soft font-semibold text-app-primary' : 'hover:bg-app-muted'}" %>
+      <% end %>
+    </nav>
+  </aside>
+
+  <main class="space-y-6">
+    <section class="ds-card p-5">
+      <h2 class="text-lg font-bold text-app-primary"><%= t("learning_profile.summary") %></h2>
+      <% if @summary_items.present? %>
+        <dl class="mt-4 grid gap-4 sm:grid-cols-2">
+          <% %w[learning_preferences teaching_strategy support_needs learning_challenges].each do |key| %>
+            <% item = @summary_items[key] %>
+            <% next unless item %>
+            <div><dt class="ds-caption"><%= learning_profile_field_label(key) %></dt><dd class="mt-1 whitespace-pre-line text-sm"><%= learning_profile_value(item.value) %></dd></div>
+          <% end %>
+        </dl>
+      <% else %>
+        <p class="mt-2 text-sm text-app-muted-foreground"><%= t("learning_profile.no_summary") %></p>
+      <% end %>
+    </section>
+
+    <section class="ds-card p-5">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p class="text-sm text-app-muted-foreground"><%= t("learning_profile.section_label", number: @section_definition[:position]) %></p>
+          <h2 class="mt-1 text-2xl font-bold text-app-primary"><%= learning_profile_section_title(@section_key) %></h2>
+        </div>
+        <span class="<%= badge_classes(:neutral) %>"><%= t("learning_profile.importance.#{@section_definition[:importance]}") %></span>
+      </div>
+
+      <%= form_with url: (admin_mode ? admin_student_learning_profile_section_path(@student, @section_key) : teacher_student_learning_profile_section_path(@student, @section_key)), method: :patch, class: "mt-6 space-y-5" do |form| %>
+        <div class="grid gap-5 md:grid-cols-2">
+          <% @fields.each do |field_key, definition| %>
+            <% item = @items[field_key] %>
+            <% value = item&.value %>
+            <% long_text = definition[:value_type] == "text" && learning_profile_textarea?(field_key) %>
+            <div class="<%= long_text ? 'md:col-span-2' : '' %>">
+              <%= label_tag "items_#{field_key}", learning_profile_field_label(field_key), class: "ds-label" %>
+              <% if definition[:sensitivity] != "standard" %><span class="ms-2 <%= badge_classes(:warning) %>"><%= learning_profile_sensitivity_label(definition[:sensitivity]) %></span><% end %>
+              <% if definition[:value_type] == "text" && long_text %>
+                <%= text_area_tag "items[#{field_key}]", learning_profile_value(value), id: "items_#{field_key}", rows: 3, class: "ds-control mt-2", dir: "auto" %>
+              <% elsif definition[:value_type] == "number" %>
+                <%= number_field_tag "items[#{field_key}]", value, id: "items_#{field_key}", class: "ds-control mt-2", min: 0 %>
+              <% elsif definition[:value_type] == "date" %>
+                <%= date_field_tag "items[#{field_key}]", value, id: "items_#{field_key}", class: "ds-control mt-2" %>
+              <% elsif definition[:value_type] == "boolean" %>
+                <%= check_box_tag "items[#{field_key}]", "1", value == true, id: "items_#{field_key}", class: "mt-3 size-5 rounded border-app-border text-app-primary" %>
+              <% else %>
+                <%= text_field_tag "items[#{field_key}]", learning_profile_value(value), id: "items_#{field_key}", class: "ds-control mt-2", placeholder: t("learning_profile.list_hint") %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+        <div class="flex flex-wrap items-end justify-between gap-4 rounded-xl border-t border-app-border bg-app-muted/40 px-4 py-4 pt-5">
+          <div>
+            <%= label_tag "section_completion_state", t("learning_profile.completion_state"), class: "ds-label" %>
+            <%= select_tag "section[completion_state]", options_for_select(StudentLearningProfileSection::COMPLETION_STATES.map { |s| [t("learning_profile.completion.#{s}"), s] }, @section&.completion_state || "not_started"), id: "section_completion_state", class: "ds-control mt-2" %>
+          </div>
+          <% if admin_mode %>
+            <div>
+              <%= label_tag "section_review_state", t("learning_profile.review_state"), class: "ds-label" %>
+              <%= select_tag "section[review_state]", options_for_select(StudentLearningProfileSection::REVIEW_STATES.map { |s| [t("learning_profile.review.#{s}"), s] }, @section&.review_state || "unreviewed"), id: "section_review_state", class: "ds-control mt-2" %>
+            </div>
+          <% end %>
+          <%= render "shared/components/button", label: t("learning_profile.save_section"), type: "submit", icon: :check %>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="ds-card p-5">
+      <div class="flex items-center justify-between gap-3"><h2 class="text-lg font-bold text-app-primary"><%= t("learning_profile.observations") %></h2><span class="text-xs text-app-muted-foreground"><%= t("learning_profile.append_only") %></span></div>
+      <%= form_with url: (admin_mode ? admin_student_observations_path(@student) : teacher_student_observations_path(@student)), scope: :observation, class: "mt-4 grid gap-3 md:grid-cols-[12rem_minmax(0,1fr)_auto] md:items-end" do |f| %>
+        <%= f.select :category, StudentObservation::CATEGORIES.map { |c| [t("learning_profile.categories.#{c}"), c] }, {}, class: "ds-control" %>
+        <%= f.text_area :observation, class: "ds-control min-h-11", rows: 2, required: true, placeholder: t("learning_profile.observation_placeholder"), dir: "auto" %>
+        <%= render "shared/components/button", label: t("learning_profile.add_observation"), type: "submit", icon: :plus %>
+      <% end %>
+      <% if @observations.any? %>
+        <div class="mt-5 divide-y divide-app-border"><% @observations.each do |observation| %><article class="py-4 first:pt-0"><div class="flex flex-wrap items-center gap-2 text-xs text-app-muted-foreground"><span class="font-semibold text-app-text"><%= t("learning_profile.categories.#{observation.category}") %></span><span><%= localized_datetime(observation.observed_at) %></span><span><%= observation.teacher_profile.display_name %></span><% if observation.sensitivity != "standard" %><span class="<%= badge_classes(:warning) %>"><%= learning_profile_sensitivity_label(observation.sensitivity) %></span><% end %></div><p class="mt-2 whitespace-pre-line text-sm"><%= observation.observation %></p></article><% end %></div>
+      <% else %><p class="mt-5 text-sm text-app-muted-foreground"><%= t("learning_profile.no_observations") %></p><% end %>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,143 @@
+en:
+  learning_profile:
+    title: Learning Profile
+    back_to_student: Back to student
+    student_page_hint: Open the learning profile to review instructional context and observations.
+    progress: Profile progress
+    summary: Current instructional summary
+    no_summary: No profile summary has been recorded yet.
+    started: sections started
+    required_progress: "Required: %{completed} of %{total} complete"
+    navigation: Learning profile sections
+    section_label: Section %{number}
+    save_section: Save section
+    saved: Learning profile section saved.
+    observation_saved: Observation added.
+    add_observation: Add observation
+    observation_placeholder: Add a short, factual observation
+    observations: Recent observations
+    no_observations: No observations yet.
+    append_only: Add corrections as a new observation.
+    list_hint: Separate values with commas
+    completion_state: Completion
+    review_state: Review
+    completion:
+      not_started: Not started
+      in_progress: In progress
+      complete: Complete
+    review:
+      unreviewed: Unreviewed
+      reviewed: Reviewed
+    importance:
+      must: Must
+      should: Should
+      could: Could
+    sensitivity:
+      standard: Standard
+      sensitive: Sensitive
+      highly_sensitive: Highly sensitive
+    categories:
+      quran_reading: Quran reading
+      memorization: Memorization
+      pronunciation: Pronunciation
+      tajweed: Tajweed
+      attention: Attention
+      engagement: Engagement
+      behaviour: Behaviour
+      motivation: Motivation
+      teaching_strategy: Teaching strategy
+      other: Other
+    sections:
+      basic_information: { title: Basic Information }
+      educational_quranic_background: { title: Educational & Quranic Background }
+      language_cultural_background: { title: Language & Cultural Background }
+      faith_spiritual_context: { title: Faith & Spiritual Context }
+      cognitive_traits_learning_preferences: { title: Cognitive Traits & Learning Preferences }
+      psychological_emotional_state: { title: Psychological & Emotional State }
+      self_regulation_behaviour: { title: Self-Regulation & Behaviour During Lessons }
+      personality_motivation: { title: Personality & Motivation }
+      interests_personal_culture: { title: Interests & Personal Culture }
+      family_social_context: { title: Family & Social Context }
+      achievements_aspirations: { title: Achievements & Aspirations }
+      challenges_support_needs: { title: Challenges & Support Needs }
+    fields:
+      instructional_summary: Instructional summary
+      communication_style: Communication style
+      previous_learning_experience: Previous learning experience
+      previous_learning_materials: Previous learning materials
+      educational_background_notes: Educational background notes
+      reading_fluency_notes: Reading fluency notes
+      pronunciation_challenges: Pronunciation challenges
+      tajweed_notes: Tajweed notes
+      preferred_explanation_language: Preferred explanation language
+      preferred_teaching_materials: Preferred teaching materials
+      spoken_languages: Spoken languages
+      arabic_literacy_context: Arabic literacy context
+      cultural_considerations: Cultural considerations
+      interaction_language: Interaction language
+      pronunciation_accent_notes: Pronunciation and accent notes
+      arabic_exposure_outside_lessons: Arabic exposure outside lessons
+      cultural_context_notes: Cultural context notes
+      spiritual_learning_goals: Spiritual learning goals
+      encouragement_approach: Encouragement approach
+      faith_context_notes: Faith context notes
+      preferred_activities: Preferred activities
+      preferred_pacing: Preferred pace
+      helpful_presentation_modes: Helpful presentation modes
+      repetition_preference: Repetition preference
+      teaching_strategy: Teaching strategy
+      learning_preferences: Learning preferences
+      comprehension_pace: Comprehension pace
+      focus_duration_minutes: Typical focus duration (minutes)
+      curiosity_notes: Curiosity notes
+      emotional_response: Emotional response during lessons
+      reassurance_approach: Helpful reassurance approach
+      lesson_readiness_pattern: Lesson readiness pattern
+      general_emotional_observation: General emotional observation
+      response_to_mistakes: Response to mistakes
+      comfort_on_camera: Comfort on camera
+      response_to_correction: Response to correction
+      attention_supports: Attention supports
+      participation_pattern: Participation pattern
+      break_preference: Break preference
+      behaviour_support_strategy: Behaviour support strategy
+      punctuality_notes: Punctuality notes
+      movement_level: Movement level
+      distraction_pattern: Distraction pattern
+      encouragement_response: Response to encouragement
+      activity_engagement_notes: Activity engagement notes
+      motivation_pattern: Motivation pattern
+      feedback_preference: Feedback preference
+      encouragement_strategy: Encouragement strategy
+      persistence_observation: Persistence observation
+      motivation_notes: Motivation notes
+      confidence_notes: Confidence notes
+      competition_preference: Competition preference
+      motivators: Motivators
+      demotivators: Demotivators
+      interests: Interests
+      engaging_topics: Engaging topics
+      preferred_activity_formats: Preferred activity formats
+      hobbies: Hobbies
+      screen_context_notes: Screen context notes
+      family_learning_context: Family learning context
+      home_support_availability: Home support availability
+      scheduling_context: Scheduling context
+      study_support_context: Study support context
+      online_lesson_supervision: Online lesson supervision
+      social_context_notes: Social context notes
+      aspirations: Aspirations
+      personal_milestones: Personal milestones
+      recognition_preferences: Recognition preferences
+      achievements_notes: Achievements notes
+      current_goals: Current goals
+      proud_moments: Proud moments
+      support_context: Support context
+      learning_challenges: Learning challenges
+      support_needs: Support needs
+      teaching_adjustments: Teaching adjustments
+      support_review_date: Support review date
+      attention_support_needs: Attention support needs
+      pronunciation_support_needs: Pronunciation support needs
+      break_needs: Break needs
+      teaching_support_plan: Teaching support plan

@@ -145,7 +145,7 @@ Rails.application.routes.draw do
         patch :restore
       end
     end
-    resources :students, except: :destroy do
+      resources :students, except: :destroy do
       collection do
         get :import
         post :import, action: :import_create
@@ -165,6 +165,9 @@ Rails.application.routes.draw do
         end
       end
     end
+    get "students/:student_id/learning_profile", to: "student_learning_profiles#show", as: :student_learning_profile
+    patch "students/:student_id/learning_profile/sections/:section_key", to: "student_learning_profiles#update_section", as: :student_learning_profile_section
+    post "students/:student_id/observations", to: "student_observations#create", as: :student_observations
     resources :guardians, except: :destroy do
       member do
         patch :archive
@@ -253,6 +256,11 @@ Rails.application.routes.draw do
     end
   end
   namespace :teacher do
+    resources :students, only: :show, controller: :students do
+      get "learning_profile", to: "student_learning_profiles#show", as: :learning_profile
+      patch "learning_profile/sections/:section_key", to: "student_learning_profiles#update_section", as: :learning_profile_section
+      post "observations", to: "student_observations#create", as: :observations
+    end
     resources :notifications, only: %i[index show create]
     resources :assessments, controller: :student_assessments, except: :destroy do
       member do

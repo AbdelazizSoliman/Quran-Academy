@@ -1,0 +1,143 @@
+ar:
+  learning_profile:
+    title: الملف التعليمي
+    back_to_student: العودة إلى الطالب
+    student_page_hint: افتح الملف التعليمي لمراجعة السياق التعليمي والملاحظات.
+    progress: تقدم الملف
+    summary: الملخص التعليمي الحالي
+    no_summary: لم يتم تسجيل ملخص تعليمي بعد.
+    started: أقسام بدأ العمل عليها
+    required_progress: "الأساسية: %{completed} من %{total} مكتملة"
+    navigation: أقسام الملف التعليمي
+    section_label: القسم %{number}
+    save_section: حفظ القسم
+    saved: تم حفظ قسم الملف التعليمي.
+    observation_saved: تمت إضافة الملاحظة.
+    add_observation: إضافة ملاحظة
+    observation_placeholder: أضف ملاحظة قصيرة وواقعية
+    observations: أحدث الملاحظات
+    no_observations: لا توجد ملاحظات بعد.
+    append_only: أضف التصحيحات كملاحظة جديدة.
+    list_hint: افصل بين القيم بفواصل
+    completion_state: حالة الإنجاز
+    review_state: المراجعة
+    completion:
+      not_started: لم يبدأ
+      in_progress: قيد العمل
+      complete: مكتمل
+    review:
+      unreviewed: غير مراجع
+      reviewed: مراجع
+    importance:
+      must: أساسي
+      should: مهم
+      could: اختياري
+    sensitivity:
+      standard: عادي
+      sensitive: حساس
+      highly_sensitive: شديد الحساسية
+    categories:
+      quran_reading: قراءة القرآن
+      memorization: الحفظ
+      pronunciation: النطق
+      tajweed: التجويد
+      attention: الانتباه
+      engagement: التفاعل
+      behaviour: السلوك
+      motivation: الدافعية
+      teaching_strategy: استراتيجية التدريس
+      other: أخرى
+    sections:
+      basic_information: { title: المعلومات الأساسية }
+      educational_quranic_background: { title: الخلفية التعليمية والقرآنية }
+      language_cultural_background: { title: الخلفية اللغوية والثقافية }
+      faith_spiritual_context: { title: الجانب الإيماني والروحي }
+      cognitive_traits_learning_preferences: { title: السمات الذهنية وتفضيلات التعلم }
+      psychological_emotional_state: { title: الحالة النفسية والعاطفية }
+      self_regulation_behaviour: { title: السلوك والانضباط الذاتي داخل الحصة }
+      personality_motivation: { title: الشخصية والدافعية }
+      interests_personal_culture: { title: الاهتمامات والثقافة الشخصية }
+      family_social_context: { title: الحالة الأسرية والاجتماعية }
+      achievements_aspirations: { title: الإنجازات والطموحات }
+      challenges_support_needs: { title: التحديات والدعم المطلوب }
+    fields:
+      instructional_summary: ملخص تعليمي
+      communication_style: أسلوب التواصل
+      previous_learning_experience: الخبرة التعليمية السابقة
+      previous_learning_materials: المواد التعليمية السابقة
+      educational_background_notes: ملاحظات الخلفية التعليمية
+      reading_fluency_notes: ملاحظات طلاقة القراءة
+      pronunciation_challenges: تحديات النطق
+      tajweed_notes: ملاحظات التجويد
+      preferred_explanation_language: لغة الشرح المفضلة
+      preferred_teaching_materials: المواد التعليمية المفضلة
+      spoken_languages: اللغات المستخدمة
+      arabic_literacy_context: سياق القراءة والكتابة بالعربية
+      cultural_considerations: الاعتبارات الثقافية
+      interaction_language: لغة التفاعل
+      pronunciation_accent_notes: ملاحظات النطق واللهجة
+      arabic_exposure_outside_lessons: التعرض للعربية خارج الحصص
+      cultural_context_notes: ملاحظات السياق الثقافي
+      spiritual_learning_goals: الأهداف الروحية من التعلم
+      encouragement_approach: أسلوب التشجيع المناسب
+      faith_context_notes: ملاحظات السياق الإيماني
+      preferred_activities: الأنشطة المفضلة
+      preferred_pacing: الوتيرة المفضلة
+      helpful_presentation_modes: أساليب العرض المفيدة
+      repetition_preference: تفضيل التكرار
+      teaching_strategy: استراتيجية التدريس
+      learning_preferences: تفضيلات التعلم
+      comprehension_pace: سرعة الاستيعاب
+      focus_duration_minutes: مدة التركيز المعتادة بالدقائق
+      curiosity_notes: ملاحظات الفضول وحب الاستكشاف
+      emotional_response: الاستجابة العاطفية أثناء الحصص
+      reassurance_approach: أسلوب الطمأنة المناسب
+      lesson_readiness_pattern: نمط الاستعداد للحصة
+      general_emotional_observation: ملاحظة عاطفية عامة
+      response_to_mistakes: الاستجابة للأخطاء
+      comfort_on_camera: الارتياح أمام الكاميرا
+      response_to_correction: الاستجابة للتصحيح
+      attention_supports: وسائل دعم الانتباه
+      participation_pattern: نمط المشاركة
+      break_preference: تفضيل الاستراحة
+      behaviour_support_strategy: استراتيجية دعم السلوك
+      punctuality_notes: ملاحظات الالتزام بالمواعيد
+      movement_level: مستوى الحركة
+      distraction_pattern: نمط التشتت
+      encouragement_response: الاستجابة للتشجيع
+      activity_engagement_notes: ملاحظات التفاعل مع الأنشطة
+      motivation_pattern: نمط الدافعية
+      feedback_preference: تفضيل أسلوب الملاحظات
+      encouragement_strategy: استراتيجية التشجيع
+      persistence_observation: ملاحظة المثابرة
+      motivation_notes: ملاحظات الدافعية
+      confidence_notes: ملاحظات الثقة بالنفس
+      competition_preference: تفضيل المنافسة
+      motivators: محفزات التعلم
+      demotivators: ما يضعف الدافعية
+      interests: الاهتمامات
+      engaging_topics: الموضوعات الجاذبة
+      preferred_activity_formats: صيغ الأنشطة المفضلة
+      hobbies: الهوايات
+      screen_context_notes: ملاحظات استخدام الشاشة
+      family_learning_context: سياق التعلم الأسري
+      home_support_availability: مدى توفر الدعم في المنزل
+      scheduling_context: سياق المواعيد
+      study_support_context: سياق دعم الدراسة
+      online_lesson_supervision: الإشراف على الحصص عبر الإنترنت
+      social_context_notes: ملاحظات السياق الاجتماعي
+      aspirations: الطموحات
+      personal_milestones: المحطات الشخصية
+      recognition_preferences: تفضيلات التقدير
+      achievements_notes: ملاحظات الإنجازات
+      current_goals: الأهداف الحالية
+      proud_moments: اللحظات التي يعتز بها الطالب
+      support_context: سياق الدعم
+      learning_challenges: تحديات التعلم
+      support_needs: احتياجات الدعم
+      teaching_adjustments: التعديلات التعليمية
+      support_review_date: تاريخ مراجعة الدعم
+      attention_support_needs: احتياجات دعم الانتباه
+      pronunciation_support_needs: احتياجات دعم النطق
+      break_needs: احتياجات الاستراحة
+      teaching_support_plan: خطة الدعم التعليمي

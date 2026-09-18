@@ -1,0 +1,6 @@
+<%= render "shared/page_header", title: (@student.display_name.presence || @student.user.full_name), description: @student.public_id,
+           primary_action: render("shared/components/button", label: t("learning_profile.title"), href: teacher_student_learning_profile_path(@student)) %>
+<% body = capture do %>
+  <p class="text-app-muted-foreground"><%= t("learning_profile.student_page_hint") %></p>
+<% end %>
+<%= render "shared/components/card", title: t("student_profiles.sections.learning"), body: body %>
