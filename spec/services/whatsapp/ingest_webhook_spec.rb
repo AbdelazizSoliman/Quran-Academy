@@ -45,6 +45,34 @@ RSpec.describe Whatsapp::IngestWebhook do
     expect(WhatsappConversation.sole.messages.sole.body).to eq("I need help with my lesson")
   end
 
+  it "ingests a string-keyed payload" do
+    expect(payload.keys).to all(be_a(String))
+
+    expect { described_class.new(payload:).call }.to change(WhatsappMessage, :count).by(1)
+  end
+
+  it "normalizes and ingests a symbol-keyed payload" do
+    symbol_payload = payload.deep_symbolize_keys
+
+    expect { described_class.new(payload: symbol_payload).call }.to change(WhatsappMessage, :count).by(1)
+  end
+
+  it "normalizes and ingests ActionController::Parameters" do
+    params_payload = ActionController::Parameters.new(payload)
+
+    expect { described_class.new(payload: params_payload).call }.to change(WhatsappMessage, :count).by(1)
+  end
+
+  it "ingests the payload shape produced by an Active Job serialization round trip" do
+    serialized = ActiveJob::Arguments.serialize([payload])
+    stored_arguments = JSON.parse(JSON.generate(serialized))
+    job_payload = ActiveJob::Arguments.deserialize(stored_arguments).first
+
+    expect(job_payload.dig("entry", 0, "changes", 0, "value", "metadata", "phone_number_id"))
+      .to eq(phone_number_id)
+    expect { described_class.new(payload: job_payload).call }.to change(WhatsappMessage, :count).by(1)
+  end
+
   it "rejects a real message with the wrong phone number ID" do
     value["metadata"]["phone_number_id"] = "wrong-id"
 

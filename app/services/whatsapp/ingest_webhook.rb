@@ -6,7 +6,8 @@ module Whatsapp
     }.freeze
 
     def initialize(payload:)
-      @payload = payload
+      payload = payload.to_unsafe_h if payload.respond_to?(:to_unsafe_h)
+      @payload = payload.to_h.deep_stringify_keys
     end
 
     def call
